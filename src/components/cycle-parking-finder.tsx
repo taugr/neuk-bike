@@ -8,7 +8,6 @@ import {
   MapPin,
   Navigation,
   Search,
-  ShieldAlert,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import cycleParkingDataset from "@/data/cycle-parking.json";
@@ -42,11 +41,11 @@ function describeParkingPoint(point: ParkingPoint) {
 }
 
 type LocationState =
-  | { status: "fallback"; location: UserLocation; message: string }
-  | { status: "locating"; location: UserLocation; message: string }
-  | { status: "located"; location: UserLocation; message: string }
-  | { status: "denied"; location: UserLocation; message: string }
-  | { status: "unavailable"; location: UserLocation; message: string };
+  | { status: "fallback"; location: UserLocation }
+  | { status: "locating"; location: UserLocation }
+  | { status: "located"; location: UserLocation }
+  | { status: "denied"; location: UserLocation }
+  | { status: "unavailable"; location: UserLocation };
 
 function getUrlLocation() {
   const params = new URLSearchParams(window.location.search);
@@ -68,7 +67,6 @@ export default function CycleParkingFinder() {
   const [locationState, setLocationState] = useState<LocationState>({
     status: "fallback",
     location: EDINBURGH_FALLBACK_LOCATION,
-    message: "Using central Edinburgh until you share your location.",
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -79,7 +77,6 @@ export default function CycleParkingFinder() {
       setLocationState({
         status: "located",
         location: urlLocation,
-        message: "Sorted by the location in the URL.",
       });
       setSelectedId(null);
       return;
@@ -124,7 +121,6 @@ export default function CycleParkingFinder() {
       setLocationState({
         status: "unavailable",
         location: EDINBURGH_FALLBACK_LOCATION,
-        message: "Location is not available in this browser. Showing central Edinburgh.",
       });
       return;
     }
@@ -132,7 +128,6 @@ export default function CycleParkingFinder() {
     setLocationState((current) => ({
       status: "locating",
       location: current.location,
-      message: "Finding your current location...",
     }));
 
     navigator.geolocation.getCurrentPosition(
@@ -143,17 +138,12 @@ export default function CycleParkingFinder() {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           },
-          message: "Sorted by your current location.",
         });
       },
       (error) => {
         setLocationState({
           status: error.code === error.PERMISSION_DENIED ? "denied" : "unavailable",
           location: EDINBURGH_FALLBACK_LOCATION,
-          message:
-            error.code === error.PERMISSION_DENIED
-              ? "Location permission was denied. Showing central Edinburgh."
-              : "Could not get your location. Showing central Edinburgh.",
         });
       },
       {
@@ -215,14 +205,6 @@ export default function CycleParkingFinder() {
           </button>
         </section>
 
-        <div className={`status-message ${locationState.status}`}>
-          {locationState.status === "denied" || locationState.status === "unavailable" ? (
-            <ShieldAlert size={16} aria-hidden="true" />
-          ) : (
-            <MapPin size={16} aria-hidden="true" />
-          )}
-          <span>{locationState.message}</span>
-        </div>
 
         <label className="search-box">
           <Search size={17} aria-hidden="true" />
