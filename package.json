@@ -1,0 +1,66 @@
+{
+  "name": "edinburgh-cycle-parking",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static mobile-friendly map for finding nearby Edinburgh cycle parking.",
+  "keywords": [
+    "active-travel",
+    "cycle-parking",
+    "cycling",
+    "edinburgh",
+    "map",
+    "nextjs"
+  ],
+  "homepage": "https://tom-auger.github.io/edinburgh-cycle-parking",
+  "bugs": {
+    "url": "https://github.com/tom-auger/edinburgh-cycle-parking/issues"
+  },
+  "license": "MIT",
+  "author": "Tom Auger <tom@tau.gr>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tom-auger/edinburgh-cycle-parking.git"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "update:data": "node scripts/update-cycle-parking-data.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "oxfmt . --check",
+    "format:fix": "oxfmt . --write",
+    "lint": "oxlint -c oxlint.json .",
+    "lint:fix": "oxlint -c oxlint.json . --fix",
+    "prepare": "node scripts/prepare.mjs"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.14.0",
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-leaflet": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^25.6.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.3",
+    "oxfmt": "^0.48.0",
+    "oxlint": "^1.63.0",
+    "oxlint-tsgolint": "^0.22.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
+  },
+  "lint-staged": {
+    "*": "oxfmt --no-error-on-unmatched-pattern"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.0.8"
+}
