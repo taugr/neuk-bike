@@ -111,11 +111,9 @@ export default function CycleParkingFinder() {
   }, [nearbyPoints, query]);
 
   const nearestPoint = nearbyPoints[0] ?? null;
-  const selectedPoint =
-    nearbyPoints.find((point) => point.id === selectedId) ??
-    nearestPoint ??
-    nearbyPoints[0] ??
-    null;
+  const explicitSelectedPoint =
+    selectedId !== null ? (nearbyPoints.find((point) => point.id === selectedId) ?? null) : null;
+  const selectedPoint = explicitSelectedPoint ?? nearestPoint;
 
   function requestLocation() {
     setSelectedId(null);
@@ -170,7 +168,7 @@ export default function CycleParkingFinder() {
         <CycleParkingMap
           points={parkingPoints}
           userLocation={locationState.location}
-          selectedPoint={selectedPoint}
+          selectedPoint={explicitSelectedPoint}
           nearestPoint={nearestPoint}
           onSelectPoint={setSelectedId}
         />

@@ -70,7 +70,7 @@ function MapFocus({
       return;
     }
 
-    map.setView([userLocation.latitude, userLocation.longitude], 14);
+    map.setView([userLocation.latitude, userLocation.longitude], 15);
   }, [map, nearestPoint, selectedPoint, userLocation]);
 
   return null;
