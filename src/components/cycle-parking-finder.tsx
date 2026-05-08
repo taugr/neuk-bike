@@ -75,16 +75,17 @@ export default function CycleParkingFinder() {
 
   useEffect(() => {
     const urlLocation = getUrlLocation();
-    if (!urlLocation) {
+    if (urlLocation) {
+      setLocationState({
+        status: "located",
+        location: urlLocation,
+        message: "Sorted by the location in the URL.",
+      });
+      setSelectedId(null);
       return;
     }
 
-    setLocationState({
-      status: "located",
-      location: urlLocation,
-      message: "Sorted by the location in the URL.",
-    });
-    setSelectedId(null);
+    requestLocation();
   }, []);
 
   const nearbyPoints = useMemo(
