@@ -86,7 +86,6 @@ export default function CycleParkingFinder() {
   );
 
   const nearestPoint = nearbyPoints[0] ?? null;
-  const nearestHighlightedPoints = nearbyPoints.slice(0, 3);
   const explicitSelectedPoint =
     selectedId !== null ? (nearbyPoints.find((point) => point.id === selectedId) ?? null) : null;
   const selectedPoint = explicitSelectedPoint ?? nearestPoint;
@@ -237,7 +236,7 @@ export default function CycleParkingFinder() {
           userLocation={locationState.location}
           selectedPoint={explicitSelectedPoint}
           nearestPoint={nearestPoint}
-          nearestHighlightedPoints={nearestHighlightedPoints}
+          rankedPoints={closestPoints}
           onSelectPoint={setSelectedId}
         />
       </section>
@@ -249,37 +248,27 @@ export default function CycleParkingFinder() {
           </div>
           <div>
             <h1>Edinburgh Cycle Parking</h1>
-            <p>{cycleParkingDataset.metadata.recordCount} cycle parking locations</p>
+            <p>{cycleParkingDataset.metadata.recordCount} locations</p>
           </div>
         </header>
 
         <section className="reference-panel" aria-label="Search from">
-          <span className="section-label">
-            <MapPin size={15} aria-hidden="true" />
-            Search from
-          </span>
-          <div className="reference-controls">
-            <form
-              className="place-search-form"
-              onSubmit={(event) => {
-                void searchForPlace(event);
-              }}
-            >
-              <label className="search-box">
-                <Search size={17} aria-hidden="true" />
-                <span className="sr-only">Search from a place</span>
-                <input
-                  type="search"
-                  value={placeQuery}
-                  placeholder="Street, postcode, or place"
-                  onChange={(event) => setPlaceQuery(event.target.value)}
-                />
-              </label>
-              <button type="submit" disabled={isPlaceSearching || placeQuery.trim().length === 0}>
-                {isPlaceSearching ? "Searching" : "Search"}
-              </button>
-            </form>
-
+          <form
+            className="place-search-form"
+            onSubmit={(event) => {
+              void searchForPlace(event);
+            }}
+          >
+            <label className="search-box">
+              <Search size={17} aria-hidden="true" />
+              <span className="sr-only">Search from a place</span>
+              <input
+                type="search"
+                value={placeQuery}
+                placeholder="Street, postcode, or place"
+                onChange={(event) => setPlaceQuery(event.target.value)}
+              />
+            </label>
             <button
               className="secondary-location-button"
               type="button"
@@ -293,7 +282,10 @@ export default function CycleParkingFinder() {
               )}
               {locationState.status === "locating" ? "Locating" : "Use my location"}
             </button>
-          </div>
+            <button type="submit" disabled={isPlaceSearching || placeQuery.trim().length === 0}>
+              {isPlaceSearching ? "Searching" : "Search"}
+            </button>
+          </form>
 
           {placeResults.length > 0 ? (
             <ol className="place-results" aria-label="Place search results">
@@ -316,8 +308,9 @@ export default function CycleParkingFinder() {
         </section>
 
         <div className="list-heading">
-          <h2>Nearby cycle parking</h2>
-          <p>Showing {closestPoints.length} closest results</p>
+          <h2>
+            Nearby cycle parking <span>· {closestPoints.length} closest</span>
+          </h2>
         </div>
 
         {locationState.status === "too-far" ? (
@@ -333,7 +326,7 @@ export default function CycleParkingFinder() {
                 className={[
                   "parking-row",
                   index === 0 ? "closest" : null,
-                  point.id === selectedPoint?.id ? "selected" : null,
+                  point.id === explicitSelectedPoint?.id ? "selected" : null,
                 ]
                   .filter(Boolean)
                   .join(" ")}
