@@ -26,6 +26,7 @@ const CycleParkingMap = dynamic(() => import("@/components/cycle-parking-map"), 
 
 const parkingPoints = cycleParkingDataset.points as ParkingPoint[];
 const maxPlaceSearchCacheEntries = 12;
+const closestParkingResultCount = 12;
 
 type LocationState =
   | { status: "fallback"; location: UserLocation }
@@ -68,7 +69,6 @@ export default function CycleParkingFinder() {
     location: EDINBURGH_FALLBACK_LOCATION,
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
   const [placeQuery, setPlaceQuery] = useState("");
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(null);
@@ -92,22 +92,10 @@ export default function CycleParkingFinder() {
     [locationState.location],
   );
 
-  const filteredPoints = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    const source =
-      normalizedQuery.length === 0
-        ? nearbyPoints
-        : nearbyPoints.filter((point) => {
-            const propertiesText = Object.entries(point.properties)
-              .flatMap(([key, value]) => [key, value])
-              .join(" ");
-            const searchable =
-              `${point.name} ${describeParkingPoint(point)} ${propertiesText}`.toLowerCase();
-            return searchable.includes(normalizedQuery);
-          });
-
-    return source.slice(0, 24);
-  }, [nearbyPoints, query]);
+  const closestPoints = useMemo(
+    () => nearbyPoints.slice(0, closestParkingResultCount),
+    [nearbyPoints],
+  );
 
   const nearestPoint = nearbyPoints[0] ?? null;
   const nearestHighlightedPoints = nearbyPoints.slice(0, 3);
@@ -360,33 +348,13 @@ export default function CycleParkingFinder() {
           ) : null}
         </section>
 
-        <section className="filter-panel" aria-label="Filter results">
-          <span className="section-label">
-            <Search size={15} aria-hidden="true" />
-            Filter results
-          </span>
-          <label className="search-box">
-            <Search size={17} aria-hidden="true" />
-            <span className="sr-only">Filter parking locations</span>
-            <input
-              type="search"
-              value={query}
-              placeholder="Filter these parking results"
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </label>
-        </section>
-
         <div className="list-heading">
           <h2>Nearby cycle parking</h2>
-          <p>
-            Showing {filteredPoints.length}{" "}
-            {query.trim().length > 0 ? "matching results" : "closest results"}
-          </p>
+          <p>Showing {closestPoints.length} closest results</p>
         </div>
 
         <ol className="parking-list" aria-label="Nearby cycle parking locations">
-          {filteredPoints.map((point, index) => (
+          {closestPoints.map((point, index) => (
             <li key={point.id}>
               <button
                 className={point.id === selectedPoint?.id ? "parking-row selected" : "parking-row"}
@@ -405,12 +373,6 @@ export default function CycleParkingFinder() {
             </li>
           ))}
         </ol>
-
-        {filteredPoints.length === 0 ? (
-          <div className="empty-state" role="status">
-            No cycle parking locations match that filter.
-          </div>
-        ) : null}
 
         <footer className="attribution">
           <details>
