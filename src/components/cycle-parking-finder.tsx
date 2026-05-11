@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Bike, Crosshair, LocateFixed, MapPin, Navigation, Search } from "lucide-react";
+import { Bike, Crosshair, LocateFixed, MapPin, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import cycleParkingDataset from "@/data/cycle-parking.json";
 import {
@@ -51,18 +51,6 @@ function getUrlLocation() {
   return location;
 }
 
-function getLocationLabel(locationState: LocationState) {
-  if (locationState.status === "located") {
-    return "you";
-  }
-
-  if (locationState.status === "searched") {
-    return locationState.label;
-  }
-
-  return "central Edinburgh";
-}
-
 export default function CycleParkingFinder() {
   const [locationState, setLocationState] = useState<LocationState>({
     status: "fallback",
@@ -102,7 +90,6 @@ export default function CycleParkingFinder() {
   const explicitSelectedPoint =
     selectedId !== null ? (nearbyPoints.find((point) => point.id === selectedId) ?? null) : null;
   const selectedPoint = explicitSelectedPoint ?? nearestPoint;
-  const locationLabel = getLocationLabel(locationState);
 
   function applyReferenceLocation(
     location: UserLocation,
@@ -266,26 +253,6 @@ export default function CycleParkingFinder() {
           </div>
         </header>
 
-        <section className="nearest-panel" aria-live="polite">
-          <div className="nearest-copy">
-            <span className="section-label">
-              <Navigation size={15} aria-hidden="true" />
-              Nearest space
-            </span>
-            <h2>{nearestPoint?.name ?? "No parking found"}</h2>
-            <p>
-              {nearestPoint
-                ? `${formatDistance(nearestPoint.distanceMeters)} from ${locationLabel} - ${describeParkingPoint(nearestPoint)}`
-                : "Refresh the dataset and try again."}
-            </p>
-            {locationState.status === "too-far" ? (
-              <div className="status-message unavailable" role="status">
-                You're very far away from a bike space, showing bike parking in central edinburgh
-              </div>
-            ) : null}
-          </div>
-        </section>
-
         <section className="reference-panel" aria-label="Search from">
           <span className="section-label">
             <MapPin size={15} aria-hidden="true" />
@@ -353,16 +320,29 @@ export default function CycleParkingFinder() {
           <p>Showing {closestPoints.length} closest results</p>
         </div>
 
+        {locationState.status === "too-far" ? (
+          <div className="status-message unavailable" role="status">
+            You're very far away from a bike space, showing bike parking in central Edinburgh.
+          </div>
+        ) : null}
+
         <ol className="parking-list" aria-label="Nearby cycle parking locations">
           {closestPoints.map((point, index) => (
             <li key={point.id}>
               <button
-                className={point.id === selectedPoint?.id ? "parking-row selected" : "parking-row"}
+                className={[
+                  "parking-row",
+                  index === 0 ? "closest" : null,
+                  point.id === selectedPoint?.id ? "selected" : null,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 type="button"
                 onClick={() => setSelectedId(point.id)}
               >
-                <span className="rank">{index + 1}</span>
+                <span className={`rank rank-${index + 1}`}>{index + 1}</span>
                 <span className="parking-row-copy">
+                  {index === 0 ? <span className="closest-label">Closest</span> : null}
                   <strong>{point.name}</strong>
                   <span>
                     {formatDistance(point.distanceMeters)} away - {describeParkingPoint(point)}

@@ -154,20 +154,6 @@ a {
   margin: 0.25rem 0 0;
 }
 
-.nearest-panel {
-  background: var(--surface-strong);
-  border: 1px solid #c6e7dd;
-  border-radius: 8px;
-  box-shadow: 0 8px 28px rgb(15 118 110 / 10%);
-  display: grid;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.nearest-copy {
-  min-width: 0;
-}
-
 .section-label {
   align-items: center;
   color: var(--accent-strong);
@@ -176,19 +162,6 @@ a {
   font-weight: 760;
   gap: 0.35rem;
   text-transform: uppercase;
-}
-
-.nearest-panel h2 {
-  font-size: 1.15rem;
-  line-height: 1.2;
-  margin: 0.45rem 0 0;
-}
-
-.nearest-panel p {
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.35;
-  margin: 0.35rem 0 0;
 }
 
 .status-message {
@@ -207,10 +180,6 @@ a {
 .status-message.unavailable {
   border-color: #e4c6a5;
   color: var(--warning);
-}
-
-.nearest-copy .status-message {
-  margin-top: 0.75rem;
 }
 
 .reference-panel {
@@ -366,13 +335,11 @@ a {
 
 .parking-list {
   display: flex;
-  flex: 1;
+  flex: none;
   flex-direction: column;
   gap: 0.55rem;
   list-style: none;
   margin: 0;
-  min-height: 0;
-  overflow: auto;
   padding: 0 0 0.25rem;
 }
 
@@ -397,6 +364,13 @@ a {
   border-color: var(--accent);
 }
 
+.parking-row.closest {
+  background: var(--surface-strong);
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px rgb(15 118 110 / 12%);
+  min-height: 82px;
+}
+
 .rank {
   align-items: center;
   background: var(--accent-soft);
@@ -410,8 +384,33 @@ a {
   width: 2rem;
 }
 
+.rank-1 {
+  background: #22c55e;
+  color: #052e16;
+}
+
+.rank-2 {
+  background: #f2b84b;
+  color: #351f04;
+}
+
+.rank-3 {
+  background: #38bdf8;
+  color: #082f49;
+}
+
 .parking-row-copy {
   min-width: 0;
+}
+
+.closest-label {
+  color: var(--accent-strong);
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 820;
+  line-height: 1.2;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
 }
 
 .parking-row-copy strong {
@@ -578,11 +577,6 @@ a {
     font-size: 0.78rem;
   }
 
-  .nearest-panel {
-    grid-template-columns: minmax(0, 1fr);
-    padding: 0.8rem;
-  }
-
   .place-search-form {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -591,29 +585,14 @@ a {
     padding: 0.75rem;
   }
 
-  .nearest-panel h2 {
-    font-size: 1rem;
-  }
-
   .list-heading {
     align-items: start;
     display: grid;
     gap: 0.2rem;
   }
 
-  .parking-list {
-    flex: none;
-    max-height: 32dvh;
-  }
-
   .attribution {
     font-size: 0.68rem;
     padding-top: 0.55rem;
-  }
-}
-
-@media (min-width: 821px) {
-  .nearest-panel {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
