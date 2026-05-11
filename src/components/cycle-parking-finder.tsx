@@ -28,6 +28,7 @@ const CycleParkingMap = dynamic(() => import("@/components/cycle-parking-map"), 
 const parkingPoints = cycleParkingDataset.points as ParkingPoint[];
 const maxPlaceSearchCacheEntries = 12;
 const closestParkingResultCount = 8;
+const copiedMessageDurationMs = 1_800;
 
 type LocationState =
   | { status: "fallback"; location: UserLocation }
@@ -56,11 +57,13 @@ export default function CycleParkingFinder() {
   const [placeQuery, setPlaceQuery] = useState("");
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(null);
-  const [shareMessage, setShareMessage] = useState<string | null>(null);
+  const [copiedParkingId, setCopiedParkingId] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
   const placeSearchInFlight = useRef(false);
+  const copiedMessageTimeout = useRef<number | null>(null);
 
   useEffect(() => {
     const sharedParkingPoint = findSharedParkingPoint(window.location.search, parkingPoints);
@@ -84,6 +87,14 @@ export default function CycleParkingFinder() {
     }
 
     requestLocation();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copiedMessageTimeout.current !== null) {
+        window.clearTimeout(copiedMessageTimeout.current);
+      }
+    };
   }, []);
 
   const nearbyPoints = useMemo(
@@ -245,11 +256,20 @@ export default function CycleParkingFinder() {
     const link = buildParkingShareUrl(window.location.origin, window.location.pathname, point.id);
 
     if (await copyTextToClipboard(link)) {
-      setShareMessage(`Link copied for ${point.name}.`);
+      setShareError(null);
+      setCopiedParkingId(point.id);
+      if (copiedMessageTimeout.current !== null) {
+        window.clearTimeout(copiedMessageTimeout.current);
+      }
+      copiedMessageTimeout.current = window.setTimeout(() => {
+        setCopiedParkingId(null);
+        copiedMessageTimeout.current = null;
+      }, copiedMessageDurationMs);
       return;
     }
 
-    setShareMessage("Could not copy link.");
+    setCopiedParkingId(null);
+    setShareError("Could not copy link.");
   }
 
   return (
@@ -347,9 +367,9 @@ export default function CycleParkingFinder() {
           </div>
         ) : null}
 
-        {shareMessage ? (
+        {shareError ? (
           <div className="parking-share-message" role="status">
-            {shareMessage}
+            {shareError}
           </div>
         ) : null}
 
@@ -385,6 +405,11 @@ export default function CycleParkingFinder() {
                 }}
               >
                 <Share2 size={17} aria-hidden="true" />
+                {copiedParkingId === point.id ? (
+                  <span className="parking-share-tooltip" role="status">
+                    Copied
+                  </span>
+                ) : null}
               </button>
             </li>
           ))}
