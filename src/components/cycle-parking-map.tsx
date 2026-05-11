@@ -17,7 +17,7 @@ type CycleParkingMapProps = {
 
 const defaultCenter: [number, number] = [55.9533, -3.1883];
 const highlightedRankCount = 3;
-const rankedPointCount = 12;
+const rankedPointCount = 8;
 
 function getFocusPadding(map: L.Map): L.FitBoundsOptions {
   const size = map.getSize();

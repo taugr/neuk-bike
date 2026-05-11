@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Bike, Crosshair, LocateFixed, MapPin, Search } from "lucide-react";
+import { Crosshair, LocateFixed, MapPin, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import cycleParkingDataset from "@/data/cycle-parking.json";
 import {
@@ -26,7 +26,7 @@ const CycleParkingMap = dynamic(() => import("@/components/cycle-parking-map"), 
 
 const parkingPoints = cycleParkingDataset.points as ParkingPoint[];
 const maxPlaceSearchCacheEntries = 12;
-const closestParkingResultCount = 12;
+const closestParkingResultCount = 8;
 
 type LocationState =
   | { status: "fallback"; location: UserLocation }
@@ -244,7 +244,7 @@ export default function CycleParkingFinder() {
       <aside className="control-pane" aria-label="Nearest cycle parking">
         <header className="app-header">
           <div className="brand-mark" aria-hidden="true">
-            <Bike size={24} strokeWidth={2.2} />
+            <img src="favicon.svg" alt="" />
           </div>
           <div>
             <h1>Edinburgh Cycle Parking</h1>

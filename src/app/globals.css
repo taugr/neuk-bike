@@ -131,14 +131,21 @@ a {
 
 .brand-mark {
   align-items: center;
-  background: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--subtle);
   border-radius: 8px;
-  color: white;
+  box-shadow: 0 8px 20px rgb(16 32 28 / 10%);
   display: grid;
   flex: 0 0 auto;
   height: 46px;
   place-items: center;
   width: 46px;
+}
+
+.brand-mark img {
+  display: block;
+  height: 36px;
+  width: 36px;
 }
 
 .app-header h1 {
@@ -576,6 +583,11 @@ a {
     width: 38px;
   }
 
+  .brand-mark img {
+    height: 30px;
+    width: 30px;
+  }
+
   .app-header h1 {
     font-size: 1.05rem;
   }
@@ -596,11 +608,38 @@ a {
 
 @media (max-width: 460px) {
   .place-search-form {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 0.75fr);
   }
 
   .place-search-form .secondary-location-button {
     grid-column: 1 / -1;
     min-height: 38px;
+  }
+}
+
+@media (min-width: 821px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr) 460px;
+  }
+
+  .control-pane {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .place-search-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .place-search-form .search-box {
+    grid-column: 1 / -1;
+  }
+
+  .parking-list {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 0.25rem;
   }
 }

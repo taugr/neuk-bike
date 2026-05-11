@@ -1,0 +1,20 @@
+{
+  "name": "Edinburgh Cycle Parking",
+  "short_name": "Cycle Parking",
+  "description": "Find nearby cycle parking spaces across Edinburgh.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0f766e",
+  "background_color": "#f6f8f5",
+  "display": "standalone"
+}
