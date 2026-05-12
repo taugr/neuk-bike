@@ -61,9 +61,11 @@ export default function CycleParkingFinder() {
   const [shareError, setShareError] = useState<string | null>(null);
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
+  const [isAttributionModalOpen, setIsAttributionModalOpen] = useState(false);
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
   const placeSearchInFlight = useRef(false);
   const copiedMessageTimeout = useRef<number | null>(null);
+  const attributionDialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const sharedParkingPoint = findSharedParkingPoint(window.location.search, parkingPoints);
@@ -96,6 +98,19 @@ export default function CycleParkingFinder() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const dialog = attributionDialog.current;
+    if (!dialog) {
+      return;
+    }
+
+    if (isAttributionModalOpen && !dialog.open) {
+      dialog.showModal();
+    } else if (!isAttributionModalOpen && dialog.open) {
+      dialog.close();
+    }
+  }, [isAttributionModalOpen]);
 
   const nearbyPoints = useMemo(
     () => sortByDistance(parkingPoints, locationState.location),
@@ -416,19 +431,47 @@ export default function CycleParkingFinder() {
         </ol>
 
         <footer className="attribution">
-          <details>
-            <summary>View attributions</summary>
-            <div className="attribution-details">
-              <span>{cycleParkingDataset.metadata.attribution}</span>
-              <a href={cycleParkingDataset.metadata.licenceUrl}>Open Government Licence v3.0</a>
-              {hasUsedPlaceSearch ? (
-                <span>
-                  Place search by <a href="https://nominatim.openstreetmap.org/">Nominatim</a> using
-                  OpenStreetMap data.
-                </span>
-              ) : null}
+          <button
+            className="attribution-trigger"
+            type="button"
+            onClick={() => setIsAttributionModalOpen(true)}
+          >
+            View attributions
+          </button>
+          <dialog
+            ref={attributionDialog}
+            className="attribution-modal"
+            aria-labelledby="attribution-modal-title"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) {
+                setIsAttributionModalOpen(false);
+              }
+            }}
+            onClose={() => setIsAttributionModalOpen(false)}
+          >
+            <div className="attribution-modal-content">
+              <div className="attribution-modal-header">
+                <h2 id="attribution-modal-title">Attributions</h2>
+                <button
+                  className="attribution-modal-close"
+                  type="button"
+                  onClick={() => setIsAttributionModalOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+              <div className="attribution-details">
+                <span>{cycleParkingDataset.metadata.attribution}</span>
+                <a href={cycleParkingDataset.metadata.licenceUrl}>Open Government Licence v3.0</a>
+                {hasUsedPlaceSearch ? (
+                  <span>
+                    Place search by <a href="https://nominatim.openstreetmap.org/">Nominatim</a>{" "}
+                    using OpenStreetMap data.
+                  </span>
+                ) : null}
+              </div>
             </div>
-          </details>
+          </dialog>
         </footer>
       </aside>
     </main>

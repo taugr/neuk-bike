@@ -505,21 +505,77 @@ a {
   padding-top: 0.75rem;
 }
 
-.attribution summary {
+.attribution-trigger {
+  background: transparent;
+  border: 0;
   color: var(--accent-strong);
-  cursor: pointer;
   font-weight: 700;
+  padding: 0;
   width: fit-content;
 }
 
-.attribution summary:hover {
+.attribution-trigger:hover,
+.attribution-trigger:focus-visible {
   text-decoration: underline;
+}
+
+.attribution-modal {
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  margin: auto;
+  max-width: min(90vw, 420px);
+  padding: 0;
+  width: calc(100% - 2rem);
+}
+
+.attribution-modal::backdrop {
+  background: rgb(16 32 28 / 42%);
+}
+
+.attribution-modal-content {
+  background: var(--surface);
+  border: 1px solid var(--subtle);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.attribution-modal-header {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.attribution-modal h2 {
+  font-size: 1rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.attribution-modal-close {
+  background: var(--surface-strong);
+  border: 1px solid var(--subtle);
+  border-radius: 8px;
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 760;
+  min-height: 2rem;
+  padding: 0 0.65rem;
+}
+
+.attribution-modal-close:hover,
+.attribution-modal-close:focus-visible {
+  background: var(--accent-soft);
+  border-color: var(--accent);
 }
 
 .attribution-details {
   display: grid;
   gap: 0.35rem;
-  margin-top: 0.45rem;
 }
 
 .attribution a {
