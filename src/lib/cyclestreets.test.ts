@@ -150,7 +150,7 @@ describe("CycleStreets utilities", () => {
     ]);
     expect(describeCycleRouteInstruction(route.instructions[0]!)).toBe("Start on Princes Street");
     expect(describeCycleRouteInstruction(route.instructions[1]!)).toBe(
-      "turn left onto North Bridge, A7",
+      "Turn left onto North Bridge, A7",
     );
   });
 

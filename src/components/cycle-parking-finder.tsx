@@ -8,6 +8,7 @@ import {
   LocateFixed,
   MapPin,
   Navigation,
+  Route,
   Search,
   Share2,
   X,
@@ -481,8 +482,18 @@ export default function CycleParkingFinder() {
         {isDirectionsMode ? (
           <section className="directions-mode" aria-label="Cycle directions">
             <div className="directions-mode-header">
-              <div>
-                <h1>Directions</h1>
+              <div className="directions-title">
+                <div className="brand-mark directions-mark" aria-hidden="true">
+                  <Route size={24} />
+                </div>
+                <div>
+                  <h1>{directionsParkingPoint?.name ?? "Directions"}</h1>
+                  <p>
+                    {directionsParkingPoint
+                      ? describeParkingPoint(directionsParkingPoint)
+                      : "Cycle route"}
+                  </p>
+                </div>
               </div>
               <button type="button" onClick={clearDirections}>
                 <X size={16} aria-hidden="true" />
@@ -504,14 +515,14 @@ export default function CycleParkingFinder() {
 
             {directionsState.status === "loaded" ? (
               <>
-                <div className="directions-destination">
-                  <span className="directions-destination-icon" aria-hidden="true">
-                    <MapPin size={21} />
-                  </span>
-                  <div>
-                    <strong>{directionsParkingPoint.name}</strong>
+                <div className="directions-summary">
+                  <div className="directions-metrics" aria-label="Route summary">
                     <span>
-                      {formatDistance(directionsState.route.distanceMeters)} {"·"}{" "}
+                      <Navigation size={16} aria-hidden="true" />
+                      {formatDistance(directionsState.route.distanceMeters)}
+                    </span>
+                    <span>
+                      <Bike size={16} aria-hidden="true" />
                       {formatCycleRouteDuration(directionsState.route.durationSeconds)}
                     </span>
                   </div>

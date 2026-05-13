@@ -167,6 +167,10 @@ export function formatCycleRouteDuration(seconds: number) {
   return minutes === 1 ? "1 min" : `${minutes} min`;
 }
 
+function capitalizeFirstLetter(value: string) {
+  return value.length > 0 ? value[0]!.toUpperCase() + value.slice(1) : value;
+}
+
 export function describeCycleRouteInstruction(instruction: CycleRouteInstruction) {
   const name = instruction.streetName.trim();
   const turn = instruction.turn.trim();
@@ -176,10 +180,10 @@ export function describeCycleRouteInstruction(instruction: CycleRouteInstruction
   }
 
   if (!name) {
-    return turn;
+    return capitalizeFirstLetter(turn);
   }
 
-  return `${turn} onto ${name}`;
+  return capitalizeFirstLetter(`${turn} onto ${name}`);
 }
 
 function getObject(value: unknown): Record<string, unknown> | null {
