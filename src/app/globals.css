@@ -562,7 +562,6 @@ a {
 .parking-list-item:has(.parking-row.closest) {
   background: var(--surface-strong);
   border-color: var(--accent);
-  min-height: 82px;
 }
 
 .parking-list-item:has(.parking-row.closest.selected) {
@@ -600,16 +599,6 @@ a {
 
 .parking-row-copy {
   min-width: 0;
-}
-
-.closest-label {
-  color: var(--accent-strong);
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 820;
-  line-height: 1.2;
-  margin: 0 0 0.25rem;
-  text-transform: uppercase;
 }
 
 .parking-row-copy strong {

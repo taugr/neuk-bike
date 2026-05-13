@@ -689,7 +689,6 @@ export default function CycleParkingFinder() {
                   >
                     <span className={`rank rank-${index + 1}`}>{index + 1}</span>
                     <span className="parking-row-copy">
-                      {index === 0 ? <span className="closest-label">Closest</span> : null}
                       <strong>{point.name}</strong>
                       <span>
                         {formatDistance(point.distanceMeters)} away - {describeParkingPoint(point)}
