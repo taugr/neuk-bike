@@ -21,6 +21,13 @@ export function findSharedParkingPoint(search: string, points: ParkingPoint[]) {
   return parkingId ? (points.find((point) => point.id === parkingId) ?? null) : null;
 }
 
+export function parseShareLinkState(search: string, points: ParkingPoint[]) {
+  return {
+    selectedParkingId: findSharedParkingPoint(search, points)?.id ?? null,
+    referenceLocation: parseUrlLocation(search),
+  };
+}
+
 export function buildParkingShareUrl(origin: string, pathname: string, parkingId: string) {
   const url = new URL(pathname, origin);
   url.searchParams.set("parking", parkingId);

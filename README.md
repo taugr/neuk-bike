@@ -18,6 +18,7 @@
 - Find the closest cycle parking from your current location
 - Search from a street, postcode, or place in Edinburgh
 - Browse nearby parking on an interactive Leaflet map
+- Show cycle directions to a selected parking space with CycleStreets
 - See parking details such as capacity, access, cover, and stand type when the source data includes them
 - Share a reference location with `?lat=` and `?lng=` URL parameters
 - Install the app as a Progressive Web App
@@ -54,6 +55,14 @@ This project requires Node.js 20 or newer and uses pnpm for package management.
 The app ships a normalized copy of the public City of Edinburgh Council Cycle Parking ArcGIS dataset in `src/data/cycle-parking.json`.
 
 On load, it asks for your browser location and sorts the bundled parking records by distance. If geolocation is unavailable or denied, it falls back to central Edinburgh. Place search uses Nominatim and OpenStreetMap data when you search for a street, postcode, or place.
+
+Directions use the CycleStreets v2 API from the browser. Add a public API key to `.env.local` for local development:
+
+```bash
+NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
+```
+
+This key is bundled into the static app because the project has no backend or proxy.
 
 Map rendering is kept client-side so the app remains compatible with static export and GitHub Pages.
 
@@ -111,7 +120,7 @@ Treat `src/data/cycle-parking.json` as generated data. Update the normalizer in 
 
 After the first successful load, the app shell and bundled parking data are available offline through the service worker.
 
-Live place search and uncached OpenStreetMap tiles still need a network connection.
+Live place search, CycleStreets directions, and uncached OpenStreetMap tiles still need a network connection.
 
 ## Deployment
 
@@ -141,6 +150,10 @@ Map tiles and place search:
 
 - [OpenStreetMap](https://www.openstreetmap.org/copyright)
 - [Nominatim](https://nominatim.openstreetmap.org/)
+
+Cycle directions:
+
+- [CycleStreets](https://www.cyclestreets.net/)
 
 ## License
 

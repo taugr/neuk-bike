@@ -1,9 +1,28 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Crosshair, LocateFixed, MapPin, Search, Share2 } from "lucide-react";
+import {
+  Bike,
+  Crosshair,
+  ExternalLink,
+  LocateFixed,
+  MapPin,
+  Navigation,
+  Search,
+  Share2,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 import cycleParkingDataset from "@/data/cycle-parking.json";
+import {
+  buildCycleRouteCacheKey,
+  buildCycleStreetsDirectionsRequest,
+  describeCycleRouteInstruction,
+  fetchCycleStreetsDirections,
+  formatCycleRouteDuration,
+  parseCycleStreetsRoute,
+  type CycleRoute,
+} from "@/lib/cyclestreets";
 import {
   buildPlaceSearchUrl,
   parsePlaceSearchResults,
@@ -18,7 +37,7 @@ import {
   sortByDistance,
 } from "@/lib/geo";
 import { describeParkingPoint } from "@/lib/parking";
-import { buildParkingShareUrl, findSharedParkingPoint, parseUrlLocation } from "@/lib/share-links";
+import { buildParkingShareUrl, parseShareLinkState } from "@/lib/share-links";
 
 const CycleParkingMap = dynamic(() => import("@/components/cycle-parking-map"), {
   ssr: false,
@@ -38,6 +57,13 @@ type LocationState =
   | { status: "too-far"; location: UserLocation }
   | { status: "denied"; location: UserLocation }
   | { status: "unavailable"; location: UserLocation };
+
+type DirectionsState =
+  | { status: "idle" }
+  | { status: "missing-key"; parkingId: string }
+  | { status: "loading"; parkingId: string }
+  | { status: "loaded"; parkingId: string; route: CycleRoute }
+  | { status: "error"; parkingId: string; message: string };
 
 async function copyTextToClipboard(text: string) {
   try {
@@ -59,32 +85,36 @@ export default function CycleParkingFinder() {
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(null);
   const [copiedParkingId, setCopiedParkingId] = useState<string | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
+  const [directionsState, setDirectionsState] = useState<DirectionsState>({ status: "idle" });
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
+  const [hasRequestedDirections, setHasRequestedDirections] = useState(false);
   const [isAttributionModalOpen, setIsAttributionModalOpen] = useState(false);
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
+  const directionsCache = useRef(new Map<string, CycleRoute>());
   const placeSearchInFlight = useRef(false);
+  const directionsRequestId = useRef(0);
   const copiedMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const sharedParkingPoint = findSharedParkingPoint(window.location.search, parkingPoints);
-    if (sharedParkingPoint) {
+    const { referenceLocation, selectedParkingId } = parseShareLinkState(
+      window.location.search,
+      parkingPoints,
+    );
+
+    if (referenceLocation) {
       applyReferenceLocation(
-        {
-          latitude: sharedParkingPoint.latitude,
-          longitude: sharedParkingPoint.longitude,
-        },
+        referenceLocation,
         "located",
         undefined,
-        sharedParkingPoint.id,
+        selectedParkingId ?? undefined,
       );
       return;
     }
 
-    const urlLocation = parseUrlLocation(window.location.search);
-    if (urlLocation) {
-      applyReferenceLocation(urlLocation, "located");
+    if (selectedParkingId) {
+      requestLocation(selectedParkingId);
       return;
     }
 
@@ -125,7 +155,17 @@ export default function CycleParkingFinder() {
   const nearestPoint = nearbyPoints[0] ?? null;
   const explicitSelectedPoint =
     selectedId !== null ? (nearbyPoints.find((point) => point.id === selectedId) ?? null) : null;
-  const selectedPoint = explicitSelectedPoint ?? nearestPoint;
+  const directionsParkingPoint =
+    directionsState.status !== "idle"
+      ? (nearbyPoints.find((point) => point.id === directionsState.parkingId) ?? null)
+      : null;
+  const activeRoute = directionsState.status === "loaded" ? directionsState.route : null;
+  const isDirectionsMode = directionsState.status !== "idle" && directionsParkingPoint !== null;
+
+  function clearDirections() {
+    directionsRequestId.current += 1;
+    setDirectionsState({ status: "idle" });
+  }
 
   function applyReferenceLocation(
     location: UserLocation,
@@ -134,6 +174,7 @@ export default function CycleParkingFinder() {
     selectedParkingId?: string,
   ) {
     setSelectedId(selectedParkingId ?? null);
+    clearDirections();
 
     if (status === "located" && isFarFromNearestParking(parkingPoints, location)) {
       setLocationState({
@@ -157,8 +198,9 @@ export default function CycleParkingFinder() {
     );
   }
 
-  function requestLocation() {
-    setSelectedId(null);
+  function requestLocation(selectedParkingId?: string) {
+    setSelectedId(selectedParkingId ?? null);
+    clearDirections();
 
     if (!("geolocation" in navigator)) {
       setLocationState({
@@ -188,7 +230,7 @@ export default function CycleParkingFinder() {
           return;
         }
 
-        applyReferenceLocation(location, "located");
+        applyReferenceLocation(location, "located", undefined, selectedParkingId);
       },
       (error) => {
         setLocationState({
@@ -266,8 +308,70 @@ export default function CycleParkingFinder() {
     applyReferenceLocation(result.location, "searched", result.name.split(",")[0] ?? result.name);
   }
 
-  async function copyParkingLink(event: MouseEvent<HTMLButtonElement>, point: ParkingPoint) {
+  function selectParkingPoint(id: string) {
+    setSelectedId(id);
+    clearDirections();
+  }
+
+  async function requestDirectionsToPoint(point: ParkingPoint) {
+    setSelectedId(point.id);
+    setHasRequestedDirections(true);
+
+    const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
+
+    if (!apiKey) {
+      setDirectionsState({ status: "missing-key", parkingId: point.id });
+      return;
+    }
+
+    const cacheKey = buildCycleRouteCacheKey(locationState.location, point);
+    const cachedRoute = directionsCache.current.get(cacheKey);
+
+    if (cachedRoute) {
+      setDirectionsState({ status: "loaded", parkingId: point.id, route: cachedRoute });
+      return;
+    }
+
+    directionsRequestId.current += 1;
+    const requestId = directionsRequestId.current;
+    setDirectionsState({ status: "loading", parkingId: point.id });
+
+    try {
+      const request = buildCycleStreetsDirectionsRequest({
+        apiKey,
+        origin: locationState.location,
+        destination: point,
+      });
+      const route = parseCycleStreetsRoute(await fetchCycleStreetsDirections(request));
+
+      if (directionsRequestId.current !== requestId) {
+        return;
+      }
+
+      directionsCache.current.set(cacheKey, route);
+      setDirectionsState({ status: "loaded", parkingId: point.id, route });
+    } catch (error) {
+      if (directionsRequestId.current !== requestId) {
+        return;
+      }
+
+      setDirectionsState({
+        status: "error",
+        parkingId: point.id,
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : "Directions are unavailable right now.",
+      });
+    }
+  }
+
+  async function requestDirections(event: MouseEvent<HTMLButtonElement>, point: ParkingPoint) {
     event.stopPropagation();
+    await requestDirectionsToPoint(point);
+  }
+
+  async function copyParkingLinkForPoint(point: ParkingPoint) {
     const link = buildParkingShareUrl(window.location.origin, window.location.pathname, point.id);
 
     if (await copyTextToClipboard(link)) {
@@ -287,6 +391,71 @@ export default function CycleParkingFinder() {
     setShareError("Could not copy link.");
   }
 
+  async function copyParkingLink(event: MouseEvent<HTMLButtonElement>, point: ParkingPoint) {
+    event.stopPropagation();
+    await copyParkingLinkForPoint(point);
+  }
+
+  function renderAttributionFooter(className = "") {
+    return (
+      <footer className={["attribution", className].filter(Boolean).join(" ")}>
+        <button
+          className="attribution-trigger"
+          type="button"
+          onClick={() => setIsAttributionModalOpen(true)}
+        >
+          View attributions
+        </button>
+        <span className="built-by-credit">
+          Built by <a href="https://tau.gr">taugr</a>
+        </span>
+        <dialog
+          ref={attributionDialog}
+          className="attribution-modal"
+          aria-labelledby="attribution-modal-title"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setIsAttributionModalOpen(false);
+            }
+          }}
+          onClose={() => setIsAttributionModalOpen(false)}
+        >
+          <div className="attribution-modal-content">
+            <div className="attribution-modal-header">
+              <h2 id="attribution-modal-title">Attributions</h2>
+              <button
+                className="attribution-modal-close"
+                type="button"
+                onClick={() => setIsAttributionModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="attribution-details">
+              <span>{cycleParkingDataset.metadata.attribution}</span>
+              <a href={cycleParkingDataset.metadata.licenceUrl}>Open Government Licence v3.0</a>
+              <span>
+                Map interface by <a href="https://leafletjs.com/">Leaflet</a>.
+              </span>
+              {hasUsedPlaceSearch ? (
+                <span>
+                  Place search by <a href="https://nominatim.openstreetmap.org/">Nominatim</a> using
+                  OpenStreetMap data.
+                </span>
+              ) : null}
+              {hasRequestedDirections ? (
+                <span>
+                  Cycle directions by <a href="https://www.cyclestreets.net/">CycleStreets</a>
+                  {"."}
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </dialog>
+      </footer>
+    );
+  }
+
   return (
     <main className="app-shell">
       <section className="map-pane" aria-label="Cycle parking map">
@@ -296,183 +465,237 @@ export default function CycleParkingFinder() {
           selectedPoint={explicitSelectedPoint}
           nearestPoint={nearestPoint}
           rankedPoints={closestPoints}
-          onSelectPoint={setSelectedId}
+          route={activeRoute}
+          copiedParkingId={copiedParkingId}
+          onSelectPoint={selectParkingPoint}
+          onRequestDirections={(point) => {
+            void requestDirectionsToPoint(point);
+          }}
+          onCopyParkingLink={(point) => {
+            void copyParkingLinkForPoint(point);
+          }}
         />
       </section>
 
       <aside className="control-pane" aria-label="Nearest cycle parking">
-        <header className="app-header">
-          <div className="brand-mark" aria-hidden="true">
-            <img src="favicon.svg" alt="" />
-          </div>
-          <div>
-            <h1>Edinburgh Cycle Parking</h1>
-            <p>{cycleParkingDataset.metadata.recordCount} locations</p>
-          </div>
-        </header>
+        {isDirectionsMode ? (
+          <section className="directions-mode" aria-label="Cycle directions">
+            <div className="directions-mode-header">
+              <div>
+                <h1>Directions</h1>
+              </div>
+              <button type="button" onClick={clearDirections}>
+                <X size={16} aria-hidden="true" />
+                Exit directions
+              </button>
+            </div>
 
-        <section className="reference-panel" aria-label="Search from">
-          <form
-            className="place-search-form"
-            onSubmit={(event) => {
-              void searchForPlace(event);
-            }}
-          >
-            <label className="search-box">
-              <Search size={17} aria-hidden="true" />
-              <span className="sr-only">Search from a place</span>
-              <input
-                type="search"
-                value={placeQuery}
-                placeholder="Street, postcode, or place"
-                onChange={(event) => setPlaceQuery(event.target.value)}
-              />
-            </label>
-            <button
-              className="secondary-location-button"
-              type="button"
-              onClick={requestLocation}
-              disabled={locationState.status === "locating"}
-            >
-              {locationState.status === "locating" ? (
-                <Crosshair size={18} aria-hidden="true" />
-              ) : (
-                <LocateFixed size={18} aria-hidden="true" />
-              )}
-              {locationState.status === "locating" ? "Locating" : "Use my location"}
-            </button>
-            <button
-              className="place-search-button"
-              type="submit"
-              disabled={isPlaceSearching || placeQuery.trim().length === 0}
-            >
-              {isPlaceSearching ? "Searching" : "Search"}
-            </button>
-          </form>
+            {directionsState.status === "loading" ? (
+              <p className="directions-message">Finding a cycle route...</p>
+            ) : null}
 
-          {placeResults.length > 0 ? (
-            <ol className="place-results" aria-label="Place search results">
-              {placeResults.map((result) => (
-                <li key={result.id}>
-                  <button type="button" onClick={() => selectPlace(result)}>
-                    <MapPin size={16} aria-hidden="true" />
-                    <span>{result.name}</span>
+            {directionsState.status === "missing-key" ? (
+              <p className="directions-message">Directions need a CycleStreets API key.</p>
+            ) : null}
+
+            {directionsState.status === "error" ? (
+              <p className="directions-message">{directionsState.message}</p>
+            ) : null}
+
+            {directionsState.status === "loaded" ? (
+              <>
+                <div className="directions-destination">
+                  <span className="directions-destination-icon" aria-hidden="true">
+                    <MapPin size={21} />
+                  </span>
+                  <div>
+                    <strong>{directionsParkingPoint.name}</strong>
+                    <span>
+                      {formatDistance(directionsState.route.distanceMeters)} {"·"}{" "}
+                      {formatCycleRouteDuration(directionsState.route.durationSeconds)}
+                    </span>
+                  </div>
+                </div>
+                {directionsState.route.instructions.length > 0 ? (
+                  <ol className="directions-list">
+                    {directionsState.route.instructions.slice(0, 8).map((instruction, index) => (
+                      <li key={instruction.id}>
+                        <span className="directions-step-number" aria-hidden="true">
+                          {index + 1}
+                        </span>
+                        <span className="directions-step-text">
+                          {describeCycleRouteInstruction(instruction)}
+                        </span>
+                        <small className="directions-step-distance">
+                          {formatDistance(instruction.distanceMeters)}
+                        </small>
+                      </li>
+                    ))}
+                  </ol>
+                ) : null}
+                <p className="directions-attribution">
+                  <Bike size={18} aria-hidden="true" />
+                  <span>Route by</span>
+                  {directionsState.route.routeUrl ? (
+                    <a href={directionsState.route.routeUrl}>
+                      CycleStreets
+                      <ExternalLink size={16} aria-hidden="true" />
+                    </a>
+                  ) : (
+                    <a href="https://www.cyclestreets.net/">
+                      CycleStreets
+                      <ExternalLink size={16} aria-hidden="true" />
+                    </a>
+                  )}
+                </p>
+              </>
+            ) : null}
+            {renderAttributionFooter("directions-footer")}
+          </section>
+        ) : (
+          <>
+            <header className="app-header">
+              <div className="brand-mark" aria-hidden="true">
+                <img src="favicon.svg" alt="" />
+              </div>
+              <div>
+                <h1>Edinburgh Cycle Parking</h1>
+                <p>{cycleParkingDataset.metadata.recordCount} locations</p>
+              </div>
+            </header>
+
+            <section className="reference-panel" aria-label="Search from">
+              <form
+                className="place-search-form"
+                onSubmit={(event) => {
+                  void searchForPlace(event);
+                }}
+              >
+                <label className="search-box">
+                  <Search size={17} aria-hidden="true" />
+                  <span className="sr-only">Search from a place</span>
+                  <input
+                    type="search"
+                    value={placeQuery}
+                    placeholder="Street, postcode, or place"
+                    onChange={(event) => setPlaceQuery(event.target.value)}
+                  />
+                </label>
+                <button
+                  className="secondary-location-button"
+                  type="button"
+                  onClick={() => requestLocation()}
+                  disabled={locationState.status === "locating"}
+                >
+                  {locationState.status === "locating" ? (
+                    <Crosshair size={18} aria-hidden="true" />
+                  ) : (
+                    <LocateFixed size={18} aria-hidden="true" />
+                  )}
+                  {locationState.status === "locating" ? "Locating" : "Use my location"}
+                </button>
+                <button
+                  className="place-search-button"
+                  type="submit"
+                  disabled={isPlaceSearching || placeQuery.trim().length === 0}
+                >
+                  {isPlaceSearching ? "Searching" : "Search"}
+                </button>
+              </form>
+
+              {placeResults.length > 0 ? (
+                <ol className="place-results" aria-label="Place search results">
+                  {placeResults.map((result) => (
+                    <li key={result.id}>
+                      <button type="button" onClick={() => selectPlace(result)}>
+                        <MapPin size={16} aria-hidden="true" />
+                        <span>{result.name}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+
+              {placeSearchMessage ? (
+                <div className="place-search-message" role="status">
+                  {placeSearchMessage}
+                </div>
+              ) : null}
+            </section>
+
+            <div className="list-heading">
+              <h2>
+                Nearby cycle parking <span>· {closestPoints.length} closest</span>
+              </h2>
+            </div>
+
+            {locationState.status === "too-far" ? (
+              <div className="status-message unavailable" role="status">
+                You're very far away from a bike space, showing bike parking in central Edinburgh.
+              </div>
+            ) : null}
+
+            {shareError ? (
+              <div className="parking-share-message" role="status">
+                {shareError}
+              </div>
+            ) : null}
+
+            <ol className="parking-list" aria-label="Nearby cycle parking locations">
+              {closestPoints.map((point, index) => (
+                <li className="parking-list-item" key={point.id}>
+                  <button
+                    className={[
+                      "parking-row",
+                      index === 0 ? "closest" : null,
+                      point.id === explicitSelectedPoint?.id ? "selected" : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    type="button"
+                    onClick={() => selectParkingPoint(point.id)}
+                  >
+                    <span className={`rank rank-${index + 1}`}>{index + 1}</span>
+                    <span className="parking-row-copy">
+                      {index === 0 ? <span className="closest-label">Closest</span> : null}
+                      <strong>{point.name}</strong>
+                      <span>
+                        {formatDistance(point.distanceMeters)} away - {describeParkingPoint(point)}
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    aria-label={`Show cycle directions to ${point.name}`}
+                    className="parking-directions-button"
+                    type="button"
+                    onClick={(event) => {
+                      void requestDirections(event, point);
+                    }}
+                  >
+                    <Navigation size={17} aria-hidden="true" />
+                  </button>
+                  <button
+                    aria-label={`Copy link to ${point.name}`}
+                    className="parking-share-button"
+                    type="button"
+                    onClick={(event) => {
+                      void copyParkingLink(event, point);
+                    }}
+                  >
+                    <Share2 size={17} aria-hidden="true" />
+                    {copiedParkingId === point.id ? (
+                      <span className="parking-share-tooltip" role="status">
+                        Copied
+                      </span>
+                    ) : null}
                   </button>
                 </li>
               ))}
             </ol>
-          ) : null}
 
-          {placeSearchMessage ? (
-            <div className="place-search-message" role="status">
-              {placeSearchMessage}
-            </div>
-          ) : null}
-        </section>
-
-        <div className="list-heading">
-          <h2>
-            Nearby cycle parking <span>· {closestPoints.length} closest</span>
-          </h2>
-        </div>
-
-        {locationState.status === "too-far" ? (
-          <div className="status-message unavailable" role="status">
-            You're very far away from a bike space, showing bike parking in central Edinburgh.
-          </div>
-        ) : null}
-
-        {shareError ? (
-          <div className="parking-share-message" role="status">
-            {shareError}
-          </div>
-        ) : null}
-
-        <ol className="parking-list" aria-label="Nearby cycle parking locations">
-          {closestPoints.map((point, index) => (
-            <li className="parking-list-item" key={point.id}>
-              <button
-                className={[
-                  "parking-row",
-                  index === 0 ? "closest" : null,
-                  point.id === explicitSelectedPoint?.id ? "selected" : null,
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                type="button"
-                onClick={() => setSelectedId(point.id)}
-              >
-                <span className={`rank rank-${index + 1}`}>{index + 1}</span>
-                <span className="parking-row-copy">
-                  {index === 0 ? <span className="closest-label">Closest</span> : null}
-                  <strong>{point.name}</strong>
-                  <span>
-                    {formatDistance(point.distanceMeters)} away - {describeParkingPoint(point)}
-                  </span>
-                </span>
-              </button>
-              <button
-                aria-label={`Copy link to ${point.name}`}
-                className="parking-share-button"
-                type="button"
-                onClick={(event) => {
-                  void copyParkingLink(event, point);
-                }}
-              >
-                <Share2 size={17} aria-hidden="true" />
-                {copiedParkingId === point.id ? (
-                  <span className="parking-share-tooltip" role="status">
-                    Copied
-                  </span>
-                ) : null}
-              </button>
-            </li>
-          ))}
-        </ol>
-
-        <footer className="attribution">
-          <button
-            className="attribution-trigger"
-            type="button"
-            onClick={() => setIsAttributionModalOpen(true)}
-          >
-            View attributions
-          </button>
-          <dialog
-            ref={attributionDialog}
-            className="attribution-modal"
-            aria-labelledby="attribution-modal-title"
-            onClick={(event) => {
-              if (event.target === event.currentTarget) {
-                setIsAttributionModalOpen(false);
-              }
-            }}
-            onClose={() => setIsAttributionModalOpen(false)}
-          >
-            <div className="attribution-modal-content">
-              <div className="attribution-modal-header">
-                <h2 id="attribution-modal-title">Attributions</h2>
-                <button
-                  className="attribution-modal-close"
-                  type="button"
-                  onClick={() => setIsAttributionModalOpen(false)}
-                >
-                  Close
-                </button>
-              </div>
-              <div className="attribution-details">
-                <span>{cycleParkingDataset.metadata.attribution}</span>
-                <a href={cycleParkingDataset.metadata.licenceUrl}>Open Government Licence v3.0</a>
-                {hasUsedPlaceSearch ? (
-                  <span>
-                    Place search by <a href="https://nominatim.openstreetmap.org/">Nominatim</a>{" "}
-                    using OpenStreetMap data.
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          </dialog>
-        </footer>
+            {renderAttributionFooter()}
+          </>
+        )}
       </aside>
     </main>
   );

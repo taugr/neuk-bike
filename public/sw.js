@@ -1,5 +1,5 @@
 const cachePrefix = "edinburgh-cycle-parking-";
-const cacheName = `${cachePrefix}v2`;
+const cacheName = `${cachePrefix}v3`;
 const scopePath = new URL(self.registration.scope).pathname;
 const appBasePath = scopePath.endsWith("/") ? scopePath.slice(0, -1) : scopePath;
 

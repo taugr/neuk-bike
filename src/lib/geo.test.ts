@@ -7,10 +7,11 @@ import {
   sortByDistance,
 } from "@/lib/geo";
 import { parsePlaceSearchResults } from "@/lib/geocoder";
-import { describeParkingPoint, getParkingDetails } from "@/lib/parking";
+import { describeParkingPoint, getParkingDetails, getParkingPopupDetails } from "@/lib/parking";
 import {
   buildParkingShareUrl,
   findSharedParkingPoint,
+  parseShareLinkState,
   parseUrlLocation,
   parseUrlParkingId,
 } from "@/lib/share-links";
@@ -32,6 +33,20 @@ const points: ParkingPoint[] = [
     properties: {},
   },
 ];
+
+function parkingPoint(
+  properties: ParkingPoint["properties"],
+  distanceMeters?: number,
+): ParkingPoint {
+  return {
+    id: "popup",
+    name: "Popup point",
+    latitude: 55.9533,
+    longitude: -3.1883,
+    distanceMeters,
+    properties,
+  };
+}
 
 describe("geo utilities", () => {
   it("calculates approximate distance in metres", () => {
@@ -99,6 +114,171 @@ describe("geo utilities", () => {
     expect(access?.value).toBe("Not listed");
   });
 
+  it("formats popup distance metric and space detail tones", () => {
+    const near = getParkingPopupDetails(parkingPoint({ capacity: 4 }, 249));
+    expect(near.metrics).toEqual([
+      {
+        icon: "distance",
+        label: "Distance",
+        tone: "green",
+        value: "249 m away",
+      },
+    ]);
+    expect(near.details[0]).toEqual({
+      emphasis: "4",
+      icon: "parking",
+      label: "Spaces",
+      tone: "amber",
+      value: "Spaces",
+    });
+
+    const medium = getParkingPopupDetails(parkingPoint({ capacity: 10 }, 250));
+    expect(medium.metrics).toEqual([
+      {
+        icon: "distance",
+        label: "Distance",
+        tone: "amber",
+        value: "250 m away",
+      },
+    ]);
+    expect(medium.details[0]).toEqual({
+      emphasis: "10",
+      icon: "parking",
+      label: "Spaces",
+      tone: "teal",
+      value: "Spaces",
+    });
+
+    const far = getParkingPopupDetails(parkingPoint({ capacity: 11 }, 1_000));
+    expect(far.metrics).toEqual([
+      {
+        icon: "distance",
+        label: "Distance",
+        tone: "muted",
+        value: "1.0 km away",
+      },
+    ]);
+    expect(far.details[0]).toEqual({
+      emphasis: "11",
+      icon: "parking",
+      label: "Spaces",
+      tone: "green",
+      value: "Spaces",
+    });
+
+    const unknown = getParkingPopupDetails(parkingPoint({ capacity: 0 }));
+    expect(unknown.metrics).toEqual([
+      {
+        icon: "distance",
+        label: "Distance",
+        tone: "neutral",
+        value: "Not listed",
+      },
+    ]);
+    expect(unknown.details[0]).toEqual({
+      icon: "parking",
+      label: "Spaces",
+      tone: "neutral",
+      value: "Not listed",
+    });
+    expect(unknown.details[0]?.emphasis).toBeUndefined();
+  });
+
+  it("groups popup stand types into icon categories", () => {
+    expect(getParkingPopupDetails(parkingPoint({ bicycle_pa: "wide_stands" })).details[1]).toEqual({
+      icon: "stand",
+      label: "Type",
+      tone: "teal",
+      value: "Wide Stands",
+    });
+    expect(getParkingPopupDetails(parkingPoint({ bicycle_pa: "rack" })).details[1]).toEqual({
+      icon: "parking",
+      label: "Type",
+      tone: "teal",
+      value: "Rack",
+    });
+    expect(getParkingPopupDetails(parkingPoint({ bicycle_pa: "shed" })).details[1]).toEqual({
+      icon: "storage",
+      label: "Type",
+      tone: "green",
+      value: "Shed",
+    });
+    expect(getParkingPopupDetails(parkingPoint({ bicycle_pa: "wall_loops" })).details[1]).toEqual({
+      icon: "fixture",
+      label: "Type",
+      tone: "amber",
+      value: "Wall Loops",
+    });
+    expect(getParkingPopupDetails(parkingPoint({ bicycle_pa: "artistic" })).details[1]).toEqual({
+      icon: "unknown",
+      label: "Type",
+      tone: "neutral",
+      value: "Artistic",
+    });
+  });
+
+  it("groups popup cover and access details", () => {
+    expect(
+      getParkingPopupDetails(parkingPoint({ covered: "yes", access: "yes" })).details.slice(2),
+    ).toEqual([
+      {
+        icon: "covered",
+        label: "Cover",
+        tone: "green",
+        value: "Covered",
+      },
+      {
+        icon: "access-open",
+        label: "Access",
+        tone: "green",
+        value: "Public access",
+      },
+    ]);
+
+    expect(
+      getParkingPopupDetails(parkingPoint({ covered: "no", access: "private" })).details.slice(2),
+    ).toEqual([
+      {
+        icon: "not-covered",
+        label: "Cover",
+        tone: "muted",
+        value: "Not covered",
+      },
+      {
+        icon: "restricted",
+        label: "Access",
+        tone: "restricted",
+        value: "Private",
+      },
+    ]);
+
+    expect(getParkingPopupDetails(parkingPoint({ access: "customers" })).details[3]).toEqual({
+      icon: "customer",
+      label: "Access",
+      tone: "amber",
+      value: "Customers",
+    });
+    expect(getParkingPopupDetails(parkingPoint({ access: "university" })).details[3]).toEqual({
+      icon: "university",
+      label: "Access",
+      tone: "teal",
+      value: "University",
+    });
+    expect(getParkingPopupDetails(parkingPoint({ access: "permissive" })).details[3]).toEqual({
+      icon: "access-open",
+      label: "Access",
+      tone: "green",
+      value: "Permissive",
+    });
+    expect(getParkingPopupDetails(parkingPoint({ access: " " })).details).toHaveLength(3);
+    expect(getParkingPopupDetails(parkingPoint({ access: "unknown" })).details[3]).toEqual({
+      icon: "unknown",
+      label: "Access",
+      tone: "neutral",
+      value: "Unknown",
+    });
+  });
+
   it("summarizes populated parking details", () => {
     expect(
       describeParkingPoint({
@@ -113,6 +293,22 @@ describe("geo utilities", () => {
         },
       }),
     ).toBe("8 spaces, stands, not covered");
+  });
+
+  it("omits unlisted cover from parking summaries", () => {
+    expect(
+      describeParkingPoint({
+        id: "summary-missing-cover",
+        name: "Summary point",
+        latitude: 55.9533,
+        longitude: -3.1883,
+        properties: {
+          capacity: 20,
+          bicycle_pa: " ",
+          covered: " ",
+        },
+      }),
+    ).toBe("20 spaces, type not listed");
   });
 
   it("parses valid place search results and rejects invalid coordinates", () => {
@@ -157,6 +353,33 @@ describe("geo utilities", () => {
   it("finds shared parking points and ignores unknown ids", () => {
     expect(findSharedParkingPoint("?parking=near", points)?.id).toBe("near");
     expect(findSharedParkingPoint("?parking=missing", points)).toBeNull();
+  });
+
+  it("parses parking links without treating the parking point as the reference location", () => {
+    expect(parseShareLinkState("?parking=near", points)).toEqual({
+      selectedParkingId: "near",
+      referenceLocation: null,
+    });
+  });
+
+  it("parses parking links with explicit URL coordinates as the reference location", () => {
+    expect(parseShareLinkState("?parking=near&lat=55.9533&lng=-3.1883", points)).toEqual({
+      selectedParkingId: "near",
+      referenceLocation: {
+        latitude: 55.9533,
+        longitude: -3.1883,
+      },
+    });
+  });
+
+  it("ignores unknown parking ids while preserving explicit URL coordinates", () => {
+    expect(parseShareLinkState("?parking=missing&lat=55.9533&lng=-3.1883", points)).toEqual({
+      selectedParkingId: null,
+      referenceLocation: {
+        latitude: 55.9533,
+        longitude: -3.1883,
+      },
+    });
   });
 
   it("builds parking share links without dropping the current base path", () => {
