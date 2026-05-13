@@ -463,8 +463,9 @@ export default function CycleParkingFinder() {
           userLocation={locationState.location}
           selectedPoint={explicitSelectedPoint}
           nearestPoint={nearestPoint}
-          rankedPoints={closestPoints}
+          rankedPoints={nearbyPoints}
           route={activeRoute}
+          isDirectionsMode={isDirectionsMode}
           copiedParkingId={copiedParkingId}
           onSelectPoint={selectParkingPoint}
           onRequestDirections={(point) => {

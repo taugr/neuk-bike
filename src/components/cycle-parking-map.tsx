@@ -1,7 +1,15 @@
 "use client";
 
 import L from "leaflet";
-import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import {
   Bike,
   Boxes,
@@ -21,11 +29,12 @@ import {
   Warehouse,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ParkingPoint, UserLocation } from "@/lib/types";
 import { getParkingPopupDetails } from "@/lib/parking";
 import type { ParkingPopupIcon } from "@/lib/parking";
 import type { CycleRoute } from "@/lib/cyclestreets";
+import { getRenderableParkingPoints, type ParkingMapBounds } from "@/lib/map-pins";
 
 type CycleParkingMapProps = {
   points: ParkingPoint[];
@@ -34,6 +43,7 @@ type CycleParkingMapProps = {
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
   route: CycleRoute | null;
+  isDirectionsMode: boolean;
   copiedParkingId: string | null;
   onSelectPoint: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
@@ -277,6 +287,77 @@ function AttributionPrefix() {
   return null;
 }
 
+function getMapBounds(map: L.Map): ParkingMapBounds {
+  const bounds = map.getBounds();
+
+  return {
+    east: bounds.getEast(),
+    north: bounds.getNorth(),
+    south: bounds.getSouth(),
+    west: bounds.getWest(),
+  };
+}
+
+function MapViewportTracker({
+  onViewportChange,
+}: {
+  onViewportChange: (viewport: { bounds: ParkingMapBounds; zoom: number }) => void;
+}) {
+  const map = useMap();
+  const frameRef = useRef<number | null>(null);
+  const updateViewport = useCallback(() => {
+    if (frameRef.current !== null) {
+      return;
+    }
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+      onViewportChange({
+        bounds: getMapBounds(map),
+        zoom: map.getZoom(),
+      });
+    });
+  }, [map, onViewportChange]);
+
+  useMapEvents({
+    move: () => {
+      updateViewport();
+    },
+    moveend: () => {
+      onViewportChange({
+        bounds: getMapBounds(map),
+        zoom: map.getZoom(),
+      });
+    },
+    zoom: () => {
+      updateViewport();
+    },
+    zoomend: () => {
+      onViewportChange({
+        bounds: getMapBounds(map),
+        zoom: map.getZoom(),
+      });
+    },
+  });
+
+  useEffect(() => {
+    onViewportChange({
+      bounds: getMapBounds(map),
+      zoom: map.getZoom(),
+    });
+  }, [map, onViewportChange]);
+
+  useEffect(() => {
+    return () => {
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
+    };
+  }, []);
+
+  return null;
+}
+
 export default function CycleParkingMap({
   points,
   userLocation,
@@ -284,6 +365,7 @@ export default function CycleParkingMap({
   nearestPoint,
   rankedPoints,
   route,
+  isDirectionsMode,
   copiedParkingId,
   onSelectPoint,
   onRequestDirections,
@@ -291,6 +373,28 @@ export default function CycleParkingMap({
 }: CycleParkingMapProps) {
   const markerRefs = useRef(new Map<string, L.Marker>());
   const hadRouteRef = useRef(false);
+  const [viewport, setViewport] = useState<{ bounds: ParkingMapBounds | null; zoom: number }>({
+    bounds: null,
+    zoom: 13,
+  });
+  const handleViewportChange = useCallback(
+    ({ bounds, zoom }: { bounds: ParkingMapBounds; zoom: number }) => {
+      setViewport((current) => {
+        if (
+          current.zoom === zoom &&
+          current.bounds?.north === bounds.north &&
+          current.bounds.south === bounds.south &&
+          current.bounds.east === bounds.east &&
+          current.bounds.west === bounds.west
+        ) {
+          return current;
+        }
+
+        return { bounds, zoom };
+      });
+    },
+    [],
+  );
   const icons = useMemo(
     () => ({
       default: createParkingIcon("default"),
@@ -332,8 +436,17 @@ export default function CycleParkingMap({
     [route, userLocation],
   );
   const visiblePoints = useMemo(
-    () => (route && selectedPoint ? [selectedPoint] : points),
-    [points, route, selectedPoint],
+    () =>
+      isDirectionsMode && selectedPoint
+        ? [selectedPoint]
+        : getRenderableParkingPoints({
+            bounds: viewport.bounds,
+            pinnedPoints: rankedPoints,
+            points,
+            selectedPoint,
+            zoom: viewport.zoom,
+          }),
+    [isDirectionsMode, points, rankedPoints, selectedPoint, viewport.bounds, viewport.zoom],
   );
 
   useEffect(() => {
@@ -359,6 +472,7 @@ export default function CycleParkingMap({
   return (
     <MapContainer center={defaultCenter} zoom={13} scrollWheelZoom className="bike-map">
       <AttributionPrefix />
+      <MapViewportTracker onViewportChange={handleViewportChange} />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -417,7 +531,7 @@ export default function CycleParkingMap({
         const popupDetails = getParkingPopupDetails(point);
         const icon =
           point.id === selectedPoint?.id
-            ? route
+            ? isDirectionsMode
               ? destinationIcon
               : rank !== undefined
                 ? (selectedRankedIcons.get(rank) ?? icons.selected)
