@@ -192,8 +192,18 @@ function MapFocus({
   userLocation: UserLocation;
 }) {
   const map = useMap();
+  const previousRouteRef = useRef(route);
 
   useEffect(() => {
+    const hadRoute = previousRouteRef.current !== null;
+    previousRouteRef.current = route;
+
+    map.stop();
+
+    if (!route && hadRoute) {
+      return;
+    }
+
     if (route && selectedPoint) {
       const bounds = L.latLngBounds([
         [userLocation.latitude, userLocation.longitude],
