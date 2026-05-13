@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildShortCycleRoute,
   buildCycleStreetsDirectionsRequest,
   describeCycleRouteInstruction,
   formatCycleRouteDuration,
@@ -125,6 +126,7 @@ describe("CycleStreets utilities", () => {
       [55.95338, -3.18854],
       [55.94401, -3.205],
     ]);
+    expect(route.source).toBe("cyclestreets");
   });
 
   it("parses and describes route instructions", () => {
@@ -157,6 +159,49 @@ describe("CycleStreets utilities", () => {
   it("formats route duration in minutes", () => {
     expect(formatCycleRouteDuration(811)).toBe("14 min");
     expect(formatCycleRouteDuration(15)).toBe("1 min");
+  });
+
+  it("builds local short routes for nearby parking", () => {
+    const route = buildShortCycleRoute(
+      { latitude: 55.9533, longitude: -3.1883 },
+      {
+        id: "near",
+        name: "Nearby parking",
+        latitude: 55.95332,
+        longitude: -3.18833,
+        properties: {},
+      },
+    );
+
+    expect(route.source).toBe("local");
+    expect(route.routeUrl).toBeUndefined();
+    expect(route.distanceMeters).toBeGreaterThan(2);
+    expect(route.distanceMeters).toBeLessThan(4);
+    expect(route.durationSeconds).toBeGreaterThanOrEqual(1);
+    expect(route.points).toEqual([
+      [55.9533, -3.1883],
+      [55.95332, -3.18833],
+    ]);
+    expect(route.instructions).toHaveLength(1);
+    expect(route.instructions[0]).toMatchObject({
+      id: "short-route-near",
+      streetName: "",
+      turn: "straight",
+      travelMode: "walking",
+    });
+  });
+
+  it("describes local short route instructions as a straight distance", () => {
+    expect(
+      describeCycleRouteInstruction({
+        id: "short",
+        streetName: "",
+        turn: "straight",
+        distanceMeters: 4.4,
+        durationSeconds: 1,
+        travelMode: "walking",
+      }),
+    ).toBe("Straight 4 m");
   });
 
   it("throws useful errors for CycleStreets errors and malformed responses", () => {

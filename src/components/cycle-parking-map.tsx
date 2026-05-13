@@ -486,11 +486,21 @@ export default function CycleParkingMap({
       />
       {route ? (
         <Polyline
-          pathOptions={{
-            color: "#2563eb",
-            opacity: 0.82,
-            weight: 6,
-          }}
+          pathOptions={
+            route.source === "local"
+              ? {
+                  color: "#f97316",
+                  dashArray: "6 8",
+                  lineCap: "round",
+                  opacity: 0.9,
+                  weight: 4,
+                }
+              : {
+                  color: "#2563eb",
+                  opacity: 0.82,
+                  weight: 6,
+                }
+          }
           positions={route.points}
         />
       ) : null}

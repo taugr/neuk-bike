@@ -1,8 +1,10 @@
 import type { ParkingPoint, UserLocation } from "@/lib/types";
+import { distanceMeters } from "@/lib/geo";
 
 export const CYCLESTREETS_DIRECTIONS_ENDPOINT = "https://api.cyclestreets.net/v2/journey.plan";
 export const CYCLESTREETS_ROUTE_PLAN = "balanced";
 export const CYCLESTREETS_SPEED_KMPH = "16";
+export const SHORT_CYCLE_ROUTE_THRESHOLD_METERS = 10;
 
 export type CycleRoutePoint = [latitude: number, longitude: number];
 
@@ -21,6 +23,7 @@ export type CycleRoute = {
   durationSeconds: number;
   points: CycleRoutePoint[];
   instructions: CycleRouteInstruction[];
+  source: "cyclestreets" | "local";
   itineraryId?: string;
   routeUrl?: string;
 };
@@ -96,7 +99,7 @@ function fetchCycleStreetsJsonp(url: string) {
   }
 
   return new Promise<unknown>((resolve, reject) => {
-    const callbackName = `__cycleStreetsDirections${Date.now()}${jsonpRequestCount}`;
+    const callbackName = `cycleStreetsDirections${Date.now()}${jsonpRequestCount}`;
     jsonpRequestCount += 1;
 
     const callbackTarget = window as unknown as Window &
@@ -179,11 +182,42 @@ export function describeCycleRouteInstruction(instruction: CycleRouteInstruction
     return name ? `Start on ${name}` : "Start";
   }
 
+  if (turn === "straight" && !name) {
+    return `Straight ${Math.round(instruction.distanceMeters)} m`;
+  }
+
   if (!name) {
     return capitalizeFirstLetter(turn);
   }
 
   return capitalizeFirstLetter(`${turn} onto ${name}`);
+}
+
+export function buildShortCycleRoute(origin: UserLocation, destination: ParkingPoint): CycleRoute {
+  const routeDistanceMeters = distanceMeters(origin, destination);
+  const speedMetersPerSecond = (Number(CYCLESTREETS_SPEED_KMPH) * 1_000) / 3_600;
+  const durationSeconds = Math.max(1, Math.round(routeDistanceMeters / speedMetersPerSecond));
+
+  return {
+    plan: CYCLESTREETS_ROUTE_PLAN,
+    distanceMeters: routeDistanceMeters,
+    durationSeconds,
+    points: [
+      [origin.latitude, origin.longitude],
+      [destination.latitude, destination.longitude],
+    ],
+    instructions: [
+      {
+        id: `short-route-${destination.id}`,
+        streetName: "",
+        turn: "straight",
+        distanceMeters: routeDistanceMeters,
+        durationSeconds,
+        travelMode: "walking",
+      },
+    ],
+    source: "local",
+  };
 }
 
 function getObject(value: unknown): Record<string, unknown> | null {
@@ -314,6 +348,7 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
     durationSeconds,
     points,
     instructions,
+    source: "cyclestreets",
     ...parseRouteUrl(routeProperties),
   };
 }

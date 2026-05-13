@@ -16,12 +16,14 @@ import {
 import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from "react";
 import cycleParkingDataset from "@/data/cycle-parking.json";
 import {
+  buildShortCycleRoute,
   buildCycleRouteCacheKey,
   buildCycleStreetsDirectionsRequest,
   describeCycleRouteInstruction,
   fetchCycleStreetsDirections,
   formatCycleRouteDuration,
   parseCycleStreetsRoute,
+  SHORT_CYCLE_ROUTE_THRESHOLD_METERS,
   type CycleRoute,
 } from "@/lib/cyclestreets";
 import {
@@ -33,6 +35,7 @@ import type { ParkingPoint, UserLocation } from "@/lib/types";
 import {
   EDINBURGH_FALLBACK_LOCATION,
   formatDistance,
+  distanceMeters,
   isFarFromNearestParking,
   isResolvedLocation,
   sortByDistance,
@@ -331,6 +334,13 @@ export default function CycleParkingFinder() {
       return;
     }
 
+    if (distanceMeters(locationState.location, point) <= SHORT_CYCLE_ROUTE_THRESHOLD_METERS) {
+      const route = buildShortCycleRoute(locationState.location, point);
+      directionsCache.current.set(cacheKey, route);
+      setDirectionsState({ status: "loaded", parkingId: point.id, route });
+      return;
+    }
+
     directionsRequestId.current += 1;
     const requestId = directionsRequestId.current;
     setDirectionsState({ status: "loading", parkingId: point.id });
@@ -543,21 +553,23 @@ export default function CycleParkingFinder() {
                     ))}
                   </ol>
                 ) : null}
-                <p className="directions-attribution">
-                  <Bike size={18} aria-hidden="true" />
-                  <span>Route by</span>
-                  {directionsState.route.routeUrl ? (
-                    <a href={directionsState.route.routeUrl}>
-                      CycleStreets
-                      <ExternalLink size={16} aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <a href="https://www.cyclestreets.net/">
-                      CycleStreets
-                      <ExternalLink size={16} aria-hidden="true" />
-                    </a>
-                  )}
-                </p>
+                {directionsState.route.source === "cyclestreets" ? (
+                  <p className="directions-attribution">
+                    <Bike size={18} aria-hidden="true" />
+                    <span>Route by</span>
+                    {directionsState.route.routeUrl ? (
+                      <a href={directionsState.route.routeUrl}>
+                        CycleStreets
+                        <ExternalLink size={16} aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <a href="https://www.cyclestreets.net/">
+                        CycleStreets
+                        <ExternalLink size={16} aria-hidden="true" />
+                      </a>
+                    )}
+                  </p>
+                ) : null}
               </>
             ) : null}
             {renderAttributionFooter("directions-footer")}
