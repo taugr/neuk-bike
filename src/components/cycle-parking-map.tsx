@@ -44,7 +44,7 @@ type CycleParkingMapProps = {
   rankedPoints: ParkingPoint[];
   route: CycleRoute | null;
   isDirectionsMode: boolean;
-  copiedParkingId: string | null;
+  copiedShareButton: { parkingId: string; source: "list" | "popup" } | null;
   onSelectPoint: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
@@ -366,7 +366,7 @@ export default function CycleParkingMap({
   rankedPoints,
   route,
   isDirectionsMode,
-  copiedParkingId,
+  copiedShareButton,
   onSelectPoint,
   onRequestDirections,
   onCopyParkingLink,
@@ -617,7 +617,8 @@ export default function CycleParkingMap({
                   >
                     <Share2 size={15} aria-hidden="true" />
                     Share
-                    {copiedParkingId === point.id ? (
+                    {copiedShareButton?.source === "popup" &&
+                    copiedShareButton.parkingId === point.id ? (
                       <span className="parking-popup-share-feedback" role="status">
                         Copied
                       </span>

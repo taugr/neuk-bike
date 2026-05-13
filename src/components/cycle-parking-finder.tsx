@@ -70,6 +70,13 @@ type DirectionsState =
   | { status: "loaded"; parkingId: string; route: CycleRoute }
   | { status: "error"; parkingId: string; message: string };
 
+type ShareSource = "list" | "popup";
+
+type CopiedShareButton = {
+  parkingId: string;
+  source: ShareSource;
+};
+
 async function copyTextToClipboard(text: string) {
   try {
     await navigator.clipboard.writeText(text);
@@ -88,7 +95,7 @@ export default function CycleParkingFinder() {
   const [placeQuery, setPlaceQuery] = useState("");
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(null);
-  const [copiedParkingId, setCopiedParkingId] = useState<string | null>(null);
+  const [copiedShareButton, setCopiedShareButton] = useState<CopiedShareButton | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
   const [directionsState, setDirectionsState] = useState<DirectionsState>({ status: "idle" });
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
@@ -388,29 +395,29 @@ export default function CycleParkingFinder() {
     await requestDirectionsToPoint(point);
   }
 
-  async function copyParkingLinkForPoint(point: ParkingPoint) {
+  async function copyParkingLinkForPoint(point: ParkingPoint, source: ShareSource) {
     const link = buildParkingShareUrl(window.location.origin, window.location.pathname, point.id);
 
     if (await copyTextToClipboard(link)) {
       setShareError(null);
-      setCopiedParkingId(point.id);
+      setCopiedShareButton({ parkingId: point.id, source });
       if (copiedMessageTimeout.current !== null) {
         window.clearTimeout(copiedMessageTimeout.current);
       }
       copiedMessageTimeout.current = window.setTimeout(() => {
-        setCopiedParkingId(null);
+        setCopiedShareButton(null);
         copiedMessageTimeout.current = null;
       }, copiedMessageDurationMs);
       return;
     }
 
-    setCopiedParkingId(null);
+    setCopiedShareButton(null);
     setShareError("Could not copy link.");
   }
 
   async function copyParkingLink(event: MouseEvent<HTMLButtonElement>, point: ParkingPoint) {
     event.stopPropagation();
-    await copyParkingLinkForPoint(point);
+    await copyParkingLinkForPoint(point, "list");
   }
 
   function renderAttributionFooter(className = "") {
@@ -484,13 +491,13 @@ export default function CycleParkingFinder() {
           rankedPoints={nearbyPoints}
           route={activeRoute}
           isDirectionsMode={isDirectionsMode}
-          copiedParkingId={copiedParkingId}
+          copiedShareButton={copiedShareButton}
           onSelectPoint={selectParkingPoint}
           onRequestDirections={(point) => {
             void requestDirectionsToPoint(point);
           }}
           onCopyParkingLink={(point) => {
-            void copyParkingLinkForPoint(point);
+            void copyParkingLinkForPoint(point, "popup");
           }}
         />
       </section>
@@ -714,7 +721,8 @@ export default function CycleParkingFinder() {
                     }}
                   >
                     <Share2 size={17} aria-hidden="true" />
-                    {copiedParkingId === point.id ? (
+                    {copiedShareButton?.source === "list" &&
+                    copiedShareButton.parkingId === point.id ? (
                       <span className="parking-share-tooltip" role="status">
                         Copied
                       </span>
