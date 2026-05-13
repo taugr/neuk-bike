@@ -586,6 +586,8 @@ export default function CycleParkingFinder() {
                   <Search size={17} aria-hidden="true" />
                   <span className="sr-only">Search from a place</span>
                   <input
+                    id="place-search"
+                    name="place-search"
                     type="search"
                     value={placeQuery}
                     placeholder="Street, postcode, or place"

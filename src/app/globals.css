@@ -1179,6 +1179,7 @@ a {
 
   .control-pane:has(.directions-mode) {
     overflow: hidden;
+    padding-right: 1.25rem;
   }
 
   .pwa-install-button {
