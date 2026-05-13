@@ -89,7 +89,6 @@ export default function CycleParkingFinder() {
   const [directionsState, setDirectionsState] = useState<DirectionsState>({ status: "idle" });
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
-  const [hasRequestedDirections, setHasRequestedDirections] = useState(false);
   const [isAttributionModalOpen, setIsAttributionModalOpen] = useState(false);
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
   const directionsCache = useRef(new Map<string, CycleRoute>());
@@ -316,7 +315,6 @@ export default function CycleParkingFinder() {
 
   async function requestDirectionsToPoint(point: ParkingPoint) {
     setSelectedId(point.id);
-    setHasRequestedDirections(true);
 
     const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
 
@@ -405,7 +403,7 @@ export default function CycleParkingFinder() {
           type="button"
           onClick={() => setIsAttributionModalOpen(true)}
         >
-          View attributions
+          Attributions
         </button>
         <span className="built-by-credit">
           Built by <a href="https://tau.gr">taugr</a>
@@ -424,13 +422,6 @@ export default function CycleParkingFinder() {
           <div className="attribution-modal-content">
             <div className="attribution-modal-header">
               <h2 id="attribution-modal-title">Attributions</h2>
-              <button
-                className="attribution-modal-close"
-                type="button"
-                onClick={() => setIsAttributionModalOpen(false)}
-              >
-                Close
-              </button>
             </div>
             <div className="attribution-details">
               <span>{cycleParkingDataset.metadata.attribution}</span>
@@ -444,12 +435,19 @@ export default function CycleParkingFinder() {
                   OpenStreetMap data.
                 </span>
               ) : null}
-              {hasRequestedDirections ? (
-                <span>
-                  Cycle directions by <a href="https://www.cyclestreets.net/">CycleStreets</a>
-                  {"."}
-                </span>
-              ) : null}
+              <span>
+                Cycle directions by <a href="https://www.cyclestreets.net/">CycleStreets</a>
+                {"."}
+              </span>
+            </div>
+            <div className="attribution-modal-footer">
+              <button
+                className="attribution-modal-close"
+                type="button"
+                onClick={() => setIsAttributionModalOpen(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </dialog>

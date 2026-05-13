@@ -945,10 +945,7 @@ a {
 }
 
 .attribution-modal-header {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
-  justify-content: space-between;
+  display: block;
 }
 
 .attribution-modal h2 {
@@ -972,6 +969,11 @@ a {
 .attribution-modal-close:focus-visible {
   background: var(--accent-soft);
   border-color: var(--accent);
+}
+
+.attribution-modal-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .attribution-details {
