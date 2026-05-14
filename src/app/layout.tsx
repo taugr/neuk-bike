@@ -9,6 +9,8 @@ const sitePath = "/edinburgh-cycle-parking";
 const siteTitle = "Edinburgh Cycle Parking";
 const siteDescription = "Find nearby cycle parking spaces across Edinburgh.";
 const socialImage = `${sitePath}/og-image.png`;
+const lightThemeColor = "#0f766e";
+const darkThemeColor = "#0f1715";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -45,7 +47,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0f766e",
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: lightThemeColor },
+    { media: "(prefers-color-scheme: dark)", color: darkThemeColor },
+  ],
 };
 
 const assetBasePath = process.env.GITHUB_PAGES === "true" ? "/edinburgh-cycle-parking" : "";
@@ -66,7 +72,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Cycle Parking" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="icon" href={assetPath("/favicon.ico")} sizes="any" />
         <link rel="icon" href={assetPath("/favicon.svg")} type="image/svg+xml" />
         <link rel="icon" href={assetPath("/icon-192.png")} sizes="192x192" type="image/png" />
