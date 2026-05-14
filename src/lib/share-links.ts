@@ -1,6 +1,17 @@
 import { isResolvedLocation } from "@/lib/geo";
 import type { ParkingPoint, UserLocation } from "@/lib/types";
 
+function getAppBasePath(pathname: string) {
+  const parkingSegment = "/parking/";
+  const parkingSegmentIndex = pathname.indexOf(parkingSegment);
+
+  if (parkingSegmentIndex >= 0) {
+    return pathname.slice(0, parkingSegmentIndex) || "/";
+  }
+
+  return pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+}
+
 export function parseUrlParkingId(search: string) {
   const parkingId = new URLSearchParams(search).get("parking")?.trim();
   return parkingId && parkingId.length > 0 ? parkingId : null;
@@ -29,7 +40,9 @@ export function parseShareLinkState(search: string, points: ParkingPoint[]) {
 }
 
 export function buildParkingShareUrl(origin: string, pathname: string, parkingId: string) {
-  const url = new URL(pathname, origin);
-  url.searchParams.set("parking", parkingId);
+  const appBasePath = getAppBasePath(pathname);
+  const basePath = appBasePath === "/" ? "" : appBasePath;
+  const url = new URL(`${basePath}/parking/${encodeURIComponent(parkingId)}/`, origin);
+
   return url.toString();
 }

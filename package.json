@@ -24,7 +24,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node scripts/generate-parking-share-pages.mjs",
     "start": "next start",
     "update:data": "node scripts/update-cycle-parking-data.mjs",
     "test": "vitest run",

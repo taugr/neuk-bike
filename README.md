@@ -21,6 +21,7 @@
 - Show cycle directions to a selected parking space with CycleStreets
 - See parking details such as capacity, access, cover, and stand type when the source data includes them
 - Share a reference location with `?lat=` and `?lng=` URL parameters
+- Share individual parking stands with stand-specific social preview metadata
 - Install the app as a Progressive Web App
 - Use the app shell and bundled parking data offline after the first successful load
 
@@ -64,7 +65,7 @@ NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 
 This key is bundled into the static app because the project has no backend or proxy.
 
-Map rendering is kept client-side so the app remains compatible with static export and GitHub Pages.
+Map rendering is kept client-side so the app remains compatible with static export and GitHub Pages. Shared parking stand links use generated static HTML files under `out/parking/` for social metadata, then redirect into the browser app with `?parking=`.
 
 ## Commands
 
@@ -132,7 +133,7 @@ Local static export:
 pnpm build
 ```
 
-On GitHub Actions, the deploy workflow sets `GITHUB_PAGES=true`. That enables the `/edinburgh-cycle-parking` base path and asset prefix, then publishes the generated `out/` directory.
+On GitHub Actions, the deploy workflow sets `GITHUB_PAGES=true`. That enables the `/edinburgh-cycle-parking` base path and asset prefix, generates static social-preview pages for parking stand links, then publishes the generated `out/` directory.
 
 ## Attribution
 
