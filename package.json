@@ -11,15 +11,15 @@
     "map",
     "nextjs"
   ],
-  "homepage": "https://tom-auger.github.io/edinburgh-cycle-parking",
+  "homepage": "https://taugr.github.io/edinburgh-cycle-parking",
   "bugs": {
-    "url": "https://github.com/tom-auger/edinburgh-cycle-parking/issues"
+    "url": "https://github.com/taugr/edinburgh-cycle-parking/issues"
   },
   "license": "MIT",
   "author": "Tom Auger <tom@tau.gr>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tom-auger/edinburgh-cycle-parking.git"
+    "url": "git+https://github.com/taugr/edinburgh-cycle-parking.git"
   },
   "type": "module",
   "scripts": {

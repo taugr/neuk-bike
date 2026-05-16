@@ -12,7 +12,7 @@ Requirements:
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/tom-auger/edinburgh-cycle-parking.git
+git clone https://github.com/taugr/edinburgh-cycle-parking.git
 cd edinburgh-cycle-parking
 pnpm install
 ```
@@ -61,4 +61,4 @@ pnpm run test
 
 ## Questions
 
-Open an issue at [https://github.com/tom-auger/edinburgh-cycle-parking/issues](https://github.com/tom-auger/edinburgh-cycle-parking/issues).
+Open an issue at [https://github.com/taugr/edinburgh-cycle-parking/issues](https://github.com/taugr/edinburgh-cycle-parking/issues).

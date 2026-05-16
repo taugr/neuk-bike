@@ -2,7 +2,7 @@
 
 If you believe you have found a security vulnerability in `edinburgh-cycle-parking`, please use GitHub's private vulnerability reporting flow:
 
-[Report a vulnerability](https://github.com/tom-auger/edinburgh-cycle-parking/security)
+[Report a vulnerability](https://github.com/taugr/edinburgh-cycle-parking/security)
 
 Please do not open public issues for suspected vulnerabilities.
 

@@ -3,7 +3,7 @@
 <p align="center">
   <img src="./public/icon-192.png" alt="Edinburgh Cycle Parking icon" width="140" />
   <br />
-  <a href="https://tom-auger.github.io/edinburgh-cycle-parking/">
+  <a href="https://taugr.github.io/edinburgh-cycle-parking/">
     <img src="https://img.shields.io/badge/live-GitHub%20Pages-0f766e" alt="live app" />
   </a>
   <a href="./LICENSE">
@@ -29,7 +29,7 @@
 
 Open the app at:
 
-- https://tom-auger.github.io/edinburgh-cycle-parking/
+- https://taugr.github.io/edinburgh-cycle-parking/
 
 The app runs entirely in the browser. It has no backend, database, tracking service, or server API.
 

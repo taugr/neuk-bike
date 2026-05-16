@@ -373,18 +373,18 @@ describe("geo utilities", () => {
 
   it("builds parking share links without dropping the current base path", () => {
     expect(
-      buildParkingShareUrl("https://tom-auger.github.io", "/edinburgh-cycle-parking", "near"),
-    ).toBe("https://tom-auger.github.io/edinburgh-cycle-parking/parking/near/");
+      buildParkingShareUrl("https://taugr.github.io", "/edinburgh-cycle-parking", "near"),
+    ).toBe("https://taugr.github.io/edinburgh-cycle-parking/parking/near/");
   });
 
   it("builds parking share links from an existing share page path", () => {
     expect(
       buildParkingShareUrl(
-        "https://tom-auger.github.io",
+        "https://taugr.github.io",
         "/edinburgh-cycle-parking/parking/near",
         "far",
       ),
-    ).toBe("https://tom-auger.github.io/edinburgh-cycle-parking/parking/far/");
+    ).toBe("https://taugr.github.io/edinburgh-cycle-parking/parking/far/");
   });
 
   it("parses valid URL coordinates and rejects invalid coordinates", () => {

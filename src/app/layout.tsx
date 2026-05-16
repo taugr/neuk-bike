@@ -4,7 +4,7 @@ import PwaInstallPrompt from "@/components/pwa-install-prompt";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
-const siteUrl = "https://tom-auger.github.io";
+const siteUrl = "https://taugr.github.io";
 const sitePath = "/edinburgh-cycle-parking";
 const siteTitle = "Edinburgh Cycle Parking";
 const siteDescription = "Find nearby cycle parking spaces across Edinburgh.";
