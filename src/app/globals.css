@@ -679,6 +679,7 @@ a {
 
 .secondary-location-button {
   align-items: center;
+  aspect-ratio: 1;
   background: var(--surface);
   border: 1px solid var(--accent);
   border-radius: 8px;
@@ -689,7 +690,8 @@ a {
   gap: 0.5rem;
   justify-content: center;
   min-height: 46px;
-  padding: 0 0.75rem;
+  min-width: 46px;
+  padding: 0;
   transition:
     background 160ms ease,
     border-color 160ms ease;
@@ -911,11 +913,50 @@ a {
   overflow-wrap: anywhere;
 }
 
-.parking-row-copy span {
+.parking-row-copy > span {
   color: var(--muted);
   display: block;
   font-size: 0.82rem;
   margin-top: 0.2rem;
+}
+
+.parking-row-copy > .parking-row-details {
+  align-items: center;
+  display: grid;
+  gap: 0.28rem 0.9rem;
+  grid-template-columns: repeat(2, minmax(5.6rem, max-content));
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.parking-row-detail {
+  align-items: center;
+  color: var(--muted);
+  display: inline-grid;
+  gap: 0.25rem;
+  grid-template-columns: 1rem minmax(0, max-content);
+  min-width: 0;
+}
+
+.parking-row-detail > span:last-child {
+  min-width: 0;
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.parking-row-detail-icon {
+  color: var(--accent-strong);
+  display: grid;
+  font-size: 0.78rem;
+  font-weight: 800;
+  min-width: 1rem;
+  place-items: center;
+}
+
+.parking-row-detail svg,
+.parking-row-detail > svg {
+  color: var(--accent-strong);
+  justify-self: center;
 }
 
 .parking-directions-button,
@@ -1460,9 +1501,7 @@ a {
     padding: 0.9rem 0.9rem max(0.4rem, env(safe-area-inset-bottom));
     position: absolute;
     right: 0.65rem;
-    max-height: calc(
-      7.25rem + ((54dvh - 7.25rem) * var(--mobile-sheet-drag-progress, 1))
-    );
+    max-height: calc(7.25rem + ((54dvh - 7.25rem) * var(--mobile-sheet-drag-progress, 1)));
     transition: max-height 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
     will-change: max-height;
   }
@@ -1617,12 +1656,16 @@ a {
     grid-template-columns: minmax(0, 1fr) 40px 40px;
   }
 
-  .place-search-button,
-  .secondary-location-button {
+  .place-search-button {
     aspect-ratio: 1;
     min-height: 40px;
     min-width: 40px;
     padding: 0;
+  }
+
+  .secondary-location-button {
+    min-height: 40px;
+    min-width: 40px;
   }
 
   .mobile-action-label {
@@ -1645,6 +1688,18 @@ a {
   }
 }
 
+@media (max-width: 400px) {
+  .parking-row-copy > .parking-row-details {
+    grid-template-columns: minmax(0, max-content);
+  }
+}
+
+@media (min-width: 560px) and (max-width: 820px) {
+  .parking-row-copy > .parking-row-details {
+    grid-template-columns: repeat(4, max-content);
+  }
+}
+
 @media (min-width: 821px) {
   .app-shell {
     grid-template-columns: minmax(0, 1fr) 460px;
@@ -1654,14 +1709,6 @@ a {
     height: 100dvh;
     min-height: 0;
     overflow: hidden;
-  }
-
-  .place-search-form {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .place-search-form .search-box {
-    grid-column: 1 / -1;
   }
 
   .parking-list-scroll {

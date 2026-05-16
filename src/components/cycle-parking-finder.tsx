@@ -3,6 +3,10 @@
 import dynamic from "next/dynamic";
 import {
   Bike,
+  Boxes,
+  Building2,
+  CircleHelp,
+  CircleParking,
   Crosshair,
   Download,
   ExternalLink,
@@ -16,7 +20,11 @@ import {
   Settings,
   Share2,
   Sun,
+  Umbrella,
+  UmbrellaOff,
+  Warehouse,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import {
   useEffect,
@@ -54,7 +62,7 @@ import {
   isResolvedLocation,
   sortByDistance,
 } from "@/lib/geo";
-import { describeParkingPoint } from "@/lib/parking";
+import { describeParkingPoint, getParkingPopupDetails, type ParkingPopupIcon } from "@/lib/parking";
 import { buildParkingShareUrl, parseShareLinkState } from "@/lib/share-links";
 import { usePwaInstallPrompt } from "@/components/pwa-install-prompt";
 
@@ -71,6 +79,23 @@ const defaultLocale = "en-GB";
 const themeStorageKey = "cycle-parking-theme";
 const mobileSheetDragThresholdPx = 48;
 const mobileSheetDragRangePx = 320;
+
+const parkingListIconByName: Partial<Record<ParkingPopupIcon, LucideIcon>> = {
+  building: Building2,
+  covered: Umbrella,
+  fixture: Boxes,
+  "not-covered": UmbrellaOff,
+  parking: CircleParking,
+  stand: Bike,
+  storage: Warehouse,
+  unknown: CircleHelp,
+};
+
+function ParkingListDetailIcon({ icon }: { icon: ParkingPopupIcon }) {
+  const Icon = parkingListIconByName[icon] ?? CircleHelp;
+
+  return <Icon size={13} aria-hidden="true" />;
+}
 
 type LocationState =
   | { status: "fallback"; location: UserLocation }
@@ -920,35 +945,41 @@ export default function CycleParkingFinder() {
                       name="place-search"
                       type="search"
                       value={placeQuery}
-                      placeholder="Street, postcode, or place"
+                      placeholder="Place or postcode"
                       onChange={(event) => setPlaceQuery(event.target.value)}
                     />
                   </label>
                   <button
+                    aria-label={
+                      locationState.status === "locating" ? "Locating" : "Use current location"
+                    }
                     className="secondary-location-button"
+                    title={
+                      locationState.status === "locating" ? "Locating" : "Use current location"
+                    }
                     type="button"
                     onClick={() => requestLocation()}
                     disabled={locationState.status === "locating"}
                   >
-                  {locationState.status === "locating" ? (
-                    <Crosshair size={18} aria-hidden="true" />
-                  ) : (
-                    <LocateFixed size={18} aria-hidden="true" />
-                  )}
-                  <span className="mobile-action-label">
-                    {locationState.status === "locating" ? "Locating" : "Use my location"}
-                  </span>
-                </button>
-                <button
-                  className="place-search-button"
-                  type="submit"
-                  disabled={isPlaceSearching || placeQuery.trim().length === 0}
-                >
-                  <Search size={18} aria-hidden="true" />
-                  <span className="mobile-action-label">
-                    {isPlaceSearching ? "Searching" : "Search"}
-                  </span>
-                </button>
+                    {locationState.status === "locating" ? (
+                      <Crosshair size={18} aria-hidden="true" />
+                    ) : (
+                      <LocateFixed size={18} aria-hidden="true" />
+                    )}
+                    <span className="sr-only">
+                      {locationState.status === "locating" ? "Locating" : "Near me"}
+                    </span>
+                  </button>
+                  <button
+                    className="place-search-button"
+                    type="submit"
+                    disabled={isPlaceSearching || placeQuery.trim().length === 0}
+                  >
+                    <Search size={18} aria-hidden="true" />
+                    <span className="mobile-action-label">
+                      {isPlaceSearching ? "Searching" : "Search"}
+                    </span>
+                  </button>
                 </form>
 
                 {placeResults.length > 0 ? (
@@ -992,56 +1023,81 @@ export default function CycleParkingFinder() {
                 ) : null}
 
                 <ol className="parking-list" aria-label="Nearby cycle parking locations">
-                  {closestPoints.map((point, index) => (
-                    <li className="parking-list-item" key={point.id}>
-                      <button
-                        className={[
-                          "parking-row",
-                          index === 0 ? "closest" : null,
-                          point.id === explicitSelectedPoint?.id ? "selected" : null,
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                        type="button"
-                        onClick={() => selectParkingPoint(point.id)}
-                      >
-                        <span className={`rank rank-${index + 1}`}>{index + 1}</span>
-                        <span className="parking-row-copy">
-                          <strong>{point.name}</strong>
-                          <span>
-                            {formatDistance(point.distanceMeters)} away -{" "}
-                            {describeParkingPoint(point)}
+                  {closestPoints.map((point, index) => {
+                    const parkingDetails = getParkingPopupDetails(point);
+                    const listDetails = parkingDetails.details.filter((detail) =>
+                      ["Spaces", "Type", "Cover"].includes(detail.label),
+                    );
+
+                    return (
+                      <li className="parking-list-item" key={point.id}>
+                        <button
+                          className={[
+                            "parking-row",
+                            index === 0 ? "closest" : null,
+                            point.id === explicitSelectedPoint?.id ? "selected" : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          type="button"
+                          onClick={() => selectParkingPoint(point.id)}
+                        >
+                          <span className={`rank rank-${index + 1}`}>{index + 1}</span>
+                          <span className="parking-row-copy">
+                            <strong>{point.name}</strong>
+                            <span className="parking-row-details">
+                              {parkingDetails.metrics.map((metric) => (
+                                <span className="parking-row-detail" key={metric.label}>
+                                  <MapPin size={13} aria-hidden="true" />
+                                  <span>{metric.value}</span>
+                                </span>
+                              ))}
+                              {listDetails.map((detail) => (
+                                <span className="parking-row-detail" key={detail.label}>
+                                  <span className="parking-row-detail-icon">
+                                    {detail.emphasis ?? (
+                                      <ParkingListDetailIcon icon={detail.icon} />
+                                    )}
+                                  </span>
+                                  <span>
+                                    {detail.label === "Spaces"
+                                      ? detail.value.toLowerCase()
+                                      : detail.value}
+                                  </span>
+                                </span>
+                              ))}
+                            </span>
                           </span>
-                        </span>
-                      </button>
-                      <button
-                        aria-label={`Show cycle directions to ${point.name}`}
-                        className="parking-directions-button"
-                        type="button"
-                        onClick={(event) => {
-                          void requestDirections(event, point);
-                        }}
-                      >
-                        <Navigation size={17} aria-hidden="true" />
-                      </button>
-                      <button
-                        aria-label={`Copy link to ${point.name}`}
-                        className="parking-share-button"
-                        type="button"
-                        onClick={(event) => {
-                          void copyParkingLink(event, point);
-                        }}
-                      >
-                        <Share2 size={17} aria-hidden="true" />
-                        {copiedShareButton?.source === "list" &&
-                        copiedShareButton.parkingId === point.id ? (
-                          <span className="parking-share-tooltip" role="status">
-                            Copied
-                          </span>
-                        ) : null}
-                      </button>
-                    </li>
-                  ))}
+                        </button>
+                        <button
+                          aria-label={`Show cycle directions to ${point.name}`}
+                          className="parking-directions-button"
+                          type="button"
+                          onClick={(event) => {
+                            void requestDirections(event, point);
+                          }}
+                        >
+                          <Navigation size={17} aria-hidden="true" />
+                        </button>
+                        <button
+                          aria-label={`Copy link to ${point.name}`}
+                          className="parking-share-button"
+                          type="button"
+                          onClick={(event) => {
+                            void copyParkingLink(event, point);
+                          }}
+                        >
+                          <Share2 size={17} aria-hidden="true" />
+                          {copiedShareButton?.source === "list" &&
+                          copiedShareButton.parkingId === point.id ? (
+                            <span className="parking-share-tooltip" role="status">
+                              Copied
+                            </span>
+                          ) : null}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ol>
               </div>
 

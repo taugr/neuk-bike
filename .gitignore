@@ -3,6 +3,7 @@
 !.env.example
 .next/
 out/
+.playwright-cli/
 node_modules/
 coverage/
 dist/
