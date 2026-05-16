@@ -341,6 +341,10 @@ a {
   color: #7a3e07;
 }
 
+:root[data-theme="dark"] .parking-popup-tone-amber {
+  color: #fbbf24;
+}
+
 .parking-popup-tone-muted {
   background: #eef2f1;
   border-color: var(--subtle);
