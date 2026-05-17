@@ -924,7 +924,7 @@ export default function CycleParkingFinder() {
               </div>
               <div>
                 <h1>Edinburgh Cycle Parking</h1>
-                <p>{formattedParkingLocationCount} parking locations</p>
+                <p>{formattedParkingLocationCount} bike neuks</p>
               </div>
               {renderThemeSettings()}
             </header>

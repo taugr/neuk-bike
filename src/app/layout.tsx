@@ -4,11 +4,11 @@ import PwaInstallPrompt from "@/components/pwa-install-prompt";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
-const siteUrl = "https://taugr.github.io";
-const sitePath = "/edinburgh-cycle-parking";
+const siteUrl = "https://neuk.bike";
+const sitePath = "/";
 const siteTitle = "Edinburgh Cycle Parking";
 const siteDescription = "Find nearby cycle parking spaces across Edinburgh.";
-const socialImage = `${sitePath}/og-image.png`;
+const socialImage = "/og-image.png";
 const lightThemeColor = "#0f766e";
 const darkThemeColor = "#0f1715";
 
@@ -54,7 +54,7 @@ export const viewport: Viewport = {
   ],
 };
 
-const assetBasePath = process.env.GITHUB_PAGES === "true" ? "/edinburgh-cycle-parking" : "";
+const assetBasePath = "";
 
 function assetPath(path: string) {
   return `${assetBasePath}${path}`;

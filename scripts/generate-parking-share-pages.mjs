@@ -7,10 +7,10 @@ const projectRoot = path.resolve(__dirname, "..");
 const datasetPath = path.join(projectRoot, "src/data/cycle-parking.json");
 const outputRoot = path.join(projectRoot, "out");
 const parkingOutputRoot = path.join(outputRoot, "parking");
-const siteUrl = "https://taugr.github.io";
-const sitePath = "/edinburgh-cycle-parking";
+const siteUrl = "https://neuk.bike";
+const sitePath = "";
 const siteTitle = "Edinburgh Cycle Parking";
-const assetBasePath = process.env.GITHUB_PAGES === "true" ? sitePath : "";
+const assetBasePath = sitePath;
 const socialImageWidth = 1200;
 const socialImageHeight = 630;
 

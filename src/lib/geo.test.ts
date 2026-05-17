@@ -377,6 +377,12 @@ describe("geo utilities", () => {
     ).toBe("https://taugr.github.io/edinburgh-cycle-parking/parking/near/");
   });
 
+  it("builds root-hosted parking share links for the custom domain", () => {
+    expect(buildParkingShareUrl("https://neuk.bike", "/", "near")).toBe(
+      "https://neuk.bike/parking/near/",
+    );
+  });
+
   it("builds parking share links from an existing share page path", () => {
     expect(
       buildParkingShareUrl(

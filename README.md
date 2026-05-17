@@ -3,7 +3,7 @@
 <p align="center">
   <img src="./public/icon-192.png" alt="Edinburgh Cycle Parking icon" width="140" />
   <br />
-  <a href="https://taugr.github.io/edinburgh-cycle-parking/">
+  <a href="https://neuk.bike/">
     <img src="https://img.shields.io/badge/live-GitHub%20Pages-0f766e" alt="live app" />
   </a>
   <a href="./LICENSE">
@@ -29,7 +29,7 @@
 
 Open the app at:
 
-- https://taugr.github.io/edinburgh-cycle-parking/
+- https://neuk.bike/
 
 The app runs entirely in the browser. It has no backend, database, tracking service, or server API.
 
@@ -125,7 +125,7 @@ Live place search, CycleStreets directions, and uncached OpenStreetMap tiles sti
 
 ## Deployment
 
-The app is configured for GitHub Pages project hosting.
+The app is configured for GitHub Pages with the custom domain `neuk.bike`.
 
 Local static export:
 
@@ -133,7 +133,9 @@ Local static export:
 pnpm build
 ```
 
-On GitHub Actions, the deploy workflow sets `GITHUB_PAGES=true`. That enables the `/edinburgh-cycle-parking` base path and asset prefix, generates static social-preview pages for parking stand links, then publishes the generated `out/` directory.
+On GitHub Actions, the deploy workflow builds the root-hosted static export for `https://neuk.bike`, generates static social-preview pages for parking stand links, then publishes the generated `out/` directory.
+
+The GitHub Pages custom domain is declared in `public/CNAME`. Configure the repository Pages custom domain as `neuk.bike`, then point the domain DNS at GitHub Pages and enable HTTPS once GitHub makes it available.
 
 ## Attribution
 
