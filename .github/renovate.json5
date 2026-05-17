@@ -1,59 +1,64 @@
 {
   // Enable Renovate
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
 
   // Extend from recommended base configuration
-  extends: ["config:recommended", ":disableDependencyDashboard"],
+  extends: ['config:recommended', ':disableDependencyDashboard'],
 
   // Timezone for schedules
-  timezone: "Asia/Yerevan",
+  timezone: 'Asia/Yerevan',
 
   // Fallback schedule for anything without a specific schedule
-  schedule: ["* 0-12 * * 1-5"],
+  schedule: ['* 0-12 * * 1-5'],
 
   // Labels for GitHub PRs
-  labels: ["dependencies"],
+  labels: ['dependencies'],
 
   // Package rules for different update schedules
   packageRules: [
     {
-      description: "Update dependencies every weekday morning",
-      matchDepTypes: ["dependencies", "peerDependencies", "pnpm.catalog", "pnpm.catalog.*"],
+      description: 'Update dependencies every weekday morning',
+      matchDepTypes: [
+        'dependencies',
+        'peerDependencies',
+        'pnpm.catalog',
+        'pnpm.catalog.*',
+      ],
       // Cron: Weekdays in the morning (minute hour day month weekday)
-      schedule: ["* 0-12 * * 1-5"],
+      schedule: ['* 0-12 * * 1-5'],
     },
     {
-      description: "Update devDependencies every Saturday morning",
-      matchDepTypes: ["devDependencies"],
+      description: 'Update devDependencies every Saturday morning',
+      matchDepTypes: ['devDependencies'],
       // Cron: Every Saturday in the morning (minute hour day month weekday)
-      schedule: ["* 0-12 * * 6"],
+      schedule: ['* 0-12 * * 6'],
     },
     {
-      description: "Update pnpm every Saturday morning",
-      matchDepNames: ["pnpm"],
+      description: 'Update pnpm every Saturday morning',
+      matchDepNames: ['pnpm'],
       // Cron: Every Saturday in the morning (minute hour day month weekday)
-      schedule: ["* 0-12 * * 6"],
+      schedule: ['* 0-12 * * 6'],
     },
     {
-      description: "Update GitHub Actions workflows on 3rd Monday of the month",
-      matchFileNames: [".github/workflows/**"],
+      description: 'Update GitHub Actions workflows on 3rd Monday of the month',
+      matchFileNames: ['.github/workflows/**'],
       // Cron: Every Monday during days 15-21 (contains 3rd Monday)
-      schedule: ["* * 15-21 * 1"],
+      schedule: ['* * 15-21 * 1'],
     },
     {
-      description: "Group and automerge non-major devDependencies updates; majors stay one PR per package",
-      matchDepTypes: ["devDependencies"],
-      matchUpdateTypes: ["minor", "patch"],
-      groupName: "dev dependencies",
+      description: 'Group and automerge non-major devDependencies updates; majors stay one PR per package',
+      matchDepTypes: ['devDependencies'],
+      matchUpdateTypes: ['minor', 'patch'],
+      groupName: 'dev dependencies',
       automerge: true,
-      automergeType: "pr",
+      automergeType: 'pr',
     },
     {
-      description: "Automerge non-major pnpm updates like devDependencies",
-      matchDepNames: ["pnpm"],
-      matchUpdateTypes: ["minor", "patch"],
+      description: 'Automerge non-major pnpm updates like devDependencies',
+      matchDepNames: ['pnpm'],
+      matchUpdateTypes: ['minor', 'patch'],
       automerge: true,
-      automergeType: "pr",
+      automergeType: 'pr',
     },
   ],
 }

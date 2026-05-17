@@ -1,4 +1,4 @@
-import type { ParkingPoint, UserLocation } from "@/lib/types";
+import type { ParkingPoint, UserLocation } from '@/lib/types';
 
 export const EDINBURGH_FALLBACK_LOCATION: UserLocation = {
   latitude: 55.9533,
@@ -40,10 +40,14 @@ export function distanceMeters(from: UserLocation, to: UserLocation) {
 
   const halfChordLength =
     Math.sin(latitudeDelta / 2) ** 2 +
-    Math.cos(fromLatitude) * Math.cos(toLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+    Math.cos(fromLatitude) *
+      Math.cos(toLatitude) *
+      Math.sin(longitudeDelta / 2) ** 2;
 
   return (
-    2 * earthRadiusMeters * Math.atan2(Math.sqrt(halfChordLength), Math.sqrt(1 - halfChordLength))
+    2 *
+    earthRadiusMeters *
+    Math.atan2(Math.sqrt(halfChordLength), Math.sqrt(1 - halfChordLength))
   );
 }
 
@@ -53,7 +57,9 @@ export function sortByDistance(points: ParkingPoint[], location: UserLocation) {
       ...point,
       distanceMeters: distanceMeters(location, point),
     }))
-    .sort((left, right) => (left.distanceMeters ?? 0) - (right.distanceMeters ?? 0));
+    .sort(
+      (left, right) => (left.distanceMeters ?? 0) - (right.distanceMeters ?? 0),
+    );
 }
 
 export function isFarFromNearestParking(
@@ -63,12 +69,14 @@ export function isFarFromNearestParking(
 ) {
   const nearestDistance = sortByDistance(points, location)[0]?.distanceMeters;
 
-  return typeof nearestDistance !== "number" || nearestDistance > thresholdMeters;
+  return (
+    typeof nearestDistance !== 'number' || nearestDistance > thresholdMeters
+  );
 }
 
 export function formatDistance(distance: number | undefined) {
-  if (typeof distance !== "number") {
-    return "Unknown distance";
+  if (typeof distance !== 'number') {
+    return 'Unknown distance';
   }
 
   if (distance < 1_000) {

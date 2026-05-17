@@ -1,27 +1,33 @@
-import { formatDistance } from "@/lib/geo";
-import type { ParkingPoint } from "@/lib/types";
+import { formatDistance } from '@/lib/geo';
+import type { ParkingPoint } from '@/lib/types';
 
 type ParkingDetail = {
   label: string;
   value: string;
 };
 
-export type ParkingPopupTone = "amber" | "green" | "muted" | "neutral" | "restricted" | "teal";
+export type ParkingPopupTone =
+  | 'amber'
+  | 'green'
+  | 'muted'
+  | 'neutral'
+  | 'restricted'
+  | 'teal';
 
 export type ParkingPopupIcon =
-  | "access-open"
-  | "building"
-  | "covered"
-  | "customer"
-  | "distance"
-  | "fixture"
-  | "not-covered"
-  | "parking"
-  | "restricted"
-  | "stand"
-  | "storage"
-  | "university"
-  | "unknown";
+  | 'access-open'
+  | 'building'
+  | 'covered'
+  | 'customer'
+  | 'distance'
+  | 'fixture'
+  | 'not-covered'
+  | 'parking'
+  | 'restricted'
+  | 'stand'
+  | 'storage'
+  | 'university'
+  | 'unknown';
 
 type ParkingPopupMetric = {
   icon: ParkingPopupIcon;
@@ -44,61 +50,67 @@ export type ParkingPopupDetails = {
 };
 
 function normalizeText(value: string | number | boolean | null | undefined) {
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+  return typeof value === 'string' && value.trim().length > 0
+    ? value.trim()
+    : null;
 }
 
 function formatCapacity(value: string | number | boolean | null | undefined) {
-  return typeof value === "number" && value > 0 ? `${value} spaces` : "Not listed";
+  return typeof value === 'number' && value > 0
+    ? `${value} spaces`
+    : 'Not listed';
 }
 
 function formatCovered(value: string | number | boolean | null | undefined) {
-  if (value === "yes") {
-    return "Covered";
+  if (value === 'yes') {
+    return 'Covered';
   }
 
-  if (value === "no") {
-    return "Not covered";
+  if (value === 'no') {
+    return 'Not covered';
   }
 
-  return "Not listed";
+  return 'Not listed';
 }
 
 function getDistanceTone(distance: number | undefined): ParkingPopupTone {
-  if (typeof distance !== "number") {
-    return "neutral";
+  if (typeof distance !== 'number') {
+    return 'neutral';
   }
 
   if (distance < 250) {
-    return "green";
+    return 'green';
   }
 
   if (distance < 1_000) {
-    return "amber";
+    return 'amber';
   }
 
-  return "muted";
+  return 'muted';
 }
 
-function getCapacityTone(value: string | number | boolean | null | undefined): ParkingPopupTone {
-  if (typeof value !== "number" || value <= 0) {
-    return "neutral";
+function getCapacityTone(
+  value: string | number | boolean | null | undefined,
+): ParkingPopupTone {
+  if (typeof value !== 'number' || value <= 0) {
+    return 'neutral';
   }
 
   if (value <= 4) {
-    return "amber";
+    return 'amber';
   }
 
   if (value <= 10) {
-    return "teal";
+    return 'teal';
   }
 
-  return "green";
+  return 'green';
 }
 
 function formatCapacityDetail(
   value: string | number | boolean | null | undefined,
 ): ParkingPopupDetail | null {
-  const hasCapacity = typeof value === "number" && value > 0;
+  const hasCapacity = typeof value === 'number' && value > 0;
 
   if (!hasCapacity) {
     return null;
@@ -106,10 +118,10 @@ function formatCapacityDetail(
 
   return {
     emphasis: String(value),
-    icon: "parking",
-    label: "Spaces",
+    icon: 'parking',
+    label: 'Spaces',
     tone: getCapacityTone(value),
-    value: "Spaces",
+    value: 'Spaces',
   };
 }
 
@@ -122,72 +134,82 @@ function formatStandType(
     return null;
   }
 
-  if (["stands", "wide_stands", "staple", "hoop", "post_hoop"].includes(type)) {
+  if (['stands', 'wide_stands', 'staple', 'hoop', 'post_hoop'].includes(type)) {
     return {
-      icon: "stand",
-      label: "Type",
-      tone: "teal",
+      icon: 'stand',
+      label: 'Type',
+      tone: 'teal',
       value: formatTypeLabel(type),
     };
   }
 
-  if (["rack", "racks"].includes(type)) {
+  if (['rack', 'racks'].includes(type)) {
     return {
-      icon: "parking",
-      label: "Type",
-      tone: "teal",
+      icon: 'parking',
+      label: 'Type',
+      tone: 'teal',
       value: formatTypeLabel(type),
     };
   }
 
-  if (["shed", "building", "lockers", "streetpod"].includes(type)) {
+  if (['shed', 'building', 'lockers', 'streetpod'].includes(type)) {
     return {
-      icon: type === "building" ? "building" : "storage",
-      label: "Type",
-      tone: "green",
+      icon: type === 'building' ? 'building' : 'storage',
+      label: 'Type',
+      tone: 'green',
       value: formatTypeLabel(type),
     };
   }
 
-  if (["wall_loops", "anchors", "ground_slots", "front_wheel", "vertical_stand"].includes(type)) {
+  if (
+    [
+      'wall_loops',
+      'anchors',
+      'ground_slots',
+      'front_wheel',
+      'vertical_stand',
+    ].includes(type)
+  ) {
     return {
-      icon: "fixture",
-      label: "Type",
-      tone: "amber",
+      icon: 'fixture',
+      label: 'Type',
+      tone: 'amber',
       value: formatTypeLabel(type),
     };
   }
 
   return {
-    icon: "unknown",
-    label: "Type",
-    tone: "neutral",
+    icon: 'unknown',
+    label: 'Type',
+    tone: 'neutral',
     value: formatTypeLabel(type),
   };
 }
 
 function formatTypeLabel(value: string) {
-  return value.replaceAll(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return value
+    .replaceAll(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function formatCoverDetail(
   value: string | number | boolean | null | undefined,
 ): ParkingPopupDetail | null {
-  if (value === "yes") {
+  if (value === 'yes') {
     return {
-      icon: "covered",
-      label: "Cover",
-      tone: "green",
-      value: "Covered",
+      icon: 'covered',
+      label: 'Cover',
+      tone: 'green',
+      value: 'Covered',
     };
   }
 
-  if (value === "no") {
+  if (value === 'no') {
     return {
-      icon: "not-covered",
-      label: "Cover",
-      tone: "muted",
-      value: "Not covered",
+      icon: 'not-covered',
+      label: 'Cover',
+      tone: 'muted',
+      value: 'Not covered',
     };
   }
 
@@ -203,50 +225,50 @@ function formatAccessDetail(
     return null;
   }
 
-  if (access === "unknown") {
+  if (access === 'unknown') {
     return null;
   }
 
-  if (["yes", "permissive", "destination"].includes(access)) {
+  if (['yes', 'permissive', 'destination'].includes(access)) {
     return {
-      icon: "access-open",
-      label: "Access",
-      tone: "green",
-      value: access === "yes" ? "Public access" : formatTypeLabel(access),
+      icon: 'access-open',
+      label: 'Access',
+      tone: 'green',
+      value: access === 'yes' ? 'Public access' : formatTypeLabel(access),
     };
   }
 
-  if (["private", "employees", "permit", "residents"].includes(access)) {
+  if (['private', 'employees', 'permit', 'residents'].includes(access)) {
     return {
-      icon: "restricted",
-      label: "Access",
-      tone: "restricted",
+      icon: 'restricted',
+      label: 'Access',
+      tone: 'restricted',
       value: formatTypeLabel(access),
     };
   }
 
-  if (access === "customers") {
+  if (access === 'customers') {
     return {
-      icon: "customer",
-      label: "Access",
-      tone: "amber",
-      value: "Customers",
+      icon: 'customer',
+      label: 'Access',
+      tone: 'amber',
+      value: 'Customers',
     };
   }
 
-  if (access === "university") {
+  if (access === 'university') {
     return {
-      icon: "university",
-      label: "Access",
-      tone: "teal",
-      value: "University",
+      icon: 'university',
+      label: 'Access',
+      tone: 'teal',
+      value: 'University',
     };
   }
 
   return {
-    icon: "unknown",
-    label: "Access",
-    tone: "neutral",
+    icon: 'unknown',
+    label: 'Access',
+    tone: 'neutral',
     value: formatTypeLabel(access),
   };
 }
@@ -254,42 +276,44 @@ function formatAccessDetail(
 export function getParkingDetails(point: ParkingPoint): ParkingDetail[] {
   return [
     {
-      label: "Distance",
+      label: 'Distance',
       value:
-        typeof point.distanceMeters === "number"
+        typeof point.distanceMeters === 'number'
           ? `${formatDistance(point.distanceMeters)} away`
-          : "Not listed",
+          : 'Not listed',
     },
     {
-      label: "Spaces",
+      label: 'Spaces',
       value: formatCapacity(point.properties.capacity),
     },
     {
-      label: "Type",
-      value: normalizeText(point.properties.bicycle_pa) ?? "Not listed",
+      label: 'Type',
+      value: normalizeText(point.properties.bicycle_pa) ?? 'Not listed',
     },
     {
-      label: "Cover",
+      label: 'Cover',
       value: formatCovered(point.properties.covered),
     },
     {
-      label: "Access",
-      value: normalizeText(point.properties.access) ?? "Not listed",
+      label: 'Access',
+      value: normalizeText(point.properties.access) ?? 'Not listed',
     },
   ];
 }
 
-export function getParkingPopupDetails(point: ParkingPoint): ParkingPopupDetails {
+export function getParkingPopupDetails(
+  point: ParkingPoint,
+): ParkingPopupDetails {
   return {
     metrics: [
       {
-        icon: "distance",
-        label: "Distance",
+        icon: 'distance',
+        label: 'Distance',
         tone: getDistanceTone(point.distanceMeters),
         value:
-          typeof point.distanceMeters === "number"
+          typeof point.distanceMeters === 'number'
             ? `${formatDistance(point.distanceMeters)} away`
-            : "Not listed",
+            : 'Not listed',
       },
     ],
     details: [
@@ -303,13 +327,13 @@ export function getParkingPopupDetails(point: ParkingPoint): ParkingPopupDetails
 
 export function describeParkingPoint(point: ParkingPoint) {
   const capacity = formatCapacity(point.properties.capacity);
-  const kind = normalizeText(point.properties.bicycle_pa) ?? "type not listed";
+  const kind = normalizeText(point.properties.bicycle_pa) ?? 'type not listed';
   const covered = formatCovered(point.properties.covered);
   const details = [capacity, kind];
 
-  if (covered !== "Not listed") {
+  if (covered !== 'Not listed') {
     details.push(covered.toLowerCase());
   }
 
-  return details.join(", ");
+  return details.join(', ');
 }

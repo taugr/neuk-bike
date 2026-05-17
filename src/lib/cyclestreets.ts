@@ -1,9 +1,10 @@
-import type { ParkingPoint, UserLocation } from "@/lib/types";
-import { distanceMeters } from "@/lib/geo";
+import type { ParkingPoint, UserLocation } from '@/lib/types';
+import { distanceMeters } from '@/lib/geo';
 
-export const CYCLESTREETS_DIRECTIONS_ENDPOINT = "https://api.cyclestreets.net/v2/journey.plan";
-export const CYCLESTREETS_ROUTE_PLAN = "balanced";
-export const CYCLESTREETS_SPEED_KMPH = "16";
+export const CYCLESTREETS_DIRECTIONS_ENDPOINT =
+  'https://api.cyclestreets.net/v2/journey.plan';
+export const CYCLESTREETS_ROUTE_PLAN = 'balanced';
+export const CYCLESTREETS_SPEED_KMPH = '16';
 export const SHORT_CYCLE_ROUTE_THRESHOLD_METERS = 10;
 
 export type CycleRoutePoint = [latitude: number, longitude: number];
@@ -23,7 +24,7 @@ export type CycleRoute = {
   durationSeconds: number;
   points: CycleRoutePoint[];
   instructions: CycleRouteInstruction[];
-  source: "cyclestreets" | "local";
+  source: 'cyclestreets' | 'local';
   itineraryId?: string;
   routeUrl?: string;
 };
@@ -55,9 +56,9 @@ type CycleStreetsProperties = Record<string, unknown>;
 let jsonpRequestCount = 0;
 
 export class CycleStreetsRouteError extends Error {
-  constructor(message = "Directions are unavailable right now.") {
+  constructor(message = 'Directions are unavailable right now.') {
     super(message);
-    this.name = "CycleStreetsRouteError";
+    this.name = 'CycleStreetsRouteError';
   }
 }
 
@@ -79,22 +80,22 @@ export function buildCycleStreetsDirectionsRequest({
     key: apiKey,
     plans: CYCLESTREETS_ROUTE_PLAN,
     speedKmph: CYCLESTREETS_SPEED_KMPH,
-    archive: "none",
-    itineraryFields: "start,finish,id",
-    journeyFields: "path,plan,lengthMetres,timeSeconds",
-    waypoints: `${formatWaypoint(origin, "Start")}|${formatWaypoint(destination, destination.name)}`,
+    archive: 'none',
+    itineraryFields: 'start,finish,id',
+    journeyFields: 'path,plan,lengthMetres,timeSeconds',
+    waypoints: `${formatWaypoint(origin, 'Start')}|${formatWaypoint(destination, destination.name)}`,
   });
 
   return {
     url: `${CYCLESTREETS_DIRECTIONS_ENDPOINT}?${params.toString()}`,
     headers: {
-      Accept: "application/json",
+      Accept: 'application/json',
     },
   };
 }
 
 function fetchCycleStreetsJsonp(url: string) {
-  if (typeof window === "undefined" || typeof document === "undefined") {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
     return Promise.reject(new CycleStreetsRouteError());
   }
 
@@ -104,7 +105,7 @@ function fetchCycleStreetsJsonp(url: string) {
 
     const callbackTarget = window as unknown as Window &
       Record<string, ((response: unknown) => void) | undefined>;
-    const script = document.createElement("script");
+    const script = document.createElement('script');
     const jsonpUrl = new URL(url);
     const timeoutId = window.setTimeout(() => {
       cleanup();
@@ -122,7 +123,7 @@ function fetchCycleStreetsJsonp(url: string) {
       resolve(response);
     };
 
-    jsonpUrl.searchParams.set("callback", callbackName);
+    jsonpUrl.searchParams.set('callback', callbackName);
     script.src = jsonpUrl.toString();
     script.async = true;
     script.onerror = () => {
@@ -134,8 +135,10 @@ function fetchCycleStreetsJsonp(url: string) {
   });
 }
 
-export async function fetchCycleStreetsDirections(request: CycleStreetsDirectionsRequest) {
-  if (typeof window !== "undefined" && typeof document !== "undefined") {
+export async function fetchCycleStreetsDirections(
+  request: CycleStreetsDirectionsRequest,
+) {
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     return fetchCycleStreetsJsonp(request.url);
   }
 
@@ -150,7 +153,10 @@ export async function fetchCycleStreetsDirections(request: CycleStreetsDirection
   return response.json();
 }
 
-export function buildCycleRouteCacheKey(origin: UserLocation, destination: ParkingPoint) {
+export function buildCycleRouteCacheKey(
+  origin: UserLocation,
+  destination: ParkingPoint,
+) {
   return [
     CYCLESTREETS_ROUTE_PLAN,
     origin.latitude.toFixed(5),
@@ -158,31 +164,33 @@ export function buildCycleRouteCacheKey(origin: UserLocation, destination: Parki
     destination.id,
     destination.latitude.toFixed(5),
     destination.longitude.toFixed(5),
-  ].join(":");
+  ].join(':');
 }
 
 export function formatCycleRouteDuration(seconds: number) {
   if (!Number.isFinite(seconds) || seconds <= 0) {
-    return "less than 1 min";
+    return 'less than 1 min';
   }
 
   const minutes = Math.max(1, Math.round(seconds / 60));
-  return minutes === 1 ? "1 min" : `${minutes} min`;
+  return minutes === 1 ? '1 min' : `${minutes} min`;
 }
 
 function capitalizeFirstLetter(value: string) {
   return value.length > 0 ? value[0]!.toUpperCase() + value.slice(1) : value;
 }
 
-export function describeCycleRouteInstruction(instruction: CycleRouteInstruction) {
+export function describeCycleRouteInstruction(
+  instruction: CycleRouteInstruction,
+) {
   const name = instruction.streetName.trim();
   const turn = instruction.turn.trim();
 
-  if (turn === "start") {
-    return name ? `Start on ${name}` : "Start";
+  if (turn === 'start') {
+    return name ? `Start on ${name}` : 'Start';
   }
 
-  if (turn === "straight" && !name) {
+  if (turn === 'straight' && !name) {
     return `Straight ${Math.round(instruction.distanceMeters)} m`;
   }
 
@@ -193,10 +201,17 @@ export function describeCycleRouteInstruction(instruction: CycleRouteInstruction
   return capitalizeFirstLetter(`${turn} onto ${name}`);
 }
 
-export function buildShortCycleRoute(origin: UserLocation, destination: ParkingPoint): CycleRoute {
+export function buildShortCycleRoute(
+  origin: UserLocation,
+  destination: ParkingPoint,
+): CycleRoute {
   const routeDistanceMeters = distanceMeters(origin, destination);
-  const speedMetersPerSecond = (Number(CYCLESTREETS_SPEED_KMPH) * 1_000) / 3_600;
-  const durationSeconds = Math.max(1, Math.round(routeDistanceMeters / speedMetersPerSecond));
+  const speedMetersPerSecond =
+    (Number(CYCLESTREETS_SPEED_KMPH) * 1_000) / 3_600;
+  const durationSeconds = Math.max(
+    1,
+    Math.round(routeDistanceMeters / speedMetersPerSecond),
+  );
 
   return {
     plan: CYCLESTREETS_ROUTE_PLAN,
@@ -209,19 +224,19 @@ export function buildShortCycleRoute(origin: UserLocation, destination: ParkingP
     instructions: [
       {
         id: `short-route-${destination.id}`,
-        streetName: "",
-        turn: "straight",
+        streetName: '',
+        turn: 'straight',
         distanceMeters: routeDistanceMeters,
         durationSeconds,
-        travelMode: "walking",
+        travelMode: 'walking',
       },
     ],
-    source: "local",
+    source: 'local',
   };
 }
 
 function getObject(value: unknown): Record<string, unknown> | null {
-  return value !== null && typeof value === "object" && !Array.isArray(value)
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : null;
 }
@@ -232,15 +247,19 @@ function getNumber(value: unknown) {
 }
 
 function getString(value: unknown) {
-  return typeof value === "string" ? value : null;
+  return typeof value === 'string' ? value : null;
 }
 
 function getStringOrNumber(value: unknown) {
-  return typeof value === "string" || typeof value === "number" ? String(value) : null;
+  return typeof value === 'string' || typeof value === 'number'
+    ? String(value)
+    : null;
 }
 
-function parseLineString(geometry: GeoJsonGeometry | undefined): CycleRoutePoint[] {
-  if (geometry?.type !== "LineString" || !Array.isArray(geometry.coordinates)) {
+function parseLineString(
+  geometry: GeoJsonGeometry | undefined,
+): CycleRoutePoint[] {
+  if (geometry?.type !== 'LineString' || !Array.isArray(geometry.coordinates)) {
     return [];
   }
 
@@ -261,7 +280,7 @@ function parseLineString(geometry: GeoJsonGeometry | undefined): CycleRoutePoint
 }
 
 function isFeature(value: unknown): value is GeoJsonFeature {
-  return getObject(value)?.type === "Feature";
+  return getObject(value)?.type === 'Feature';
 }
 
 function getFeatureProperties(feature: GeoJsonFeature): CycleStreetsProperties {
@@ -269,11 +288,12 @@ function getFeatureProperties(feature: GeoJsonFeature): CycleStreetsProperties {
 }
 
 function getPath(properties: CycleStreetsProperties) {
-  return getString(properties.path) ?? "";
+  return getString(properties.path) ?? '';
 }
 
 function parseRouteUrl(properties: CycleStreetsProperties) {
-  const itineraryId = getStringOrNumber(properties.id) ?? getStringOrNumber(properties.itinerary);
+  const itineraryId =
+    getStringOrNumber(properties.id) ?? getStringOrNumber(properties.itinerary);
 
   if (!itineraryId) {
     return {};
@@ -292,8 +312,13 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
   }
 
   const collection = getObject(response) as GeoJsonFeatureCollection | null;
-  if (collection?.type !== "FeatureCollection" || !Array.isArray(collection.features)) {
-    throw new CycleStreetsRouteError("CycleStreets returned an unexpected route response.");
+  if (
+    collection?.type !== 'FeatureCollection' ||
+    !Array.isArray(collection.features)
+  ) {
+    throw new CycleStreetsRouteError(
+      'CycleStreets returned an unexpected route response.',
+    );
   }
 
   const features = collection.features.filter(isFeature);
@@ -303,7 +328,9 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
   });
 
   if (!routeFeature) {
-    throw new CycleStreetsRouteError("CycleStreets did not return a usable route.");
+    throw new CycleStreetsRouteError(
+      'CycleStreets did not return a usable route.',
+    );
   }
 
   const routeProperties = getFeatureProperties(routeFeature);
@@ -311,21 +338,29 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
   const durationSeconds = getNumber(routeProperties.timeSeconds);
   const points = parseLineString(routeFeature.geometry);
 
-  if (distanceMeters === null || durationSeconds === null || points.length < 2) {
-    throw new CycleStreetsRouteError("CycleStreets returned an incomplete route.");
+  if (
+    distanceMeters === null ||
+    durationSeconds === null ||
+    points.length < 2
+  ) {
+    throw new CycleStreetsRouteError(
+      'CycleStreets returned an incomplete route.',
+    );
   }
 
   const instructions = features
     .filter((feature) =>
-      getPath(getFeatureProperties(feature)).startsWith(`plan/${CYCLESTREETS_ROUTE_PLAN}/street/`),
+      getPath(getFeatureProperties(feature)).startsWith(
+        `plan/${CYCLESTREETS_ROUTE_PLAN}/street/`,
+      ),
     )
     .map((feature, index): CycleRouteInstruction | null => {
       const properties = getFeatureProperties(feature);
-      const streetName = getString(properties.name) ?? "";
-      const turn = getString(properties.turnPrevText) ?? "";
+      const streetName = getString(properties.name) ?? '';
+      const turn = getString(properties.turnPrevText) ?? '';
       const streetDistanceMeters = getNumber(properties.lengthMetres);
       const streetDurationSeconds = getNumber(properties.timeSeconds);
-      const travelMode = getString(properties.travelMode) ?? "cycling";
+      const travelMode = getString(properties.travelMode) ?? 'cycling';
 
       if (streetDistanceMeters === null || streetDurationSeconds === null) {
         return null;
@@ -340,7 +375,10 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
         travelMode,
       };
     })
-    .filter((instruction): instruction is CycleRouteInstruction => instruction !== null);
+    .filter(
+      (instruction): instruction is CycleRouteInstruction =>
+        instruction !== null,
+    );
 
   return {
     plan: CYCLESTREETS_ROUTE_PLAN,
@@ -348,7 +386,7 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
     durationSeconds,
     points,
     instructions,
-    source: "cyclestreets",
+    source: 'cyclestreets',
     ...parseRouteUrl(routeProperties),
   };
 }

@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 import {
   Bike,
   Boxes,
@@ -25,7 +25,7 @@ import {
   Warehouse,
   X,
   type LucideIcon,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   useEffect,
   useMemo,
@@ -35,8 +35,8 @@ import {
   type FormEvent,
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
-} from "react";
-import cycleParkingDataset from "@/data/cycle-parking.json";
+} from 'react';
+import cycleParkingDataset from '@/data/cycle-parking.json';
 import {
   buildShortCycleRoute,
   buildCycleRouteCacheKey,
@@ -47,13 +47,13 @@ import {
   parseCycleStreetsRoute,
   SHORT_CYCLE_ROUTE_THRESHOLD_METERS,
   type CycleRoute,
-} from "@/lib/cyclestreets";
+} from '@/lib/cyclestreets';
 import {
   buildPlaceSearchUrl,
   parsePlaceSearchResults,
   type PlaceSearchResult,
-} from "@/lib/geocoder";
-import type { ParkingPoint, UserLocation } from "@/lib/types";
+} from '@/lib/geocoder';
+import type { ParkingPoint, UserLocation } from '@/lib/types';
 import {
   EDINBURGH_FALLBACK_LOCATION,
   formatDistance,
@@ -61,22 +61,29 @@ import {
   isFarFromNearestParking,
   isResolvedLocation,
   sortByDistance,
-} from "@/lib/geo";
-import { describeParkingPoint, getParkingPopupDetails, type ParkingPopupIcon } from "@/lib/parking";
-import { buildParkingShareUrl, parseShareLinkState } from "@/lib/share-links";
-import { usePwaInstallPrompt } from "@/components/pwa-install-prompt";
+} from '@/lib/geo';
+import {
+  describeParkingPoint,
+  getParkingPopupDetails,
+  type ParkingPopupIcon,
+} from '@/lib/parking';
+import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
+import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 
-const CycleParkingMap = dynamic(() => import("@/components/cycle-parking-map"), {
-  ssr: false,
-  loading: () => <div className="map-loading">Loading map...</div>,
-});
+const CycleParkingMap = dynamic(
+  () => import('@/components/cycle-parking-map'),
+  {
+    ssr: false,
+    loading: () => <div className="map-loading">Loading map...</div>,
+  },
+);
 
 const parkingPoints = cycleParkingDataset.points as ParkingPoint[];
 const maxPlaceSearchCacheEntries = 12;
 const closestParkingResultCount = 8;
 const copiedMessageDurationMs = 1_800;
-const defaultLocale = "en-GB";
-const themeStorageKey = "cycle-parking-theme";
+const defaultLocale = 'en-GB';
+const themeStorageKey = 'cycle-parking-theme';
 const mobileSheetDragThresholdPx = 48;
 const mobileSheetDragRangePx = 320;
 
@@ -84,7 +91,7 @@ const parkingListIconByName: Partial<Record<ParkingPopupIcon, LucideIcon>> = {
   building: Building2,
   covered: Umbrella,
   fixture: Boxes,
-  "not-covered": UmbrellaOff,
+  'not-covered': UmbrellaOff,
   parking: CircleParking,
   stand: Bike,
   storage: Warehouse,
@@ -98,25 +105,25 @@ function ParkingListDetailIcon({ icon }: { icon: ParkingPopupIcon }) {
 }
 
 type LocationState =
-  | { status: "fallback"; location: UserLocation }
-  | { status: "locating"; location: UserLocation }
-  | { status: "located"; location: UserLocation }
-  | { status: "searched"; location: UserLocation; label: string }
-  | { status: "too-far"; location: UserLocation }
-  | { status: "denied"; location: UserLocation }
-  | { status: "unavailable"; location: UserLocation };
+  | { status: 'fallback'; location: UserLocation }
+  | { status: 'locating'; location: UserLocation }
+  | { status: 'located'; location: UserLocation }
+  | { status: 'searched'; location: UserLocation; label: string }
+  | { status: 'too-far'; location: UserLocation }
+  | { status: 'denied'; location: UserLocation }
+  | { status: 'unavailable'; location: UserLocation };
 
 type DirectionsState =
-  | { status: "idle" }
-  | { status: "missing-key"; parkingId: string }
-  | { status: "loading"; parkingId: string }
-  | { status: "loaded"; parkingId: string; route: CycleRoute }
-  | { status: "error"; parkingId: string; message: string };
+  | { status: 'idle' }
+  | { status: 'missing-key'; parkingId: string }
+  | { status: 'loading'; parkingId: string }
+  | { status: 'loaded'; parkingId: string; route: CycleRoute }
+  | { status: 'error'; parkingId: string; message: string };
 
-type ShareSource = "list" | "popup";
-type ThemeMode = "system" | "light" | "dark";
-type ResolvedTheme = "light" | "dark";
-type MobileSheetState = "expanded" | "collapsed";
+type ShareSource = 'list' | 'popup';
+type ThemeMode = 'system' | 'light' | 'dark';
+type ResolvedTheme = 'light' | 'dark';
+type MobileSheetState = 'expanded' | 'collapsed';
 
 type CopiedShareButton = {
   parkingId: string;
@@ -128,18 +135,18 @@ const themeOptions: {
   label: string;
   mode: ThemeMode;
 }[] = [
-  { icon: Monitor, label: "System", mode: "system" },
-  { icon: Sun, label: "Light", mode: "light" },
-  { icon: Moon, label: "Dark", mode: "dark" },
+  { icon: Monitor, label: 'System', mode: 'system' },
+  { icon: Sun, label: 'Light', mode: 'light' },
+  { icon: Moon, label: 'Dark', mode: 'dark' },
 ];
 
 function isThemeMode(value: string | null): value is ThemeMode {
-  return value === "system" || value === "light" || value === "dark";
+  return value === 'system' || value === 'light' || value === 'dark';
 }
 
 function resolveTheme(mode: ThemeMode, prefersDark: boolean): ResolvedTheme {
-  if (mode === "system") {
-    return prefersDark ? "dark" : "light";
+  if (mode === 'system') {
+    return prefersDark ? 'dark' : 'light';
   }
 
   return mode;
@@ -156,24 +163,30 @@ async function copyTextToClipboard(text: string) {
 
 export default function CycleParkingFinder() {
   const [locationState, setLocationState] = useState<LocationState>({
-    status: "fallback",
+    status: 'fallback',
     location: EDINBURGH_FALLBACK_LOCATION,
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [placeQuery, setPlaceQuery] = useState("");
+  const [placeQuery, setPlaceQuery] = useState('');
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
-  const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(null);
-  const [copiedShareButton, setCopiedShareButton] = useState<CopiedShareButton | null>(null);
+  const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(
+    null,
+  );
+  const [copiedShareButton, setCopiedShareButton] =
+    useState<CopiedShareButton | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
-  const [directionsState, setDirectionsState] = useState<DirectionsState>({ status: "idle" });
+  const [directionsState, setDirectionsState] = useState<DirectionsState>({
+    status: 'idle',
+  });
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
   const [isAttributionModalOpen, setIsAttributionModalOpen] = useState(false);
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [numberLocale, setNumberLocale] = useState(defaultLocale);
-  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
-  const [mobileSheetState, setMobileSheetState] = useState<MobileSheetState>("expanded");
+  const [themeMode, setThemeMode] = useState<ThemeMode>('system');
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light');
+  const [mobileSheetState, setMobileSheetState] =
+    useState<MobileSheetState>('expanded');
   const [mobileSheetDragOffset, setMobileSheetDragOffset] = useState(0);
   const [mobileSheetDragProgress, setMobileSheetDragProgress] = useState(0);
   const { canInstall, installApp } = usePwaInstallPrompt();
@@ -184,9 +197,11 @@ export default function CycleParkingFinder() {
   const copiedMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
   const settingsMenu = useRef<HTMLDivElement>(null);
-  const mobileSheetDrag = useRef<{ currentY: number; pointerId: number; startY: number } | null>(
-    null,
-  );
+  const mobileSheetDrag = useRef<{
+    currentY: number;
+    pointerId: number;
+    startY: number;
+  } | null>(null);
   const ignoreNextSheetGripClick = useRef(false);
 
   useEffect(() => {
@@ -200,7 +215,7 @@ export default function CycleParkingFinder() {
     if (referenceLocation) {
       applyReferenceLocation(
         referenceLocation,
-        "located",
+        'located',
         undefined,
         selectedParkingId ?? undefined,
       );
@@ -224,7 +239,7 @@ export default function CycleParkingFinder() {
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     function updateResolvedTheme() {
       setResolvedTheme(resolveTheme(themeMode, mediaQuery.matches));
@@ -232,13 +247,13 @@ export default function CycleParkingFinder() {
 
     updateResolvedTheme();
 
-    if (themeMode !== "system") {
+    if (themeMode !== 'system') {
       return;
     }
 
-    mediaQuery.addEventListener("change", updateResolvedTheme);
+    mediaQuery.addEventListener('change', updateResolvedTheme);
 
-    return () => mediaQuery.removeEventListener("change", updateResolvedTheme);
+    return () => mediaQuery.removeEventListener('change', updateResolvedTheme);
   }, [themeMode]);
 
   useEffect(() => {
@@ -270,17 +285,17 @@ export default function CycleParkingFinder() {
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsSettingsMenuOpen(false);
       }
     }
 
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isSettingsMenuOpen]);
 
@@ -313,17 +328,22 @@ export default function CycleParkingFinder() {
 
   const nearestPoint = nearbyPoints[0] ?? null;
   const explicitSelectedPoint =
-    selectedId !== null ? (nearbyPoints.find((point) => point.id === selectedId) ?? null) : null;
-  const directionsParkingPoint =
-    directionsState.status !== "idle"
-      ? (nearbyPoints.find((point) => point.id === directionsState.parkingId) ?? null)
+    selectedId !== null
+      ? (nearbyPoints.find((point) => point.id === selectedId) ?? null)
       : null;
-  const activeRoute = directionsState.status === "loaded" ? directionsState.route : null;
-  const isDirectionsMode = directionsState.status !== "idle" && directionsParkingPoint !== null;
+  const directionsParkingPoint =
+    directionsState.status !== 'idle'
+      ? (nearbyPoints.find((point) => point.id === directionsState.parkingId) ??
+        null)
+      : null;
+  const activeRoute =
+    directionsState.status === 'loaded' ? directionsState.route : null;
+  const isDirectionsMode =
+    directionsState.status !== 'idle' && directionsParkingPoint !== null;
 
   useEffect(() => {
     if (isDirectionsMode) {
-      setMobileSheetState("expanded");
+      setMobileSheetState('expanded');
     }
   }, [isDirectionsMode]);
 
@@ -332,23 +352,27 @@ export default function CycleParkingFinder() {
       return;
     }
 
-    setMobileSheetState((current) => (current === "expanded" ? "collapsed" : "expanded"));
+    setMobileSheetState((current) =>
+      current === 'expanded' ? 'collapsed' : 'expanded',
+    );
   }
 
   function snapMobileSheetFromDrag(deltaY: number) {
     if (Math.abs(deltaY) < mobileSheetDragThresholdPx) {
       setMobileSheetDragOffset(0);
-      setMobileSheetDragProgress(mobileSheetState === "expanded" ? 1 : 0);
+      setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
       return;
     }
 
     ignoreNextSheetGripClick.current = true;
-    setMobileSheetState(deltaY > 0 ? "collapsed" : "expanded");
+    setMobileSheetState(deltaY > 0 ? 'collapsed' : 'expanded');
     setMobileSheetDragOffset(0);
     setMobileSheetDragProgress(deltaY > 0 ? 0 : 1);
   }
 
-  function handleSheetGripPointerDown(event: ReactPointerEvent<HTMLButtonElement>) {
+  function handleSheetGripPointerDown(
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ) {
     if (isDirectionsMode) {
       return;
     }
@@ -359,11 +383,13 @@ export default function CycleParkingFinder() {
       startY: event.clientY,
     };
     setMobileSheetDragOffset(0);
-    setMobileSheetDragProgress(mobileSheetState === "expanded" ? 1 : 0);
+    setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
-  function handleSheetGripPointerMove(event: ReactPointerEvent<HTMLButtonElement>) {
+  function handleSheetGripPointerMove(
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ) {
     const drag = mobileSheetDrag.current;
     if (!drag || drag.pointerId !== event.pointerId) {
       return;
@@ -372,20 +398,24 @@ export default function CycleParkingFinder() {
     drag.currentY = event.clientY;
     const rawDeltaY = event.clientY - drag.startY;
     const dragDistance =
-      mobileSheetState === "expanded" ? Math.max(0, rawDeltaY) : Math.max(0, -rawDeltaY);
+      mobileSheetState === 'expanded'
+        ? Math.max(0, rawDeltaY)
+        : Math.max(0, -rawDeltaY);
     const dragProgress =
-      mobileSheetState === "expanded"
+      mobileSheetState === 'expanded'
         ? 1 - Math.min(dragDistance / mobileSheetDragRangePx, 1)
         : Math.min(dragDistance / mobileSheetDragRangePx, 1);
     const nextOffset =
-      mobileSheetState === "expanded"
+      mobileSheetState === 'expanded'
         ? Math.min(rawDeltaY, mobileSheetDragRangePx)
         : Math.max(rawDeltaY, -mobileSheetDragRangePx);
     setMobileSheetDragOffset(nextOffset);
     setMobileSheetDragProgress(dragProgress);
   }
 
-  function handleSheetGripPointerEnd(event: ReactPointerEvent<HTMLButtonElement>) {
+  function handleSheetGripPointerEnd(
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ) {
     const drag = mobileSheetDrag.current;
     if (!drag || drag.pointerId !== event.pointerId) {
       return;
@@ -409,53 +439,58 @@ export default function CycleParkingFinder() {
     toggleMobileSheet();
   }
 
-  function handleSheetGripPointerCancel(event: ReactPointerEvent<HTMLButtonElement>) {
+  function handleSheetGripPointerCancel(
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ) {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
     mobileSheetDrag.current = null;
     setMobileSheetDragOffset(0);
-    setMobileSheetDragProgress(mobileSheetState === "expanded" ? 1 : 0);
+    setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
   }
 
   const controlPaneStyle = {
-    "--mobile-sheet-drag-progress":
+    '--mobile-sheet-drag-progress':
       mobileSheetDrag.current !== null
         ? mobileSheetDragProgress
-        : mobileSheetState === "expanded"
+        : mobileSheetState === 'expanded'
           ? 1
           : 0,
   } as CSSProperties;
 
   function clearDirections() {
     directionsRequestId.current += 1;
-    setDirectionsState({ status: "idle" });
+    setDirectionsState({ status: 'idle' });
   }
 
   function applyReferenceLocation(
     location: UserLocation,
-    status: Extract<LocationState["status"], "located" | "searched">,
+    status: Extract<LocationState['status'], 'located' | 'searched'>,
     label?: string,
     selectedParkingId?: string,
   ) {
     setSelectedId(selectedParkingId ?? null);
     clearDirections();
 
-    if (status === "located" && isFarFromNearestParking(parkingPoints, location)) {
+    if (
+      status === 'located' &&
+      isFarFromNearestParking(parkingPoints, location)
+    ) {
       setLocationState({
-        status: "too-far",
+        status: 'too-far',
         location: EDINBURGH_FALLBACK_LOCATION,
       });
       return;
     }
 
     setLocationState(
-      status === "searched"
+      status === 'searched'
         ? {
             status,
             location,
-            label: label ?? "selected place",
+            label: label ?? 'selected place',
           }
         : {
             status,
@@ -468,16 +503,16 @@ export default function CycleParkingFinder() {
     setSelectedId(selectedParkingId ?? null);
     clearDirections();
 
-    if (!("geolocation" in navigator)) {
+    if (!('geolocation' in navigator)) {
       setLocationState({
-        status: "unavailable",
+        status: 'unavailable',
         location: EDINBURGH_FALLBACK_LOCATION,
       });
       return;
     }
 
     setLocationState((current) => ({
-      status: "locating",
+      status: 'locating',
       location: current.location,
     }));
 
@@ -490,17 +525,23 @@ export default function CycleParkingFinder() {
 
         if (!isResolvedLocation(location)) {
           setLocationState({
-            status: "unavailable",
+            status: 'unavailable',
             location: EDINBURGH_FALLBACK_LOCATION,
           });
           return;
         }
 
-        applyReferenceLocation(location, "located", undefined, selectedParkingId);
+        applyReferenceLocation(
+          location,
+          'located',
+          undefined,
+          selectedParkingId,
+        );
       },
       (error) => {
         setLocationState({
-          status: error.code === error.PERMISSION_DENIED ? "denied" : "unavailable",
+          status:
+            error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable',
           location: EDINBURGH_FALLBACK_LOCATION,
         });
       },
@@ -526,7 +567,9 @@ export default function CycleParkingFinder() {
     if (cachedResults) {
       setPlaceResults(cachedResults);
       setPlaceSearchMessage(
-        cachedResults.length === 0 ? "No matching Edinburgh places found." : null,
+        cachedResults.length === 0
+          ? 'No matching Edinburgh places found.'
+          : null,
       );
       return;
     }
@@ -538,12 +581,12 @@ export default function CycleParkingFinder() {
     try {
       const response = await fetch(buildPlaceSearchUrl(trimmedQuery), {
         headers: {
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       });
 
       if (!response.ok) {
-        throw new Error("Place search failed");
+        throw new Error('Place search failed');
       }
 
       const results = parsePlaceSearchResults(await response.json());
@@ -555,11 +598,13 @@ export default function CycleParkingFinder() {
         }
       }
       setPlaceResults(results);
-      setPlaceSearchMessage(results.length === 0 ? "No matching Edinburgh places found." : null);
+      setPlaceSearchMessage(
+        results.length === 0 ? 'No matching Edinburgh places found.' : null,
+      );
       setHasUsedPlaceSearch(true);
     } catch {
       setPlaceResults([]);
-      setPlaceSearchMessage("Place search is unavailable right now.");
+      setPlaceSearchMessage('Place search is unavailable right now.');
     } finally {
       placeSearchInFlight.current = false;
       setIsPlaceSearching(false);
@@ -569,9 +614,13 @@ export default function CycleParkingFinder() {
   function selectPlace(result: PlaceSearchResult) {
     setPlaceResults([]);
     setPlaceSearchMessage(null);
-    setPlaceQuery(result.name.split(",")[0] ?? result.name);
+    setPlaceQuery(result.name.split(',')[0] ?? result.name);
     setHasUsedPlaceSearch(true);
-    applyReferenceLocation(result.location, "searched", result.name.split(",")[0] ?? result.name);
+    applyReferenceLocation(
+      result.location,
+      'searched',
+      result.name.split(',')[0] ?? result.name,
+    );
   }
 
   function selectParkingPoint(id: string) {
@@ -585,7 +634,7 @@ export default function CycleParkingFinder() {
     const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
 
     if (!apiKey) {
-      setDirectionsState({ status: "missing-key", parkingId: point.id });
+      setDirectionsState({ status: 'missing-key', parkingId: point.id });
       return;
     }
 
@@ -593,20 +642,27 @@ export default function CycleParkingFinder() {
     const cachedRoute = directionsCache.current.get(cacheKey);
 
     if (cachedRoute) {
-      setDirectionsState({ status: "loaded", parkingId: point.id, route: cachedRoute });
+      setDirectionsState({
+        status: 'loaded',
+        parkingId: point.id,
+        route: cachedRoute,
+      });
       return;
     }
 
-    if (distanceMeters(locationState.location, point) <= SHORT_CYCLE_ROUTE_THRESHOLD_METERS) {
+    if (
+      distanceMeters(locationState.location, point) <=
+      SHORT_CYCLE_ROUTE_THRESHOLD_METERS
+    ) {
       const route = buildShortCycleRoute(locationState.location, point);
       directionsCache.current.set(cacheKey, route);
-      setDirectionsState({ status: "loaded", parkingId: point.id, route });
+      setDirectionsState({ status: 'loaded', parkingId: point.id, route });
       return;
     }
 
     directionsRequestId.current += 1;
     const requestId = directionsRequestId.current;
-    setDirectionsState({ status: "loading", parkingId: point.id });
+    setDirectionsState({ status: 'loading', parkingId: point.id });
 
     try {
       const request = buildCycleStreetsDirectionsRequest({
@@ -614,37 +670,49 @@ export default function CycleParkingFinder() {
         origin: locationState.location,
         destination: point,
       });
-      const route = parseCycleStreetsRoute(await fetchCycleStreetsDirections(request));
+      const route = parseCycleStreetsRoute(
+        await fetchCycleStreetsDirections(request),
+      );
 
       if (directionsRequestId.current !== requestId) {
         return;
       }
 
       directionsCache.current.set(cacheKey, route);
-      setDirectionsState({ status: "loaded", parkingId: point.id, route });
+      setDirectionsState({ status: 'loaded', parkingId: point.id, route });
     } catch (error) {
       if (directionsRequestId.current !== requestId) {
         return;
       }
 
       setDirectionsState({
-        status: "error",
+        status: 'error',
         parkingId: point.id,
         message:
           error instanceof Error && error.message
             ? error.message
-            : "Directions are unavailable right now.",
+            : 'Directions are unavailable right now.',
       });
     }
   }
 
-  async function requestDirections(event: MouseEvent<HTMLButtonElement>, point: ParkingPoint) {
+  async function requestDirections(
+    event: MouseEvent<HTMLButtonElement>,
+    point: ParkingPoint,
+  ) {
     event.stopPropagation();
     await requestDirectionsToPoint(point);
   }
 
-  async function copyParkingLinkForPoint(point: ParkingPoint, source: ShareSource) {
-    const link = buildParkingShareUrl(window.location.origin, window.location.pathname, point.id);
+  async function copyParkingLinkForPoint(
+    point: ParkingPoint,
+    source: ShareSource,
+  ) {
+    const link = buildParkingShareUrl(
+      window.location.origin,
+      window.location.pathname,
+      point.id,
+    );
 
     if (await copyTextToClipboard(link)) {
       setShareError(null);
@@ -660,12 +728,15 @@ export default function CycleParkingFinder() {
     }
 
     setCopiedShareButton(null);
-    setShareError("Could not copy link.");
+    setShareError('Could not copy link.');
   }
 
-  async function copyParkingLink(event: MouseEvent<HTMLButtonElement>, point: ParkingPoint) {
+  async function copyParkingLink(
+    event: MouseEvent<HTMLButtonElement>,
+    point: ParkingPoint,
+  ) {
     event.stopPropagation();
-    await copyParkingLinkForPoint(point, "list");
+    await copyParkingLinkForPoint(point, 'list');
   }
 
   function chooseThemeMode(mode: ThemeMode) {
@@ -697,7 +768,7 @@ export default function CycleParkingFinder() {
               {themeOptions.map(({ icon: Icon, label, mode }) => (
                 <button
                   aria-pressed={themeMode === mode}
-                  className={themeMode === mode ? "selected" : undefined}
+                  className={themeMode === mode ? 'selected' : undefined}
                   key={mode}
                   type="button"
                   onClick={() => chooseThemeMode(mode)}
@@ -710,7 +781,11 @@ export default function CycleParkingFinder() {
             {canInstall ? (
               <>
                 <span className="settings-label">App</span>
-                <button className="settings-action-button" type="button" onClick={installPwa}>
+                <button
+                  className="settings-action-button"
+                  type="button"
+                  onClick={installPwa}
+                >
                   <Download size={15} aria-hidden="true" />
                   Install app
                 </button>
@@ -722,9 +797,9 @@ export default function CycleParkingFinder() {
     );
   }
 
-  function renderAttributionFooter(className = "") {
+  function renderAttributionFooter(className = '') {
     return (
-      <footer className={["attribution", className].filter(Boolean).join(" ")}>
+      <footer className={['attribution', className].filter(Boolean).join(' ')}>
         <button
           className="attribution-trigger"
           type="button"
@@ -752,19 +827,23 @@ export default function CycleParkingFinder() {
             </div>
             <div className="attribution-details">
               <span>{cycleParkingDataset.metadata.attribution}</span>
-              <a href={cycleParkingDataset.metadata.licenceUrl}>Open Government Licence v3.0</a>
+              <a href={cycleParkingDataset.metadata.licenceUrl}>
+                Open Government Licence v3.0
+              </a>
               <span>
                 Map interface by <a href="https://leafletjs.com/">Leaflet</a>.
               </span>
               {hasUsedPlaceSearch ? (
                 <span>
-                  Place search by <a href="https://nominatim.openstreetmap.org/">Nominatim</a> using
-                  OpenStreetMap data.
+                  Place search by{' '}
+                  <a href="https://nominatim.openstreetmap.org/">Nominatim</a>{' '}
+                  using OpenStreetMap data.
                 </span>
               ) : null}
               <span>
-                Cycle directions by <a href="https://www.cyclestreets.net/">CycleStreets</a>
-                {"."}
+                Cycle directions by{' '}
+                <a href="https://www.cyclestreets.net/">CycleStreets</a>
+                {'.'}
               </span>
             </div>
             <div className="attribution-modal-footer">
@@ -793,7 +872,7 @@ export default function CycleParkingFinder() {
           rankedPoints={nearbyPoints}
           route={activeRoute}
           isDirectionsMode={isDirectionsMode}
-          mobileSheetState={isDirectionsMode ? "expanded" : mobileSheetState}
+          mobileSheetState={isDirectionsMode ? 'expanded' : mobileSheetState}
           copiedShareButton={copiedShareButton}
           theme={resolvedTheme}
           onSelectPoint={selectParkingPoint}
@@ -801,7 +880,7 @@ export default function CycleParkingFinder() {
             void requestDirectionsToPoint(point);
           }}
           onCopyParkingLink={(point) => {
-            void copyParkingLinkForPoint(point, "popup");
+            void copyParkingLinkForPoint(point, 'popup');
           }}
         />
       </section>
@@ -809,15 +888,21 @@ export default function CycleParkingFinder() {
       <aside
         className="control-pane"
         aria-label="Nearest cycle parking"
-        data-mobile-sheet-dragging={mobileSheetDragOffset !== 0 ? "true" : undefined}
-        data-mobile-sheet-state={isDirectionsMode ? "expanded" : mobileSheetState}
+        data-mobile-sheet-dragging={
+          mobileSheetDragOffset !== 0 ? 'true' : undefined
+        }
+        data-mobile-sheet-state={
+          isDirectionsMode ? 'expanded' : mobileSheetState
+        }
         style={controlPaneStyle}
       >
         {!isDirectionsMode ? (
           <button
-            aria-expanded={mobileSheetState === "expanded"}
+            aria-expanded={mobileSheetState === 'expanded'}
             aria-label={
-              mobileSheetState === "expanded" ? "Collapse results panel" : "Expand results panel"
+              mobileSheetState === 'expanded'
+                ? 'Collapse results panel'
+                : 'Expand results panel'
             }
             className="mobile-sheet-grip"
             type="button"
@@ -838,11 +923,11 @@ export default function CycleParkingFinder() {
                   <Route size={24} />
                 </div>
                 <div>
-                  <h1>{directionsParkingPoint?.name ?? "Directions"}</h1>
+                  <h1>{directionsParkingPoint?.name ?? 'Directions'}</h1>
                   <p>
                     {directionsParkingPoint
                       ? describeParkingPoint(directionsParkingPoint)
-                      : "Cycle route"}
+                      : 'Cycle route'}
                   </p>
                 </div>
               </div>
@@ -852,50 +937,62 @@ export default function CycleParkingFinder() {
               </button>
             </div>
 
-            {directionsState.status === "loading" ? (
+            {directionsState.status === 'loading' ? (
               <p className="directions-message">Finding a cycle route...</p>
             ) : null}
 
-            {directionsState.status === "missing-key" ? (
-              <p className="directions-message">Directions need a CycleStreets API key.</p>
+            {directionsState.status === 'missing-key' ? (
+              <p className="directions-message">
+                Directions need a CycleStreets API key.
+              </p>
             ) : null}
 
-            {directionsState.status === "error" ? (
+            {directionsState.status === 'error' ? (
               <p className="directions-message">{directionsState.message}</p>
             ) : null}
 
-            {directionsState.status === "loaded" ? (
+            {directionsState.status === 'loaded' ? (
               <>
                 <div className="directions-summary">
-                  <div className="directions-metrics" aria-label="Route summary">
+                  <div
+                    className="directions-metrics"
+                    aria-label="Route summary"
+                  >
                     <span>
                       <Navigation size={16} aria-hidden="true" />
                       {formatDistance(directionsState.route.distanceMeters)}
                     </span>
                     <span>
                       <Bike size={16} aria-hidden="true" />
-                      {formatCycleRouteDuration(directionsState.route.durationSeconds)}
+                      {formatCycleRouteDuration(
+                        directionsState.route.durationSeconds,
+                      )}
                     </span>
                   </div>
                 </div>
                 {directionsState.route.instructions.length > 0 ? (
                   <ol className="directions-list">
-                    {directionsState.route.instructions.slice(0, 8).map((instruction, index) => (
-                      <li key={instruction.id}>
-                        <span className="directions-step-number" aria-hidden="true">
-                          {index + 1}
-                        </span>
-                        <span className="directions-step-text">
-                          {describeCycleRouteInstruction(instruction)}
-                        </span>
-                        <small className="directions-step-distance">
-                          {formatDistance(instruction.distanceMeters)}
-                        </small>
-                      </li>
-                    ))}
+                    {directionsState.route.instructions
+                      .slice(0, 8)
+                      .map((instruction, index) => (
+                        <li key={instruction.id}>
+                          <span
+                            className="directions-step-number"
+                            aria-hidden="true"
+                          >
+                            {index + 1}
+                          </span>
+                          <span className="directions-step-text">
+                            {describeCycleRouteInstruction(instruction)}
+                          </span>
+                          <small className="directions-step-distance">
+                            {formatDistance(instruction.distanceMeters)}
+                          </small>
+                        </li>
+                      ))}
                   </ol>
                 ) : null}
-                {directionsState.route.source === "cyclestreets" ? (
+                {directionsState.route.source === 'cyclestreets' ? (
                   <p className="directions-attribution">
                     <Bike size={18} aria-hidden="true" />
                     <span>Route by</span>
@@ -914,7 +1011,7 @@ export default function CycleParkingFinder() {
                 ) : null}
               </>
             ) : null}
-            {renderAttributionFooter("directions-footer")}
+            {renderAttributionFooter('directions-footer')}
           </section>
         ) : (
           <>
@@ -951,42 +1048,56 @@ export default function CycleParkingFinder() {
                   </label>
                   <button
                     aria-label={
-                      locationState.status === "locating" ? "Locating" : "Use current location"
+                      locationState.status === 'locating'
+                        ? 'Locating'
+                        : 'Use current location'
                     }
                     className="secondary-location-button"
                     title={
-                      locationState.status === "locating" ? "Locating" : "Use current location"
+                      locationState.status === 'locating'
+                        ? 'Locating'
+                        : 'Use current location'
                     }
                     type="button"
                     onClick={() => requestLocation()}
-                    disabled={locationState.status === "locating"}
+                    disabled={locationState.status === 'locating'}
                   >
-                    {locationState.status === "locating" ? (
+                    {locationState.status === 'locating' ? (
                       <Crosshair size={18} aria-hidden="true" />
                     ) : (
                       <LocateFixed size={18} aria-hidden="true" />
                     )}
                     <span className="sr-only">
-                      {locationState.status === "locating" ? "Locating" : "Near me"}
+                      {locationState.status === 'locating'
+                        ? 'Locating'
+                        : 'Near me'}
                     </span>
                   </button>
                   <button
                     className="place-search-button"
                     type="submit"
-                    disabled={isPlaceSearching || placeQuery.trim().length === 0}
+                    disabled={
+                      isPlaceSearching || placeQuery.trim().length === 0
+                    }
                   >
                     <Search size={18} aria-hidden="true" />
                     <span className="mobile-action-label">
-                      {isPlaceSearching ? "Searching" : "Search"}
+                      {isPlaceSearching ? 'Searching' : 'Search'}
                     </span>
                   </button>
                 </form>
 
                 {placeResults.length > 0 ? (
-                  <ol className="place-results" aria-label="Place search results">
+                  <ol
+                    className="place-results"
+                    aria-label="Place search results"
+                  >
                     {placeResults.map((result) => (
                       <li key={result.id}>
-                        <button type="button" onClick={() => selectPlace(result)}>
+                        <button
+                          type="button"
+                          onClick={() => selectPlace(result)}
+                        >
                           <MapPin size={16} aria-hidden="true" />
                           <span>{result.name}</span>
                         </button>
@@ -1004,7 +1115,8 @@ export default function CycleParkingFinder() {
 
               <div className="list-heading">
                 <h2>
-                  Nearby cycle parking <span>· {closestPoints.length} closest</span>
+                  Nearby cycle parking{' '}
+                  <span>· {closestPoints.length} closest</span>
                 </h2>
               </div>
 
@@ -1015,52 +1127,68 @@ export default function CycleParkingFinder() {
               ) : null}
 
               <div className="parking-list-scroll">
-                {locationState.status === "too-far" ? (
+                {locationState.status === 'too-far' ? (
                   <div className="parking-list-context" role="status">
-                    You're very far away from a bike space, showing bike parking in central
-                    Edinburgh.
+                    You're very far away from a bike space, showing bike parking
+                    in central Edinburgh.
                   </div>
                 ) : null}
 
-                <ol className="parking-list" aria-label="Nearby cycle parking locations">
+                <ol
+                  className="parking-list"
+                  aria-label="Nearby cycle parking locations"
+                >
                   {closestPoints.map((point, index) => {
                     const parkingDetails = getParkingPopupDetails(point);
-                    const listDetails = parkingDetails.details.filter((detail) =>
-                      ["Spaces", "Type", "Cover"].includes(detail.label),
+                    const listDetails = parkingDetails.details.filter(
+                      (detail) =>
+                        ['Spaces', 'Type', 'Cover'].includes(detail.label),
                     );
 
                     return (
                       <li className="parking-list-item" key={point.id}>
                         <button
                           className={[
-                            "parking-row",
-                            index === 0 ? "closest" : null,
-                            point.id === explicitSelectedPoint?.id ? "selected" : null,
+                            'parking-row',
+                            index === 0 ? 'closest' : null,
+                            point.id === explicitSelectedPoint?.id
+                              ? 'selected'
+                              : null,
                           ]
                             .filter(Boolean)
-                            .join(" ")}
+                            .join(' ')}
                           type="button"
                           onClick={() => selectParkingPoint(point.id)}
                         >
-                          <span className={`rank rank-${index + 1}`}>{index + 1}</span>
+                          <span className={`rank rank-${index + 1}`}>
+                            {index + 1}
+                          </span>
                           <span className="parking-row-copy">
                             <strong>{point.name}</strong>
                             <span className="parking-row-details">
                               {parkingDetails.metrics.map((metric) => (
-                                <span className="parking-row-detail" key={metric.label}>
+                                <span
+                                  className="parking-row-detail"
+                                  key={metric.label}
+                                >
                                   <MapPin size={13} aria-hidden="true" />
                                   <span>{metric.value}</span>
                                 </span>
                               ))}
                               {listDetails.map((detail) => (
-                                <span className="parking-row-detail" key={detail.label}>
+                                <span
+                                  className="parking-row-detail"
+                                  key={detail.label}
+                                >
                                   <span className="parking-row-detail-icon">
                                     {detail.emphasis ?? (
-                                      <ParkingListDetailIcon icon={detail.icon} />
+                                      <ParkingListDetailIcon
+                                        icon={detail.icon}
+                                      />
                                     )}
                                   </span>
                                   <span>
-                                    {detail.label === "Spaces"
+                                    {detail.label === 'Spaces'
                                       ? detail.value.toLowerCase()
                                       : detail.value}
                                   </span>
@@ -1088,9 +1216,12 @@ export default function CycleParkingFinder() {
                           }}
                         >
                           <Share2 size={17} aria-hidden="true" />
-                          {copiedShareButton?.source === "list" &&
+                          {copiedShareButton?.source === 'list' &&
                           copiedShareButton.parkingId === point.id ? (
-                            <span className="parking-share-tooltip" role="status">
+                            <span
+                              className="parking-share-tooltip"
+                              role="status"
+                            >
                               Copied
                             </span>
                           ) : null}

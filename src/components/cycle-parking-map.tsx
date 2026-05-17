@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import L from "leaflet";
+import L from 'leaflet';
 import {
   MapContainer,
   Marker,
@@ -9,7 +9,7 @@ import {
   TileLayer,
   useMap,
   useMapEvents,
-} from "react-leaflet";
+} from 'react-leaflet';
 import {
   Bike,
   Boxes,
@@ -27,14 +27,17 @@ import {
   Umbrella,
   UmbrellaOff,
   Warehouse,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ParkingPoint, UserLocation } from "@/lib/types";
-import { getParkingPopupDetails } from "@/lib/parking";
-import type { ParkingPopupIcon } from "@/lib/parking";
-import type { CycleRoute } from "@/lib/cyclestreets";
-import { getRenderableParkingPoints, type ParkingMapBounds } from "@/lib/map-pins";
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ParkingPoint, UserLocation } from '@/lib/types';
+import { getParkingPopupDetails } from '@/lib/parking';
+import type { ParkingPopupIcon } from '@/lib/parking';
+import type { CycleRoute } from '@/lib/cyclestreets';
+import {
+  getRenderableParkingPoints,
+  type ParkingMapBounds,
+} from '@/lib/map-pins';
 
 type CycleParkingMapProps = {
   points: ParkingPoint[];
@@ -44,9 +47,9 @@ type CycleParkingMapProps = {
   rankedPoints: ParkingPoint[];
   route: CycleRoute | null;
   isDirectionsMode: boolean;
-  mobileSheetState: "collapsed" | "expanded";
-  copiedShareButton: { parkingId: string; source: "list" | "popup" } | null;
-  theme: "light" | "dark";
+  mobileSheetState: 'collapsed' | 'expanded';
+  copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
+  theme: 'light' | 'dark';
   onSelectPoint: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
@@ -56,13 +59,13 @@ const defaultCenter: [number, number] = [55.9533, -3.1883];
 const highlightedRankCount = 3;
 const rankedPointCount = 8;
 const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
-  "access-open": LockOpen,
+  'access-open': LockOpen,
   building: Building2,
   covered: Umbrella,
   customer: ShoppingBag,
   distance: Route,
   fixture: Boxes,
-  "not-covered": UmbrellaOff,
+  'not-covered': UmbrellaOff,
   parking: ParkingCircle,
   restricted: Lock,
   stand: Bike,
@@ -78,7 +81,7 @@ type PopupWithMap = L.Popup & {
 function getControlPaneOverlapHeight(map: L.Map) {
   const size = map.getSize();
   const mapElement = map.getContainer();
-  const controlPane = document.querySelector<HTMLElement>(".control-pane");
+  const controlPane = document.querySelector<HTMLElement>('.control-pane');
 
   if (!controlPane) {
     return 0;
@@ -87,13 +90,15 @@ function getControlPaneOverlapHeight(map: L.Map) {
   const mapRect = mapElement.getBoundingClientRect();
   const controlPaneRect = controlPane.getBoundingClientRect();
   const horizontalOverlap =
-    Math.min(mapRect.right, controlPaneRect.right) - Math.max(mapRect.left, controlPaneRect.left);
+    Math.min(mapRect.right, controlPaneRect.right) -
+    Math.max(mapRect.left, controlPaneRect.left);
 
   if (horizontalOverlap <= 0) {
     return 0;
   }
 
-  const overlapHeight = mapRect.bottom - Math.max(mapRect.top, controlPaneRect.top);
+  const overlapHeight =
+    mapRect.bottom - Math.max(mapRect.top, controlPaneRect.top);
 
   return Math.min(Math.max(0, Math.round(overlapHeight)), size.y - 80);
 }
@@ -111,10 +116,11 @@ function centerPopupInVisibleMapArea(popup: L.Popup) {
   }
 
   const mapRect = map.getContainer().getBoundingClientRect();
-  const controlPane = document.querySelector<HTMLElement>(".control-pane");
+  const controlPane = document.querySelector<HTMLElement>('.control-pane');
   const controlPaneRect = controlPane?.getBoundingClientRect();
   const horizontalOverlap = controlPaneRect
-    ? Math.min(mapRect.right, controlPaneRect.right) - Math.max(mapRect.left, controlPaneRect.left)
+    ? Math.min(mapRect.right, controlPaneRect.right) -
+      Math.max(mapRect.left, controlPaneRect.left)
     : 0;
   const visibleBottom =
     controlPaneRect && horizontalOverlap > 0
@@ -158,7 +164,7 @@ function getSelectedPointCenter(
   map: L.Map,
   selectedPoint: ParkingPoint,
   zoom: number,
-  mobileSheetState: "collapsed" | "expanded",
+  mobileSheetState: 'collapsed' | 'expanded',
 ) {
   const latLng = L.latLng(selectedPoint.latitude, selectedPoint.longitude);
   const size = map.getSize();
@@ -170,7 +176,7 @@ function getSelectedPointCenter(
 
   const visibleHeight = size.y - coveredHeight;
   const targetY =
-    mobileSheetState === "collapsed"
+    mobileSheetState === 'collapsed'
       ? Math.round(visibleHeight * 0.62)
       : Math.min(
           Math.max(48, visibleHeight - 56),
@@ -179,12 +185,17 @@ function getSelectedPointCenter(
   const targetPoint = L.point(size.x / 2, targetY);
   const mapCenterPoint = L.point(size.x / 2, size.y / 2);
   const projectedPoint = map.project(latLng, zoom);
-  const projectedCenter = projectedPoint.subtract(targetPoint.subtract(mapCenterPoint));
+  const projectedCenter = projectedPoint.subtract(
+    targetPoint.subtract(mapCenterPoint),
+  );
 
   return map.unproject(projectedCenter, zoom);
 }
 
-function createParkingIcon(kind: "default" | "selected" | "selected-ranked", label = "") {
+function createParkingIcon(
+  kind: 'default' | 'selected' | 'selected-ranked',
+  label = '',
+) {
   return L.divIcon({
     className: `parking-marker parking-marker-${kind}`,
     html: `<span>${label}</span>`,
@@ -211,16 +222,16 @@ function ParkingPopupIcon({ icon }: { icon: ParkingPopupIcon }) {
 }
 
 const startIcon = L.divIcon({
-  className: "start-marker",
-  html: "<span></span>",
+  className: 'start-marker',
+  html: '<span></span>',
   iconSize: [32, 42],
   iconAnchor: [16, 42],
   popupAnchor: [0, -42],
 });
 
 const destinationIcon = L.divIcon({
-  className: "destination-marker",
-  html: "<span></span>",
+  className: 'destination-marker',
+  html: '<span></span>',
   iconSize: [32, 42],
   iconAnchor: [16, 42],
   popupAnchor: [0, -42],
@@ -236,7 +247,10 @@ function getFinalApproachPositions(
     return null;
   }
 
-  const destination: [number, number] = [selectedPoint.latitude, selectedPoint.longitude];
+  const destination: [number, number] = [
+    selectedPoint.latitude,
+    selectedPoint.longitude,
+  ];
   const distanceMeters = L.latLng(routeEnd).distanceTo(destination);
 
   if (distanceMeters < 2) {
@@ -256,7 +270,10 @@ function getInitialApproachPositions(
     return null;
   }
 
-  const start: [number, number] = [userLocation.latitude, userLocation.longitude];
+  const start: [number, number] = [
+    userLocation.latitude,
+    userLocation.longitude,
+  ];
   const distanceMeters = L.latLng(start).distanceTo(routeStart);
 
   if (distanceMeters < 2) {
@@ -275,7 +292,7 @@ function MapFocus({
   userLocation,
 }: {
   highlightedPoints: ParkingPoint[];
-  mobileSheetState: "collapsed" | "expanded";
+  mobileSheetState: 'collapsed' | 'expanded';
   nearestPoint: ParkingPoint | null;
   route: CycleRoute | null;
   selectedPoint: ParkingPoint | null;
@@ -311,17 +328,26 @@ function MapFocus({
     }
 
     const focusPoints =
-      highlightedPoints.length > 0 ? highlightedPoints : nearestPoint ? [nearestPoint] : [];
+      highlightedPoints.length > 0
+        ? highlightedPoints
+        : nearestPoint
+          ? [nearestPoint]
+          : [];
 
     if (selectedPoint) {
-      if (mobileSheetState === "collapsed") {
+      if (mobileSheetState === 'collapsed') {
         return;
       }
 
-      if (selectedPoint.id === nearestPoint?.id && mobileSheetState === "expanded") {
+      if (
+        selectedPoint.id === nearestPoint?.id &&
+        mobileSheetState === 'expanded'
+      ) {
         const bounds = L.latLngBounds([
           [userLocation.latitude, userLocation.longitude],
-          ...focusPoints.map((point) => [point.latitude, point.longitude] as [number, number]),
+          ...focusPoints.map(
+            (point) => [point.latitude, point.longitude] as [number, number],
+          ),
         ]);
 
         map.fitBounds(bounds, {
@@ -334,16 +360,22 @@ function MapFocus({
       }
 
       const zoom = Math.max(map.getZoom(), 16);
-      map.flyTo(getSelectedPointCenter(map, selectedPoint, zoom, mobileSheetState), zoom, {
-        duration: 0.7,
-      });
+      map.flyTo(
+        getSelectedPointCenter(map, selectedPoint, zoom, mobileSheetState),
+        zoom,
+        {
+          duration: 0.7,
+        },
+      );
       return;
     }
 
     if (focusPoints.length > 0) {
       const bounds = L.latLngBounds([
         [userLocation.latitude, userLocation.longitude],
-        ...focusPoints.map((point) => [point.latitude, point.longitude] as [number, number]),
+        ...focusPoints.map(
+          (point) => [point.latitude, point.longitude] as [number, number],
+        ),
       ]);
 
       map.fitBounds(bounds, {
@@ -356,7 +388,14 @@ function MapFocus({
     }
 
     map.setView([userLocation.latitude, userLocation.longitude], 16);
-  }, [highlightedPoints, map, nearestPoint, route, selectedPoint, userLocation]);
+  }, [
+    highlightedPoints,
+    map,
+    nearestPoint,
+    route,
+    selectedPoint,
+    userLocation,
+  ]);
 
   return null;
 }
@@ -371,13 +410,13 @@ function AttributionPrefix() {
   return null;
 }
 
-function MapThemeClass({ theme }: { theme: "light" | "dark" }) {
+function MapThemeClass({ theme }: { theme: 'light' | 'dark' }) {
   const map = useMap();
 
   useEffect(() => {
     const container = map.getContainer();
-    container.classList.toggle("bike-map-dark", theme === "dark");
-    container.classList.toggle("bike-map-light", theme === "light");
+    container.classList.toggle('bike-map-dark', theme === 'dark');
+    container.classList.toggle('bike-map-light', theme === 'light');
   }, [map, theme]);
 
   return null;
@@ -397,7 +436,10 @@ function getMapBounds(map: L.Map): ParkingMapBounds {
 function MapViewportTracker({
   onViewportChange,
 }: {
-  onViewportChange: (viewport: { bounds: ParkingMapBounds; zoom: number }) => void;
+  onViewportChange: (viewport: {
+    bounds: ParkingMapBounds;
+    zoom: number;
+  }) => void;
 }) {
   const map = useMap();
   const frameRef = useRef<number | null>(null);
@@ -473,7 +515,10 @@ export default function CycleParkingMap({
   const hadRouteRef = useRef(false);
   const mobileSheetStateRef = useRef(mobileSheetState);
   const previousMobileSheetStateRef = useRef(mobileSheetState);
-  const [viewport, setViewport] = useState<{ bounds: ParkingMapBounds | null; zoom: number }>({
+  const [viewport, setViewport] = useState<{
+    bounds: ParkingMapBounds | null;
+    zoom: number;
+  }>({
     bounds: null,
     zoom: 13,
   });
@@ -497,8 +542,8 @@ export default function CycleParkingMap({
   );
   const icons = useMemo(
     () => ({
-      default: createParkingIcon("default"),
-      selected: createParkingIcon("selected"),
+      default: createParkingIcon('default'),
+      selected: createParkingIcon('selected'),
     }),
     [],
   );
@@ -514,13 +559,15 @@ export default function CycleParkingMap({
     return new Map(
       Array.from({ length: rankedPointCount }, (_, index) => {
         const rank = index + 1;
-        return [rank, createParkingIcon("selected-ranked", String(rank))];
+        return [rank, createParkingIcon('selected-ranked', String(rank))];
       }),
     );
   }, []);
   const rankedPointRanks = useMemo(() => {
     return new Map(
-      rankedPoints.slice(0, rankedPointCount).map((point, index) => [point.id, index + 1]),
+      rankedPoints
+        .slice(0, rankedPointCount)
+        .map((point, index) => [point.id, index + 1]),
     );
   }, [rankedPoints]);
   const highlightedPoints = useMemo(
@@ -546,7 +593,14 @@ export default function CycleParkingMap({
             selectedPoint,
             zoom: viewport.zoom,
           }),
-    [isDirectionsMode, points, rankedPoints, selectedPoint, viewport.bounds, viewport.zoom],
+    [
+      isDirectionsMode,
+      points,
+      rankedPoints,
+      selectedPoint,
+      viewport.bounds,
+      viewport.zoom,
+    ],
   );
 
   useEffect(() => {
@@ -572,7 +626,7 @@ export default function CycleParkingMap({
         return;
       }
 
-      if (mobileSheetState === "collapsed") {
+      if (mobileSheetState === 'collapsed') {
         centerPopupInVisibleMapArea(popup);
         return;
       }
@@ -580,11 +634,19 @@ export default function CycleParkingMap({
       const map = (popup as PopupWithMap)._map;
 
       if (map) {
-        map.panTo(getSelectedPointCenter(map, selectedPoint, map.getZoom(), mobileSheetState), {
-          animate: true,
-          duration: 0.65,
-          easeLinearity: 0.25,
-        });
+        map.panTo(
+          getSelectedPointCenter(
+            map,
+            selectedPoint,
+            map.getZoom(),
+            mobileSheetState,
+          ),
+          {
+            animate: true,
+            duration: 0.65,
+            easeLinearity: 0.25,
+          },
+        );
       }
     }, 380);
 
@@ -608,7 +670,8 @@ export default function CycleParkingMap({
     const openTimeoutId = window.setTimeout(() => {
       const marker = markerRefs.current.get(selectedPoint.id);
       const popup = marker?.getPopup();
-      const shouldCenterCollapsedPopup = mobileSheetStateRef.current === "collapsed";
+      const shouldCenterCollapsedPopup =
+        mobileSheetStateRef.current === 'collapsed';
 
       if (popup) {
         popup.options.autoPan = !shouldCenterCollapsedPopup;
@@ -620,7 +683,10 @@ export default function CycleParkingMap({
         popup.options.autoPan = false;
 
         if (shouldCenterCollapsedPopup) {
-          centerTimeoutId = window.setTimeout(() => centerPopupInVisibleMapArea(popup), 100);
+          centerTimeoutId = window.setTimeout(
+            () => centerPopupInVisibleMapArea(popup),
+            100,
+          );
         }
       }
     }, 250);
@@ -659,16 +725,16 @@ export default function CycleParkingMap({
       {route ? (
         <Polyline
           pathOptions={
-            route.source === "local"
+            route.source === 'local'
               ? {
-                  color: "#f97316",
-                  dashArray: "6 8",
-                  lineCap: "round",
+                  color: '#f97316',
+                  dashArray: '6 8',
+                  lineCap: 'round',
                   opacity: 0.9,
                   weight: 4,
                 }
               : {
-                  color: "#2563eb",
+                  color: '#2563eb',
                   opacity: 0.82,
                   weight: 6,
                 }
@@ -679,9 +745,9 @@ export default function CycleParkingMap({
       {initialApproachPositions ? (
         <Polyline
           pathOptions={{
-            color: "#f97316",
-            dashArray: "6 8",
-            lineCap: "round",
+            color: '#f97316',
+            dashArray: '6 8',
+            lineCap: 'round',
             opacity: 0.9,
             weight: 4,
           }}
@@ -691,16 +757,19 @@ export default function CycleParkingMap({
       {finalApproachPositions ? (
         <Polyline
           pathOptions={{
-            color: "#f97316",
-            dashArray: "6 8",
-            lineCap: "round",
+            color: '#f97316',
+            dashArray: '6 8',
+            lineCap: 'round',
             opacity: 0.9,
             weight: 4,
           }}
           positions={finalApproachPositions}
         />
       ) : null}
-      <Marker position={[userLocation.latitude, userLocation.longitude]} icon={startIcon}>
+      <Marker
+        position={[userLocation.latitude, userLocation.longitude]}
+        icon={startIcon}
+      >
         <Popup keepInView={false}>
           <div className="parking-popup">
             <strong>Start position</strong>
@@ -763,9 +832,13 @@ export default function CycleParkingMap({
                       key={detail.label}
                     >
                       <span className="parking-popup-detail-icon">
-                        {detail.emphasis ?? <ParkingPopupIcon icon={detail.icon} />}
+                        {detail.emphasis ?? (
+                          <ParkingPopupIcon icon={detail.icon} />
+                        )}
                       </span>
-                      <span className="parking-popup-detail-value">{detail.value}</span>
+                      <span className="parking-popup-detail-value">
+                        {detail.value}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -792,9 +865,12 @@ export default function CycleParkingMap({
                   >
                     <Share2 size={15} aria-hidden="true" />
                     Share
-                    {copiedShareButton?.source === "popup" &&
+                    {copiedShareButton?.source === 'popup' &&
                     copiedShareButton.parkingId === point.id ? (
-                      <span className="parking-popup-share-feedback" role="status">
+                      <span
+                        className="parking-popup-share-feedback"
+                        role="status"
+                      >
                         Copied
                       </span>
                     ) : null}

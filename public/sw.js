@@ -1,23 +1,25 @@
-const cachePrefix = "edinburgh-cycle-parking-";
+const cachePrefix = 'edinburgh-cycle-parking-';
 const cacheName = `${cachePrefix}v3`;
 const scopePath = new URL(self.registration.scope).pathname;
-const appBasePath = scopePath.endsWith("/") ? scopePath.slice(0, -1) : scopePath;
+const appBasePath = scopePath.endsWith('/')
+  ? scopePath.slice(0, -1)
+  : scopePath;
 
 function appPath(path) {
   return `${appBasePath}${path}`;
 }
 
 const coreAssets = [
-  appPath("/"),
-  appPath("/site.webmanifest"),
-  appPath("/favicon.ico"),
-  appPath("/favicon.svg"),
-  appPath("/icon-192.png"),
-  appPath("/icon-512.png"),
-  appPath("/apple-touch-icon.png"),
+  appPath('/'),
+  appPath('/site.webmanifest'),
+  appPath('/favicon.ico'),
+  appPath('/favicon.svg'),
+  appPath('/icon-192.png'),
+  appPath('/icon-512.png'),
+  appPath('/apple-touch-icon.png'),
 ];
 
-self.addEventListener("install", (event) => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(cacheName)
@@ -26,14 +28,17 @@ self.addEventListener("install", (event) => {
   );
 });
 
-self.addEventListener("activate", (event) => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
       .then((cacheNames) =>
         Promise.all(
           cacheNames
-            .filter((candidate) => candidate.startsWith(cachePrefix) && candidate !== cacheName)
+            .filter(
+              (candidate) =>
+                candidate.startsWith(cachePrefix) && candidate !== cacheName,
+            )
             .map((candidate) => caches.delete(candidate)),
         ),
       )
@@ -53,11 +58,11 @@ function isStaticAsset(request) {
   const url = new URL(request.url);
 
   return (
-    request.destination === "script" ||
-    request.destination === "style" ||
-    request.destination === "font" ||
-    request.destination === "image" ||
-    url.pathname.startsWith(appPath("/_next/static/"))
+    request.destination === 'script' ||
+    request.destination === 'style' ||
+    request.destination === 'font' ||
+    request.destination === 'image' ||
+    url.pathname.startsWith(appPath('/_next/static/'))
   );
 }
 
@@ -84,29 +89,29 @@ async function networkFirstNavigation(request) {
 
     if (response.ok) {
       const cache = await caches.open(cacheName);
-      await cache.put(appPath("/"), response.clone());
+      await cache.put(appPath('/'), response.clone());
     }
 
     return response;
   } catch {
-    const cachedResponse = await caches.match(appPath("/"));
+    const cachedResponse = await caches.match(appPath('/'));
 
     if (cachedResponse) {
       return cachedResponse;
     }
 
-    throw new Error("Navigation failed and no cached app shell is available.");
+    throw new Error('Navigation failed and no cached app shell is available.');
   }
 }
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  if (request.method !== "GET" || !isSameOrigin(request)) {
+  if (request.method !== 'GET' || !isSameOrigin(request)) {
     return;
   }
 
-  if (request.mode === "navigate") {
+  if (request.mode === 'navigate') {
     event.respondWith(networkFirstNavigation(request));
     return;
   }

@@ -1,8 +1,9 @@
-import { isResolvedLocation } from "@/lib/geo";
-import type { UserLocation } from "@/lib/types";
+import { isResolvedLocation } from '@/lib/geo';
+import type { UserLocation } from '@/lib/types';
 
-export const NOMINATIM_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
-export const EDINBURGH_VIEWBOX = "-3.45,56.04,-3.05,55.86";
+export const NOMINATIM_SEARCH_URL =
+  'https://nominatim.openstreetmap.org/search';
+export const EDINBURGH_VIEWBOX = '-3.45,56.04,-3.05,55.86';
 
 export type PlaceSearchResult = {
   id: string;
@@ -21,11 +22,11 @@ type NominatimResult = {
 export function buildPlaceSearchUrl(query: string) {
   const params = new URLSearchParams({
     q: query,
-    format: "jsonv2",
-    limit: "5",
-    countrycodes: "gb",
+    format: 'jsonv2',
+    limit: '5',
+    countrycodes: 'gb',
     viewbox: EDINBURGH_VIEWBOX,
-    bounded: "1",
+    bounded: '1',
   });
 
   return `${NOMINATIM_SEARCH_URL}?${params.toString()}`;
@@ -42,7 +43,10 @@ export function parsePlaceSearchResults(results: unknown): PlaceSearchResult[] {
     const longitude = Number(candidate.lon);
     const location = { latitude, longitude };
 
-    if (!isResolvedLocation(location) || typeof candidate.display_name !== "string") {
+    if (
+      !isResolvedLocation(location) ||
+      typeof candidate.display_name !== 'string'
+    ) {
       return [];
     }
 

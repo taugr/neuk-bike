@@ -48,7 +48,7 @@
   --shadow: 0 20px 50px rgb(18 38 31 / 14%);
 }
 
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   color-scheme: dark;
   --background: #0f1715;
   --surface: #17211e;
@@ -117,7 +117,7 @@ body {
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
-    "Segoe UI",
+    'Segoe UI',
     sans-serif;
   letter-spacing: 0;
 }
@@ -192,7 +192,8 @@ a {
 }
 
 .bike-map-dark .leaflet-tile {
-  filter: brightness(0.62) contrast(1.22) saturate(0.78) invert(1) hue-rotate(180deg);
+  filter: brightness(0.62) contrast(1.22) saturate(0.78) invert(1)
+    hue-rotate(180deg);
 }
 
 .parking-popup {
@@ -341,7 +342,7 @@ a {
   color: #7a3e07;
 }
 
-:root[data-theme="dark"] .parking-popup-tone-amber {
+:root[data-theme='dark'] .parking-popup-tone-amber {
   color: #fbbf24;
 }
 
@@ -531,7 +532,7 @@ a {
 
 .settings-trigger:hover,
 .settings-trigger:focus-visible,
-.settings-trigger[aria-expanded="true"] {
+.settings-trigger[aria-expanded='true'] {
   background: var(--surface-strong);
   border-color: var(--accent);
 }
@@ -1160,7 +1161,7 @@ a {
 .directions-list li::before {
   background: var(--accent);
   bottom: -0.9rem;
-  content: "";
+  content: '';
   left: 1.15rem;
   opacity: 0.78;
   position: absolute;
@@ -1428,7 +1429,7 @@ a {
 .start-marker span::after {
   background: var(--marker-border);
   border-radius: 999px;
-  content: "";
+  content: '';
   height: 10px;
   left: 50%;
   position: absolute;
@@ -1454,7 +1455,7 @@ a {
 .destination-marker span::after {
   background: var(--marker-border);
   border-radius: 999px;
-  content: "";
+  content: '';
   height: 10px;
   left: 50%;
   position: absolute;
@@ -1505,12 +1506,14 @@ a {
     padding: 0.9rem 0.9rem max(0.4rem, env(safe-area-inset-bottom));
     position: absolute;
     right: 0.65rem;
-    max-height: calc(7.25rem + ((54dvh - 7.25rem) * var(--mobile-sheet-drag-progress, 1)));
+    max-height: calc(
+      7.25rem + ((54dvh - 7.25rem) * var(--mobile-sheet-drag-progress, 1))
+    );
     transition: max-height 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
     will-change: max-height;
   }
 
-  .control-pane[data-mobile-sheet-dragging="true"] {
+  .control-pane[data-mobile-sheet-dragging='true'] {
     transition: none;
   }
 
@@ -1531,7 +1534,7 @@ a {
   }
 
   .mobile-sheet-grip::before {
-    content: "";
+    content: '';
     inset: -0.9rem 0;
     position: absolute;
   }
@@ -1554,7 +1557,7 @@ a {
     width: 2.75rem;
   }
 
-  .control-pane[data-mobile-sheet-state="collapsed"] {
+  .control-pane[data-mobile-sheet-state='collapsed'] {
     --mobile-sheet-drag-progress: 0;
   }
 
@@ -1573,12 +1576,12 @@ a {
     visibility: visible;
   }
 
-  .control-pane[data-mobile-sheet-state="collapsed"] .mobile-sheet-body {
+  .control-pane[data-mobile-sheet-state='collapsed'] .mobile-sheet-body {
     pointer-events: none;
     visibility: hidden;
   }
 
-  .control-pane[data-mobile-sheet-state="collapsed"][data-mobile-sheet-dragging="true"]
+  .control-pane[data-mobile-sheet-state='collapsed'][data-mobile-sheet-dragging='true']
     .mobile-sheet-body {
     pointer-events: auto;
     visibility: visible;

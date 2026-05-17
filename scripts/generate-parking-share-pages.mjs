@@ -1,70 +1,76 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const projectRoot = path.resolve(__dirname, "..");
-const datasetPath = path.join(projectRoot, "src/data/cycle-parking.json");
-const outputRoot = path.join(projectRoot, "out");
-const parkingOutputRoot = path.join(outputRoot, "parking");
-const siteUrl = "https://neuk.bike";
-const sitePath = "";
-const siteTitle = "Edinburgh Cycle Parking";
+const projectRoot = path.resolve(__dirname, '..');
+const datasetPath = path.join(projectRoot, 'src/data/cycle-parking.json');
+const outputRoot = path.join(projectRoot, 'out');
+const parkingOutputRoot = path.join(outputRoot, 'parking');
+const siteUrl = 'https://neuk.bike';
+const sitePath = '';
+const siteTitle = 'Edinburgh Cycle Parking';
 const assetBasePath = sitePath;
 const socialImageWidth = 1200;
 const socialImageHeight = 630;
 
 function normalizeText(value) {
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+  return typeof value === 'string' && value.trim().length > 0
+    ? value.trim()
+    : null;
 }
 
 function formatCapacity(value) {
-  return typeof value === "number" && value > 0 ? `${value} spaces` : "Not listed";
+  return typeof value === 'number' && value > 0
+    ? `${value} spaces`
+    : 'Not listed';
 }
 
 function formatCovered(value) {
-  if (value === "yes") {
-    return "Covered";
+  if (value === 'yes') {
+    return 'Covered';
   }
 
-  if (value === "no") {
-    return "Not covered";
+  if (value === 'no') {
+    return 'Not covered';
   }
 
-  return "Not listed";
+  return 'Not listed';
 }
 
 function formatTypeLabel(value) {
-  return value.replaceAll(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return value
+    .replaceAll(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function getCapacityTone(value) {
-  if (typeof value !== "number" || value <= 0) {
-    return "neutral";
+  if (typeof value !== 'number' || value <= 0) {
+    return 'neutral';
   }
 
   if (value <= 4) {
-    return "amber";
+    return 'amber';
   }
 
   if (value <= 10) {
-    return "teal";
+    return 'teal';
   }
 
-  return "green";
+  return 'green';
 }
 
 function formatCapacityDetail(value) {
-  if (typeof value !== "number" || value <= 0) {
+  if (typeof value !== 'number' || value <= 0) {
     return null;
   }
 
   return {
     emphasis: String(value),
-    icon: "parking",
-    label: "Spaces",
+    icon: 'parking',
+    label: 'Spaces',
     tone: getCapacityTone(value),
-    value: "Spaces",
+    value: 'Spaces',
   };
 }
 
@@ -75,66 +81,74 @@ function formatStandType(value) {
     return null;
   }
 
-  if (["stands", "wide_stands", "staple", "hoop", "post_hoop"].includes(type)) {
+  if (['stands', 'wide_stands', 'staple', 'hoop', 'post_hoop'].includes(type)) {
     return {
-      icon: "stand",
-      label: "Type",
-      tone: "teal",
+      icon: 'stand',
+      label: 'Type',
+      tone: 'teal',
       value: formatTypeLabel(type),
     };
   }
 
-  if (["rack", "racks"].includes(type)) {
+  if (['rack', 'racks'].includes(type)) {
     return {
-      icon: "parking",
-      label: "Type",
-      tone: "teal",
+      icon: 'parking',
+      label: 'Type',
+      tone: 'teal',
       value: formatTypeLabel(type),
     };
   }
 
-  if (["shed", "building", "lockers", "streetpod"].includes(type)) {
+  if (['shed', 'building', 'lockers', 'streetpod'].includes(type)) {
     return {
-      icon: type === "building" ? "building" : "storage",
-      label: "Type",
-      tone: "green",
+      icon: type === 'building' ? 'building' : 'storage',
+      label: 'Type',
+      tone: 'green',
       value: formatTypeLabel(type),
     };
   }
 
-  if (["wall_loops", "anchors", "ground_slots", "front_wheel", "vertical_stand"].includes(type)) {
+  if (
+    [
+      'wall_loops',
+      'anchors',
+      'ground_slots',
+      'front_wheel',
+      'vertical_stand',
+    ].includes(type)
+  ) {
     return {
-      icon: "fixture",
-      label: "Type",
-      tone: "amber",
+      icon: 'fixture',
+      label: 'Type',
+      tone: 'amber',
       value: formatTypeLabel(type),
     };
   }
 
   return {
-    icon: "unknown",
-    label: "Type",
-    tone: "neutral",
+    icon: 'unknown',
+    label: 'Type',
+    tone: 'neutral',
     value: formatTypeLabel(type),
   };
 }
 
 function formatCoverDetail(value) {
-  if (value === "yes") {
+  if (value === 'yes') {
     return {
-      icon: "covered",
-      label: "Cover",
-      tone: "green",
-      value: "Covered",
+      icon: 'covered',
+      label: 'Cover',
+      tone: 'green',
+      value: 'Covered',
     };
   }
 
-  if (value === "no") {
+  if (value === 'no') {
     return {
-      icon: "not-covered",
-      label: "Cover",
-      tone: "muted",
-      value: "Not covered",
+      icon: 'not-covered',
+      label: 'Cover',
+      tone: 'muted',
+      value: 'Not covered',
     };
   }
 
@@ -144,50 +158,50 @@ function formatCoverDetail(value) {
 function formatAccessDetail(value) {
   const access = normalizeText(value);
 
-  if (!access || access === "unknown") {
+  if (!access || access === 'unknown') {
     return null;
   }
 
-  if (["yes", "permissive", "destination"].includes(access)) {
+  if (['yes', 'permissive', 'destination'].includes(access)) {
     return {
-      icon: "access-open",
-      label: "Access",
-      tone: "green",
-      value: access === "yes" ? "Public access" : formatTypeLabel(access),
+      icon: 'access-open',
+      label: 'Access',
+      tone: 'green',
+      value: access === 'yes' ? 'Public access' : formatTypeLabel(access),
     };
   }
 
-  if (["private", "employees", "permit", "residents"].includes(access)) {
+  if (['private', 'employees', 'permit', 'residents'].includes(access)) {
     return {
-      icon: "restricted",
-      label: "Access",
-      tone: "restricted",
+      icon: 'restricted',
+      label: 'Access',
+      tone: 'restricted',
       value: formatTypeLabel(access),
     };
   }
 
-  if (access === "customers") {
+  if (access === 'customers') {
     return {
-      icon: "customer",
-      label: "Access",
-      tone: "amber",
-      value: "Customers",
+      icon: 'customer',
+      label: 'Access',
+      tone: 'amber',
+      value: 'Customers',
     };
   }
 
-  if (access === "university") {
+  if (access === 'university') {
     return {
-      icon: "university",
-      label: "Access",
-      tone: "teal",
-      value: "University",
+      icon: 'university',
+      label: 'Access',
+      tone: 'teal',
+      value: 'University',
     };
   }
 
   return {
-    icon: "unknown",
-    label: "Access",
-    tone: "neutral",
+    icon: 'unknown',
+    label: 'Access',
+    tone: 'neutral',
     value: formatTypeLabel(access),
   };
 }
@@ -203,21 +217,21 @@ function getParkingPopupDetails(point) {
 
 function describeParkingPoint(point) {
   const capacity = formatCapacity(point.properties.capacity);
-  const kind = normalizeText(point.properties.bicycle_pa) ?? "type not listed";
+  const kind = normalizeText(point.properties.bicycle_pa) ?? 'type not listed';
   const covered = formatCovered(point.properties.covered);
   const details = [capacity, kind];
 
-  if (covered !== "Not listed") {
+  if (covered !== 'Not listed') {
     details.push(covered.toLowerCase());
   }
 
-  return details.join(", ");
+  return details.join(', ');
 }
 
 function wrapText(value, maxLineLength, maxLines) {
-  const words = String(value).replaceAll(/\s+/g, " ").trim().split(" ");
+  const words = String(value).replaceAll(/\s+/g, ' ').trim().split(' ');
   const lines = [];
-  let currentLine = "";
+  let currentLine = '';
 
   for (const word of words) {
     const candidate = currentLine ? `${currentLine} ${word}` : word;
@@ -242,8 +256,11 @@ function wrapText(value, maxLineLength, maxLines) {
     lines.push(currentLine);
   }
 
-  if (lines.length === maxLines && words.join(" ").length > lines.join(" ").length) {
-    lines[maxLines - 1] = `${lines[maxLines - 1].replace(/\.*$/, "")}...`;
+  if (
+    lines.length === maxLines &&
+    words.join(' ').length > lines.join(' ').length
+  ) {
+    lines[maxLines - 1] = `${lines[maxLines - 1].replace(/\.*$/, '')}...`;
   }
 
   return lines;
@@ -255,10 +272,10 @@ function wrapSvgText(value, maxLineLength, maxLines) {
 
 function escapeHtml(value) {
   return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
 
 function buildDetailIcon(detail) {
@@ -268,27 +285,27 @@ function buildDetailIcon(detail) {
 
   const iconPath = (() => {
     switch (detail.icon) {
-      case "access-open":
+      case 'access-open':
         return '<path d="M-14 -2v-9a9 9 0 0 1 17 -4" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/><rect x="-13" y="-2" width="26" height="20" rx="4" stroke="currentColor" stroke-width="4" fill="none"/>';
-      case "building":
+      case 'building':
         return '<path d="M-12 15v-30h24v30M-4 -7h2M6 -7h2M-4 2h2M6 2h2M-16 15h32" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "covered":
+      case 'covered':
         return '<path d="M-17 -2a17 17 0 0 1 34 0H-17ZM0 -19v34" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "customer":
+      case 'customer':
         return '<path d="M-12 -5h24l-2 20h-20l-2 -20ZM-6 -5a6 6 0 0 1 12 0" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "fixture":
+      case 'fixture':
         return '<path d="M-13 -9h26v18h-26zM-13 0h26M0 -9v18" stroke="currentColor" stroke-width="4" stroke-linejoin="round" fill="none"/>';
-      case "not-covered":
+      case 'not-covered':
         return '<path d="M-17 -2a17 17 0 0 1 34 0H-17ZM0 -19v34M-17 -17l34 34" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "parking":
+      case 'parking':
         return '<path d="M-10 15v-30h10a10 10 0 1 1 0 20h-10" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "restricted":
+      case 'restricted':
         return '<path d="M-11 -2v-8a11 11 0 0 1 22 0v8M-14 -2h28v20h-28z" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "stand":
+      case 'stand':
         return '<circle cx="-12" cy="8" r="9" stroke="currentColor" stroke-width="4" fill="none"/><circle cx="13" cy="8" r="9" stroke="currentColor" stroke-width="4" fill="none"/><path d="M-12 8h10l9 -17h-11l-5 17M-1 8h14M7 -9l6 17M-6 -9h-5M7 -9l-1 -7M4 -16h8" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "storage":
+      case 'storage':
         return '<path d="M-17 15v-22l17 -10 17 10v22M-8 15v-15h16v15" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-      case "university":
+      case 'university':
         return '<path d="M-17 -4L0 -14 17 -4 0 6 -17 -4ZM-10 0v10c6 4 14 4 20 0V0" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
       default:
         return '<circle cx="0" cy="0" r="15" stroke="currentColor" stroke-width="4" fill="none"/><path d="M-1 -5a6 6 0 1 1 6 6c-4 1 -5 3 -5 5M0 13h.1" stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"/>';
@@ -307,7 +324,7 @@ function buildDetailLabel(detail, cellWidth) {
       (line, index) =>
         `<text x="${cellWidth / 2}" y="${firstLineY + index * 25}" text-anchor="middle" fill="#123c37" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="760">${escapeHtml(line)}</text>`,
     )
-    .join("\n        ");
+    .join('\n        ');
 }
 
 function buildDetailGrid(point) {
@@ -317,10 +334,10 @@ function buildDetailGrid(point) {
       ? details
       : [
           {
-            icon: "unknown",
-            label: "Details",
-            tone: "neutral",
-            value: "Details unavailable",
+            icon: 'unknown',
+            label: 'Details',
+            tone: 'neutral',
+            value: 'Details unavailable',
           },
         ];
   const gridWidth = 560;
@@ -337,7 +354,7 @@ function buildDetailGrid(point) {
   });
 
   return `<g transform="translate(0 185)">
-      ${cells.join("\n      ")}
+      ${cells.join('\n      ')}
     </g>`;
 }
 
@@ -375,7 +392,7 @@ function buildSocialImage(point) {
         (line, index) =>
           `<text x="0" y="${112 + index * 76}" fill="#123c37" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="68" font-weight="800">${escapeHtml(line)}</text>`,
       )
-      .join("\n    ")}
+      .join('\n    ')}
     ${buildDetailGrid(point)}
   </g>
 </svg>
@@ -425,20 +442,31 @@ function buildSharePage(point) {
 }
 
 async function main() {
-  const dataset = JSON.parse(await readFile(datasetPath, "utf8"));
+  const dataset = JSON.parse(await readFile(datasetPath, 'utf8'));
 
   await rm(parkingOutputRoot, { force: true, recursive: true });
 
   await Promise.all(
     dataset.points.map(async (point) => {
-      const parkingPageDir = path.join(parkingOutputRoot, encodeURIComponent(point.id));
+      const parkingPageDir = path.join(
+        parkingOutputRoot,
+        encodeURIComponent(point.id),
+      );
       await mkdir(parkingPageDir, { recursive: true });
-      await writeFile(path.join(parkingPageDir, "index.html"), buildSharePage(point));
-      await writeFile(path.join(parkingPageDir, "og-image.svg"), buildSocialImage(point));
+      await writeFile(
+        path.join(parkingPageDir, 'index.html'),
+        buildSharePage(point),
+      );
+      await writeFile(
+        path.join(parkingPageDir, 'og-image.svg'),
+        buildSocialImage(point),
+      );
     }),
   );
 
-  console.log(`Generated ${dataset.points.length} parking share pages and social preview images.`);
+  console.log(
+    `Generated ${dataset.points.length} parking share pages and social preview images.`,
+  );
 }
 
 await main();

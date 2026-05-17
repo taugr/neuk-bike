@@ -1,27 +1,28 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const sourceUrl =
-  "https://services-eu1.arcgis.com/FgpikkYuSUOuITxp/arcgis/rest/services/Cycle_Parking/FeatureServer/46/query?where=1%3D1&outFields=*&outSR=4326&f=geojson";
+  'https://services-eu1.arcgis.com/FgpikkYuSUOuITxp/arcgis/rest/services/Cycle_Parking/FeatureServer/46/query?where=1%3D1&outFields=*&outSR=4326&f=geojson';
 
-const licenceUrl = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
+const licenceUrl =
+  'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/';
 const attribution =
-  "Copyright City of Edinburgh Council, contains Ordnance Survey data (c) Crown copyright and database right 2026.";
+  'Copyright City of Edinburgh Council, contains Ordnance Survey data (c) Crown copyright and database right 2026.';
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const outputPath = resolve(repoRoot, "src/data/cycle-parking.json");
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const outputPath = resolve(repoRoot, 'src/data/cycle-parking.json');
 
 function isRecord(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function cleanProperty(value) {
   if (
     value === null ||
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean"
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
   ) {
     return value;
   }
@@ -42,7 +43,7 @@ function pickName(properties, index) {
   ];
 
   const name = candidates.find(
-    (candidate) => typeof candidate === "string" && candidate.trim().length > 0,
+    (candidate) => typeof candidate === 'string' && candidate.trim().length > 0,
   );
   return name?.trim() ?? `Cycle parking ${index + 1}`;
 }
@@ -57,13 +58,16 @@ function normalizeFeature(feature, index) {
   }
 
   const [longitude, latitude] = feature.geometry.coordinates;
-  if (typeof latitude !== "number" || typeof longitude !== "number") {
+  if (typeof latitude !== 'number' || typeof longitude !== 'number') {
     return null;
   }
 
   const rawProperties = isRecord(feature.properties) ? feature.properties : {};
   const properties = Object.fromEntries(
-    Object.entries(rawProperties).map(([key, value]) => [key, cleanProperty(value)]),
+    Object.entries(rawProperties).map(([key, value]) => [
+      key,
+      cleanProperty(value),
+    ]),
   );
   const rawId = properties.OBJECTID ?? properties.FID ?? feature.id ?? index;
 
@@ -78,12 +82,14 @@ function normalizeFeature(feature, index) {
 
 const response = await fetch(sourceUrl);
 if (!response.ok) {
-  throw new Error(`Failed to fetch cycle parking data: ${response.status} ${response.statusText}`);
+  throw new Error(
+    `Failed to fetch cycle parking data: ${response.status} ${response.statusText}`,
+  );
 }
 
 const geojson = await response.json();
 if (!isRecord(geojson) || !Array.isArray(geojson.features)) {
-  throw new Error("ArcGIS response did not include a GeoJSON features array.");
+  throw new Error('ArcGIS response did not include a GeoJSON features array.');
 }
 
 const points = geojson.features

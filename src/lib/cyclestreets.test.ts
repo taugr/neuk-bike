@@ -1,51 +1,51 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from 'vitest';
 import {
   buildShortCycleRoute,
   buildCycleStreetsDirectionsRequest,
   describeCycleRouteInstruction,
   formatCycleRouteDuration,
   parseCycleStreetsRoute,
-} from "@/lib/cyclestreets";
-import type { ParkingPoint } from "@/lib/types";
+} from '@/lib/cyclestreets';
+import type { ParkingPoint } from '@/lib/types';
 
 const destination: ParkingPoint = {
-  id: "parking-1",
-  name: "Cycle parking 1",
+  id: 'parking-1',
+  name: 'Cycle parking 1',
   latitude: 55.944,
   longitude: -3.205,
   properties: {},
 };
 
 const cycleStreetsFixture = {
-  type: "FeatureCollection",
+  type: 'FeatureCollection',
   properties: {
-    start: "Princes Street",
-    finish: "Service road",
+    start: 'Princes Street',
+    finish: 'Service road',
   },
   features: [
     {
-      type: "Feature",
+      type: 'Feature',
       properties: {
-        path: "waypoint/1",
+        path: 'waypoint/1',
         number: 1,
-        markerTag: "start",
-        name: "Princes Street",
+        markerTag: 'start',
+        name: 'Princes Street',
       },
       geometry: {
-        type: "Point",
+        type: 'Point',
         coordinates: [-3.18852, 55.9534],
       },
     },
     {
-      type: "Feature",
+      type: 'Feature',
       properties: {
-        path: "plan/balanced",
-        plan: "balanced",
+        path: 'plan/balanced',
+        plan: 'balanced',
         lengthMetres: 1966,
         timeSeconds: 811,
       },
       geometry: {
-        type: "LineString",
+        type: 'LineString',
         coordinates: [
           [-3.18852, 55.9534],
           [-3.18854, 55.95338],
@@ -54,18 +54,18 @@ const cycleStreetsFixture = {
       },
     },
     {
-      type: "Feature",
+      type: 'Feature',
       properties: {
-        path: "plan/balanced/street/1",
+        path: 'plan/balanced/street/1',
         number: 1,
-        name: "Princes Street",
+        name: 'Princes Street',
         lengthMetres: 39,
         timeSeconds: 24,
-        travelMode: "cycling",
-        turnPrevText: "start",
+        travelMode: 'cycling',
+        turnPrevText: 'start',
       },
       geometry: {
-        type: "LineString",
+        type: 'LineString',
         coordinates: [
           [-3.18852, 55.9534],
           [-3.18908, 55.9533],
@@ -73,18 +73,18 @@ const cycleStreetsFixture = {
       },
     },
     {
-      type: "Feature",
+      type: 'Feature',
       properties: {
-        path: "plan/balanced/street/2",
+        path: 'plan/balanced/street/2',
         number: 2,
-        name: "North Bridge, A7",
+        name: 'North Bridge, A7',
         lengthMetres: 362,
         timeSeconds: 221,
-        travelMode: "cycling",
-        turnPrevText: "turn left",
+        travelMode: 'cycling',
+        turnPrevText: 'turn left',
       },
       geometry: {
-        type: "LineString",
+        type: 'LineString',
         coordinates: [
           [-3.18908, 55.9533],
           [-3.18841, 55.95195],
@@ -94,29 +94,31 @@ const cycleStreetsFixture = {
   ],
 };
 
-describe("CycleStreets utilities", () => {
-  it("builds browser-compatible v2 journey requests", () => {
+describe('CycleStreets utilities', () => {
+  it('builds browser-compatible v2 journey requests', () => {
     const request = buildCycleStreetsDirectionsRequest({
-      apiKey: "public-test-key",
+      apiKey: 'public-test-key',
       origin: { latitude: 55.9533, longitude: -3.1883 },
       destination,
     });
 
     const url = new URL(request.url);
 
-    expect(`${url.origin}${url.pathname}`).toBe("https://api.cyclestreets.net/v2/journey.plan");
-    expect(url.searchParams.get("key")).toBe("public-test-key");
-    expect(url.searchParams.get("plans")).toBe("balanced");
-    expect(url.searchParams.get("speedKmph")).toBe("16");
-    expect(url.searchParams.get("waypoints")).toBe(
-      "-3.18830,55.95330,Start|-3.20500,55.94400,Cycle parking 1",
+    expect(`${url.origin}${url.pathname}`).toBe(
+      'https://api.cyclestreets.net/v2/journey.plan',
+    );
+    expect(url.searchParams.get('key')).toBe('public-test-key');
+    expect(url.searchParams.get('plans')).toBe('balanced');
+    expect(url.searchParams.get('speedKmph')).toBe('16');
+    expect(url.searchParams.get('waypoints')).toBe(
+      '-3.18830,55.95330,Start|-3.20500,55.94400,Cycle parking 1',
     );
     expect(request.headers).toEqual({
-      Accept: "application/json",
+      Accept: 'application/json',
     });
   });
 
-  it("parses v2 GeoJSON routes into Leaflet latitude and longitude order", () => {
+  it('parses v2 GeoJSON routes into Leaflet latitude and longitude order', () => {
     const route = parseCycleStreetsRoute(cycleStreetsFixture);
 
     expect(route.distanceMeters).toBe(1966);
@@ -126,54 +128,56 @@ describe("CycleStreets utilities", () => {
       [55.95338, -3.18854],
       [55.94401, -3.205],
     ]);
-    expect(route.source).toBe("cyclestreets");
+    expect(route.source).toBe('cyclestreets');
   });
 
-  it("parses and describes route instructions", () => {
+  it('parses and describes route instructions', () => {
     const route = parseCycleStreetsRoute(cycleStreetsFixture);
 
     expect(route.instructions).toEqual([
       {
-        id: "plan/balanced/street/1",
-        streetName: "Princes Street",
-        turn: "start",
+        id: 'plan/balanced/street/1',
+        streetName: 'Princes Street',
+        turn: 'start',
         distanceMeters: 39,
         durationSeconds: 24,
-        travelMode: "cycling",
+        travelMode: 'cycling',
       },
       {
-        id: "plan/balanced/street/2",
-        streetName: "North Bridge, A7",
-        turn: "turn left",
+        id: 'plan/balanced/street/2',
+        streetName: 'North Bridge, A7',
+        turn: 'turn left',
         distanceMeters: 362,
         durationSeconds: 221,
-        travelMode: "cycling",
+        travelMode: 'cycling',
       },
     ]);
-    expect(describeCycleRouteInstruction(route.instructions[0]!)).toBe("Start on Princes Street");
+    expect(describeCycleRouteInstruction(route.instructions[0]!)).toBe(
+      'Start on Princes Street',
+    );
     expect(describeCycleRouteInstruction(route.instructions[1]!)).toBe(
-      "Turn left onto North Bridge, A7",
+      'Turn left onto North Bridge, A7',
     );
   });
 
-  it("formats route duration in minutes", () => {
-    expect(formatCycleRouteDuration(811)).toBe("14 min");
-    expect(formatCycleRouteDuration(15)).toBe("1 min");
+  it('formats route duration in minutes', () => {
+    expect(formatCycleRouteDuration(811)).toBe('14 min');
+    expect(formatCycleRouteDuration(15)).toBe('1 min');
   });
 
-  it("builds local short routes for nearby parking", () => {
+  it('builds local short routes for nearby parking', () => {
     const route = buildShortCycleRoute(
       { latitude: 55.9533, longitude: -3.1883 },
       {
-        id: "near",
-        name: "Nearby parking",
+        id: 'near',
+        name: 'Nearby parking',
         latitude: 55.95332,
         longitude: -3.18833,
         properties: {},
       },
     );
 
-    expect(route.source).toBe("local");
+    expect(route.source).toBe('local');
     expect(route.routeUrl).toBeUndefined();
     expect(route.distanceMeters).toBeGreaterThan(2);
     expect(route.distanceMeters).toBeLessThan(4);
@@ -184,32 +188,32 @@ describe("CycleStreets utilities", () => {
     ]);
     expect(route.instructions).toHaveLength(1);
     expect(route.instructions[0]).toMatchObject({
-      id: "short-route-near",
-      streetName: "",
-      turn: "straight",
-      travelMode: "walking",
+      id: 'short-route-near',
+      streetName: '',
+      turn: 'straight',
+      travelMode: 'walking',
     });
   });
 
-  it("describes local short route instructions as a straight distance", () => {
+  it('describes local short route instructions as a straight distance', () => {
     expect(
       describeCycleRouteInstruction({
-        id: "short",
-        streetName: "",
-        turn: "straight",
+        id: 'short',
+        streetName: '',
+        turn: 'straight',
         distanceMeters: 4.4,
         durationSeconds: 1,
-        travelMode: "walking",
+        travelMode: 'walking',
       }),
-    ).toBe("Straight 4 m");
+    ).toBe('Straight 4 m');
   });
 
-  it("throws useful errors for CycleStreets errors and malformed responses", () => {
-    expect(() => parseCycleStreetsRoute({ error: "No routes to plan" })).toThrow(
-      "No routes to plan",
-    );
-    expect(() => parseCycleStreetsRoute({ type: "FeatureCollection", features: [] })).toThrow(
-      "CycleStreets did not return a usable route.",
-    );
+  it('throws useful errors for CycleStreets errors and malformed responses', () => {
+    expect(() =>
+      parseCycleStreetsRoute({ error: 'No routes to plan' }),
+    ).toThrow('No routes to plan');
+    expect(() =>
+      parseCycleStreetsRoute({ type: 'FeatureCollection', features: [] }),
+    ).toThrow('CycleStreets did not return a usable route.');
   });
 });

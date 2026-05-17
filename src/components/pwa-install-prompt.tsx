@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   createContext,
@@ -8,10 +8,10 @@ import {
   useMemo,
   useState,
   type ReactNode,
-} from "react";
+} from 'react';
 
 type BeforeInstallPromptChoice = {
-  outcome: "accepted" | "dismissed";
+  outcome: 'accepted' | 'dismissed';
   platform: string;
 };
 
@@ -48,19 +48,26 @@ export function usePwaInstallPrompt() {
   return useContext(PwaInstallPromptContext);
 }
 
-export default function PwaInstallPrompt({ assetBasePath, children }: PwaInstallPromptProps) {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+export default function PwaInstallPrompt({
+  assetBasePath,
+  children,
+}: PwaInstallPromptProps) {
+  const [installPrompt, setInstallPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) {
+    if (!('serviceWorker' in navigator)) {
       return;
     }
 
     const registerServiceWorker = async () => {
       try {
-        await navigator.serviceWorker.register(assetPath(assetBasePath, "/sw.js"), {
-          scope: assetPath(assetBasePath, "/") || "/",
-        });
+        await navigator.serviceWorker.register(
+          assetPath(assetBasePath, '/sw.js'),
+          {
+            scope: assetPath(assetBasePath, '/') || '/',
+          },
+        );
       } catch {
         // Installability is progressive enhancement; the app still works without a service worker.
       }
@@ -83,12 +90,15 @@ export default function PwaInstallPrompt({ assetBasePath, children }: PwaInstall
       setInstallPrompt(null);
     }
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.addEventListener("appinstalled", handleAppInstalled);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-      window.removeEventListener("appinstalled", handleAppInstalled);
+      window.removeEventListener(
+        'beforeinstallprompt',
+        handleBeforeInstallPrompt,
+      );
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 

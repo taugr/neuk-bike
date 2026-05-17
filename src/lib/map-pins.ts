@@ -1,4 +1,4 @@
-import type { ParkingPoint } from "@/lib/types";
+import type { ParkingPoint } from '@/lib/types';
 
 export type ParkingMapBounds = {
   east: number;
@@ -86,7 +86,10 @@ function getGridKey(point: ParkingPoint, cellSizeDegrees: number) {
   return `${latitudeCell}:${longitudeCell}`;
 }
 
-function addUniquePoint(pointsById: Map<string, ParkingPoint>, point: ParkingPoint) {
+function addUniquePoint(
+  pointsById: Map<string, ParkingPoint>,
+  point: ParkingPoint,
+) {
   pointsById.set(point.id, point);
 }
 
@@ -98,7 +101,9 @@ export function getRenderableParkingPoints({
   zoom,
 }: RenderableParkingPointsOptions) {
   const renderablePoints = new Map<string, ParkingPoint>();
-  const visiblePoints = bounds ? points.filter((point) => containsPoint(bounds, point)) : points;
+  const visiblePoints = bounds
+    ? points.filter((point) => containsPoint(bounds, point))
+    : points;
 
   if (zoom >= allPointZoom) {
     for (const point of visiblePoints) {
@@ -125,10 +130,9 @@ export function getRenderableParkingPoints({
     }
   }
 
-  for (const point of (pinnedPoints ?? points.slice(0, defaultPinnedPointCount)).slice(
-    0,
-    defaultPinnedPointCount,
-  )) {
+  for (const point of (
+    pinnedPoints ?? points.slice(0, defaultPinnedPointCount)
+  ).slice(0, defaultPinnedPointCount)) {
     addUniquePoint(renderablePoints, point);
   }
 
