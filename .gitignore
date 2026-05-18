@@ -8,3 +8,5 @@ node_modules/
 coverage/
 dist/
 *.tsbuildinfo
+.env.local
+posthog-setup-report.md

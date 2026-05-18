@@ -1,2 +1,5 @@
 allowBuilds:
+  core-js: true
+  protobufjs: true
   sharp: true
+storeDir: /Users/tomauger/Library/pnpm/store/v11

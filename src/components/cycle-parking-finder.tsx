@@ -62,12 +62,10 @@ import {
   isResolvedLocation,
   sortByDistance,
 } from '@/lib/geo';
-import {
-  getParkingPopupDetails,
-  type ParkingPopupIcon,
-} from '@/lib/parking';
+import { getParkingPopupDetails, type ParkingPopupIcon } from '@/lib/parking';
 import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
+import posthog from 'posthog-js';
 
 const CycleParkingMap = dynamic(
   () => import('@/components/cycle-parking-map'),
@@ -579,6 +577,7 @@ export default function CycleParkingFinder() {
           return;
         }
 
+        posthog.capture('location_granted');
         applyReferenceLocation(
           location,
           'located',
@@ -587,9 +586,11 @@ export default function CycleParkingFinder() {
         );
       },
       (error) => {
+        const status =
+          error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable';
+        posthog.capture('location_denied', { reason: status });
         setLocationState({
-          status:
-            error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable',
+          status,
           location: EDINBURGH_FALLBACK_LOCATION,
         });
       },
@@ -645,12 +646,17 @@ export default function CycleParkingFinder() {
           placeSearchCache.current.delete(oldestKey);
         }
       }
+      posthog.capture('place_searched', {
+        query: trimmedQuery,
+        result_count: results.length,
+      });
       setPlaceResults(results);
       setPlaceSearchMessage(
         results.length === 0 ? 'No matching Edinburgh places found.' : null,
       );
       setHasUsedPlaceSearch(true);
     } catch {
+      posthog.capture('place_searched', { query: trimmedQuery, error: true });
       setPlaceResults([]);
       setPlaceSearchMessage('Place search is unavailable right now.');
     } finally {
@@ -660,6 +666,7 @@ export default function CycleParkingFinder() {
   }
 
   function selectPlace(result: PlaceSearchResult) {
+    posthog.capture('place_selected', { place_name: result.name });
     setPlaceResults([]);
     setPlaceSearchMessage(null);
     setPlaceQuery(result.name.split(',')[0] ?? result.name);
@@ -672,11 +679,16 @@ export default function CycleParkingFinder() {
   }
 
   function selectParkingPoint(id: string) {
+    posthog.capture('parking_selected', { parking_id: id });
     setSelectedId(id);
     clearDirections();
   }
 
   async function requestDirectionsToPoint(point: ParkingPoint) {
+    posthog.capture('directions_requested', {
+      parking_id: point.id,
+      parking_name: point.name,
+    });
     setSelectedId(point.id);
 
     const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
@@ -727,19 +739,32 @@ export default function CycleParkingFinder() {
       }
 
       directionsCache.current.set(cacheKey, route);
+      posthog.capture('directions_loaded', {
+        parking_id: point.id,
+        parking_name: point.name,
+        distance_meters: route.distanceMeters,
+        duration_seconds: route.durationSeconds,
+        route_source: route.source,
+      });
       setDirectionsState({ status: 'loaded', parkingId: point.id, route });
     } catch (error) {
       if (directionsRequestId.current !== requestId) {
         return;
       }
 
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : 'Directions are unavailable right now.';
+      posthog.capture('directions_error', {
+        parking_id: point.id,
+        parking_name: point.name,
+        message,
+      });
       setDirectionsState({
         status: 'error',
         parkingId: point.id,
-        message:
-          error instanceof Error && error.message
-            ? error.message
-            : 'Directions are unavailable right now.',
+        message,
       });
     }
   }
@@ -763,6 +788,11 @@ export default function CycleParkingFinder() {
     );
 
     if (await copyTextToClipboard(link)) {
+      posthog.capture('parking_link_copied', {
+        parking_id: point.id,
+        parking_name: point.name,
+        source,
+      });
       setShareError(null);
       setCopiedShareButton({ parkingId: point.id, source });
       if (copiedMessageTimeout.current !== null) {
@@ -788,11 +818,13 @@ export default function CycleParkingFinder() {
   }
 
   function chooseThemeMode(mode: ThemeMode) {
+    posthog.capture('theme_changed', { theme: mode });
     setThemeMode(mode);
     setIsSettingsMenuOpen(false);
   }
 
   function installPwa() {
+    posthog.capture('pwa_install_triggered');
     setIsSettingsMenuOpen(false);
     void installApp();
   }
@@ -1113,7 +1145,10 @@ export default function CycleParkingFinder() {
                         : 'Use current location'
                     }
                     type="button"
-                    onClick={() => requestLocation()}
+                    onClick={() => {
+                      posthog.capture('location_requested');
+                      requestLocation();
+                    }}
                     disabled={locationState.status === 'locating'}
                   >
                     {locationState.status === 'locating' ? (
