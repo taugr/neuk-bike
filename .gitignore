@@ -6,6 +6,7 @@ next-env.d.ts
 out/
 .playwright-cli/
 playwright-videos/
+.pnpm-store
 node_modules/
 coverage/
 dist/
