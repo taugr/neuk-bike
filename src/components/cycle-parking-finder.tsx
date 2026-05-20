@@ -117,6 +117,12 @@ const panelSpringTransition: Transition = {
   damping: 38,
   mass: 0.85,
 };
+const panelSlideTransition: Transition = {
+  type: 'spring',
+  stiffness: 360,
+  damping: 40,
+  mass: 0.9,
+};
 const rowLayoutTransition: Transition = {
   type: 'spring',
   stiffness: 500,
@@ -307,13 +313,50 @@ export default function CycleParkingFinder() {
         initial: { opacity: 0, y: 8 },
         transition: smallRiseTransition,
       };
-  const panelPresence: PresenceMotion = shouldReduceMotion
-    ? fadePresence
+  const panelSlideVariants = shouldReduceMotion
+    ? {
+        center: { opacity: 1 },
+        enter: { opacity: 0 },
+        exit: { opacity: 0 },
+      }
     : {
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: 12 },
-        initial: { opacity: 0, y: 14 },
-        transition: panelSpringTransition,
+        center: { opacity: 1, x: 0 },
+        enter: (direction: number) => ({
+          opacity: 1,
+          x: direction > 0 ? '100%' : '-100%',
+        }),
+        exit: (direction: number) => ({
+          opacity: 1,
+          x: direction > 0 ? '-100%' : '100%',
+        }),
+      };
+  const routeContentVariants = shouldReduceMotion
+    ? {
+        animate: { opacity: 1 },
+        initial: { opacity: 0 },
+      }
+    : {
+        animate: {
+          opacity: 1,
+          transition: {
+            staggerChildren: 0.045,
+          },
+          y: 0,
+        },
+        initial: { opacity: 1, y: 10 },
+      };
+  const routeStepVariants = shouldReduceMotion
+    ? {
+        animate: { opacity: 1 },
+        initial: { opacity: 0 },
+      }
+    : {
+        animate: {
+          opacity: 1,
+          transition: smallRiseTransition,
+          x: 0,
+        },
+        initial: { opacity: 0, x: 18 },
       };
   const popoverPresence: PresenceMotion = shouldReduceMotion
     ? fadePresence
@@ -474,6 +517,7 @@ export default function CycleParkingFinder() {
     directionsState.status === 'loaded' ? directionsState.route : null;
   const isDirectionsMode =
     directionsState.status !== 'idle' && directionsParkingPoint !== null;
+  const panelDirection = isDirectionsMode ? 1 : -1;
 
   useEffect(() => {
     if (
@@ -1145,13 +1189,22 @@ export default function CycleParkingFinder() {
             </motion.button>
           ) : null}
           <LayoutGroup>
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence
+              custom={panelDirection}
+              initial={false}
+              mode="popLayout"
+            >
               {isDirectionsMode ? (
                 <motion.section
-                  {...panelPresence}
+                  animate="center"
+                  custom={panelDirection}
+                  exit="exit"
+                  initial="enter"
                   key="directions"
-                  className="directions-mode"
+                  className="directions-mode panel-view"
                   aria-label="Cycle directions"
+                  transition={panelSlideTransition}
+                  variants={panelSlideVariants}
                 >
                   <motion.div
                     layout
@@ -1274,9 +1327,12 @@ export default function CycleParkingFinder() {
 
                     {directionsState.status === 'loaded' ? (
                       <motion.div
-                        {...risePresence}
+                        animate="animate"
+                        initial="initial"
                         key="directions-loaded"
                         className="directions-route-content"
+                        transition={smallRiseTransition}
+                        variants={routeContentVariants}
                       >
                         {directionsState.route.instructions.length > 0 ? (
                           <motion.ol
@@ -1287,24 +1343,12 @@ export default function CycleParkingFinder() {
                             {directionsState.route.instructions
                               .slice(0, 8)
                               .map((instruction, index) => {
-                                const itemMotion = shouldReduceMotion
-                                  ? fadePresence
-                                  : {
-                                      animate: { opacity: 1, y: 0 },
-                                      exit: { opacity: 0, y: 4 },
-                                      initial: { opacity: 0, y: 6 },
-                                      transition: {
-                                        ...smallRiseTransition,
-                                        delay: index * 0.025,
-                                      },
-                                    };
-
                                 return (
                                   <motion.li
                                     layout
-                                    {...itemMotion}
                                     key={instruction.id}
                                     transition={rowLayoutTransition}
+                                    variants={routeStepVariants}
                                   >
                                     <span
                                       className="directions-step-number"
@@ -1355,9 +1399,14 @@ export default function CycleParkingFinder() {
                 </motion.section>
               ) : (
                 <motion.div
-                  {...panelPresence}
+                  animate="center"
+                  custom={panelDirection}
+                  exit="exit"
+                  initial="enter"
                   key="finder"
-                  className="finder-panel-content"
+                  className="finder-panel-content panel-view"
+                  transition={panelSlideTransition}
+                  variants={panelSlideVariants}
                 >
                   <header className="app-header" key="finder-header">
                     <div className="brand-mark" aria-hidden="true">

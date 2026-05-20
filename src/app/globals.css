@@ -447,6 +447,7 @@ a {
   min-width: 0;
   overflow: auto;
   padding: 1.25rem 1.25rem 0.45rem;
+  position: relative;
   -webkit-overflow-scrolling: touch;
   z-index: 500;
 }
@@ -465,6 +466,10 @@ a {
   flex-direction: column;
   gap: 0.8rem;
   min-height: 0;
+}
+
+.panel-view {
+  width: 100%;
 }
 
 .control-pane,

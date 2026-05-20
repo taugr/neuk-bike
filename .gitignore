@@ -5,6 +5,7 @@
 next-env.d.ts
 out/
 .playwright-cli/
+playwright-videos/
 node_modules/
 coverage/
 dist/
