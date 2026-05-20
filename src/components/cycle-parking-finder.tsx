@@ -326,7 +326,7 @@ export default function CycleParkingFinder() {
           x: direction > 0 ? '100%' : '-100%',
         }),
         exit: (direction: number) => ({
-          opacity: 1,
+          opacity: 0,
           x: direction > 0 ? '-100%' : '100%',
         }),
       };
