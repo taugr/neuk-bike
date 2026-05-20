@@ -459,8 +459,17 @@ a {
   display: contents;
 }
 
+.finder-panel-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-height: 0;
+}
+
 .control-pane,
 .directions-mode,
+.directions-scroll,
 .parking-list-scroll,
 .parking-list {
   scrollbar-width: none;
@@ -468,6 +477,7 @@ a {
 
 .control-pane::-webkit-scrollbar,
 .directions-mode::-webkit-scrollbar,
+.directions-scroll::-webkit-scrollbar,
 .parking-list-scroll::-webkit-scrollbar,
 .parking-list::-webkit-scrollbar {
   display: none;
@@ -1022,11 +1032,35 @@ a {
   flex-direction: column;
   gap: 1rem;
   min-height: 0;
+  overflow: hidden;
+}
+
+.directions-scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: -1rem;
+  min-height: 0;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 
+.directions-route-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .directions-mode-header {
+  align-items: stretch;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.directions-header-main {
   align-items: center;
   display: flex;
   gap: 0.75rem;
@@ -1070,10 +1104,10 @@ a {
 }
 
 .directions-parking-details {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28rem 0.9rem;
+  align-items: start;
+  display: grid;
+  gap: 0.28rem;
+  grid-template-columns: minmax(0, max-content);
   line-height: 1.2;
   margin-top: 0.35rem;
   max-width: 100%;
@@ -1265,7 +1299,9 @@ a {
 }
 
 .directions-footer {
-  margin-top: auto;
+  background: var(--surface);
+  flex: 0 0 auto;
+  margin-top: 0;
 }
 
 .attribution-modal {
@@ -1519,12 +1555,7 @@ a {
     max-height: calc(
       7.25rem + ((54dvh - 7.25rem) * var(--mobile-sheet-drag-progress, 1))
     );
-    transition: max-height 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
     will-change: max-height;
-  }
-
-  .control-pane[data-mobile-sheet-dragging='true'] {
-    transition: none;
   }
 
   .mobile-sheet-grip {
@@ -1580,9 +1611,6 @@ a {
     min-height: 0;
     opacity: var(--mobile-sheet-drag-progress, 1);
     overflow: hidden;
-    transition:
-      max-height 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      opacity 140ms ease;
     visibility: visible;
   }
 
@@ -1605,7 +1633,14 @@ a {
     -webkit-overflow-scrolling: touch;
   }
 
+  .finder-panel-content {
+    gap: 0.75rem;
+  }
+
   .control-pane:has(.directions-mode) {
+    height: 54vh;
+    height: 54svh;
+    height: 54dvh;
     overflow: hidden;
     padding-right: 1.25rem;
   }
@@ -1695,13 +1730,6 @@ a {
     position: absolute;
     white-space: nowrap;
     width: 1px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .control-pane,
-    .mobile-sheet-body {
-      transition: none;
-    }
   }
 }
 

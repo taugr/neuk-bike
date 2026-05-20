@@ -1,4 +1,5 @@
 import posthog from 'posthog-js';
+import { isAnalyticsEnabled } from '@/lib/analytics';
 
 const urlPropertyNames = [
   '$current_url',
@@ -28,27 +29,28 @@ function redactLocationQueryParams(value: unknown) {
   }
 }
 
-posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-  ui_host: 'https://eu.posthog.com',
-  defaults: '2026-01-30',
-  cookieless_mode: 'always',
-  autocapture: false,
-  capture_exceptions: true,
-  before_send: (event) => {
-    if (!event) {
-      return event;
-    }
-
-    for (const propertyName of urlPropertyNames) {
-      if (event.properties?.[propertyName]) {
-        event.properties[propertyName] = redactLocationQueryParams(
-          event.properties[propertyName],
-        );
+if (isAnalyticsEnabled) {
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    ui_host: 'https://eu.posthog.com',
+    defaults: '2026-01-30',
+    cookieless_mode: 'always',
+    autocapture: false,
+    capture_exceptions: true,
+    before_send: (event) => {
+      if (!event) {
+        return event;
       }
-    }
 
-    return event;
-  },
-  debug: process.env.NODE_ENV === 'development',
-});
+      for (const propertyName of urlPropertyNames) {
+        if (event.properties?.[propertyName]) {
+          event.properties[propertyName] = redactLocationQueryParams(
+            event.properties[propertyName],
+          );
+        }
+      }
+
+      return event;
+    },
+  });
+}

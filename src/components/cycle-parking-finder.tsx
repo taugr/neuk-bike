@@ -2,6 +2,15 @@
 
 import dynamic from 'next/dynamic';
 import {
+  AnimatePresence,
+  LayoutGroup,
+  MotionConfig,
+  motion,
+  type TargetAndTransition,
+  type Transition,
+  useReducedMotion,
+} from 'motion/react';
+import {
   Bike,
   Boxes,
   Building2,
@@ -27,6 +36,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import {
+  Fragment,
   useEffect,
   useMemo,
   useRef,
@@ -65,7 +75,7 @@ import {
 import { getParkingPopupDetails, type ParkingPopupIcon } from '@/lib/parking';
 import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
-import posthog from 'posthog-js';
+import { captureAnalyticsEvent } from '@/lib/analytics';
 
 const CycleParkingMap = dynamic(
   () => import('@/components/cycle-parking-map'),
@@ -83,6 +93,37 @@ const defaultLocale = 'en-GB';
 const themeStorageKey = 'cycle-parking-theme';
 const mobileSheetDragThresholdPx = 48;
 const mobileSheetDragRangePx = 320;
+type PresenceMotion = {
+  animate: TargetAndTransition;
+  exit: TargetAndTransition;
+  initial: TargetAndTransition;
+  transition: Transition;
+};
+
+const quickFadeTransition: Transition = { duration: 0.16, ease: 'easeOut' };
+const smallRiseTransition: Transition = {
+  duration: 0.2,
+  ease: [0.22, 1, 0.36, 1],
+};
+const tooltipTransition: Transition = {
+  type: 'spring',
+  stiffness: 600,
+  damping: 34,
+  mass: 0.7,
+};
+const panelSpringTransition: Transition = {
+  type: 'spring',
+  stiffness: 420,
+  damping: 38,
+  mass: 0.85,
+};
+const rowLayoutTransition: Transition = {
+  type: 'spring',
+  stiffness: 500,
+  damping: 42,
+  mass: 0.8,
+};
+const buttonTap = { scale: 0.96 };
 
 const parkingListIconByName: Partial<Record<ParkingPopupIcon, LucideIcon>> = {
   building: Building2,
@@ -208,6 +249,7 @@ async function copyTextToClipboard(text: string) {
 }
 
 export default function CycleParkingFinder() {
+  const shouldReduceMotion = useReducedMotion();
   const [locationState, setLocationState] = useState<LocationState>({
     status: 'fallback',
     location: EDINBURGH_FALLBACK_LOCATION,
@@ -242,6 +284,7 @@ export default function CycleParkingFinder() {
   const directionsRequestId = useRef(0);
   const copiedMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
+  const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
   const settingsMenu = useRef<HTMLDivElement>(null);
   const mobileSheetDrag = useRef<{
     currentY: number;
@@ -249,6 +292,45 @@ export default function CycleParkingFinder() {
     startY: number;
   } | null>(null);
   const ignoreNextSheetGripClick = useRef(false);
+  const subtleTap = shouldReduceMotion ? undefined : buttonTap;
+  const fadePresence: PresenceMotion = {
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    initial: { opacity: 0 },
+    transition: quickFadeTransition,
+  };
+  const risePresence: PresenceMotion = shouldReduceMotion
+    ? fadePresence
+    : {
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 6 },
+        initial: { opacity: 0, y: 8 },
+        transition: smallRiseTransition,
+      };
+  const panelPresence: PresenceMotion = shouldReduceMotion
+    ? fadePresence
+    : {
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 12 },
+        initial: { opacity: 0, y: 14 },
+        transition: panelSpringTransition,
+      };
+  const popoverPresence: PresenceMotion = shouldReduceMotion
+    ? fadePresence
+    : {
+        animate: { opacity: 1, scale: 1, y: 0 },
+        exit: { opacity: 0, scale: 0.98, y: 6 },
+        initial: { opacity: 0, scale: 0.98, y: 6 },
+        transition: smallRiseTransition,
+      };
+  const tooltipPresence: PresenceMotion = shouldReduceMotion
+    ? fadePresence
+    : {
+        animate: { opacity: 1, scale: 1, y: '-50%' },
+        exit: { opacity: 0, scale: 0.96, y: '-50%' },
+        initial: { opacity: 0, scale: 0.94, y: '-50%' },
+        transition: tooltipTransition,
+      };
 
   useEffect(() => {
     setNumberLocale(navigator.language || defaultLocale);
@@ -353,10 +435,16 @@ export default function CycleParkingFinder() {
 
     if (isAttributionModalOpen && !dialog.open) {
       dialog.showModal();
-    } else if (!isAttributionModalOpen && dialog.open) {
-      dialog.close();
     }
   }, [isAttributionModalOpen]);
+
+  function closeAttributionDialogAfterExit() {
+    const dialog = attributionDialog.current;
+
+    if (!isAttributionModalOpen && dialog?.open) {
+      dialog.close();
+    }
+  }
 
   const nearbyPoints = useMemo(
     () => sortByDistance(parkingPoints, locationState.location),
@@ -386,6 +474,30 @@ export default function CycleParkingFinder() {
     directionsState.status === 'loaded' ? directionsState.route : null;
   const isDirectionsMode =
     directionsState.status !== 'idle' && directionsParkingPoint !== null;
+
+  useEffect(() => {
+    if (
+      selectedId === null ||
+      !window.matchMedia('(max-width: 820px)').matches
+    ) {
+      return;
+    }
+
+    const selectedListItem = parkingListItemRefs.current.get(selectedId);
+
+    if (!selectedListItem) {
+      return;
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    selectedListItem.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+    });
+  }, [selectedId, closestPoints]);
 
   useEffect(() => {
     if (isDirectionsMode) {
@@ -497,14 +609,22 @@ export default function CycleParkingFinder() {
     setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
   }
 
+  const mobileSheetProgress = isDirectionsMode
+    ? 1
+    : mobileSheetDrag.current !== null
+      ? mobileSheetDragProgress
+      : mobileSheetState === 'expanded'
+        ? 1
+        : 0;
+  const isMobileSheetDragging = mobileSheetDragOffset !== 0;
   const controlPaneStyle = {
-    '--mobile-sheet-drag-progress':
-      mobileSheetDrag.current !== null
-        ? mobileSheetDragProgress
-        : mobileSheetState === 'expanded'
-          ? 1
-          : 0,
+    '--mobile-sheet-drag-progress': isMobileSheetDragging
+      ? mobileSheetProgress
+      : undefined,
   } as CSSProperties;
+  const controlPaneAnimate = {
+    '--mobile-sheet-drag-progress': mobileSheetProgress,
+  };
 
   function clearDirections() {
     directionsRequestId.current += 1;
@@ -577,7 +697,7 @@ export default function CycleParkingFinder() {
           return;
         }
 
-        posthog.capture('location_granted');
+        captureAnalyticsEvent('location_granted');
         applyReferenceLocation(
           location,
           'located',
@@ -588,7 +708,7 @@ export default function CycleParkingFinder() {
       (error) => {
         const status =
           error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable';
-        posthog.capture('location_denied', { reason: status });
+        captureAnalyticsEvent('location_denied', { reason: status });
         setLocationState({
           status,
           location: EDINBURGH_FALLBACK_LOCATION,
@@ -646,7 +766,7 @@ export default function CycleParkingFinder() {
           placeSearchCache.current.delete(oldestKey);
         }
       }
-      posthog.capture('place_searched', {
+      captureAnalyticsEvent('place_searched', {
         result_count: results.length,
       });
       setPlaceResults(results);
@@ -655,7 +775,7 @@ export default function CycleParkingFinder() {
       );
       setHasUsedPlaceSearch(true);
     } catch {
-      posthog.capture('place_searched', { error: true });
+      captureAnalyticsEvent('place_searched', { error: true });
       setPlaceResults([]);
       setPlaceSearchMessage('Place search is unavailable right now.');
     } finally {
@@ -665,7 +785,7 @@ export default function CycleParkingFinder() {
   }
 
   function selectPlace(result: PlaceSearchResult) {
-    posthog.capture('place_selected', { place_name: result.name });
+    captureAnalyticsEvent('place_selected', { place_name: result.name });
     setPlaceResults([]);
     setPlaceSearchMessage(null);
     setPlaceQuery(result.name.split(',')[0] ?? result.name);
@@ -678,13 +798,13 @@ export default function CycleParkingFinder() {
   }
 
   function selectParkingPoint(id: string) {
-    posthog.capture('parking_selected', { parking_id: id });
+    captureAnalyticsEvent('parking_selected', { parking_id: id });
     setSelectedId(id);
     clearDirections();
   }
 
   async function requestDirectionsToPoint(point: ParkingPoint) {
-    posthog.capture('directions_requested', {
+    captureAnalyticsEvent('directions_requested', {
       parking_id: point.id,
       parking_name: point.name,
     });
@@ -738,7 +858,7 @@ export default function CycleParkingFinder() {
       }
 
       directionsCache.current.set(cacheKey, route);
-      posthog.capture('directions_loaded', {
+      captureAnalyticsEvent('directions_loaded', {
         parking_id: point.id,
         parking_name: point.name,
         route_source: route.source,
@@ -753,7 +873,7 @@ export default function CycleParkingFinder() {
         error instanceof Error && error.message
           ? error.message
           : 'Directions are unavailable right now.';
-      posthog.capture('directions_error', {
+      captureAnalyticsEvent('directions_error', {
         parking_id: point.id,
         parking_name: point.name,
         message,
@@ -785,7 +905,7 @@ export default function CycleParkingFinder() {
     );
 
     if (await copyTextToClipboard(link)) {
-      posthog.capture('parking_link_copied', {
+      captureAnalyticsEvent('parking_link_copied', {
         parking_id: point.id,
         parking_name: point.name,
         source,
@@ -815,13 +935,13 @@ export default function CycleParkingFinder() {
   }
 
   function chooseThemeMode(mode: ThemeMode) {
-    posthog.capture('theme_changed', { theme: mode });
+    captureAnalyticsEvent('theme_changed', { theme: mode });
     setThemeMode(mode);
     setIsSettingsMenuOpen(false);
   }
 
   function installPwa() {
-    posthog.capture('pwa_install_triggered');
+    captureAnalyticsEvent('pwa_install_triggered');
     setIsSettingsMenuOpen(false);
     void installApp();
   }
@@ -829,47 +949,57 @@ export default function CycleParkingFinder() {
   function renderThemeSettings() {
     return (
       <div className="settings-menu" ref={settingsMenu}>
-        <button
+        <motion.button
           aria-expanded={isSettingsMenuOpen}
           aria-label="Theme settings"
           className="settings-trigger"
           type="button"
+          whileTap={subtleTap}
           onClick={() => setIsSettingsMenuOpen((isOpen) => !isOpen)}
         >
           <Settings size={18} aria-hidden="true" />
-        </button>
-        {isSettingsMenuOpen ? (
-          <div className="settings-popover" role="menu" aria-label="Settings">
-            <span className="settings-label">Theme</span>
-            <div className="theme-options" role="group" aria-label="Theme">
-              {themeOptions.map(({ icon: Icon, label, mode }) => (
-                <button
-                  aria-pressed={themeMode === mode}
-                  className={themeMode === mode ? 'selected' : undefined}
-                  key={mode}
-                  type="button"
-                  onClick={() => chooseThemeMode(mode)}
-                >
-                  <Icon size={15} aria-hidden="true" />
-                  {label}
-                </button>
-              ))}
-            </div>
-            {canInstall ? (
-              <>
-                <span className="settings-label">App</span>
-                <button
-                  className="settings-action-button"
-                  type="button"
-                  onClick={installPwa}
-                >
-                  <Download size={15} aria-hidden="true" />
-                  Install app
-                </button>
-              </>
-            ) : null}
-          </div>
-        ) : null}
+        </motion.button>
+        <AnimatePresence initial={false}>
+          {isSettingsMenuOpen ? (
+            <motion.div
+              {...popoverPresence}
+              className="settings-popover"
+              role="menu"
+              aria-label="Settings"
+            >
+              <span className="settings-label">Theme</span>
+              <div className="theme-options" role="group" aria-label="Theme">
+                {themeOptions.map(({ icon: Icon, label, mode }) => (
+                  <motion.button
+                    aria-pressed={themeMode === mode}
+                    className={themeMode === mode ? 'selected' : undefined}
+                    key={mode}
+                    type="button"
+                    whileTap={subtleTap}
+                    onClick={() => chooseThemeMode(mode)}
+                  >
+                    <Icon size={15} aria-hidden="true" />
+                    {label}
+                  </motion.button>
+                ))}
+              </div>
+              {canInstall ? (
+                <Fragment key="install-app-action">
+                  <span className="settings-label">App</span>
+                  <motion.button
+                    className="settings-action-button"
+                    type="button"
+                    whileTap={subtleTap}
+                    onClick={installPwa}
+                  >
+                    <Download size={15} aria-hidden="true" />
+                    Install app
+                  </motion.button>
+                </Fragment>
+              ) : null}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
     );
   }
@@ -898,396 +1028,604 @@ export default function CycleParkingFinder() {
           }}
           onClose={() => setIsAttributionModalOpen(false)}
         >
-          <div className="attribution-modal-content">
-            <div className="attribution-modal-header">
-              <h2 id="attribution-modal-title">Attributions</h2>
-            </div>
-            <div className="attribution-details">
-              <span>{cycleParkingDataset.metadata.attribution}</span>
-              <a href={cycleParkingDataset.metadata.licenceUrl}>
-                Open Government Licence v3.0
-              </a>
-              <span>
-                Map interface by <a href="https://leafletjs.com/">Leaflet</a>.
-              </span>
-              {hasUsedPlaceSearch ? (
-                <span>
-                  Place search by{' '}
-                  <a href="https://nominatim.openstreetmap.org/">Nominatim</a>{' '}
-                  using OpenStreetMap data.
-                </span>
-              ) : null}
-              <span>
-                Cycle directions by{' '}
-                <a href="https://www.cyclestreets.net/">CycleStreets</a>
-                {'.'}
-              </span>
-            </div>
-            <div className="attribution-modal-footer">
-              <button
-                className="attribution-modal-close"
-                type="button"
-                onClick={() => setIsAttributionModalOpen(false)}
+          <AnimatePresence
+            initial={false}
+            onExitComplete={closeAttributionDialogAfterExit}
+          >
+            {isAttributionModalOpen ? (
+              <motion.div
+                {...popoverPresence}
+                key="attribution-modal-content"
+                className="attribution-modal-content"
               >
-                Close
-              </button>
-            </div>
-          </div>
+                <div className="attribution-modal-header">
+                  <h2 id="attribution-modal-title">Attributions</h2>
+                </div>
+                <div className="attribution-details">
+                  <span>{cycleParkingDataset.metadata.attribution}</span>
+                  <a href={cycleParkingDataset.metadata.licenceUrl}>
+                    Open Government Licence v3.0
+                  </a>
+                  <span>
+                    Map interface by{' '}
+                    <a href="https://leafletjs.com/">Leaflet</a>.
+                  </span>
+                  {hasUsedPlaceSearch ? (
+                    <span>
+                      Place search by{' '}
+                      <a href="https://nominatim.openstreetmap.org/">
+                        Nominatim
+                      </a>{' '}
+                      using OpenStreetMap data.
+                    </span>
+                  ) : null}
+                  <span>
+                    Cycle directions by{' '}
+                    <a href="https://www.cyclestreets.net/">CycleStreets</a>
+                    {'.'}
+                  </span>
+                </div>
+                <div className="attribution-modal-footer">
+                  <motion.button
+                    className="attribution-modal-close"
+                    type="button"
+                    whileTap={subtleTap}
+                    onClick={() => setIsAttributionModalOpen(false)}
+                  >
+                    Close
+                  </motion.button>
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </dialog>
       </footer>
     );
   }
 
   return (
-    <main className="app-shell" data-theme={resolvedTheme}>
-      <section className="map-pane" aria-label="Cycle parking map">
-        <CycleParkingMap
-          points={nearbyPoints}
-          userLocation={locationState.location}
-          selectedPoint={explicitSelectedPoint}
-          nearestPoint={nearestPoint}
-          rankedPoints={nearbyPoints}
-          route={activeRoute}
-          isDirectionsMode={isDirectionsMode}
-          mobileSheetState={isDirectionsMode ? 'expanded' : mobileSheetState}
-          copiedShareButton={copiedShareButton}
-          theme={resolvedTheme}
-          onSelectPoint={selectParkingPoint}
-          onRequestDirections={(point) => {
-            void requestDirectionsToPoint(point);
-          }}
-          onCopyParkingLink={(point) => {
-            void copyParkingLinkForPoint(point, 'popup');
-          }}
-        />
-      </section>
+    <MotionConfig reducedMotion="user">
+      <main className="app-shell" data-theme={resolvedTheme}>
+        <section className="map-pane" aria-label="Cycle parking map">
+          <CycleParkingMap
+            points={nearbyPoints}
+            userLocation={locationState.location}
+            selectedPoint={explicitSelectedPoint}
+            nearestPoint={nearestPoint}
+            rankedPoints={nearbyPoints}
+            route={activeRoute}
+            isDirectionsMode={isDirectionsMode}
+            mobileSheetState={isDirectionsMode ? 'expanded' : mobileSheetState}
+            copiedShareButton={copiedShareButton}
+            theme={resolvedTheme}
+            onSelectPoint={selectParkingPoint}
+            onRequestDirections={(point) => {
+              void requestDirectionsToPoint(point);
+            }}
+            onCopyParkingLink={(point) => {
+              void copyParkingLinkForPoint(point, 'popup');
+            }}
+          />
+        </section>
 
-      <aside
-        className="control-pane"
-        aria-label="Nearest cycle parking"
-        data-mobile-sheet-dragging={
-          mobileSheetDragOffset !== 0 ? 'true' : undefined
-        }
-        data-mobile-sheet-state={
-          isDirectionsMode ? 'expanded' : mobileSheetState
-        }
-        style={controlPaneStyle}
-      >
-        {!isDirectionsMode ? (
-          <button
-            aria-expanded={mobileSheetState === 'expanded'}
-            aria-label={
-              mobileSheetState === 'expanded'
-                ? 'Collapse results panel'
-                : 'Expand results panel'
-            }
-            className="mobile-sheet-grip"
-            type="button"
-            onClick={handleSheetGripClick}
-            onPointerCancel={handleSheetGripPointerCancel}
-            onPointerDown={handleSheetGripPointerDown}
-            onPointerMove={handleSheetGripPointerMove}
-            onPointerUp={handleSheetGripPointerEnd}
-          >
-            <span aria-hidden="true" />
-          </button>
-        ) : null}
-        {isDirectionsMode ? (
-          <section className="directions-mode" aria-label="Cycle directions">
-            <div className="directions-mode-header">
-              <div className="directions-title">
-                <div className="brand-mark directions-mark" aria-hidden="true">
-                  <Route size={24} />
-                </div>
-                <div>
-                  <h1>{directionsParkingPoint?.name ?? 'Directions'}</h1>
-                  {directionsParkingPoint ? (
-                    <ParkingDetailStrip
-                      className="directions-parking-details"
-                      point={directionsParkingPoint}
-                    />
-                  ) : (
-                    <p>Cycle route</p>
-                  )}
-                </div>
-              </div>
-              <button type="button" onClick={clearDirections}>
-                <X size={16} aria-hidden="true" />
-                Exit directions
-              </button>
-            </div>
-
-            {directionsState.status === 'loading' ? (
-              <p className="directions-message">Finding a cycle route...</p>
-            ) : null}
-
-            {directionsState.status === 'missing-key' ? (
-              <p className="directions-message">
-                Directions need a CycleStreets API key.
-              </p>
-            ) : null}
-
-            {directionsState.status === 'error' ? (
-              <p className="directions-message">{directionsState.message}</p>
-            ) : null}
-
-            {directionsState.status === 'loaded' ? (
-              <>
-                <div className="directions-summary">
-                  <div
-                    className="directions-metrics"
-                    aria-label="Route summary"
+        <motion.aside
+          className="control-pane"
+          aria-label="Nearest cycle parking"
+          data-mobile-sheet-dragging={
+            isMobileSheetDragging ? 'true' : undefined
+          }
+          data-mobile-sheet-state={
+            isDirectionsMode ? 'expanded' : mobileSheetState
+          }
+          initial={false}
+          animate={controlPaneAnimate}
+          transition={
+            isMobileSheetDragging ? { duration: 0 } : panelSpringTransition
+          }
+          style={controlPaneStyle}
+        >
+          {!isDirectionsMode ? (
+            <motion.button
+              aria-expanded={mobileSheetState === 'expanded'}
+              aria-label={
+                mobileSheetState === 'expanded'
+                  ? 'Collapse results panel'
+                  : 'Expand results panel'
+              }
+              className="mobile-sheet-grip"
+              type="button"
+              onClick={handleSheetGripClick}
+              onPointerCancel={handleSheetGripPointerCancel}
+              onPointerDown={handleSheetGripPointerDown}
+              onPointerMove={handleSheetGripPointerMove}
+              onPointerUp={handleSheetGripPointerEnd}
+              whileTap={subtleTap}
+            >
+              <span aria-hidden="true" />
+            </motion.button>
+          ) : null}
+          <LayoutGroup>
+            <AnimatePresence mode="wait" initial={false}>
+              {isDirectionsMode ? (
+                <motion.section
+                  {...panelPresence}
+                  key="directions"
+                  className="directions-mode"
+                  aria-label="Cycle directions"
+                >
+                  <motion.div
+                    layout
+                    className="directions-mode-header"
+                    transition={rowLayoutTransition}
                   >
-                    <span>
-                      <Navigation size={16} aria-hidden="true" />
-                      {formatDistance(directionsState.route.distanceMeters)}
-                    </span>
-                    <span>
-                      <Bike size={16} aria-hidden="true" />
-                      {formatCycleRouteDuration(
-                        directionsState.route.durationSeconds,
-                      )}
-                    </span>
-                  </div>
-                </div>
-                {directionsState.route.instructions.length > 0 ? (
-                  <ol className="directions-list">
-                    {directionsState.route.instructions
-                      .slice(0, 8)
-                      .map((instruction, index) => (
-                        <li key={instruction.id}>
-                          <span
-                            className="directions-step-number"
-                            aria-hidden="true"
+                    <motion.div
+                      layout
+                      className="directions-header-main"
+                      transition={rowLayoutTransition}
+                    >
+                      <motion.div
+                        layout
+                        className="directions-title"
+                        transition={rowLayoutTransition}
+                      >
+                        <motion.div
+                          layout
+                          className="brand-mark directions-mark"
+                          aria-hidden="true"
+                          transition={rowLayoutTransition}
+                        >
+                          <Route size={24} />
+                        </motion.div>
+                        <motion.div layout transition={rowLayoutTransition}>
+                          <h1>
+                            {directionsParkingPoint?.name ?? 'Directions'}
+                          </h1>
+                          <AnimatePresence initial={false} mode="wait">
+                            {directionsParkingPoint ? (
+                              <motion.div
+                                {...risePresence}
+                                key="directions-parking-details"
+                              >
+                                <ParkingDetailStrip
+                                  className="directions-parking-details"
+                                  point={directionsParkingPoint}
+                                />
+                              </motion.div>
+                            ) : (
+                              <motion.p {...risePresence} key="directions-copy">
+                                Cycle route
+                              </motion.p>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      </motion.div>
+                      <motion.button
+                        type="button"
+                        whileTap={subtleTap}
+                        onClick={clearDirections}
+                      >
+                        <X size={16} aria-hidden="true" />
+                        Exit directions
+                      </motion.button>
+                    </motion.div>
+                    <AnimatePresence initial={false}>
+                      {directionsState.status === 'loaded' ? (
+                        <motion.div
+                          layout
+                          {...risePresence}
+                          key="directions-summary"
+                          className="directions-summary"
+                          transition={rowLayoutTransition}
+                        >
+                          <div
+                            className="directions-metrics"
+                            aria-label="Route summary"
                           >
-                            {index + 1}
-                          </span>
-                          <span className="directions-step-text">
-                            {describeCycleRouteInstruction(instruction)}
-                          </span>
-                          <small className="directions-step-distance">
-                            {formatDistance(instruction.distanceMeters)}
-                          </small>
-                        </li>
-                      ))}
-                  </ol>
-                ) : null}
-                {directionsState.route.source === 'cyclestreets' ? (
-                  <p className="directions-attribution">
-                    <Bike size={18} aria-hidden="true" />
-                    <span>Route by</span>
-                    {directionsState.route.routeUrl ? (
-                      <a href={directionsState.route.routeUrl}>
-                        CycleStreets
-                        <ExternalLink size={16} aria-hidden="true" />
-                      </a>
-                    ) : (
-                      <a href="https://www.cyclestreets.net/">
-                        CycleStreets
-                        <ExternalLink size={16} aria-hidden="true" />
-                      </a>
-                    )}
-                  </p>
-                ) : null}
-              </>
-            ) : null}
-            {renderAttributionFooter('directions-footer')}
-          </section>
-        ) : (
-          <>
-            <header className="app-header">
-              <div className="brand-mark" aria-hidden="true">
-                <img src="favicon.svg" alt="" />
-              </div>
-              <div>
-                <h1>Bike Neuks</h1>
-                <p>
-                  {formattedParkingLocationCount} cycle parking spots in
-                  Edinburgh
-                </p>
-              </div>
-              {renderThemeSettings()}
-            </header>
-
-            <div className="mobile-sheet-body">
-              <section className="reference-panel" aria-label="Search from">
-                <form
-                  className="place-search-form"
-                  onSubmit={(event) => {
-                    void searchForPlace(event);
-                  }}
-                >
-                  <label className="search-box">
-                    <Search size={17} aria-hidden="true" />
-                    <span className="sr-only">Search from a place</span>
-                    <input
-                      id="place-search"
-                      name="place-search"
-                      type="search"
-                      value={placeQuery}
-                      placeholder="Place or postcode"
-                      onChange={(event) => setPlaceQuery(event.target.value)}
-                    />
-                  </label>
-                  <button
-                    aria-label={
-                      locationState.status === 'locating'
-                        ? 'Locating'
-                        : 'Use current location'
-                    }
-                    className="secondary-location-button"
-                    title={
-                      locationState.status === 'locating'
-                        ? 'Locating'
-                        : 'Use current location'
-                    }
-                    type="button"
-                    onClick={() => {
-                      posthog.capture('location_requested');
-                      requestLocation();
-                    }}
-                    disabled={locationState.status === 'locating'}
-                  >
-                    {locationState.status === 'locating' ? (
-                      <Crosshair size={18} aria-hidden="true" />
-                    ) : (
-                      <LocateFixed size={18} aria-hidden="true" />
-                    )}
-                    <span className="sr-only">
-                      {locationState.status === 'locating'
-                        ? 'Locating'
-                        : 'Near me'}
-                    </span>
-                  </button>
-                  <button
-                    className="place-search-button"
-                    type="submit"
-                    disabled={
-                      isPlaceSearching || placeQuery.trim().length === 0
-                    }
-                  >
-                    <Search size={18} aria-hidden="true" />
-                    <span className="mobile-action-label">
-                      {isPlaceSearching ? 'Searching' : 'Search'}
-                    </span>
-                  </button>
-                </form>
-
-                {placeResults.length > 0 ? (
-                  <ol
-                    className="place-results"
-                    aria-label="Place search results"
-                  >
-                    {placeResults.map((result) => (
-                      <li key={result.id}>
-                        <button
-                          type="button"
-                          onClick={() => selectPlace(result)}
-                        >
-                          <MapPin size={16} aria-hidden="true" />
-                          <span>{result.name}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ol>
-                ) : null}
-
-                {placeSearchMessage ? (
-                  <div className="place-search-message" role="status">
-                    {placeSearchMessage}
-                  </div>
-                ) : null}
-              </section>
-
-              <div className="list-heading">
-                <h2>
-                  Nearby cycle parking{' '}
-                  <span>· {closestPoints.length} closest</span>
-                </h2>
-              </div>
-
-              {shareError ? (
-                <div className="parking-share-message" role="status">
-                  {shareError}
-                </div>
-              ) : null}
-
-              <div className="parking-list-scroll">
-                {locationState.status === 'too-far' ? (
-                  <div className="parking-list-context" role="status">
-                    You're very far away from a bike space, showing bike parking
-                    in central Edinburgh.
-                  </div>
-                ) : null}
-
-                <ol
-                  className="parking-list"
-                  aria-label="Nearby cycle parking locations"
-                >
-                  {closestPoints.map((point, index) => {
-                    return (
-                      <li className="parking-list-item" key={point.id}>
-                        <button
-                          className={[
-                            'parking-row',
-                            index === 0 ? 'closest' : null,
-                            point.id === explicitSelectedPoint?.id
-                              ? 'selected'
-                              : null,
-                          ]
-                            .filter(Boolean)
-                            .join(' ')}
-                          type="button"
-                          onClick={() => selectParkingPoint(point.id)}
-                        >
-                          <span className={`rank rank-${index + 1}`}>
-                            {index + 1}
-                          </span>
-                          <span className="parking-row-copy">
-                            <strong>{point.name}</strong>
-                            <ParkingDetailStrip includeDistance point={point} />
-                          </span>
-                        </button>
-                        <button
-                          aria-label={`Show cycle directions to ${point.name}`}
-                          className="parking-directions-button"
-                          type="button"
-                          onClick={(event) => {
-                            void requestDirections(event, point);
-                          }}
-                        >
-                          <Navigation size={17} aria-hidden="true" />
-                        </button>
-                        <button
-                          aria-label={`Copy link to ${point.name}`}
-                          className="parking-share-button"
-                          type="button"
-                          onClick={(event) => {
-                            void copyParkingLink(event, point);
-                          }}
-                        >
-                          <Share2 size={17} aria-hidden="true" />
-                          {copiedShareButton?.source === 'list' &&
-                          copiedShareButton.parkingId === point.id ? (
-                            <span
-                              className="parking-share-tooltip"
-                              role="status"
-                            >
-                              Copied
+                            <span>
+                              <Navigation size={16} aria-hidden="true" />
+                              {formatDistance(
+                                directionsState.route.distanceMeters,
+                              )}
                             </span>
-                          ) : null}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
+                            <span>
+                              <Bike size={16} aria-hidden="true" />
+                              {formatCycleRouteDuration(
+                                directionsState.route.durationSeconds,
+                              )}
+                            </span>
+                          </div>
+                        </motion.div>
+                      ) : null}
+                    </AnimatePresence>
+                  </motion.div>
 
-              {renderAttributionFooter()}
-            </div>
-          </>
-        )}
-      </aside>
-    </main>
+                  <div className="directions-scroll">
+                    <AnimatePresence initial={false} mode="wait">
+                      {directionsState.status === 'loading' ? (
+                        <motion.p
+                          {...risePresence}
+                          key="directions-loading"
+                          className="directions-message"
+                        >
+                          Finding a cycle route...
+                        </motion.p>
+                      ) : null}
+
+                      {directionsState.status === 'missing-key' ? (
+                        <motion.p
+                          {...risePresence}
+                          key="directions-missing-key"
+                          className="directions-message"
+                        >
+                          Directions need a CycleStreets API key.
+                        </motion.p>
+                      ) : null}
+
+                      {directionsState.status === 'error' ? (
+                        <motion.p
+                          {...risePresence}
+                          key="directions-error"
+                          className="directions-message"
+                        >
+                          {directionsState.message}
+                        </motion.p>
+                      ) : null}
+                    </AnimatePresence>
+
+                    {directionsState.status === 'loaded' ? (
+                      <motion.div
+                        {...risePresence}
+                        key="directions-loaded"
+                        className="directions-route-content"
+                      >
+                        {directionsState.route.instructions.length > 0 ? (
+                          <motion.ol
+                            layout
+                            className="directions-list"
+                            transition={rowLayoutTransition}
+                          >
+                            {directionsState.route.instructions
+                              .slice(0, 8)
+                              .map((instruction, index) => {
+                                const itemMotion = shouldReduceMotion
+                                  ? fadePresence
+                                  : {
+                                      animate: { opacity: 1, y: 0 },
+                                      exit: { opacity: 0, y: 4 },
+                                      initial: { opacity: 0, y: 6 },
+                                      transition: {
+                                        ...smallRiseTransition,
+                                        delay: index * 0.025,
+                                      },
+                                    };
+
+                                return (
+                                  <motion.li
+                                    layout
+                                    {...itemMotion}
+                                    key={instruction.id}
+                                    transition={rowLayoutTransition}
+                                  >
+                                    <span
+                                      className="directions-step-number"
+                                      aria-hidden="true"
+                                    >
+                                      {index + 1}
+                                    </span>
+                                    <span className="directions-step-text">
+                                      {describeCycleRouteInstruction(
+                                        instruction,
+                                      )}
+                                    </span>
+                                    <small className="directions-step-distance">
+                                      {formatDistance(
+                                        instruction.distanceMeters,
+                                      )}
+                                    </small>
+                                  </motion.li>
+                                );
+                              })}
+                          </motion.ol>
+                        ) : null}
+                        {directionsState.route.source === 'cyclestreets' ? (
+                          <motion.p
+                            {...risePresence}
+                            key="directions-attribution"
+                            className="directions-attribution"
+                          >
+                            <Bike size={18} aria-hidden="true" />
+                            <span>Route by</span>
+                            {directionsState.route.routeUrl ? (
+                              <a href={directionsState.route.routeUrl}>
+                                CycleStreets
+                                <ExternalLink size={16} aria-hidden="true" />
+                              </a>
+                            ) : (
+                              <a href="https://www.cyclestreets.net/">
+                                CycleStreets
+                                <ExternalLink size={16} aria-hidden="true" />
+                              </a>
+                            )}
+                          </motion.p>
+                        ) : null}
+                      </motion.div>
+                    ) : null}
+                  </div>
+                  {renderAttributionFooter('directions-footer')}
+                </motion.section>
+              ) : (
+                <motion.div
+                  {...panelPresence}
+                  key="finder"
+                  className="finder-panel-content"
+                >
+                  <header className="app-header" key="finder-header">
+                    <div className="brand-mark" aria-hidden="true">
+                      <img src="favicon.svg" alt="" />
+                    </div>
+                    <div>
+                      <h1>Bike Neuks</h1>
+                      <p>
+                        {formattedParkingLocationCount} cycle parking spots in
+                        Edinburgh
+                      </p>
+                    </div>
+                    {renderThemeSettings()}
+                  </header>
+
+                  <div className="mobile-sheet-body">
+                    <section
+                      className="reference-panel"
+                      aria-label="Search from"
+                    >
+                      <form
+                        className="place-search-form"
+                        onSubmit={(event) => {
+                          void searchForPlace(event);
+                        }}
+                      >
+                        <label className="search-box">
+                          <Search size={17} aria-hidden="true" />
+                          <span className="sr-only">Search from a place</span>
+                          <input
+                            id="place-search"
+                            name="place-search"
+                            type="search"
+                            value={placeQuery}
+                            placeholder="Place or postcode"
+                            onChange={(event) =>
+                              setPlaceQuery(event.target.value)
+                            }
+                          />
+                        </label>
+                        <motion.button
+                          aria-label={
+                            locationState.status === 'locating'
+                              ? 'Locating'
+                              : 'Use current location'
+                          }
+                          className="secondary-location-button"
+                          title={
+                            locationState.status === 'locating'
+                              ? 'Locating'
+                              : 'Use current location'
+                          }
+                          type="button"
+                          onClick={() => {
+                            captureAnalyticsEvent('location_requested');
+                            requestLocation();
+                          }}
+                          disabled={locationState.status === 'locating'}
+                          whileTap={
+                            locationState.status === 'locating'
+                              ? undefined
+                              : subtleTap
+                          }
+                        >
+                          {locationState.status === 'locating' ? (
+                            <Crosshair size={18} aria-hidden="true" />
+                          ) : (
+                            <LocateFixed size={18} aria-hidden="true" />
+                          )}
+                          <span className="sr-only">
+                            {locationState.status === 'locating'
+                              ? 'Locating'
+                              : 'Near me'}
+                          </span>
+                        </motion.button>
+                        <motion.button
+                          className="place-search-button"
+                          type="submit"
+                          disabled={
+                            isPlaceSearching || placeQuery.trim().length === 0
+                          }
+                          whileTap={
+                            isPlaceSearching || placeQuery.trim().length === 0
+                              ? undefined
+                              : subtleTap
+                          }
+                        >
+                          <Search size={18} aria-hidden="true" />
+                          <span className="mobile-action-label">
+                            {isPlaceSearching ? 'Searching' : 'Search'}
+                          </span>
+                        </motion.button>
+                      </form>
+
+                      <AnimatePresence initial={false}>
+                        {placeResults.length > 0 ? (
+                          <motion.ol
+                            {...risePresence}
+                            layout
+                            className="place-results"
+                            aria-label="Place search results"
+                          >
+                            {placeResults.map((result) => (
+                              <motion.li
+                                layout
+                                key={result.id}
+                                transition={rowLayoutTransition}
+                              >
+                                <motion.button
+                                  type="button"
+                                  whileTap={subtleTap}
+                                  onClick={() => selectPlace(result)}
+                                >
+                                  <MapPin size={16} aria-hidden="true" />
+                                  <span>{result.name}</span>
+                                </motion.button>
+                              </motion.li>
+                            ))}
+                          </motion.ol>
+                        ) : null}
+                      </AnimatePresence>
+
+                      <AnimatePresence initial={false}>
+                        {placeSearchMessage ? (
+                          <motion.div
+                            {...risePresence}
+                            key={placeSearchMessage}
+                            className="place-search-message"
+                            role="status"
+                          >
+                            {placeSearchMessage}
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    </section>
+
+                    <div className="list-heading">
+                      <h2>
+                        Nearby cycle parking{' '}
+                        <span>· {closestPoints.length} closest</span>
+                      </h2>
+                    </div>
+
+                    <AnimatePresence initial={false}>
+                      {shareError ? (
+                        <motion.div
+                          {...risePresence}
+                          key={shareError}
+                          className="parking-share-message"
+                          role="status"
+                        >
+                          {shareError}
+                        </motion.div>
+                      ) : null}
+                    </AnimatePresence>
+
+                    <div className="parking-list-scroll">
+                      <AnimatePresence initial={false}>
+                        {locationState.status === 'too-far' ? (
+                          <motion.div
+                            {...risePresence}
+                            key="too-far"
+                            className="parking-list-context"
+                            role="status"
+                          >
+                            You're very far away from a bike space, showing bike
+                            parking in central Edinburgh.
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+
+                      <motion.ol
+                        layout
+                        className="parking-list"
+                        aria-label="Nearby cycle parking locations"
+                      >
+                        {closestPoints.map((point, index) => {
+                          return (
+                            <motion.li
+                              layout
+                              className="parking-list-item"
+                              key={point.id}
+                              transition={rowLayoutTransition}
+                              ref={(item) => {
+                                if (item) {
+                                  parkingListItemRefs.current.set(
+                                    point.id,
+                                    item,
+                                  );
+                                } else {
+                                  parkingListItemRefs.current.delete(point.id);
+                                }
+                              }}
+                            >
+                              <motion.button
+                                className={[
+                                  'parking-row',
+                                  index === 0 ? 'closest' : null,
+                                  point.id === explicitSelectedPoint?.id
+                                    ? 'selected'
+                                    : null,
+                                ]
+                                  .filter(Boolean)
+                                  .join(' ')}
+                                type="button"
+                                whileTap={subtleTap}
+                                onClick={() => selectParkingPoint(point.id)}
+                              >
+                                <span className={`rank rank-${index + 1}`}>
+                                  {index + 1}
+                                </span>
+                                <span className="parking-row-copy">
+                                  <strong>{point.name}</strong>
+                                  <ParkingDetailStrip
+                                    includeDistance
+                                    point={point}
+                                  />
+                                </span>
+                              </motion.button>
+                              <motion.button
+                                aria-label={`Show cycle directions to ${point.name}`}
+                                className="parking-directions-button"
+                                type="button"
+                                whileTap={subtleTap}
+                                onClick={(event) => {
+                                  void requestDirections(event, point);
+                                }}
+                              >
+                                <Navigation size={17} aria-hidden="true" />
+                              </motion.button>
+                              <motion.button
+                                aria-label={`Copy link to ${point.name}`}
+                                className="parking-share-button"
+                                type="button"
+                                whileTap={subtleTap}
+                                onClick={(event) => {
+                                  void copyParkingLink(event, point);
+                                }}
+                              >
+                                <Share2 size={17} aria-hidden="true" />
+                                <AnimatePresence initial={false}>
+                                  {copiedShareButton?.source === 'list' &&
+                                  copiedShareButton.parkingId === point.id ? (
+                                    <motion.span
+                                      {...tooltipPresence}
+                                      key="copied"
+                                      className="parking-share-tooltip"
+                                      role="status"
+                                    >
+                                      Copied
+                                    </motion.span>
+                                  ) : null}
+                                </AnimatePresence>
+                              </motion.button>
+                            </motion.li>
+                          );
+                        })}
+                      </motion.ol>
+                    </div>
+
+                    {renderAttributionFooter()}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </LayoutGroup>
+        </motion.aside>
+      </main>
+    </MotionConfig>
   );
 }

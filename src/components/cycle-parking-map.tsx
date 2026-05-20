@@ -780,16 +780,16 @@ export default function CycleParkingMap({
       {visiblePoints.map((point) => {
         const rank = rankedPointRanks.get(point.id);
         const popupDetails = getParkingPopupDetails(point);
-        const icon =
-          point.id === selectedPoint?.id
-            ? isDirectionsMode
-              ? destinationIcon
-              : rank !== undefined
-                ? (selectedRankedIcons.get(rank) ?? icons.selected)
-                : icons.selected
+        const isSelected = point.id === selectedPoint?.id;
+        const icon = isSelected
+          ? isDirectionsMode
+            ? destinationIcon
             : rank !== undefined
-              ? (rankedIcons.get(rank) ?? icons.default)
-              : icons.default;
+              ? (selectedRankedIcons.get(rank) ?? icons.selected)
+              : icons.selected
+          : rank !== undefined
+            ? (rankedIcons.get(rank) ?? icons.default)
+            : icons.default;
 
         return (
           <Marker
@@ -803,6 +803,7 @@ export default function CycleParkingMap({
             }}
             position={[point.latitude, point.longitude]}
             icon={icon}
+            zIndexOffset={isSelected ? 1000 : 0}
             eventHandlers={{
               click: () => onSelectPoint(point.id),
             }}
