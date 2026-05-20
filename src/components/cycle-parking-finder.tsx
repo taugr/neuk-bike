@@ -111,12 +111,6 @@ const tooltipTransition: Transition = {
   damping: 34,
   mass: 0.7,
 };
-const panelSpringTransition: Transition = {
-  type: 'spring',
-  stiffness: 420,
-  damping: 38,
-  mass: 0.85,
-};
 const panelSlideTransition: Transition = {
   type: 'spring',
   stiffness: 360,
@@ -281,8 +275,8 @@ export default function CycleParkingFinder() {
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light');
   const [mobileSheetState, setMobileSheetState] =
     useState<MobileSheetState>('expanded');
-  const [mobileSheetDragOffset, setMobileSheetDragOffset] = useState(0);
   const [mobileSheetDragProgress, setMobileSheetDragProgress] = useState(0);
+  const [isMobileSheetDragging, setIsMobileSheetDragging] = useState(false);
   const { canInstall, installApp } = usePwaInstallPrompt();
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
   const directionsCache = useRef(new Map<string, CycleRoute>());
@@ -557,14 +551,14 @@ export default function CycleParkingFinder() {
 
   function snapMobileSheetFromDrag(deltaY: number) {
     if (Math.abs(deltaY) < mobileSheetDragThresholdPx) {
-      setMobileSheetDragOffset(0);
+      setIsMobileSheetDragging(false);
       setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
       return;
     }
 
     ignoreNextSheetGripClick.current = true;
     setMobileSheetState(deltaY > 0 ? 'collapsed' : 'expanded');
-    setMobileSheetDragOffset(0);
+    setIsMobileSheetDragging(false);
     setMobileSheetDragProgress(deltaY > 0 ? 0 : 1);
   }
 
@@ -576,7 +570,7 @@ export default function CycleParkingFinder() {
       pointerId: event.pointerId,
       startY: event.clientY,
     };
-    setMobileSheetDragOffset(0);
+    setIsMobileSheetDragging(false);
     setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
@@ -599,11 +593,7 @@ export default function CycleParkingFinder() {
       mobileSheetState === 'expanded'
         ? 1 - Math.min(dragDistance / mobileSheetDragRangePx, 1)
         : Math.min(dragDistance / mobileSheetDragRangePx, 1);
-    const nextOffset =
-      mobileSheetState === 'expanded'
-        ? Math.min(rawDeltaY, mobileSheetDragRangePx)
-        : Math.max(rawDeltaY, -mobileSheetDragRangePx);
-    setMobileSheetDragOffset(nextOffset);
+    setIsMobileSheetDragging(dragDistance > 0);
     setMobileSheetDragProgress(dragProgress);
   }
 
@@ -641,7 +631,7 @@ export default function CycleParkingFinder() {
     }
 
     mobileSheetDrag.current = null;
-    setMobileSheetDragOffset(0);
+    setIsMobileSheetDragging(false);
     setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
   }
 
@@ -651,15 +641,11 @@ export default function CycleParkingFinder() {
       : mobileSheetState === 'expanded'
         ? 1
         : 0;
-  const isMobileSheetDragging = mobileSheetDragOffset !== 0;
   const controlPaneStyle = {
     '--mobile-sheet-drag-progress': isMobileSheetDragging
       ? mobileSheetProgress
       : undefined,
   } as CSSProperties;
-  const controlPaneAnimate = {
-    '--mobile-sheet-drag-progress': mobileSheetProgress,
-  };
 
   function clearDirections() {
     directionsRequestId.current += 1;
@@ -1151,10 +1137,6 @@ export default function CycleParkingFinder() {
           }
           data-mobile-sheet-state={mobileSheetState}
           initial={false}
-          animate={controlPaneAnimate}
-          transition={
-            isMobileSheetDragging ? { duration: 0 } : panelSpringTransition
-          }
           style={controlPaneStyle}
         >
           <motion.button

@@ -108,6 +108,12 @@ body {
   margin: 0;
 }
 
+@property --mobile-sheet-drag-progress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
 body {
   background: var(--background);
   color: var(--text);
@@ -1543,6 +1549,9 @@ a {
   }
 
   .control-pane {
+    --mobile-sheet-collapsed-height: 5.4rem;
+    --mobile-sheet-expanded-height: 54dvh;
+    --mobile-sheet-drag-progress: 1;
     border: 1px solid var(--subtle);
     border-radius: 8px 8px 0 0;
     bottom: 0;
@@ -1557,10 +1566,26 @@ a {
     padding: 0.9rem 0.9rem max(0.4rem, env(safe-area-inset-bottom));
     position: absolute;
     right: 0.65rem;
-    max-height: calc(
-      7.25rem + ((54dvh - 7.25rem) * var(--mobile-sheet-drag-progress, 1))
+    height: calc(
+      var(--mobile-sheet-collapsed-height) +
+        (
+          (
+              var(--mobile-sheet-expanded-height) -
+                var(--mobile-sheet-collapsed-height)
+            ) *
+            var(--mobile-sheet-drag-progress, 1)
+        )
     );
-    will-change: max-height;
+    max-height: 54dvh;
+    transition:
+      --mobile-sheet-drag-progress 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      height 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      max-height 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: height;
+  }
+
+  .control-pane[data-mobile-sheet-dragging='true'] {
+    transition: none;
   }
 
   .mobile-sheet-grip {
@@ -1642,12 +1667,13 @@ a {
     gap: 0.75rem;
   }
 
-  .control-pane:has(.directions-mode) {
-    height: 54vh;
-    height: 54svh;
-    height: 54dvh;
+  .control-pane[data-mobile-sheet-state='expanded']:has(.directions-mode) {
     overflow: hidden;
     padding-right: 1.25rem;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode) {
+    padding-right: 0.9rem;
   }
 
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
@@ -1668,11 +1694,22 @@ a {
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
     .directions-title {
     flex: 1 1 auto;
-    gap: 0;
+    gap: 0.7rem;
   }
 
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
-    .directions-mark,
+    .directions-mark {
+    height: 30px;
+    width: 30px;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-mark
+    svg {
+    height: 16px;
+    width: 16px;
+  }
+
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
     .directions-parking-details,
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
