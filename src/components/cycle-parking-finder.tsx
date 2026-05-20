@@ -550,10 +550,6 @@ export default function CycleParkingFinder() {
   }, [isDirectionsMode]);
 
   function toggleMobileSheet() {
-    if (isDirectionsMode) {
-      return;
-    }
-
     setMobileSheetState((current) =>
       current === 'expanded' ? 'collapsed' : 'expanded',
     );
@@ -575,10 +571,6 @@ export default function CycleParkingFinder() {
   function handleSheetGripPointerDown(
     event: ReactPointerEvent<HTMLButtonElement>,
   ) {
-    if (isDirectionsMode) {
-      return;
-    }
-
     mobileSheetDrag.current = {
       currentY: event.clientY,
       pointerId: event.pointerId,
@@ -653,9 +645,8 @@ export default function CycleParkingFinder() {
     setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
   }
 
-  const mobileSheetProgress = isDirectionsMode
-    ? 1
-    : mobileSheetDrag.current !== null
+  const mobileSheetProgress =
+    mobileSheetDrag.current !== null
       ? mobileSheetDragProgress
       : mobileSheetState === 'expanded'
         ? 1
@@ -1139,7 +1130,7 @@ export default function CycleParkingFinder() {
             rankedPoints={nearbyPoints}
             route={activeRoute}
             isDirectionsMode={isDirectionsMode}
-            mobileSheetState={isDirectionsMode ? 'expanded' : mobileSheetState}
+            mobileSheetState={mobileSheetState}
             copiedShareButton={copiedShareButton}
             theme={resolvedTheme}
             onSelectPoint={selectParkingPoint}
@@ -1158,9 +1149,7 @@ export default function CycleParkingFinder() {
           data-mobile-sheet-dragging={
             isMobileSheetDragging ? 'true' : undefined
           }
-          data-mobile-sheet-state={
-            isDirectionsMode ? 'expanded' : mobileSheetState
-          }
+          data-mobile-sheet-state={mobileSheetState}
           initial={false}
           animate={controlPaneAnimate}
           transition={
@@ -1168,26 +1157,24 @@ export default function CycleParkingFinder() {
           }
           style={controlPaneStyle}
         >
-          {!isDirectionsMode ? (
-            <motion.button
-              aria-expanded={mobileSheetState === 'expanded'}
-              aria-label={
-                mobileSheetState === 'expanded'
-                  ? 'Collapse results panel'
-                  : 'Expand results panel'
-              }
-              className="mobile-sheet-grip"
-              type="button"
-              onClick={handleSheetGripClick}
-              onPointerCancel={handleSheetGripPointerCancel}
-              onPointerDown={handleSheetGripPointerDown}
-              onPointerMove={handleSheetGripPointerMove}
-              onPointerUp={handleSheetGripPointerEnd}
-              whileTap={subtleTap}
-            >
-              <span aria-hidden="true" />
-            </motion.button>
-          ) : null}
+          <motion.button
+            aria-expanded={mobileSheetState === 'expanded'}
+            aria-label={
+              mobileSheetState === 'expanded'
+                ? `Collapse ${isDirectionsMode ? 'directions' : 'results'} panel`
+                : `Expand ${isDirectionsMode ? 'directions' : 'results'} panel`
+            }
+            className="mobile-sheet-grip"
+            type="button"
+            onClick={handleSheetGripClick}
+            onPointerCancel={handleSheetGripPointerCancel}
+            onPointerDown={handleSheetGripPointerDown}
+            onPointerMove={handleSheetGripPointerMove}
+            onPointerUp={handleSheetGripPointerEnd}
+            whileTap={subtleTap}
+          >
+            <span aria-hidden="true" />
+          </motion.button>
           <LayoutGroup>
             <AnimatePresence
               custom={panelDirection}

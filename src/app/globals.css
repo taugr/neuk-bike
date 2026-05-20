@@ -1650,6 +1650,56 @@ a {
     padding-right: 1.25rem;
   }
 
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-mode {
+    gap: 0;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-mode-header {
+    gap: 0;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-header-main {
+    gap: 0.7rem;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-title {
+    flex: 1 1 auto;
+    gap: 0;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-mark,
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-parking-details,
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-summary,
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-scroll,
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-footer {
+    display: none;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-mode-header
+    h1 {
+    font-size: 1.05rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-mode-header
+    button {
+    min-height: 42px;
+    white-space: nowrap;
+  }
+
   .leaflet-bottom.leaflet-right {
     bottom: auto;
     right: 0;
