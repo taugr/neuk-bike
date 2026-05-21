@@ -269,7 +269,7 @@ a {
 }
 
 .parking-popup:has(.parking-popup-details-count-4) {
-  min-width: 240px;
+  min-width: 292px;
 }
 
 .parking-popup-details-count-4 {
