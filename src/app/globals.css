@@ -1214,17 +1214,27 @@ a {
   position: relative;
 }
 
-.directions-list li::before {
+.directions-list li::before,
+.directions-list li::after {
   background: var(--accent);
-  bottom: -0.9rem;
   content: '';
   left: 1.15rem;
   opacity: 0.78;
   position: absolute;
-  top: 2.55rem;
   width: 2px;
 }
 
+.directions-list li::before {
+  bottom: 0;
+  top: 50%;
+}
+
+.directions-list li::after {
+  bottom: 50%;
+  top: 0;
+}
+
+.directions-list li:first-child::after,
 .directions-list li:last-child::before {
   display: none;
 }
