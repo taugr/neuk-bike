@@ -1346,19 +1346,24 @@ export default function CycleParkingFinder() {
                             key="directions-attribution"
                             className="directions-attribution"
                           >
-                            <Bike size={18} aria-hidden="true" />
-                            <span>Route by</span>
-                            {directionsState.route.routeUrl ? (
-                              <a href={directionsState.route.routeUrl}>
-                                CycleStreets
-                                <ExternalLink size={16} aria-hidden="true" />
-                              </a>
-                            ) : (
-                              <a href="https://www.cyclestreets.net/">
-                                CycleStreets
-                                <ExternalLink size={16} aria-hidden="true" />
-                              </a>
-                            )}
+                            <Bike
+                              key="directions-attribution-icon"
+                              size={18}
+                              aria-hidden="true"
+                            />
+                            <span key="directions-attribution-label">
+                              Route by
+                            </span>
+                            <a
+                              key="directions-attribution-link"
+                              href={
+                                directionsState.route.routeUrl ??
+                                'https://www.cyclestreets.net/'
+                              }
+                            >
+                              CycleStreets
+                              <ExternalLink size={16} aria-hidden="true" />
+                            </a>
                           </motion.p>
                         ) : null}
                       </motion.div>
