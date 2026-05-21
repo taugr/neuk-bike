@@ -1391,6 +1391,15 @@ a {
   font-weight: 700;
 }
 
+.attribution-details a:focus,
+.attribution-details a:focus-visible {
+  box-shadow: none;
+  outline: 0;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
 .built-by-credit {
   text-align: right;
 }
