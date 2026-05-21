@@ -1669,7 +1669,6 @@ a {
 
   .control-pane[data-mobile-sheet-state='expanded']:has(.directions-mode) {
     overflow: hidden;
-    padding-right: 1.25rem;
   }
 
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode) {

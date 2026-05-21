@@ -105,6 +105,10 @@ const smallRiseTransition: Transition = {
   duration: 0.2,
   ease: [0.22, 1, 0.36, 1],
 };
+const directionsRevealTransition: Transition = {
+  duration: 0.28,
+  ease: [0.22, 1, 0.36, 1],
+};
 const tooltipTransition: Transition = {
   type: 'spring',
   stiffness: 600,
@@ -307,6 +311,14 @@ export default function CycleParkingFinder() {
         initial: { opacity: 0, y: 8 },
         transition: smallRiseTransition,
       };
+  const directionsRevealPresence: PresenceMotion = shouldReduceMotion
+    ? fadePresence
+    : {
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 3 },
+        initial: { opacity: 0, y: 4 },
+        transition: directionsRevealTransition,
+      };
   const panelSlideVariants = shouldReduceMotion
     ? {
         center: { opacity: 1 },
@@ -333,11 +345,12 @@ export default function CycleParkingFinder() {
         animate: {
           opacity: 1,
           transition: {
-            staggerChildren: 0.045,
+            delayChildren: 0.04,
+            staggerChildren: 0.026,
           },
           y: 0,
         },
-        initial: { opacity: 1, y: 10 },
+        initial: { opacity: 0, y: 4 },
       };
   const routeStepVariants = shouldReduceMotion
     ? {
@@ -347,10 +360,10 @@ export default function CycleParkingFinder() {
     : {
         animate: {
           opacity: 1,
-          transition: smallRiseTransition,
-          x: 0,
+          transition: directionsRevealTransition,
+          y: 0,
         },
-        initial: { opacity: 0, x: 18 },
+        initial: { opacity: 0, y: 5 },
       };
   const popoverPresence: PresenceMotion = shouldReduceMotion
     ? fadePresence
@@ -1233,11 +1246,9 @@ export default function CycleParkingFinder() {
                     <AnimatePresence initial={false}>
                       {directionsState.status === 'loaded' ? (
                         <motion.div
-                          layout
-                          {...risePresence}
+                          {...directionsRevealPresence}
                           key="directions-summary"
                           className="directions-summary"
-                          transition={rowLayoutTransition}
                         >
                           <div
                             className="directions-metrics"
@@ -1300,12 +1311,11 @@ export default function CycleParkingFinder() {
                         initial="initial"
                         key="directions-loaded"
                         className="directions-route-content"
-                        transition={smallRiseTransition}
                         variants={routeContentVariants}
                       >
                         {directionsState.route.instructions.length > 0 ? (
                           <motion.ol
-                            layout
+                            layout="position"
                             className="directions-list"
                             transition={rowLayoutTransition}
                           >
@@ -1314,7 +1324,7 @@ export default function CycleParkingFinder() {
                               .map((instruction, index) => {
                                 return (
                                   <motion.li
-                                    layout
+                                    layout="position"
                                     key={instruction.id}
                                     transition={rowLayoutTransition}
                                     variants={routeStepVariants}
@@ -1553,14 +1563,14 @@ export default function CycleParkingFinder() {
                       </AnimatePresence>
 
                       <motion.ol
-                        layout
+                        layout="position"
                         className="parking-list"
                         aria-label="Nearby cycle parking locations"
                       >
                         {closestPoints.map((point, index) => {
                           return (
                             <motion.li
-                              layout
+                              layout="position"
                               className="parking-list-item"
                               key={point.id}
                               transition={rowLayoutTransition}
