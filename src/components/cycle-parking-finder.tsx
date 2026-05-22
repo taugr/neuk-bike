@@ -258,6 +258,8 @@ export default function CycleParkingFinder() {
     status: 'fallback',
     location: EDINBURGH_FALLBACK_LOCATION,
   });
+  const [currentLocationFocusRequestId, setCurrentLocationFocusRequestId] =
+    useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [placeQuery, setPlaceQuery] = useState('');
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
@@ -665,6 +667,23 @@ export default function CycleParkingFinder() {
     setDirectionsState({ status: 'idle' });
   }
 
+  function requestCurrentLocationFocus() {
+    setCurrentLocationFocusRequestId((requestId) => requestId + 1);
+  }
+
+  function applyFallbackLocation(
+    status: Extract<
+      LocationState['status'],
+      'denied' | 'too-far' | 'unavailable'
+    >,
+  ) {
+    setLocationState({
+      status,
+      location: EDINBURGH_FALLBACK_LOCATION,
+    });
+    requestCurrentLocationFocus();
+  }
+
   function applyReferenceLocation(
     location: UserLocation,
     status: Extract<LocationState['status'], 'located' | 'searched'>,
@@ -678,11 +697,8 @@ export default function CycleParkingFinder() {
       status === 'located' &&
       isFarFromNearestParking(parkingPoints, location)
     ) {
-      setLocationState({
-        status: 'too-far',
-        location: EDINBURGH_FALLBACK_LOCATION,
-      });
-      return;
+      applyFallbackLocation('too-far');
+      return false;
     }
 
     setLocationState(
@@ -697,6 +713,8 @@ export default function CycleParkingFinder() {
             location,
           },
     );
+
+    return true;
   }
 
   function requestLocation(selectedParkingId?: string) {
@@ -704,10 +722,7 @@ export default function CycleParkingFinder() {
     clearDirections();
 
     if (!('geolocation' in navigator)) {
-      setLocationState({
-        status: 'unavailable',
-        location: EDINBURGH_FALLBACK_LOCATION,
-      });
+      applyFallbackLocation('unavailable');
       return;
     }
 
@@ -724,29 +739,27 @@ export default function CycleParkingFinder() {
         };
 
         if (!isResolvedLocation(location)) {
-          setLocationState({
-            status: 'unavailable',
-            location: EDINBURGH_FALLBACK_LOCATION,
-          });
+          applyFallbackLocation('unavailable');
           return;
         }
 
         captureAnalyticsEvent('location_granted');
-        applyReferenceLocation(
+        const didApplyLocation = applyReferenceLocation(
           location,
           'located',
           undefined,
           selectedParkingId,
         );
+
+        if (didApplyLocation) {
+          requestCurrentLocationFocus();
+        }
       },
       (error) => {
         const status =
           error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable';
         captureAnalyticsEvent('location_denied', { reason: status });
-        setLocationState({
-          status,
-          location: EDINBURGH_FALLBACK_LOCATION,
-        });
+        applyFallbackLocation(status);
       },
       {
         enableHighAccuracy: true,
@@ -1124,6 +1137,7 @@ export default function CycleParkingFinder() {
           <CycleParkingMap
             points={nearbyPoints}
             userLocation={locationState.location}
+            currentLocationFocusRequestId={currentLocationFocusRequestId}
             selectedPoint={explicitSelectedPoint}
             nearestPoint={nearestPoint}
             rankedPoints={nearbyPoints}

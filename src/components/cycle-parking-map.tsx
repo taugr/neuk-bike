@@ -42,6 +42,7 @@ import {
 type CycleParkingMapProps = {
   points: ParkingPoint[];
   userLocation: UserLocation;
+  currentLocationFocusRequestId: number;
   selectedPoint: ParkingPoint | null;
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
@@ -284,6 +285,7 @@ function getInitialApproachPositions(
 }
 
 function MapFocus({
+  currentLocationFocusRequestId,
   highlightedPoints,
   mobileSheetState,
   nearestPoint,
@@ -291,6 +293,7 @@ function MapFocus({
   selectedPoint,
   userLocation,
 }: {
+  currentLocationFocusRequestId: number;
   highlightedPoints: ParkingPoint[];
   mobileSheetState: 'collapsed' | 'expanded';
   nearestPoint: ParkingPoint | null;
@@ -389,6 +392,7 @@ function MapFocus({
 
     map.setView([userLocation.latitude, userLocation.longitude], 16);
   }, [
+    currentLocationFocusRequestId,
     highlightedPoints,
     map,
     nearestPoint,
@@ -499,6 +503,7 @@ function MapViewportTracker({
 export default function CycleParkingMap({
   points,
   userLocation,
+  currentLocationFocusRequestId,
   selectedPoint,
   nearestPoint,
   rankedPoints,
@@ -715,6 +720,7 @@ export default function CycleParkingMap({
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapFocus
+        currentLocationFocusRequestId={currentLocationFocusRequestId}
         highlightedPoints={highlightedPoints}
         mobileSheetState={mobileSheetState}
         nearestPoint={nearestPoint}
