@@ -11,6 +11,7 @@ export type CycleRoutePoint = [latitude: number, longitude: number];
 
 export type CycleRouteInstruction = {
   id: string;
+  anchor: CycleRoutePoint;
   streetName: string;
   turn: string;
   distanceMeters: number;
@@ -224,6 +225,7 @@ export function buildShortCycleRoute(
     instructions: [
       {
         id: `short-route-${destination.id}`,
+        anchor: [origin.latitude, origin.longitude],
         streetName: '',
         turn: 'straight',
         distanceMeters: routeDistanceMeters,
@@ -361,13 +363,19 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
       const streetDistanceMeters = getNumber(properties.lengthMetres);
       const streetDurationSeconds = getNumber(properties.timeSeconds);
       const travelMode = getString(properties.travelMode) ?? 'cycling';
+      const anchor = parseLineString(feature.geometry).at(0);
 
-      if (streetDistanceMeters === null || streetDurationSeconds === null) {
+      if (
+        !anchor ||
+        streetDistanceMeters === null ||
+        streetDurationSeconds === null
+      ) {
         return null;
       }
 
       return {
         id: getPath(properties) || `instruction-${index}`,
+        anchor,
         streetName,
         turn,
         distanceMeters: streetDistanceMeters,

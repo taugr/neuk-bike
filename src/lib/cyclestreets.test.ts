@@ -137,6 +137,7 @@ describe('CycleStreets utilities', () => {
     expect(route.instructions).toEqual([
       {
         id: 'plan/balanced/street/1',
+        anchor: [55.9534, -3.18852],
         streetName: 'Princes Street',
         turn: 'start',
         distanceMeters: 39,
@@ -145,6 +146,7 @@ describe('CycleStreets utilities', () => {
       },
       {
         id: 'plan/balanced/street/2',
+        anchor: [55.9533, -3.18908],
         streetName: 'North Bridge, A7',
         turn: 'turn left',
         distanceMeters: 362,
@@ -189,6 +191,7 @@ describe('CycleStreets utilities', () => {
     expect(route.instructions).toHaveLength(1);
     expect(route.instructions[0]).toMatchObject({
       id: 'short-route-near',
+      anchor: [55.9533, -3.1883],
       streetName: '',
       turn: 'straight',
       travelMode: 'walking',
@@ -199,6 +202,7 @@ describe('CycleStreets utilities', () => {
     expect(
       describeCycleRouteInstruction({
         id: 'short',
+        anchor: [55.9533, -3.1883],
         streetName: '',
         turn: 'straight',
         distanceMeters: 4.4,

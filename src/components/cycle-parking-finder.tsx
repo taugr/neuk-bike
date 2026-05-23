@@ -272,6 +272,10 @@ export default function CycleParkingFinder() {
   const [directionsState, setDirectionsState] = useState<DirectionsState>({
     status: 'idle',
   });
+  const [activeInstruction, setActiveInstruction] = useState<{
+    id: string;
+    requestId: number;
+  } | null>(null);
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
   const [isAttributionModalOpen, setIsAttributionModalOpen] = useState(false);
@@ -291,6 +295,7 @@ export default function CycleParkingFinder() {
   const copiedMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
+  const routeInstructionRefs = useRef(new Map<string, HTMLLIElement>());
   const settingsMenu = useRef<HTMLDivElement>(null);
   const mobileSheetDrag = useRef<{
     currentY: number;
@@ -558,6 +563,29 @@ export default function CycleParkingFinder() {
     }
   }, [isDirectionsMode]);
 
+  useEffect(() => {
+    if (!activeInstruction) {
+      return;
+    }
+
+    const instructionListItem = routeInstructionRefs.current.get(
+      activeInstruction.id,
+    );
+
+    if (!instructionListItem) {
+      return;
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    instructionListItem.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+    });
+  }, [activeInstruction]);
+
   function toggleMobileSheet() {
     setMobileSheetState((current) =>
       current === 'expanded' ? 'collapsed' : 'expanded',
@@ -665,6 +693,14 @@ export default function CycleParkingFinder() {
   function clearDirections() {
     directionsRequestId.current += 1;
     setDirectionsState({ status: 'idle' });
+    setActiveInstruction(null);
+  }
+
+  function selectRouteInstruction(id: string) {
+    setActiveInstruction((current) => ({
+      id,
+      requestId: (current?.requestId ?? 0) + 1,
+    }));
   }
 
   function requestCurrentLocationFocus() {
@@ -1142,11 +1178,13 @@ export default function CycleParkingFinder() {
             nearestPoint={nearestPoint}
             rankedPoints={nearbyPoints}
             route={activeRoute}
+            activeInstructionId={activeInstruction?.id ?? null}
             isDirectionsMode={isDirectionsMode}
             mobileSheetState={mobileSheetState}
             copiedShareButton={copiedShareButton}
             theme={resolvedTheme}
             onSelectPoint={selectParkingPoint}
+            onSelectInstruction={selectRouteInstruction}
             onRequestDirections={(point) => {
               void requestDirectionsToPoint(point);
             }}
@@ -1333,13 +1371,43 @@ export default function CycleParkingFinder() {
                             className="directions-list"
                             transition={rowLayoutTransition}
                           >
-                            {directionsState.route.instructions
-                              .slice(0, 8)
-                              .map((instruction, index) => {
+                            {directionsState.route.instructions.map(
+                              (instruction, index) => {
                                 return (
                                   <motion.li
                                     layout="position"
                                     key={instruction.id}
+                                    ref={(listItem) => {
+                                      if (listItem) {
+                                        routeInstructionRefs.current.set(
+                                          instruction.id,
+                                          listItem,
+                                        );
+                                      } else {
+                                        routeInstructionRefs.current.delete(
+                                          instruction.id,
+                                        );
+                                      }
+                                    }}
+                                    className={
+                                      activeInstruction?.id === instruction.id
+                                        ? 'directions-list-item directions-list-item-active'
+                                        : 'directions-list-item'
+                                    }
+                                    onClick={() =>
+                                      selectRouteInstruction(instruction.id)
+                                    }
+                                    onKeyDown={(event) => {
+                                      if (
+                                        event.key === 'Enter' ||
+                                        event.key === ' '
+                                      ) {
+                                        event.preventDefault();
+                                        selectRouteInstruction(instruction.id);
+                                      }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
                                     transition={rowLayoutTransition}
                                     variants={routeStepVariants}
                                   >
@@ -1361,7 +1429,8 @@ export default function CycleParkingFinder() {
                                     </small>
                                   </motion.li>
                                 );
-                              })}
+                              },
+                            )}
                           </motion.ol>
                         ) : null}
                         {directionsState.route.source === 'cyclestreets' ? (

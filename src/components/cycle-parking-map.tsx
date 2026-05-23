@@ -47,11 +47,13 @@ type CycleParkingMapProps = {
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
   route: CycleRoute | null;
+  activeInstructionId: string | null;
   isDirectionsMode: boolean;
   mobileSheetState: 'collapsed' | 'expanded';
   copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
   theme: 'light' | 'dark';
   onSelectPoint: (id: string) => void;
+  onSelectInstruction: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
 };
@@ -213,6 +215,17 @@ function createRankedParkingIcon(rank: number) {
     iconSize: [28, 28],
     iconAnchor: [14, 14],
     popupAnchor: [0, -16],
+  });
+}
+
+function createRouteInstructionIcon(index: number, isActive: boolean) {
+  return L.divIcon({
+    className: isActive
+      ? 'route-instruction-marker route-instruction-marker-active'
+      : 'route-instruction-marker',
+    html: `<span>${index + 1}</span>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
   });
 }
 
@@ -508,11 +521,13 @@ export default function CycleParkingMap({
   nearestPoint,
   rankedPoints,
   route,
+  activeInstructionId,
   isDirectionsMode,
   mobileSheetState,
   copiedShareButton,
   theme,
   onSelectPoint,
+  onSelectInstruction,
   onRequestDirections,
   onCopyParkingLink,
 }: CycleParkingMapProps) {
@@ -772,6 +787,21 @@ export default function CycleParkingMap({
           positions={finalApproachPositions}
         />
       ) : null}
+      {route?.instructions.map((instruction, index) => (
+        <Marker
+          key={instruction.id}
+          position={instruction.anchor}
+          icon={createRouteInstructionIcon(
+            index,
+            instruction.id === activeInstructionId,
+          )}
+          title={`Show step ${index + 1}`}
+          zIndexOffset={instruction.id === activeInstructionId ? 900 : 650}
+          eventHandlers={{
+            click: () => onSelectInstruction(instruction.id),
+          }}
+        />
+      ))}
       <Marker
         position={[userLocation.latitude, userLocation.longitude]}
         icon={startIcon}
@@ -779,7 +809,7 @@ export default function CycleParkingMap({
         <Popup keepInView={false}>
           <div className="parking-popup">
             <strong>Start position</strong>
-            <span>Distances and directions start here.</span>
+            <span>Current location</span>
           </div>
         </Popup>
       </Marker>
@@ -810,9 +840,13 @@ export default function CycleParkingMap({
             position={[point.latitude, point.longitude]}
             icon={icon}
             zIndexOffset={isSelected ? 1000 : 0}
-            eventHandlers={{
-              click: () => onSelectPoint(point.id),
-            }}
+            eventHandlers={
+              isDirectionsMode
+                ? undefined
+                : {
+                    click: () => onSelectPoint(point.id),
+                  }
+            }
           >
             <Popup keepInView={false}>
               <div className="parking-popup">
@@ -849,40 +883,42 @@ export default function CycleParkingMap({
                     </div>
                   ))}
                 </div>
-                <div className="parking-popup-actions">
-                  <button
-                    className="parking-popup-directions-button"
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onRequestDirections(point);
-                    }}
-                  >
-                    <Navigation size={15} aria-hidden="true" />
-                    Directions
-                  </button>
-                  <button
-                    aria-label={`Copy link to ${point.name}`}
-                    className="parking-popup-share-button"
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onCopyParkingLink(point);
-                    }}
-                  >
-                    <Share2 size={15} aria-hidden="true" />
-                    Share
-                    {copiedShareButton?.source === 'popup' &&
-                    copiedShareButton.parkingId === point.id ? (
-                      <span
-                        className="parking-popup-share-feedback"
-                        role="status"
-                      >
-                        Copied
-                      </span>
-                    ) : null}
-                  </button>
-                </div>
+                {isDirectionsMode ? null : (
+                  <div className="parking-popup-actions">
+                    <button
+                      className="parking-popup-directions-button"
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onRequestDirections(point);
+                      }}
+                    >
+                      <Navigation size={15} aria-hidden="true" />
+                      Directions
+                    </button>
+                    <button
+                      aria-label={`Copy link to ${point.name}`}
+                      className="parking-popup-share-button"
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onCopyParkingLink(point);
+                      }}
+                    >
+                      <Share2 size={15} aria-hidden="true" />
+                      Share
+                      {copiedShareButton?.source === 'popup' &&
+                      copiedShareButton.parkingId === point.id ? (
+                        <span
+                          className="parking-popup-share-feedback"
+                          role="status"
+                        >
+                          Copied
+                        </span>
+                      ) : null}
+                    </button>
+                  </div>
+                )}
               </div>
             </Popup>
           </Marker>
