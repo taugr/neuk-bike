@@ -283,6 +283,7 @@ export default function CycleParkingFinder() {
   const [numberLocale, setNumberLocale] = useState(defaultLocale);
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light');
+  const [isClientReady, setIsClientReady] = useState(false);
   const [mobileSheetState, setMobileSheetState] =
     useState<MobileSheetState>('expanded');
   const [mobileSheetDragProgress, setMobileSheetDragProgress] = useState(0);
@@ -390,6 +391,7 @@ export default function CycleParkingFinder() {
       };
 
   useEffect(() => {
+    setIsClientReady(true);
     setNumberLocale(navigator.language || defaultLocale);
 
     const { referenceLocation, selectedParkingId } = parseShareLinkState(
@@ -887,6 +889,10 @@ export default function CycleParkingFinder() {
   }
 
   async function requestDirectionsToPoint(point: ParkingPoint) {
+    if (!isClientReady) {
+      return;
+    }
+
     captureAnalyticsEvent('directions_requested', {
       parking_id: point.id,
       parking_name: point.name,
@@ -1183,6 +1189,7 @@ export default function CycleParkingFinder() {
             mobileSheetState={mobileSheetState}
             copiedShareButton={copiedShareButton}
             theme={resolvedTheme}
+            canRequestDirections={isClientReady}
             onSelectPoint={selectParkingPoint}
             onSelectInstruction={selectRouteInstruction}
             onRequestDirections={(point) => {
@@ -1696,6 +1703,7 @@ export default function CycleParkingFinder() {
                               <motion.button
                                 aria-label={`Show cycle directions to ${point.name}`}
                                 className="parking-directions-button"
+                                disabled={!isClientReady}
                                 type="button"
                                 whileTap={subtleTap}
                                 onClick={(event) => {

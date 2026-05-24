@@ -6,6 +6,7 @@ export const CYCLESTREETS_DIRECTIONS_ENDPOINT =
 export const CYCLESTREETS_ROUTE_PLAN = 'balanced';
 export const CYCLESTREETS_SPEED_KMPH = '16';
 export const SHORT_CYCLE_ROUTE_THRESHOLD_METERS = 10;
+const CYCLESTREETS_JSONP_ATTEMPTS = 2;
 
 export type CycleRoutePoint = [latitude: number, longitude: number];
 
@@ -95,7 +96,7 @@ export function buildCycleStreetsDirectionsRequest({
   };
 }
 
-function fetchCycleStreetsJsonp(url: string) {
+function fetchCycleStreetsJsonpOnce(url: string) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return Promise.reject(new CycleStreetsRouteError());
   }
@@ -134,6 +135,20 @@ function fetchCycleStreetsJsonp(url: string) {
 
     document.head.append(script);
   });
+}
+
+async function fetchCycleStreetsJsonp(url: string) {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < CYCLESTREETS_JSONP_ATTEMPTS; attempt += 1) {
+    try {
+      return await fetchCycleStreetsJsonpOnce(url);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new CycleStreetsRouteError();
 }
 
 export async function fetchCycleStreetsDirections(

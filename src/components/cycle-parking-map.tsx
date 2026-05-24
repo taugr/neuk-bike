@@ -52,6 +52,7 @@ type CycleParkingMapProps = {
   mobileSheetState: 'collapsed' | 'expanded';
   copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
   theme: 'light' | 'dark';
+  canRequestDirections: boolean;
   onSelectPoint: (id: string) => void;
   onSelectInstruction: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
@@ -526,6 +527,7 @@ export default function CycleParkingMap({
   mobileSheetState,
   copiedShareButton,
   theme,
+  canRequestDirections,
   onSelectPoint,
   onSelectInstruction,
   onRequestDirections,
@@ -887,6 +889,7 @@ export default function CycleParkingMap({
                   <div className="parking-popup-actions">
                     <button
                       className="parking-popup-directions-button"
+                      disabled={!canRequestDirections}
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation();

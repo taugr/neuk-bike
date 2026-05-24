@@ -1,12 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildShortCycleRoute,
   buildCycleStreetsDirectionsRequest,
+  CycleStreetsRouteError,
   describeCycleRouteInstruction,
+  fetchCycleStreetsDirections,
   formatCycleRouteDuration,
   parseCycleStreetsRoute,
 } from '@/lib/cyclestreets';
 import type { ParkingPoint } from '@/lib/types';
+
+type JsonpCallback = (response: unknown) => void;
+type JsonpScript = {
+  async: boolean;
+  onerror: (() => void) | null;
+  remove: () => void;
+  src: string;
+};
 
 const destination: ParkingPoint = {
   id: 'parking-1',
@@ -94,6 +104,65 @@ const cycleStreetsFixture = {
   ],
 };
 
+function waitForJsonpRetry() {
+  return Promise.resolve().then(() => Promise.resolve());
+}
+
+function getJsonpCallbackName(script: JsonpScript) {
+  const callbackName = new URL(script.src).searchParams.get('callback');
+
+  if (!callbackName) {
+    throw new Error('Expected JSONP callback parameter.');
+  }
+
+  return callbackName;
+}
+
+function installJsonpDom() {
+  const scripts: JsonpScript[] = [];
+  const fakeWindow = {
+    clearTimeout: globalThis.clearTimeout.bind(globalThis),
+    setTimeout: globalThis.setTimeout.bind(globalThis),
+  } as unknown as Window & Record<string, unknown>;
+  const fakeDocument = {
+    createElement: vi.fn((tagName: string) => {
+      if (tagName !== 'script') {
+        throw new Error(`Unexpected element: ${tagName}`);
+      }
+
+      const script: JsonpScript = {
+        async: false,
+        onerror: null,
+        remove: () => {
+          const index = scripts.indexOf(script);
+
+          if (index >= 0) {
+            scripts.splice(index, 1);
+          }
+        },
+        src: '',
+      };
+
+      return script as HTMLScriptElement;
+    }),
+    head: {
+      append: vi.fn((script: JsonpScript) => {
+        scripts.push(script);
+      }),
+    },
+  } as unknown as Document;
+
+  vi.stubGlobal('window', fakeWindow);
+  vi.stubGlobal('document', fakeDocument);
+
+  return { fakeWindow, scripts };
+}
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
+
 describe('CycleStreets utilities', () => {
   it('builds browser-compatible v2 journey requests', () => {
     const request = buildCycleStreetsDirectionsRequest({
@@ -116,6 +185,82 @@ describe('CycleStreets utilities', () => {
     expect(request.headers).toEqual({
       Accept: 'application/json',
     });
+  });
+
+  it('retries browser JSONP directions once after a script error', async () => {
+    const { fakeWindow, scripts } = installJsonpDom();
+    const request = buildCycleStreetsDirectionsRequest({
+      apiKey: 'public-test-key',
+      origin: { latitude: 55.9533, longitude: -3.1883 },
+      destination,
+    });
+    const response = fetchCycleStreetsDirections(request);
+
+    expect(scripts).toHaveLength(1);
+    const firstCallbackName = getJsonpCallbackName(scripts[0]!);
+
+    scripts[0]!.onerror?.();
+    await waitForJsonpRetry();
+
+    expect(scripts).toHaveLength(1);
+    expect(fakeWindow[firstCallbackName]).toBeUndefined();
+
+    const secondCallbackName = getJsonpCallbackName(scripts[0]!);
+    (fakeWindow[secondCallbackName] as JsonpCallback | undefined)?.(
+      cycleStreetsFixture,
+    );
+
+    await expect(response).resolves.toBe(cycleStreetsFixture);
+    expect(scripts).toHaveLength(0);
+    expect(fakeWindow[secondCallbackName]).toBeUndefined();
+  });
+
+  it('retries browser JSONP directions once after a timeout', async () => {
+    vi.useFakeTimers();
+    const { fakeWindow, scripts } = installJsonpDom();
+    const request = buildCycleStreetsDirectionsRequest({
+      apiKey: 'public-test-key',
+      origin: { latitude: 55.9533, longitude: -3.1883 },
+      destination,
+    });
+    const response = fetchCycleStreetsDirections(request);
+
+    expect(scripts).toHaveLength(1);
+    const firstCallbackName = getJsonpCallbackName(scripts[0]!);
+
+    vi.advanceTimersByTime(15_000);
+    await waitForJsonpRetry();
+
+    expect(scripts).toHaveLength(1);
+    expect(fakeWindow[firstCallbackName]).toBeUndefined();
+
+    const secondCallbackName = getJsonpCallbackName(scripts[0]!);
+    (fakeWindow[secondCallbackName] as JsonpCallback | undefined)?.(
+      cycleStreetsFixture,
+    );
+
+    await expect(response).resolves.toBe(cycleStreetsFixture);
+    expect(scripts).toHaveLength(0);
+  });
+
+  it('rejects browser JSONP directions after both attempts fail', async () => {
+    const { scripts } = installJsonpDom();
+    const request = buildCycleStreetsDirectionsRequest({
+      apiKey: 'public-test-key',
+      origin: { latitude: 55.9533, longitude: -3.1883 },
+      destination,
+    });
+    const response = fetchCycleStreetsDirections(request);
+
+    expect(scripts).toHaveLength(1);
+    scripts[0]!.onerror?.();
+    await waitForJsonpRetry();
+
+    expect(scripts).toHaveLength(1);
+    scripts[0]!.onerror?.();
+
+    await expect(response).rejects.toBeInstanceOf(CycleStreetsRouteError);
+    expect(scripts).toHaveLength(0);
   });
 
   it('parses v2 GeoJSON routes into Leaflet latitude and longitude order', () => {
