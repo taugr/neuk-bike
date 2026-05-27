@@ -1079,6 +1079,13 @@ a {
   justify-content: space-between;
 }
 
+.directions-header-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+
 .directions-title {
   align-items: center;
   display: flex;
@@ -1150,9 +1157,25 @@ a {
   border-color: var(--accent-strong);
 }
 
+.directions-mode-header .directions-route-start-button {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.directions-mode-header .directions-route-start-button:hover,
+.directions-mode-header .directions-route-start-button:focus-visible {
+  background: var(--accent-strong);
+}
+
 .directions-mode-header button svg {
   height: 1rem;
   width: 1rem;
+}
+
+.directions-live-status {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: -0.35rem 0 0;
 }
 
 .directions-message,
@@ -1438,7 +1461,8 @@ a {
 
 .parking-marker,
 .start-marker,
-.destination-marker {
+.destination-marker,
+.live-route-marker {
   background: transparent;
   border: 0;
 }
@@ -1561,6 +1585,70 @@ a {
   top: 50%;
   transform: translate(-50%, -50%);
   width: 10px;
+}
+
+.live-route-marker span {
+  align-items: center;
+  background: #2563eb;
+  border: 3px solid var(--marker-border);
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 4px rgb(37 99 235 / 24%),
+    0 10px 24px var(--marker-shadow);
+  color: #ffffff;
+  display: grid;
+  height: 34px;
+  isolation: isolate;
+  place-items: center;
+  position: relative;
+  width: 34px;
+}
+
+.live-route-marker span::before {
+  animation: live-route-pulse 1.8s ease-out infinite;
+  border: 2px solid rgb(37 99 235 / 42%);
+  border-radius: inherit;
+  content: '';
+  inset: -8px;
+  position: absolute;
+  z-index: -1;
+}
+
+.live-route-marker svg {
+  height: 20px;
+  width: 20px;
+}
+
+.live-route-marker-off-route span {
+  background: #f59e0b;
+  box-shadow:
+    0 0 0 4px rgb(245 158 11 / 26%),
+    0 10px 24px var(--marker-shadow);
+}
+
+.live-route-marker-off-route span::before {
+  border-color: rgb(245 158 11 / 44%);
+}
+
+@keyframes live-route-pulse {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.7);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-route-marker span::before {
+    animation: none;
+    opacity: 0.65;
+    transform: scale(1);
+  }
 }
 
 .route-instruction-marker {
@@ -1814,6 +1902,13 @@ a {
     button {
     min-height: 42px;
     white-space: nowrap;
+  }
+
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-route-start-button,
+  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
+    .directions-live-status {
+    display: none;
   }
 
   .leaflet-bottom.leaflet-right {

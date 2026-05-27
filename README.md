@@ -123,6 +123,20 @@ After the first successful load, the app shell and bundled parking data are avai
 
 Live place search, CycleStreets directions, and uncached OpenStreetMap tiles still need a network connection.
 
+## Mock GPS
+
+For local browser testing without device GPS, add `mockGps` query parameters on `localhost` or loopback hosts. Production hosts always use the browser geolocation API.
+
+Examples:
+
+```text
+/?lat=55.9406042783081&lng=-3.29451047885751&parking=1&mockGps=55.9406042783081,-3.29451047885751
+/?lat=55.9406042783081&lng=-3.29451047885751&parking=1&mockGpsPath=55.9406042783081,-3.29451047885751;55.9506,-3.3145&mockGpsStepMs=1000
+/?lat=55.9406042783081&lng=-3.29451047885751&parking=1&mockGps=denied
+/?lat=55.9406042783081&lng=-3.29451047885751&parking=1&mockGps=unavailable
+/?lat=55.9406042783081&lng=-3.29451047885751&parking=1&mockGps=null-island
+```
+
 ## Deployment
 
 The app is configured for GitHub Pages with the custom domain `neuk.bike`.

@@ -33,7 +33,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ParkingPoint, UserLocation } from '@/lib/types';
 import { getParkingPopupDetails } from '@/lib/parking';
 import type { ParkingPopupIcon } from '@/lib/parking';
-import type { CycleRoute } from '@/lib/cyclestreets';
+import type { CycleRoute, CycleRoutePoint } from '@/lib/cyclestreets';
 import {
   getRenderableParkingPoints,
   type ParkingMapBounds,
@@ -47,6 +47,12 @@ type CycleParkingMapProps = {
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
   route: CycleRoute | null;
+  liveRouteMarker: {
+    isOffRoute: boolean;
+    position: CycleRoutePoint;
+    updatedAt: number;
+  } | null;
+  shouldFollowLiveRoute: boolean;
   activeInstructionId: string | null;
   isDirectionsMode: boolean;
   mobileSheetState: 'collapsed' | 'expanded';
@@ -252,6 +258,17 @@ const destinationIcon = L.divIcon({
   popupAnchor: [0, -42],
 });
 
+function createLiveRouteIcon(isOffRoute: boolean) {
+  return L.divIcon({
+    className: isOffRoute
+      ? 'live-route-marker live-route-marker-off-route'
+      : 'live-route-marker',
+    html: `<span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="m12 17.5 3-6 2 3h2"></path><path d="m5.5 17.5 3-6h4l3 6"></path><path d="m8.5 11.5 2-4h3.5"></path></svg></span>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+  });
+}
+
 function getFinalApproachPositions(
   route: CycleRoute | null,
   selectedPoint: ParkingPoint | null,
@@ -418,6 +435,43 @@ function MapFocus({
   return null;
 }
 
+function LiveRouteFollower({
+  marker,
+  shouldFollow,
+}: {
+  marker: {
+    position: CycleRoutePoint;
+    updatedAt: number;
+  } | null;
+  shouldFollow: boolean;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!marker || !shouldFollow) {
+      return;
+    }
+
+    const nextCenter = L.latLng(marker.position);
+
+    if (map.getBounds().pad(-0.18).contains(nextCenter)) {
+      return;
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    map.panTo(nextCenter, {
+      animate: !prefersReducedMotion,
+      duration: 0.45,
+      easeLinearity: 0.25,
+    });
+  }, [map, marker, marker?.updatedAt, shouldFollow]);
+
+  return null;
+}
+
 function AttributionPrefix() {
   const map = useMap();
 
@@ -522,6 +576,8 @@ export default function CycleParkingMap({
   nearestPoint,
   rankedPoints,
   route,
+  liveRouteMarker,
+  shouldFollowLiveRoute,
   activeInstructionId,
   isDirectionsMode,
   mobileSheetState,
@@ -568,6 +624,10 @@ export default function CycleParkingMap({
       selected: createParkingIcon('selected'),
     }),
     [],
+  );
+  const liveRouteIcon = useMemo(
+    () => createLiveRouteIcon(liveRouteMarker?.isOffRoute ?? false),
+    [liveRouteMarker?.isOffRoute],
   );
   const rankedIcons = useMemo(() => {
     return new Map(
@@ -745,6 +805,10 @@ export default function CycleParkingMap({
         selectedPoint={selectedPoint}
         userLocation={userLocation}
       />
+      <LiveRouteFollower
+        marker={liveRouteMarker}
+        shouldFollow={shouldFollowLiveRoute}
+      />
       {route ? (
         <Polyline
           pathOptions={
@@ -815,6 +879,13 @@ export default function CycleParkingMap({
           </div>
         </Popup>
       </Marker>
+      {liveRouteMarker ? (
+        <Marker
+          position={liveRouteMarker.position}
+          icon={liveRouteIcon}
+          zIndexOffset={1250}
+        />
+      ) : null}
       {visiblePoints.map((point) => {
         const rank = rankedPointRanks.get(point.id);
         const popupDetails = getParkingPopupDetails(point);
