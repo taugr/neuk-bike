@@ -3,6 +3,8 @@ import type { UserLocation } from '@/lib/types';
 
 export const LIVE_ROUTE_BASE_SNAP_THRESHOLD_METERS = 35;
 export const LIVE_ROUTE_MAX_SNAP_THRESHOLD_METERS = 60;
+export const LIVE_ROUTE_ARRIVAL_THRESHOLD_METERS = 12;
+export const LIVE_ROUTE_MIN_HEADING_DISTANCE_METERS = 2;
 const activeInstructionGraceMeters = 10;
 const metersPerDegreeLatitude = 111_320;
 
@@ -21,6 +23,8 @@ type RouteProjection = {
 export type LiveRouteProgress = {
   activeInstructionId: string | null;
   distanceFromRouteMeters: number;
+  hasArrived: boolean;
+  headingDegrees: number | null;
   isOffRoute: boolean;
   markerPosition: CycleRoutePoint;
   rawPosition: CycleRoutePoint;
@@ -44,6 +48,14 @@ function getSnapThresholdMeters(accuracyMeters?: number | null) {
   );
 }
 
+function normalizeHeadingDegrees(headingDegrees?: number | null) {
+  if (typeof headingDegrees !== 'number' || !Number.isFinite(headingDegrees)) {
+    return null;
+  }
+
+  return ((headingDegrees % 360) + 360) % 360;
+}
+
 function toProjectedPoint(
   point: CycleRoutePoint | UserLocation,
   originLatitude: number,
@@ -58,6 +70,28 @@ function toProjectedPoint(
       Math.cos((originLatitude * Math.PI) / 180),
     y: latitude * metersPerDegreeLatitude,
   };
+}
+
+export function getBearingDegrees(
+  from: CycleRoutePoint | UserLocation,
+  to: CycleRoutePoint | UserLocation,
+) {
+  const fromLatitude = Array.isArray(from) ? from[0] : from.latitude;
+  const fromLongitude = Array.isArray(from) ? from[1] : from.longitude;
+  const toLatitude = Array.isArray(to) ? to[0] : to.latitude;
+  const toLongitude = Array.isArray(to) ? to[1] : to.longitude;
+
+  const fromLatitudeRadians = (fromLatitude * Math.PI) / 180;
+  const toLatitudeRadians = (toLatitude * Math.PI) / 180;
+  const longitudeDeltaRadians = ((toLongitude - fromLongitude) * Math.PI) / 180;
+  const y = Math.sin(longitudeDeltaRadians) * Math.cos(toLatitudeRadians);
+  const x =
+    Math.cos(fromLatitudeRadians) * Math.sin(toLatitudeRadians) -
+    Math.sin(fromLatitudeRadians) *
+      Math.cos(toLatitudeRadians) *
+      Math.cos(longitudeDeltaRadians);
+
+  return normalizeHeadingDegrees((Math.atan2(y, x) * 180) / Math.PI);
 }
 
 function toRoutePoint(
@@ -214,10 +248,12 @@ function getActiveInstructionId(route: CycleRoute, travelledMeters: number) {
 
 export function getLiveRouteProgress({
   accuracyMeters,
+  headingDegrees,
   location,
   route,
 }: {
   accuracyMeters?: number | null;
+  headingDegrees?: number | null;
   location: UserLocation;
   route: CycleRoute;
 }): LiveRouteProgress | null {
@@ -230,6 +266,10 @@ export function getLiveRouteProgress({
   const snapThresholdMeters = getSnapThresholdMeters(accuracyMeters);
   const isOffRoute = projection.distanceFromRouteMeters > snapThresholdMeters;
   const rawPosition: CycleRoutePoint = [location.latitude, location.longitude];
+  const remainingMeters = Math.max(
+    projection.totalDistanceMeters - projection.travelledMeters,
+    0,
+  );
 
   return {
     activeInstructionId: getActiveInstructionId(
@@ -237,13 +277,13 @@ export function getLiveRouteProgress({
       projection.travelledMeters,
     ),
     distanceFromRouteMeters: projection.distanceFromRouteMeters,
+    hasArrived:
+      !isOffRoute && remainingMeters <= LIVE_ROUTE_ARRIVAL_THRESHOLD_METERS,
+    headingDegrees: normalizeHeadingDegrees(headingDegrees),
     isOffRoute,
     markerPosition: isOffRoute ? rawPosition : projection.snappedPosition,
     rawPosition,
-    remainingMeters: Math.max(
-      projection.totalDistanceMeters - projection.travelledMeters,
-      0,
-    ),
+    remainingMeters,
     snappedPosition: projection.snappedPosition,
     travelledMeters: projection.travelledMeters,
   };

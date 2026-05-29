@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CycleRoute } from '@/lib/cyclestreets';
-import { getLiveRouteProgress } from '@/lib/route-progress';
+import { getBearingDegrees, getLiveRouteProgress } from '@/lib/route-progress';
 
 const straightRoute: CycleRoute = {
   plan: 'balanced',
@@ -84,6 +84,7 @@ describe('live route progress', () => {
     expect(progress?.markerPosition[0]).toBeCloseTo(55.001, 5);
     expect(progress?.markerPosition[1]).toBeCloseTo(-3, 5);
     expect(progress?.distanceFromRouteMeters).toBeLessThan(10);
+    expect(progress?.hasArrived).toBe(false);
     expect(progress?.travelledMeters).toBeGreaterThan(100);
     expect(progress?.remainingMeters).toBeGreaterThan(100);
     expect(progress?.activeInstructionId).toBe('continue');
@@ -113,6 +114,7 @@ describe('live route progress', () => {
 
     expect(progress).not.toBeNull();
     expect(progress?.isOffRoute).toBe(true);
+    expect(progress?.hasArrived).toBe(false);
     expect(progress?.markerPosition).toEqual([55.001, -3.002]);
     expect(progress?.snappedPosition[1]).toBeCloseTo(-3, 5);
     expect(progress?.distanceFromRouteMeters).toBeGreaterThan(35);
@@ -143,6 +145,70 @@ describe('live route progress', () => {
     expect(progress?.markerPosition).toEqual([55, -3]);
     expect(progress?.remainingMeters).toBe(0);
     expect(progress?.travelledMeters).toBe(0);
+    expect(progress?.hasArrived).toBe(true);
     expect(progress?.activeInstructionId).toBe('start');
+  });
+
+  it('marks the route arrived near the destination', () => {
+    const progress = getLiveRouteProgress({
+      accuracyMeters: 5,
+      location: { latitude: 55.00195, longitude: -3 },
+      route: straightRoute,
+    });
+
+    expect(progress).not.toBeNull();
+    expect(progress?.remainingMeters).toBeLessThanOrEqual(12);
+    expect(progress?.hasArrived).toBe(true);
+  });
+
+  it('does not mark arrival when off route near the destination', () => {
+    const progress = getLiveRouteProgress({
+      accuracyMeters: 5,
+      location: { latitude: 55.002, longitude: -3.002 },
+      route: straightRoute,
+    });
+
+    expect(progress).not.toBeNull();
+    expect(progress?.remainingMeters).toBe(0);
+    expect(progress?.isOffRoute).toBe(true);
+    expect(progress?.hasArrived).toBe(false);
+  });
+
+  it('does not mark arrival before the threshold', () => {
+    const progress = getLiveRouteProgress({
+      accuracyMeters: 5,
+      location: { latitude: 55.0018, longitude: -3 },
+      route: straightRoute,
+    });
+
+    expect(progress).not.toBeNull();
+    expect(progress?.remainingMeters).toBeGreaterThan(12);
+    expect(progress?.hasArrived).toBe(false);
+  });
+
+  it('normalizes live heading values', () => {
+    const progress = getLiveRouteProgress({
+      accuracyMeters: 5,
+      headingDegrees: -10,
+      location: { latitude: 55.001, longitude: -3 },
+      route: straightRoute,
+    });
+
+    expect(progress?.headingDegrees).toBe(350);
+  });
+
+  it('calculates a bearing from movement points', () => {
+    expect(
+      getBearingDegrees(
+        { latitude: 55, longitude: -3 },
+        { latitude: 55.001, longitude: -3 },
+      ),
+    ).toBeCloseTo(0, 1);
+    expect(
+      getBearingDegrees(
+        { latitude: 55, longitude: -3 },
+        { latitude: 55, longitude: -2.999 },
+      ),
+    ).toBeCloseTo(90, 1);
   });
 });

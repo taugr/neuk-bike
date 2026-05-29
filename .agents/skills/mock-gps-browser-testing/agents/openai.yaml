@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Mock GPS Browser Testing'
+  short_description: 'Test mocked GPS route flows in Browser'
+  default_prompt: 'Use $mock-gps-browser-testing to verify Neuk Bike live route tracking with mocked GPS in the in-app Browser.'

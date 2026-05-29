@@ -20,7 +20,13 @@ type MockGeolocationConfig =
 const defaultMockAccuracyMeters = 5;
 const defaultMockStepMs = 1000;
 let nextMockWatchId = -1;
-const mockWatchIntervals = new Map<number, number>();
+const mockWatches = new Map<
+  number,
+  {
+    intervalId: number | null;
+    timeoutId: number;
+  }
+>();
 
 function getMockError(
   status: 'denied' | 'unavailable',
@@ -190,15 +196,36 @@ export function watchPosition(
   nextMockWatchId -= 1;
 
   if (mockConfig.status !== 'available') {
-    window.setTimeout(() => failure?.(getMockError(mockConfig.status)), 0);
+    const timeoutId = window.setTimeout(() => {
+      mockWatches.delete(watchId);
+      failure?.(getMockError(mockConfig.status));
+    }, 0);
+    mockWatches.set(watchId, { intervalId: null, timeoutId });
     return watchId;
   }
 
   let index = 0;
-  window.setTimeout(() => success(toPosition(mockConfig.points[0]!)), 0);
+  const timeoutId = window.setTimeout(() => {
+    const watch = mockWatches.get(watchId);
+
+    if (!watch) {
+      return;
+    }
+
+    success(toPosition(mockConfig.points[0]!));
+
+    if (mockConfig.points.length === 1) {
+      mockWatches.delete(watchId);
+    }
+  }, 0);
+  mockWatches.set(watchId, { intervalId: null, timeoutId });
 
   if (mockConfig.points.length > 1) {
     const intervalId = window.setInterval(() => {
+      if (!mockWatches.has(watchId)) {
+        return;
+      }
+
       index = Math.min(index + 1, mockConfig.points.length - 1);
       success(toPosition(mockConfig.points[index]!));
 
@@ -207,19 +234,26 @@ export function watchPosition(
       }
     }, mockConfig.stepMs);
 
-    mockWatchIntervals.set(watchId, intervalId);
+    mockWatches.set(watchId, { intervalId, timeoutId });
   }
 
   return watchId;
 }
 
 function clearMockWatch(watchId: number) {
-  const intervalId = mockWatchIntervals.get(watchId);
+  const watch = mockWatches.get(watchId);
 
-  if (intervalId) {
-    window.clearInterval(intervalId);
-    mockWatchIntervals.delete(watchId);
+  if (!watch) {
+    return;
   }
+
+  window.clearTimeout(watch.timeoutId);
+
+  if (watch.intervalId !== null) {
+    window.clearInterval(watch.intervalId);
+  }
+
+  mockWatches.delete(watchId);
 }
 
 export function clearWatch(watchId: number) {

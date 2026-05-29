@@ -11,11 +11,14 @@ import {
   useReducedMotion,
 } from 'motion/react';
 import {
+  ArrowUp,
   Bike,
   Boxes,
   Building2,
   CircleHelp,
   CircleParking,
+  CornerUpLeft,
+  CornerUpRight,
   Crosshair,
   Download,
   ExternalLink,
@@ -57,6 +60,8 @@ import {
   parseCycleStreetsRoute,
   SHORT_CYCLE_ROUTE_THRESHOLD_METERS,
   type CycleRoute,
+  type CycleRouteInstruction,
+  type CycleRoutePoint,
 } from '@/lib/cyclestreets';
 import {
   buildPlaceSearchUrl,
@@ -80,9 +85,12 @@ import {
 } from '@/lib/geo';
 import { getParkingPopupDetails, type ParkingPopupIcon } from '@/lib/parking';
 import {
+  getBearingDegrees,
   getLiveRouteProgress,
+  LIVE_ROUTE_MIN_HEADING_DISTANCE_METERS,
   type LiveRouteProgress,
 } from '@/lib/route-progress';
+import { getRouteInstructionManeuver } from '@/lib/route-instructions';
 import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { captureAnalyticsEvent } from '@/lib/analytics';
@@ -109,6 +117,26 @@ type PresenceMotion = {
   initial: TargetAndTransition;
   transition: Transition;
 };
+
+function getRouteInstructionIcon(
+  instruction: CycleRouteInstruction,
+): LucideIcon {
+  const maneuver = getRouteInstructionManeuver(instruction);
+
+  if (maneuver === 'start') {
+    return Route;
+  }
+
+  if (maneuver === 'left') {
+    return CornerUpLeft;
+  }
+
+  if (maneuver === 'right') {
+    return CornerUpRight;
+  }
+
+  return ArrowUp;
+}
 
 const quickFadeTransition: Transition = { duration: 0.16, ease: 'easeOut' };
 const smallRiseTransition: Transition = {
@@ -210,6 +238,7 @@ type LocationState =
   | { status: 'locating'; location: UserLocation }
   | { status: 'located'; location: UserLocation }
   | { status: 'searched'; location: UserLocation; label: string }
+  | { status: 'too-far'; location: UserLocation }
   | { status: 'denied'; location: UserLocation }
   | { status: 'unavailable'; location: UserLocation };
 
@@ -226,10 +255,12 @@ type LiveRouteTrackingState =
   | {
       status: 'tracking';
       accuracyMeters: number | null;
+      headingDegrees: number | null;
       location: UserLocation;
       updatedAt: number;
     }
   | { status: 'denied' }
+  | { status: 'too-far' }
   | { status: 'unavailable' };
 
 type ShareSource = 'list' | 'popup';
@@ -301,6 +332,11 @@ export default function CycleParkingFinder() {
     id: string;
     requestId: number;
   } | null>(null);
+  const [routeInstructionFocusRequest, setRouteInstructionFocusRequest] =
+    useState<{
+      id: string;
+      requestId: number;
+    } | null>(null);
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
   const [isAttributionModalOpen, setIsAttributionModalOpen] = useState(false);
@@ -319,10 +355,10 @@ export default function CycleParkingFinder() {
   const placeSearchInFlight = useRef(false);
   const directionsRequestId = useRef(0);
   const liveRouteWatchId = useRef<number | null>(null);
+  const previousLiveRouteMarkerPosition = useRef<CycleRoutePoint | null>(null);
   const copiedMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
-  const routeInstructionRefs = useRef(new Map<string, HTMLLIElement>());
   const settingsMenu = useRef<HTMLDivElement>(null);
   const mobileSheetDrag = useRef<{
     currentY: number;
@@ -557,6 +593,12 @@ export default function CycleParkingFinder() {
       : null;
   const activeRoute =
     directionsState.status === 'loaded' ? directionsState.route : null;
+  const activeRouteInstruction =
+    activeRoute && activeInstruction
+      ? (activeRoute.instructions.find(
+          (instruction) => instruction.id === activeInstruction.id,
+        ) ?? null)
+      : null;
   const isDirectionsMode =
     directionsState.status !== 'idle' && directionsParkingPoint !== null;
   const liveRouteProgress: LiveRouteProgress | null = useMemo(() => {
@@ -566,6 +608,7 @@ export default function CycleParkingFinder() {
 
     return getLiveRouteProgress({
       accuracyMeters: liveRouteTracking.accuracyMeters,
+      headingDegrees: liveRouteTracking.headingDegrees,
       location: liveRouteTracking.location,
       route: activeRoute,
     });
@@ -628,6 +671,7 @@ export default function CycleParkingFinder() {
       return;
     }
 
+    setRouteInstructionFocusRequest(null);
     setActiveInstruction((current) =>
       current?.id === activeInstructionId
         ? current
@@ -637,29 +681,6 @@ export default function CycleParkingFinder() {
           },
     );
   }, [liveRouteProgress?.activeInstructionId]);
-
-  useEffect(() => {
-    if (!activeInstruction) {
-      return;
-    }
-
-    const instructionListItem = routeInstructionRefs.current.get(
-      activeInstruction.id,
-    );
-
-    if (!instructionListItem) {
-      return;
-    }
-
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-
-    instructionListItem.scrollIntoView({
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
-      block: 'nearest',
-    });
-  }, [activeInstruction]);
 
   function toggleMobileSheet() {
     setMobileSheetState((current) =>
@@ -776,6 +797,7 @@ export default function CycleParkingFinder() {
 
   function stopLiveRouteTracking() {
     clearLiveRouteWatch();
+    previousLiveRouteMarkerPosition.current = null;
     setLiveRouteTracking({ status: 'idle' });
   }
 
@@ -790,6 +812,7 @@ export default function CycleParkingFinder() {
     }
 
     clearLiveRouteWatch();
+    previousLiveRouteMarkerPosition.current = null;
     setLiveRouteTracking({ status: 'starting' });
 
     liveRouteWatchId.current = watchPosition(
@@ -801,27 +824,59 @@ export default function CycleParkingFinder() {
 
         if (!isResolvedLocation(location)) {
           clearLiveRouteWatch();
+          previousLiveRouteMarkerPosition.current = null;
           setLiveRouteTracking({ status: 'unavailable' });
           return;
         }
 
         if (isFarFromNearestParking(parkingPoints, location)) {
           clearLiveRouteWatch();
-          setLiveRouteTracking({ status: 'denied' });
+          previousLiveRouteMarkerPosition.current = null;
+          setLiveRouteTracking({ status: 'too-far' });
           return;
         }
 
+        const accuracyMeters = Number.isFinite(position.coords.accuracy)
+          ? position.coords.accuracy
+          : null;
+        const browserHeadingDegrees = Number.isFinite(position.coords.heading)
+          ? position.coords.heading
+          : null;
+        const progressForMarkerPosition = getLiveRouteProgress({
+          accuracyMeters,
+          headingDegrees: browserHeadingDegrees,
+          location,
+          route: activeRoute,
+        });
+        const markerPosition =
+          progressForMarkerPosition?.markerPosition ??
+          ([location.latitude, location.longitude] satisfies CycleRoutePoint);
+        const previousMarkerPosition = previousLiveRouteMarkerPosition.current;
+        const inferredHeadingDegrees =
+          browserHeadingDegrees === null &&
+          previousMarkerPosition &&
+          distanceMeters(
+            {
+              latitude: previousMarkerPosition[0],
+              longitude: previousMarkerPosition[1],
+            },
+            { latitude: markerPosition[0], longitude: markerPosition[1] },
+          ) >= LIVE_ROUTE_MIN_HEADING_DISTANCE_METERS
+            ? getBearingDegrees(previousMarkerPosition, markerPosition)
+            : null;
+
+        previousLiveRouteMarkerPosition.current = markerPosition;
         setLiveRouteTracking({
           status: 'tracking',
-          accuracyMeters: Number.isFinite(position.coords.accuracy)
-            ? position.coords.accuracy
-            : null,
+          accuracyMeters,
+          headingDegrees: browserHeadingDegrees ?? inferredHeadingDegrees,
           location,
           updatedAt: position.timestamp,
         });
       },
       (error) => {
         clearLiveRouteWatch();
+        previousLiveRouteMarkerPosition.current = null;
         setLiveRouteTracking({
           status:
             error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable',
@@ -849,10 +904,15 @@ export default function CycleParkingFinder() {
     stopLiveRouteTracking();
     setDirectionsState({ status: 'idle' });
     setActiveInstruction(null);
+    setRouteInstructionFocusRequest(null);
   }
 
   function selectRouteInstruction(id: string) {
     setActiveInstruction((current) => ({
+      id,
+      requestId: (current?.requestId ?? 0) + 1,
+    }));
+    setRouteInstructionFocusRequest((current) => ({
       id,
       requestId: (current?.requestId ?? 0) + 1,
     }));
@@ -863,7 +923,10 @@ export default function CycleParkingFinder() {
   }
 
   function applyFallbackLocation(
-    status: Extract<LocationState['status'], 'denied' | 'unavailable'>,
+    status: Extract<
+      LocationState['status'],
+      'denied' | 'too-far' | 'unavailable'
+    >,
   ) {
     setLocationState({
       status,
@@ -885,7 +948,7 @@ export default function CycleParkingFinder() {
       status === 'located' &&
       isFarFromNearestParking(parkingPoints, location)
     ) {
-      applyFallbackLocation('denied');
+      applyFallbackLocation('too-far');
       return false;
     }
 
@@ -942,7 +1005,7 @@ export default function CycleParkingFinder() {
           captureAnalyticsEvent('location_granted');
           requestCurrentLocationFocus();
         } else {
-          captureAnalyticsEvent('location_denied', { reason: 'denied' });
+          captureAnalyticsEvent('location_denied', { reason: 'too_far' });
         }
       },
       (error) => {
@@ -1051,6 +1114,8 @@ export default function CycleParkingFinder() {
       parking_name: point.name,
     });
     setSelectedId(point.id);
+    setActiveInstruction(null);
+    setRouteInstructionFocusRequest(null);
 
     const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
 
@@ -1337,24 +1402,24 @@ export default function CycleParkingFinder() {
             nearestPoint={nearestPoint}
             rankedPoints={nearbyPoints}
             route={activeRoute}
+            routeInstructionFocusRequest={routeInstructionFocusRequest}
             liveRouteMarker={
               liveRouteTracking.status === 'tracking' && liveRouteProgress
                 ? {
                     isOffRoute: liveRouteProgress.isOffRoute,
+                    headingDegrees: liveRouteProgress.headingDegrees,
                     position: liveRouteProgress.markerPosition,
                     updatedAt: liveRouteTracking.updatedAt,
                   }
                 : null
             }
             shouldFollowLiveRoute={liveRouteTracking.status === 'tracking'}
-            activeInstructionId={activeInstruction?.id ?? null}
             isDirectionsMode={isDirectionsMode}
             mobileSheetState={mobileSheetState}
             copiedShareButton={copiedShareButton}
             theme={resolvedTheme}
             canRequestDirections={isClientReady}
             onSelectPoint={selectParkingPoint}
-            onSelectInstruction={selectRouteInstruction}
             onRequestDirections={(point) => {
               void requestDirectionsToPoint(point);
             }}
@@ -1471,7 +1536,9 @@ export default function CycleParkingFinder() {
                           >
                             <Bike size={16} aria-hidden="true" />
                             {liveRouteTracking.status === 'tracking'
-                              ? 'Stop'
+                              ? liveRouteProgress?.hasArrived
+                                ? 'Done'
+                                : 'Stop'
                               : liveRouteTracking.status === 'starting'
                                 ? 'Starting...'
                                 : 'Start route'}
@@ -1488,7 +1555,17 @@ export default function CycleParkingFinder() {
                         </motion.button>
                       </motion.div>
                     </motion.div>
+                    {liveRouteProgress?.hasArrived ? (
+                      <motion.p
+                        {...directionsRevealPresence}
+                        className="directions-live-status directions-live-status-arrived"
+                        role="status"
+                      >
+                        Arrived at bike parking.
+                      </motion.p>
+                    ) : null}
                     {liveRouteTracking.status === 'denied' ||
+                    liveRouteTracking.status === 'too-far' ||
                     liveRouteTracking.status === 'unavailable' ? (
                       <motion.p
                         {...directionsRevealPresence}
@@ -1496,9 +1573,41 @@ export default function CycleParkingFinder() {
                         role="status"
                       >
                         {liveRouteTracking.status === 'denied'
-                          ? 'Location permission is off.'
-                          : 'Live location is unavailable.'}
+                          ? 'Enable location permissions to start route.'
+                          : liveRouteTracking.status === 'too-far'
+                            ? 'Start route is only available near Edinburgh.'
+                            : 'Live location is unavailable.'}
                       </motion.p>
+                    ) : null}
+                    {liveRouteTracking.status === 'tracking' &&
+                    !liveRouteProgress?.hasArrived &&
+                    activeRouteInstruction ? (
+                      <motion.div
+                        {...directionsRevealPresence}
+                        className="directions-current-step"
+                      >
+                        <span
+                          className="directions-step-icon directions-current-step-icon"
+                          aria-hidden="true"
+                        >
+                          {(() => {
+                            const CurrentStepIcon = getRouteInstructionIcon(
+                              activeRouteInstruction,
+                            );
+                            return <CurrentStepIcon size={20} />;
+                          })()}
+                        </span>
+                        <span className="directions-current-step-text">
+                          {describeCycleRouteInstruction(
+                            activeRouteInstruction,
+                          )}
+                        </span>
+                        <small className="directions-step-distance directions-current-step-distance">
+                          {formatDistance(
+                            activeRouteInstruction.distanceMeters,
+                          )}
+                        </small>
+                      </motion.div>
                     ) : null}
                     <AnimatePresence initial={false}>
                       {directionsState.status === 'loaded' ? (
@@ -1577,28 +1686,29 @@ export default function CycleParkingFinder() {
                             transition={rowLayoutTransition}
                           >
                             {directionsState.route.instructions.map(
-                              (instruction, index) => {
+                              (instruction) => {
+                                const StepIcon =
+                                  getRouteInstructionIcon(instruction);
+                                const isActiveInstruction =
+                                  activeInstruction?.id === instruction.id;
+                                const isLiveActiveInstruction =
+                                  liveRouteTracking.status === 'tracking' &&
+                                  isActiveInstruction;
                                 return (
                                   <motion.li
                                     layout="position"
                                     key={instruction.id}
-                                    ref={(listItem) => {
-                                      if (listItem) {
-                                        routeInstructionRefs.current.set(
-                                          instruction.id,
-                                          listItem,
-                                        );
-                                      } else {
-                                        routeInstructionRefs.current.delete(
-                                          instruction.id,
-                                        );
-                                      }
-                                    }}
-                                    className={
-                                      activeInstruction?.id === instruction.id
-                                        ? 'directions-list-item directions-list-item-active'
-                                        : 'directions-list-item'
-                                    }
+                                    className={[
+                                      'directions-list-item',
+                                      isActiveInstruction
+                                        ? 'directions-list-item-active'
+                                        : '',
+                                      isLiveActiveInstruction
+                                        ? 'directions-list-item-live-active'
+                                        : '',
+                                    ]
+                                      .filter(Boolean)
+                                      .join(' ')}
                                     onClick={() =>
                                       selectRouteInstruction(instruction.id)
                                     }
@@ -1617,10 +1727,10 @@ export default function CycleParkingFinder() {
                                     variants={routeStepVariants}
                                   >
                                     <span
-                                      className="directions-step-number"
+                                      className="directions-step-icon"
                                       aria-hidden="true"
                                     >
-                                      {index + 1}
+                                      <StepIcon size={18} />
                                     </span>
                                     <span className="directions-step-text">
                                       {describeCycleRouteInstruction(
@@ -1836,6 +1946,20 @@ export default function CycleParkingFinder() {
                     </AnimatePresence>
 
                     <div className="parking-list-scroll">
+                      <AnimatePresence initial={false}>
+                        {locationState.status === 'too-far' ? (
+                          <motion.div
+                            {...risePresence}
+                            key="too-far"
+                            className="parking-list-context"
+                            role="status"
+                          >
+                            You're too far from Edinburgh, showing bike parking
+                            in central Edinburgh.
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+
                       <motion.ol
                         layout="position"
                         className="parking-list"

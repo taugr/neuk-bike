@@ -35,6 +35,10 @@ import { getParkingPopupDetails } from '@/lib/parking';
 import type { ParkingPopupIcon } from '@/lib/parking';
 import type { CycleRoute, CycleRoutePoint } from '@/lib/cyclestreets';
 import {
+  getRouteInstructionManeuver,
+  type RouteInstructionManeuver,
+} from '@/lib/route-instructions';
+import {
   getRenderableParkingPoints,
   type ParkingMapBounds,
 } from '@/lib/map-pins';
@@ -47,20 +51,23 @@ type CycleParkingMapProps = {
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
   route: CycleRoute | null;
+  routeInstructionFocusRequest: {
+    id: string;
+    requestId: number;
+  } | null;
   liveRouteMarker: {
+    headingDegrees: number | null;
     isOffRoute: boolean;
     position: CycleRoutePoint;
     updatedAt: number;
   } | null;
   shouldFollowLiveRoute: boolean;
-  activeInstructionId: string | null;
   isDirectionsMode: boolean;
   mobileSheetState: 'collapsed' | 'expanded';
   copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
   theme: 'light' | 'dark';
   canRequestDirections: boolean;
   onSelectPoint: (id: string) => void;
-  onSelectInstruction: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
 };
@@ -88,29 +95,104 @@ type PopupWithMap = L.Popup & {
   _map?: L.Map;
 };
 
-function getControlPaneOverlapHeight(map: L.Map) {
-  const size = map.getSize();
+type VisibleMapArea = {
+  bottom: number;
+  center: L.Point;
+  height: number;
+  left: number;
+  right: number;
+  top: number;
+  width: number;
+};
+
+function getVisibleMapArea(map: L.Map): VisibleMapArea {
   const mapElement = map.getContainer();
+  const size = map.getSize();
+  const fallbackArea = {
+    bottom: size.y,
+    center: L.point(size.x / 2, size.y / 2),
+    height: size.y,
+    left: 0,
+    right: size.x,
+    top: 0,
+    width: size.x,
+  };
   const controlPane = document.querySelector<HTMLElement>('.control-pane');
 
   if (!controlPane) {
-    return 0;
+    return fallbackArea;
   }
 
   const mapRect = mapElement.getBoundingClientRect();
   const controlPaneRect = controlPane.getBoundingClientRect();
-  const horizontalOverlap =
-    Math.min(mapRect.right, controlPaneRect.right) -
-    Math.max(mapRect.left, controlPaneRect.left);
+  const overlapLeft = Math.max(mapRect.left, controlPaneRect.left);
+  const overlapRight = Math.min(mapRect.right, controlPaneRect.right);
+  const overlapTop = Math.max(mapRect.top, controlPaneRect.top);
+  const overlapBottom = Math.min(mapRect.bottom, controlPaneRect.bottom);
+  const horizontalOverlap = Math.round(overlapRight - overlapLeft);
+  const verticalOverlap = Math.round(overlapBottom - overlapTop);
 
-  if (horizontalOverlap <= 0) {
-    return 0;
+  if (horizontalOverlap <= 0 || verticalOverlap <= 0) {
+    return fallbackArea;
   }
 
-  const overlapHeight =
-    mapRect.bottom - Math.max(mapRect.top, controlPaneRect.top);
+  let left = 0;
+  let right = size.x;
+  let top = 0;
+  let bottom = size.y;
+  const minVisibleWidth = Math.min(160, Math.round(size.x * 0.5));
+  const minVisibleHeight = Math.min(160, Math.round(size.y * 0.5));
 
-  return Math.min(Math.max(0, Math.round(overlapHeight)), size.y - 80);
+  if (
+    horizontalOverlap > size.x * 0.5 &&
+    controlPaneRect.top > mapRect.top &&
+    controlPaneRect.top < mapRect.bottom
+  ) {
+    bottom = Math.max(
+      minVisibleHeight,
+      Math.round(controlPaneRect.top - mapRect.top),
+    );
+  } else if (
+    horizontalOverlap > size.x * 0.5 &&
+    controlPaneRect.bottom > mapRect.top &&
+    controlPaneRect.bottom < mapRect.bottom
+  ) {
+    top = Math.min(
+      size.y - minVisibleHeight,
+      Math.round(controlPaneRect.bottom - mapRect.top),
+    );
+  } else if (
+    verticalOverlap > size.y * 0.5 &&
+    controlPaneRect.left > mapRect.left &&
+    controlPaneRect.left < mapRect.right
+  ) {
+    right = Math.max(
+      minVisibleWidth,
+      Math.round(controlPaneRect.left - mapRect.left),
+    );
+  } else if (
+    verticalOverlap > size.y * 0.5 &&
+    controlPaneRect.right > mapRect.left &&
+    controlPaneRect.right < mapRect.right
+  ) {
+    left = Math.min(
+      size.x - minVisibleWidth,
+      Math.round(controlPaneRect.right - mapRect.left),
+    );
+  }
+
+  const width = right - left;
+  const height = bottom - top;
+
+  return {
+    bottom,
+    center: L.point(left + width / 2, top + height / 2),
+    height,
+    left,
+    right,
+    top,
+    width,
+  };
 }
 
 function centerPopupInVisibleMapArea(popup: L.Popup) {
@@ -126,18 +208,9 @@ function centerPopupInVisibleMapArea(popup: L.Popup) {
   }
 
   const mapRect = map.getContainer().getBoundingClientRect();
-  const controlPane = document.querySelector<HTMLElement>('.control-pane');
-  const controlPaneRect = controlPane?.getBoundingClientRect();
-  const horizontalOverlap = controlPaneRect
-    ? Math.min(mapRect.right, controlPaneRect.right) -
-      Math.max(mapRect.left, controlPaneRect.left)
-    : 0;
-  const visibleBottom =
-    controlPaneRect && horizontalOverlap > 0
-      ? Math.min(mapRect.bottom, Math.max(mapRect.top, controlPaneRect.top))
-      : mapRect.bottom;
-  const visibleCenterX = mapRect.left + mapRect.width / 2;
-  const visibleCenterY = mapRect.top + (visibleBottom - mapRect.top) / 2;
+  const visibleArea = getVisibleMapArea(map);
+  const visibleCenterX = mapRect.left + visibleArea.center.x;
+  const visibleCenterY = mapRect.top + visibleArea.center.y;
   const popupRect = popupElement.getBoundingClientRect();
   const popupCenterX = (popupRect.left + popupRect.right) / 2;
   const popupCenterY = (popupRect.top + popupRect.bottom) / 2;
@@ -156,50 +229,70 @@ function centerPopupInVisibleMapArea(popup: L.Popup) {
 }
 
 function getFocusPadding(map: L.Map): L.FitBoundsOptions {
-  const coveredHeight = getControlPaneOverlapHeight(map);
-
-  if (coveredHeight > 0) {
-    return {
-      paddingTopLeft: [40, 40],
-      paddingBottomRight: [40, coveredHeight],
-    };
-  }
+  const visibleArea = getVisibleMapArea(map);
+  const size = map.getSize();
+  const coveredLeft = visibleArea.left;
+  const coveredRight = size.x - visibleArea.right;
+  const coveredTop = visibleArea.top;
+  const coveredBottom = size.y - visibleArea.bottom;
 
   return {
-    padding: [40, 40],
+    paddingBottomRight: [40 + coveredRight, 40 + coveredBottom],
+    paddingTopLeft: [40 + coveredLeft, 40 + coveredTop],
   };
 }
 
-function getSelectedPointCenter(
+function getMapPointFocusCenter(
   map: L.Map,
-  selectedPoint: ParkingPoint,
+  latLng: L.LatLngExpression,
   zoom: number,
   mobileSheetState: 'collapsed' | 'expanded',
 ) {
-  const latLng = L.latLng(selectedPoint.latitude, selectedPoint.longitude);
+  const point = L.latLng(latLng);
   const size = map.getSize();
-  const coveredHeight = getControlPaneOverlapHeight(map);
+  const visibleArea = getVisibleMapArea(map);
 
-  if (coveredHeight <= 0) {
-    return latLng;
+  if (
+    visibleArea.left === 0 &&
+    visibleArea.top === 0 &&
+    visibleArea.right === size.x &&
+    visibleArea.bottom === size.y
+  ) {
+    return point;
   }
 
-  const visibleHeight = size.y - coveredHeight;
   const targetY =
     mobileSheetState === 'collapsed'
-      ? Math.round(visibleHeight * 0.62)
+      ? Math.round(visibleArea.top + visibleArea.height * 0.62)
       : Math.min(
-          Math.max(48, visibleHeight - 56),
-          Math.max(180, Math.round(visibleHeight * 0.75)),
+          Math.max(visibleArea.top + 48, visibleArea.bottom - 56),
+          Math.max(
+            visibleArea.top + 180,
+            Math.round(visibleArea.top + visibleArea.height * 0.75),
+          ),
         );
-  const targetPoint = L.point(size.x / 2, targetY);
+  const targetPoint = L.point(visibleArea.center.x, targetY);
   const mapCenterPoint = L.point(size.x / 2, size.y / 2);
-  const projectedPoint = map.project(latLng, zoom);
+  const projectedPoint = map.project(point, zoom);
   const projectedCenter = projectedPoint.subtract(
     targetPoint.subtract(mapCenterPoint),
   );
 
   return map.unproject(projectedCenter, zoom);
+}
+
+function isPointInVisibleMapArea(map: L.Map, latLng: L.LatLngExpression) {
+  const visibleArea = getVisibleMapArea(map);
+  const projectedPoint = map.latLngToContainerPoint(latLng);
+  const insetX = Math.min(32, visibleArea.width * 0.18);
+  const insetY = Math.min(32, visibleArea.height * 0.18);
+
+  return (
+    projectedPoint.x >= visibleArea.left + insetX &&
+    projectedPoint.x <= visibleArea.right - insetX &&
+    projectedPoint.y >= visibleArea.top + insetY &&
+    projectedPoint.y <= visibleArea.bottom - insetY
+  );
 }
 
 function createParkingIcon(
@@ -225,17 +318,6 @@ function createRankedParkingIcon(rank: number) {
   });
 }
 
-function createRouteInstructionIcon(index: number, isActive: boolean) {
-  return L.divIcon({
-    className: isActive
-      ? 'route-instruction-marker route-instruction-marker-active'
-      : 'route-instruction-marker',
-    html: `<span>${index + 1}</span>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
-}
-
 function ParkingPopupIcon({ icon }: { icon: ParkingPopupIcon }) {
   const Icon = popupIconByName[icon] ?? MapPin;
 
@@ -258,14 +340,50 @@ const destinationIcon = L.divIcon({
   popupAnchor: [0, -42],
 });
 
-function createLiveRouteIcon(isOffRoute: boolean) {
+function createLiveRouteIcon({
+  headingDegrees,
+  isOffRoute,
+}: {
+  headingDegrees: number | null;
+  isOffRoute: boolean;
+}) {
+  const headingCue =
+    headingDegrees === null
+      ? ''
+      : `<i class="live-route-heading" style="transform: translateX(-50%) rotate(${headingDegrees}deg)" aria-hidden="true"></i>`;
+
   return L.divIcon({
     className: isOffRoute
       ? 'live-route-marker live-route-marker-off-route'
       : 'live-route-marker',
-    html: `<span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="m12 17.5 3-6 2 3h2"></path><path d="m5.5 17.5 3-6h4l3 6"></path><path d="m8.5 11.5 2-4h3.5"></path></svg></span>`,
+    html: `<span>${headingCue}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="m12 17.5 3-6 2 3h2"></path><path d="m5.5 17.5 3-6h4l3 6"></path><path d="m8.5 11.5 2-4h3.5"></path></svg></span>`,
     iconSize: [34, 34],
     iconAnchor: [17, 17],
+  });
+}
+
+function getSelectedInstructionMarkerSvg(maneuver: RouteInstructionManeuver) {
+  if (maneuver === 'start') {
+    return '<path d="M5 19V5"></path><path d="m5 5 12 3-12 3"></path>';
+  }
+
+  if (maneuver === 'left') {
+    return '<path d="M15 18v-6a4 4 0 0 0-4-4H5"></path><path d="m8 5-3 3 3 3"></path>';
+  }
+
+  if (maneuver === 'right') {
+    return '<path d="M9 18v-6a4 4 0 0 1 4-4h6"></path><path d="m16 5 3 3-3 3"></path>';
+  }
+
+  return '<path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path>';
+}
+
+function createSelectedInstructionIcon(maneuver: RouteInstructionManeuver) {
+  return L.divIcon({
+    className: `selected-route-instruction-marker selected-route-instruction-marker-${maneuver}`,
+    html: `<span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4">${getSelectedInstructionMarkerSvg(maneuver)}</svg></span>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
   });
 }
 
@@ -395,7 +513,12 @@ function MapFocus({
 
       const zoom = Math.max(map.getZoom(), 16);
       map.flyTo(
-        getSelectedPointCenter(map, selectedPoint, zoom, mobileSheetState),
+        getMapPointFocusCenter(
+          map,
+          [selectedPoint.latitude, selectedPoint.longitude],
+          zoom,
+          mobileSheetState,
+        ),
         zoom,
         {
           duration: 0.7,
@@ -437,12 +560,14 @@ function MapFocus({
 
 function LiveRouteFollower({
   marker,
+  mobileSheetState,
   shouldFollow,
 }: {
   marker: {
     position: CycleRoutePoint;
     updatedAt: number;
   } | null;
+  mobileSheetState: 'collapsed' | 'expanded';
   shouldFollow: boolean;
 }) {
   const map = useMap();
@@ -454,7 +579,7 @@ function LiveRouteFollower({
 
     const nextCenter = L.latLng(marker.position);
 
-    if (map.getBounds().pad(-0.18).contains(nextCenter)) {
+    if (isPointInVisibleMapArea(map, nextCenter)) {
       return;
     }
 
@@ -462,12 +587,55 @@ function LiveRouteFollower({
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    map.panTo(nextCenter, {
-      animate: !prefersReducedMotion,
-      duration: 0.45,
-      easeLinearity: 0.25,
-    });
-  }, [map, marker, marker?.updatedAt, shouldFollow]);
+    map.panTo(
+      getMapPointFocusCenter(map, nextCenter, map.getZoom(), mobileSheetState),
+      {
+        animate: !prefersReducedMotion,
+        duration: 0.45,
+        easeLinearity: 0.25,
+      },
+    );
+  }, [map, marker, marker?.updatedAt, mobileSheetState, shouldFollow]);
+
+  return null;
+}
+
+function RouteInstructionFocus({
+  focusRequest,
+  mobileSheetState,
+  route,
+}: {
+  focusRequest: {
+    id: string;
+    requestId: number;
+  } | null;
+  mobileSheetState: 'collapsed' | 'expanded';
+  route: CycleRoute | null;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!focusRequest || !route) {
+      return;
+    }
+
+    const instruction = route.instructions.find(
+      (candidate) => candidate.id === focusRequest.id,
+    );
+
+    if (!instruction) {
+      return;
+    }
+
+    const zoom = Math.max(map.getZoom(), 16);
+    map.flyTo(
+      getMapPointFocusCenter(map, instruction.anchor, zoom, mobileSheetState),
+      zoom,
+      {
+        duration: 0.65,
+      },
+    );
+  }, [focusRequest, focusRequest?.requestId, map, mobileSheetState, route]);
 
   return null;
 }
@@ -576,16 +744,15 @@ export default function CycleParkingMap({
   nearestPoint,
   rankedPoints,
   route,
+  routeInstructionFocusRequest,
   liveRouteMarker,
   shouldFollowLiveRoute,
-  activeInstructionId,
   isDirectionsMode,
   mobileSheetState,
   copiedShareButton,
   theme,
   canRequestDirections,
   onSelectPoint,
-  onSelectInstruction,
   onRequestDirections,
   onCopyParkingLink,
 }: CycleParkingMapProps) {
@@ -626,8 +793,12 @@ export default function CycleParkingMap({
     [],
   );
   const liveRouteIcon = useMemo(
-    () => createLiveRouteIcon(liveRouteMarker?.isOffRoute ?? false),
-    [liveRouteMarker?.isOffRoute],
+    () =>
+      createLiveRouteIcon({
+        headingDegrees: liveRouteMarker?.headingDegrees ?? null,
+        isOffRoute: liveRouteMarker?.isOffRoute ?? false,
+      }),
+    [liveRouteMarker?.headingDegrees, liveRouteMarker?.isOffRoute],
   );
   const rankedIcons = useMemo(() => {
     return new Map(
@@ -645,6 +816,26 @@ export default function CycleParkingMap({
       }),
     );
   }, []);
+  const selectedInstruction = useMemo(() => {
+    if (!route || !routeInstructionFocusRequest) {
+      return null;
+    }
+
+    return (
+      route.instructions.find(
+        (instruction) => instruction.id === routeInstructionFocusRequest.id,
+      ) ?? null
+    );
+  }, [route, routeInstructionFocusRequest]);
+  const selectedInstructionIcon = useMemo(() => {
+    if (!selectedInstruction) {
+      return null;
+    }
+
+    return createSelectedInstructionIcon(
+      getRouteInstructionManeuver(selectedInstruction),
+    );
+  }, [selectedInstruction]);
   const rankedPointRanks = useMemo(() => {
     return new Map(
       rankedPoints
@@ -717,9 +908,9 @@ export default function CycleParkingMap({
 
       if (map) {
         map.panTo(
-          getSelectedPointCenter(
+          getMapPointFocusCenter(
             map,
-            selectedPoint,
+            [selectedPoint.latitude, selectedPoint.longitude],
             map.getZoom(),
             mobileSheetState,
           ),
@@ -807,7 +998,13 @@ export default function CycleParkingMap({
       />
       <LiveRouteFollower
         marker={liveRouteMarker}
+        mobileSheetState={mobileSheetState}
         shouldFollow={shouldFollowLiveRoute}
+      />
+      <RouteInstructionFocus
+        focusRequest={routeInstructionFocusRequest}
+        mobileSheetState={mobileSheetState}
+        route={route}
       />
       {route ? (
         <Polyline
@@ -853,21 +1050,6 @@ export default function CycleParkingMap({
           positions={finalApproachPositions}
         />
       ) : null}
-      {route?.instructions.map((instruction, index) => (
-        <Marker
-          key={instruction.id}
-          position={instruction.anchor}
-          icon={createRouteInstructionIcon(
-            index,
-            instruction.id === activeInstructionId,
-          )}
-          title={`Show step ${index + 1}`}
-          zIndexOffset={instruction.id === activeInstructionId ? 900 : 650}
-          eventHandlers={{
-            click: () => onSelectInstruction(instruction.id),
-          }}
-        />
-      ))}
       <Marker
         position={[userLocation.latitude, userLocation.longitude]}
         icon={startIcon}
@@ -884,6 +1066,13 @@ export default function CycleParkingMap({
           position={liveRouteMarker.position}
           icon={liveRouteIcon}
           zIndexOffset={1250}
+        />
+      ) : null}
+      {selectedInstruction && selectedInstructionIcon ? (
+        <Marker
+          position={selectedInstruction.anchor}
+          icon={selectedInstructionIcon}
+          zIndexOffset={900}
         />
       ) : null}
       {visiblePoints.map((point) => {
