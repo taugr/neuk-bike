@@ -196,6 +196,20 @@ function capitalizeFirstLetter(value: string) {
   return value.length > 0 ? value[0]!.toUpperCase() + value.slice(1) : value;
 }
 
+function buildArrivalInstruction(
+  destination: ParkingPoint,
+): CycleRouteInstruction {
+  return {
+    id: `arrival-${destination.id}`,
+    anchor: [destination.latitude, destination.longitude],
+    streetName: destination.name,
+    turn: 'arrive',
+    distanceMeters: 0,
+    durationSeconds: 0,
+    travelMode: 'cycling',
+  };
+}
+
 export function describeCycleRouteInstruction(
   instruction: CycleRouteInstruction,
 ) {
@@ -204,6 +218,10 @@ export function describeCycleRouteInstruction(
 
   if (turn === 'start') {
     return name ? `Start on ${name}` : 'Start';
+  }
+
+  if (turn === 'arrive') {
+    return name ? `Arrive at ${name}` : 'Arrive';
   }
 
   if (turn === 'straight' && !name) {
@@ -247,6 +265,7 @@ export function buildShortCycleRoute(
         durationSeconds,
         travelMode: 'walking',
       },
+      buildArrivalInstruction(destination),
     ],
     source: 'local',
   };
@@ -322,7 +341,10 @@ function parseRouteUrl(properties: CycleStreetsProperties) {
   };
 }
 
-export function parseCycleStreetsRoute(response: unknown): CycleRoute {
+export function parseCycleStreetsRoute(
+  response: unknown,
+  destination: ParkingPoint,
+): CycleRoute {
   const errorMessage = getString(getObject(response)?.error);
   if (errorMessage) {
     throw new CycleStreetsRouteError(errorMessage);
@@ -408,7 +430,7 @@ export function parseCycleStreetsRoute(response: unknown): CycleRoute {
     distanceMeters,
     durationSeconds,
     points,
-    instructions,
+    instructions: [...instructions, buildArrivalInstruction(destination)],
     source: 'cyclestreets',
     ...parseRouteUrl(routeProperties),
   };

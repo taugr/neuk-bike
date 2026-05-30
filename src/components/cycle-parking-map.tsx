@@ -367,6 +367,10 @@ function getSelectedInstructionMarkerSvg(maneuver: RouteInstructionManeuver) {
     return '<path d="M5 19V5"></path><path d="m5 5 12 3-12 3"></path>';
   }
 
+  if (maneuver === 'arrive') {
+    return '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle>';
+  }
+
   if (maneuver === 'left') {
     return '<path d="M15 18v-6a4 4 0 0 0-4-4H5"></path><path d="m8 5-3 3 3 3"></path>';
   }

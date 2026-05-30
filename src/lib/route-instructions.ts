@@ -1,6 +1,11 @@
 import type { CycleRouteInstruction } from '@/lib/cyclestreets';
 
-export type RouteInstructionManeuver = 'start' | 'left' | 'right' | 'straight';
+export type RouteInstructionManeuver =
+  | 'start'
+  | 'left'
+  | 'right'
+  | 'straight'
+  | 'arrive';
 
 export function getRouteInstructionManeuver(
   instruction: Pick<CycleRouteInstruction, 'turn'>,
@@ -9,6 +14,10 @@ export function getRouteInstructionManeuver(
 
   if (turn === 'start') {
     return 'start';
+  }
+
+  if (turn === 'arrive') {
+    return 'arrive';
   }
 
   if (turn.includes('left')) {

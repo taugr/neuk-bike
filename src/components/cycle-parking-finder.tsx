@@ -127,6 +127,10 @@ function getRouteInstructionIcon(
     return Route;
   }
 
+  if (maneuver === 'arrive') {
+    return MapPin;
+  }
+
   if (maneuver === 'left') {
     return CornerUpLeft;
   }
@@ -1158,6 +1162,7 @@ export default function CycleParkingFinder() {
       });
       const route = parseCycleStreetsRoute(
         await fetchCycleStreetsDirections(request),
+        point,
       );
 
       if (directionsRequestId.current !== requestId) {

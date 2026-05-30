@@ -264,7 +264,7 @@ describe('CycleStreets utilities', () => {
   });
 
   it('parses v2 GeoJSON routes into Leaflet latitude and longitude order', () => {
-    const route = parseCycleStreetsRoute(cycleStreetsFixture);
+    const route = parseCycleStreetsRoute(cycleStreetsFixture, destination);
 
     expect(route.distanceMeters).toBe(1966);
     expect(route.durationSeconds).toBe(811);
@@ -277,7 +277,7 @@ describe('CycleStreets utilities', () => {
   });
 
   it('parses and describes route instructions', () => {
-    const route = parseCycleStreetsRoute(cycleStreetsFixture);
+    const route = parseCycleStreetsRoute(cycleStreetsFixture, destination);
 
     expect(route.instructions).toEqual([
       {
@@ -298,12 +298,24 @@ describe('CycleStreets utilities', () => {
         durationSeconds: 221,
         travelMode: 'cycling',
       },
+      {
+        id: 'arrival-parking-1',
+        anchor: [55.944, -3.205],
+        streetName: 'Cycle parking 1',
+        turn: 'arrive',
+        distanceMeters: 0,
+        durationSeconds: 0,
+        travelMode: 'cycling',
+      },
     ]);
     expect(describeCycleRouteInstruction(route.instructions[0]!)).toBe(
       'Start on Princes Street',
     );
     expect(describeCycleRouteInstruction(route.instructions[1]!)).toBe(
       'Turn left onto North Bridge, A7',
+    );
+    expect(describeCycleRouteInstruction(route.instructions[2]!)).toBe(
+      'Arrive at Cycle parking 1',
     );
   });
 
@@ -333,13 +345,22 @@ describe('CycleStreets utilities', () => {
       [55.9533, -3.1883],
       [55.95332, -3.18833],
     ]);
-    expect(route.instructions).toHaveLength(1);
+    expect(route.instructions).toHaveLength(2);
     expect(route.instructions[0]).toMatchObject({
       id: 'short-route-near',
       anchor: [55.9533, -3.1883],
       streetName: '',
       turn: 'straight',
       travelMode: 'walking',
+    });
+    expect(route.instructions[1]).toMatchObject({
+      id: 'arrival-near',
+      anchor: [55.95332, -3.18833],
+      streetName: 'Nearby parking',
+      turn: 'arrive',
+      distanceMeters: 0,
+      durationSeconds: 0,
+      travelMode: 'cycling',
     });
   });
 
@@ -357,12 +378,29 @@ describe('CycleStreets utilities', () => {
     ).toBe('Straight 4 m');
   });
 
+  it('describes arrival instructions', () => {
+    expect(
+      describeCycleRouteInstruction({
+        id: 'arrival-near',
+        anchor: [55.95332, -3.18833],
+        streetName: 'Nearby parking',
+        turn: 'arrive',
+        distanceMeters: 0,
+        durationSeconds: 0,
+        travelMode: 'cycling',
+      }),
+    ).toBe('Arrive at Nearby parking');
+  });
+
   it('throws useful errors for CycleStreets errors and malformed responses', () => {
     expect(() =>
-      parseCycleStreetsRoute({ error: 'No routes to plan' }),
+      parseCycleStreetsRoute({ error: 'No routes to plan' }, destination),
     ).toThrow('No routes to plan');
     expect(() =>
-      parseCycleStreetsRoute({ type: 'FeatureCollection', features: [] }),
+      parseCycleStreetsRoute(
+        { type: 'FeatureCollection', features: [] },
+        destination,
+      ),
     ).toThrow('CycleStreets did not return a usable route.');
   });
 });
