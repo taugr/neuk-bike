@@ -31,7 +31,7 @@ Open the app at:
 
 - https://neuk.bike/
 
-The app runs entirely in the browser. It has no backend, database, tracking service, or server API.
+The app runs entirely in the browser. It has no backend, database, or server API.
 
 ## Quick Start
 
@@ -66,6 +66,8 @@ NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 This key is bundled into the static app because the project has no backend or proxy.
 
 Map rendering is kept client-side so the app remains compatible with static export and GitHub Pages. Shared parking stand links use generated static HTML files under `out/parking/` for social metadata, then redirect into the browser app with `?parking=`.
+
+Production builds use PostHog analytics when `NEXT_PUBLIC_POSTHOG_KEY` is configured. Analytics are disabled on `localhost` and loopback hosts by default, including local static exports served from `out/`; set `NEXT_PUBLIC_POSTHOG_FORCE_ENABLE=true` only when you explicitly need to test PostHog locally.
 
 ## Commands
 
