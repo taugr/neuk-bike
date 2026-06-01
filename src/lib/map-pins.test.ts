@@ -98,7 +98,7 @@ describe('map pin rendering', () => {
     });
 
     expect(renderablePoints.length).toBeGreaterThan(12);
-    expect(renderablePoints.length).toBeLessThanOrEqual(24);
+    expect(renderablePoints.length).toBeLessThanOrEqual(60);
   });
 
   it('shows a sparse spread of pins in panned city areas at mid zoom', () => {
@@ -134,6 +134,36 @@ describe('map pin rendering', () => {
     expect(
       renderablePoints.map((renderablePoint) => renderablePoint.id),
     ).toEqual(visiblePoints.map((visiblePoint) => visiblePoint.id));
+  });
+
+  it('renders all candidate points once zoomed in closely', () => {
+    const visiblePoints = gridPoints(60);
+    const renderablePoints = getRenderableParkingPoints({
+      bounds: edinburghBounds,
+      pinnedPoints: [],
+      points: visiblePoints,
+      zoom: 16,
+    });
+
+    expect(
+      renderablePoints.map((renderablePoint) => renderablePoint.id),
+    ).toEqual(visiblePoints.map((visiblePoint) => visiblePoint.id));
+  });
+
+  it('preloads nearby points around the viewport at high zoom for panning', () => {
+    const visiblePoint = point('visible', 55.95, -3.2);
+    const nearbyEastPoint = point('nearby-east', 55.95, -3.14);
+    const farEastPoint = point('far-east', 55.95, -3.04);
+    const renderablePoints = getRenderableParkingPoints({
+      bounds: edinburghBounds,
+      pinnedPoints: [],
+      points: [visiblePoint, nearbyEastPoint, farEastPoint],
+      zoom: 17,
+    });
+
+    expect(
+      renderablePoints.map((renderablePoint) => renderablePoint.id),
+    ).toEqual(['visible', 'nearby-east']);
   });
 
   it('retains the selected point outside the sampled subset', () => {

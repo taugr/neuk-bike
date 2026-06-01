@@ -666,20 +666,30 @@ function MapThemeClass({ theme }: { theme: 'light' | 'dark' }) {
   return null;
 }
 
-function getMapBounds(map: L.Map): ParkingMapBounds {
-  const bounds = map.getBounds();
+function getVisibleMapBounds(map: L.Map): ParkingMapBounds {
+  const visibleArea = getVisibleMapArea(map);
+  const northWest = map.containerPointToLatLng([
+    visibleArea.left,
+    visibleArea.top,
+  ]);
+  const southEast = map.containerPointToLatLng([
+    visibleArea.right,
+    visibleArea.bottom,
+  ]);
 
   return {
-    east: bounds.getEast(),
-    north: bounds.getNorth(),
-    south: bounds.getSouth(),
-    west: bounds.getWest(),
+    east: southEast.lng,
+    north: northWest.lat,
+    south: southEast.lat,
+    west: northWest.lng,
   };
 }
 
 function MapViewportTracker({
+  mobileSheetState,
   onViewportChange,
 }: {
+  mobileSheetState: 'collapsed' | 'expanded';
   onViewportChange: (viewport: {
     bounds: ParkingMapBounds;
     zoom: number;
@@ -695,7 +705,7 @@ function MapViewportTracker({
     frameRef.current = window.requestAnimationFrame(() => {
       frameRef.current = null;
       onViewportChange({
-        bounds: getMapBounds(map),
+        bounds: getVisibleMapBounds(map),
         zoom: map.getZoom(),
       });
     });
@@ -707,7 +717,7 @@ function MapViewportTracker({
     },
     moveend: () => {
       onViewportChange({
-        bounds: getMapBounds(map),
+        bounds: getVisibleMapBounds(map),
         zoom: map.getZoom(),
       });
     },
@@ -716,7 +726,7 @@ function MapViewportTracker({
     },
     zoomend: () => {
       onViewportChange({
-        bounds: getMapBounds(map),
+        bounds: getVisibleMapBounds(map),
         zoom: map.getZoom(),
       });
     },
@@ -724,10 +734,35 @@ function MapViewportTracker({
 
   useEffect(() => {
     onViewportChange({
-      bounds: getMapBounds(map),
+      bounds: getVisibleMapBounds(map),
       zoom: map.getZoom(),
     });
-  }, [map, onViewportChange]);
+  }, [map, mobileSheetState, onViewportChange]);
+
+  useEffect(() => {
+    const mapElement = map.getContainer();
+    const controlPane = document.querySelector<HTMLElement>('.control-pane');
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', updateViewport);
+
+      return () => window.removeEventListener('resize', updateViewport);
+    }
+
+    const resizeObserver = new ResizeObserver(() => updateViewport());
+    resizeObserver.observe(mapElement);
+
+    if (controlPane) {
+      resizeObserver.observe(controlPane);
+    }
+
+    window.addEventListener('resize', updateViewport);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, [map, updateViewport]);
 
   useEffect(() => {
     return () => {
@@ -986,7 +1021,10 @@ export default function CycleParkingMap({
     >
       <AttributionPrefix />
       <MapThemeClass theme={theme} />
-      <MapViewportTracker onViewportChange={handleViewportChange} />
+      <MapViewportTracker
+        mobileSheetState={mobileSheetState}
+        onViewportChange={handleViewportChange}
+      />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

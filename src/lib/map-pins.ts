@@ -15,31 +15,31 @@ type RenderableParkingPointsOptions = {
   zoom: number;
 };
 
-const allPointZoom = 17;
+const allPointZoom = 16;
 const defaultPinnedPointCount = 8;
 
-function getMaxRenderablePointCount(zoom: number) {
+function getSafetyRenderablePointCount(zoom: number) {
   if (zoom >= allPointZoom) {
     return Number.POSITIVE_INFINITY;
   }
 
-  if (zoom >= 16) {
-    return 80;
-  }
-
   if (zoom >= 15) {
-    return 48;
+    return 420;
   }
 
   if (zoom >= 14) {
-    return 32;
+    return 300;
+  }
+
+  if (zoom >= 13) {
+    return 220;
   }
 
   if (zoom >= 12) {
-    return 24;
+    return 160;
   }
 
-  return 12;
+  return 80;
 }
 
 function containsPoint(bounds: ParkingMapBounds, point: ParkingPoint) {
@@ -51,32 +51,62 @@ function containsPoint(bounds: ParkingMapBounds, point: ParkingPoint) {
   );
 }
 
+function getBoundsPaddingRatio(zoom: number) {
+  if (zoom >= allPointZoom) {
+    return 1;
+  }
+
+  if (zoom >= 16) {
+    return 0.75;
+  }
+
+  if (zoom >= 15) {
+    return 0.5;
+  }
+
+  return 0;
+}
+
+function getPaddedBounds(bounds: ParkingMapBounds, zoom: number) {
+  const paddingRatio = getBoundsPaddingRatio(zoom);
+
+  if (paddingRatio === 0) {
+    return bounds;
+  }
+
+  const latitudePadding = (bounds.north - bounds.south) * paddingRatio;
+  const longitudePadding = (bounds.east - bounds.west) * paddingRatio;
+
+  return {
+    east: bounds.east + longitudePadding,
+    north: bounds.north + latitudePadding,
+    south: bounds.south - latitudePadding,
+    west: bounds.west - longitudePadding,
+  };
+}
+
 function getCellSizeDegrees(zoom: number) {
   if (zoom >= allPointZoom) {
     return 0;
   }
 
-  if (zoom >= 16) {
-    return 0.0008;
-  }
-
   if (zoom >= 15) {
-    return 0.001;
+    return 0.0012;
   }
 
   if (zoom >= 14) {
-    return 0.0016;
-  }
-
-  if (zoom >= 13) {
     return 0.0025;
   }
 
-  if (zoom >= 12) {
-    return 0.004;
+  if (zoom >= 13) {
+    return 0.007;
   }
 
-  return 0.008;
+  if (zoom >= 12) {
+    return 0.012;
+  }
+
+  return 0.02;
 }
 
 function getGridKey(point: ParkingPoint, cellSizeDegrees: number) {
@@ -101,21 +131,22 @@ export function getRenderableParkingPoints({
   zoom,
 }: RenderableParkingPointsOptions) {
   const renderablePoints = new Map<string, ParkingPoint>();
-  const visiblePoints = bounds
-    ? points.filter((point) => containsPoint(bounds, point))
+  const candidateBounds = bounds ? getPaddedBounds(bounds, zoom) : null;
+  const candidatePoints = candidateBounds
+    ? points.filter((point) => containsPoint(candidateBounds, point))
     : points;
 
   if (zoom >= allPointZoom) {
-    for (const point of visiblePoints) {
+    for (const point of candidatePoints) {
       addUniquePoint(renderablePoints, point);
     }
   } else {
     const cellSizeDegrees = getCellSizeDegrees(zoom);
-    const maxRenderablePointCount = getMaxRenderablePointCount(zoom);
+    const safetyRenderablePointCount = getSafetyRenderablePointCount(zoom);
     const occupiedCells = new Set<string>();
 
-    for (const point of visiblePoints) {
-      if (renderablePoints.size >= maxRenderablePointCount) {
+    for (const point of candidatePoints) {
+      if (renderablePoints.size >= safetyRenderablePointCount) {
         break;
       }
 
