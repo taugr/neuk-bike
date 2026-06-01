@@ -75,6 +75,13 @@ Run the focused test suite:
 pnpm test
 ```
 
+Run the browser workflow tests against a local static export:
+
+```bash
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
 Check lint:
 
 ```bash

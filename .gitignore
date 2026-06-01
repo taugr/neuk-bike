@@ -5,6 +5,8 @@
 next-env.d.ts
 out/
 .playwright-cli/
+test-results/
+playwright-report/
 playwright-videos/
 .pnpm-store
 node_modules/

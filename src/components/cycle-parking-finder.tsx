@@ -1688,6 +1688,7 @@ export default function CycleParkingFinder() {
                           <motion.ol
                             layout="position"
                             className="directions-list"
+                            data-testid="directions-list"
                             transition={rowLayoutTransition}
                           >
                             {directionsState.route.instructions.map(
@@ -1717,6 +1718,7 @@ export default function CycleParkingFinder() {
                                     onClick={() =>
                                       selectRouteInstruction(instruction.id)
                                     }
+                                    data-testid={`directions-step-${instruction.id}`}
                                     onKeyDown={(event) => {
                                       if (
                                         event.key === 'Enter' ||
@@ -1968,6 +1970,7 @@ export default function CycleParkingFinder() {
                       <motion.ol
                         layout="position"
                         className="parking-list"
+                        data-testid="parking-list"
                         aria-label="Nearby cycle parking locations"
                       >
                         {closestPoints.map((point, index) => {
@@ -1999,6 +2002,7 @@ export default function CycleParkingFinder() {
                                   .filter(Boolean)
                                   .join(' ')}
                                 type="button"
+                                data-testid={`parking-row-${point.id}`}
                                 whileTap={subtleTap}
                                 onClick={() => selectParkingPoint(point.id)}
                               >
@@ -2016,6 +2020,7 @@ export default function CycleParkingFinder() {
                               <motion.button
                                 aria-label={`Show cycle directions to ${point.name}`}
                                 className="parking-directions-button"
+                                data-testid={`parking-directions-${point.id}`}
                                 disabled={!isClientReady}
                                 type="button"
                                 whileTap={subtleTap}
