@@ -63,7 +63,13 @@ Directions use the CycleStreets v2 API from the browser. Add a public API key to
 NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 ```
 
-This key is bundled into the static app because the project has no backend or proxy.
+Street View previews use the Google Maps Embed API. Add a restricted public browser key to `.env.local` to show the popup Street View button:
+
+```bash
+NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY=your_embed_key_here
+```
+
+These keys are bundled into the static app because the project has no backend or proxy. Restrict the Google key to the Maps Embed API and the app's allowed HTTP referrers.
 
 Map rendering is kept client-side so the app remains compatible with static export and GitHub Pages. Shared parking stand links use generated static HTML files under `out/parking/` for social metadata, then redirect into the browser app with `?parking=`.
 

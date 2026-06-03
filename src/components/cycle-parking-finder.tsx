@@ -92,6 +92,7 @@ import {
 } from '@/lib/route-progress';
 import { getRouteInstructionManeuver } from '@/lib/route-instructions';
 import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
+import { buildGoogleStreetViewEmbedUrl } from '@/lib/street-view';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { captureAnalyticsEvent } from '@/lib/analytics';
 
@@ -111,6 +112,8 @@ const defaultLocale = 'en-GB';
 const themeStorageKey = 'cycle-parking-theme';
 const mobileSheetDragThresholdPx = 48;
 const mobileSheetDragRangePx = 320;
+const googleStreetViewApiKey =
+  process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY?.trim() ?? '';
 type PresenceMotion = {
   animate: TargetAndTransition;
   exit: TargetAndTransition;
@@ -344,6 +347,9 @@ export default function CycleParkingFinder() {
   const [isPlaceSearching, setIsPlaceSearching] = useState(false);
   const [hasUsedPlaceSearch, setHasUsedPlaceSearch] = useState(false);
   const [isAttributionModalOpen, setIsAttributionModalOpen] = useState(false);
+  const [streetViewPoint, setStreetViewPoint] = useState<ParkingPoint | null>(
+    null,
+  );
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
   const [numberLocale, setNumberLocale] = useState(defaultLocale);
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
@@ -362,6 +368,7 @@ export default function CycleParkingFinder() {
   const previousLiveRouteMarkerPosition = useRef<CycleRoutePoint | null>(null);
   const copiedMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
+  const streetViewDialog = useRef<HTMLDialogElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
   const settingsMenu = useRef<HTMLDivElement>(null);
   const mobileSheetDrag = useRef<{
@@ -563,10 +570,29 @@ export default function CycleParkingFinder() {
     }
   }, [isAttributionModalOpen]);
 
+  useEffect(() => {
+    const dialog = streetViewDialog.current;
+    if (!dialog) {
+      return;
+    }
+
+    if (streetViewPoint && !dialog.open) {
+      dialog.showModal();
+    }
+  }, [streetViewPoint]);
+
   function closeAttributionDialogAfterExit() {
     const dialog = attributionDialog.current;
 
     if (!isAttributionModalOpen && dialog?.open) {
+      dialog.close();
+    }
+  }
+
+  function closeStreetViewDialogAfterExit() {
+    const dialog = streetViewDialog.current;
+
+    if (!streetViewPoint && dialog?.open) {
       dialog.close();
     }
   }
@@ -1424,9 +1450,17 @@ export default function CycleParkingFinder() {
             copiedShareButton={copiedShareButton}
             theme={resolvedTheme}
             canRequestDirections={isClientReady}
+            canShowStreetView={googleStreetViewApiKey.length > 0}
             onSelectPoint={selectParkingPoint}
             onRequestDirections={(point) => {
               void requestDirectionsToPoint(point);
+            }}
+            onOpenStreetView={(point) => {
+              setStreetViewPoint(point);
+              captureAnalyticsEvent('street_view_opened', {
+                parking_id: point.id,
+                parking_name: point.name,
+              });
             }}
             onCopyParkingLink={(point) => {
               void copyParkingLinkForPoint(point, 'popup');
@@ -2067,6 +2101,54 @@ export default function CycleParkingFinder() {
             </AnimatePresence>
           </LayoutGroup>
         </motion.aside>
+        <dialog
+          ref={streetViewDialog}
+          className="street-view-modal"
+          aria-labelledby="street-view-modal-title"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setStreetViewPoint(null);
+            }
+          }}
+          onClose={() => setStreetViewPoint(null)}
+        >
+          <AnimatePresence
+            initial={false}
+            onExitComplete={closeStreetViewDialogAfterExit}
+          >
+            {streetViewPoint ? (
+              <motion.div
+                {...popoverPresence}
+                key="street-view-modal-content"
+                className="street-view-modal-content"
+              >
+                <div className="street-view-modal-header">
+                  <h2 id="street-view-modal-title">{streetViewPoint.name}</h2>
+                  <motion.button
+                    aria-label="Close Street View"
+                    className="street-view-modal-close"
+                    type="button"
+                    whileTap={subtleTap}
+                    onClick={() => setStreetViewPoint(null)}
+                  >
+                    <X size={18} aria-hidden="true" />
+                  </motion.button>
+                </div>
+                <iframe
+                  allowFullScreen
+                  className="street-view-frame"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={buildGoogleStreetViewEmbedUrl(
+                    streetViewPoint,
+                    googleStreetViewApiKey,
+                  )}
+                  title={`Street View for ${streetViewPoint.name}`}
+                />
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </dialog>
       </main>
     </MotionConfig>
   );

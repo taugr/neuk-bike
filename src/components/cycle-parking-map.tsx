@@ -20,6 +20,7 @@ import {
   LockOpen,
   MapPin,
   Navigation,
+  ScanSearch,
   ParkingCircle,
   Route,
   Share2,
@@ -67,8 +68,10 @@ type CycleParkingMapProps = {
   copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
   theme: 'light' | 'dark';
   canRequestDirections: boolean;
+  canShowStreetView: boolean;
   onSelectPoint: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
+  onOpenStreetView: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
 };
 
@@ -791,8 +794,10 @@ export default function CycleParkingMap({
   copiedShareButton,
   theme,
   canRequestDirections,
+  canShowStreetView,
   onSelectPoint,
   onRequestDirections,
+  onOpenStreetView,
   onCopyParkingLink,
 }: CycleParkingMapProps) {
   const markerRefs = useRef(new Map<string, L.Marker>());
@@ -1201,6 +1206,20 @@ export default function CycleParkingMap({
                       <Navigation size={15} aria-hidden="true" />
                       Directions
                     </button>
+                    {canShowStreetView ? (
+                      <button
+                        aria-label={`Open Street View for ${point.name}`}
+                        className="parking-popup-street-view-button"
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onOpenStreetView(point);
+                        }}
+                      >
+                        <ScanSearch size={15} aria-hidden="true" />
+                        Street
+                      </button>
+                    ) : null}
                     <button
                       aria-label={`Copy link to ${point.name}`}
                       className="parking-popup-share-button"
