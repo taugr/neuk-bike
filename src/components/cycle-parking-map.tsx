@@ -1,12 +1,12 @@
 'use client';
 
 import L from 'leaflet';
+import '@maplibre/maplibre-gl-leaflet';
 import {
   MapContainer,
   Marker,
   Polyline,
   Popup,
-  TileLayer,
   useMap,
   useMapEvents,
 } from 'react-leaflet';
@@ -76,6 +76,8 @@ type CycleParkingMapProps = {
 };
 
 const defaultCenter: [number, number] = [55.9533, -3.1883];
+const mapLibreBasemapStyleUrl = 'https://tiles.openfreemap.org/styles/liberty';
+const mapLibreMaxLatitude = 85.051129;
 const highlightedRankCount = 3;
 const rankedPointCount = 8;
 const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
@@ -669,6 +671,22 @@ function MapThemeClass({ theme }: { theme: 'light' | 'dark' }) {
   return null;
 }
 
+function MapLibreBasemap() {
+  const map = useMap();
+
+  useEffect(() => {
+    const layer = L.maplibreGL({
+      style: mapLibreBasemapStyleUrl,
+    }).addTo(map);
+
+    return () => {
+      layer.remove();
+    };
+  }, [map]);
+
+  return null;
+}
+
 function getVisibleMapBounds(map: L.Map): ParkingMapBounds {
   const visibleArea = getVisibleMapArea(map);
   const northWest = map.containerPointToLatLng([
@@ -1020,6 +1038,12 @@ export default function CycleParkingMap({
   return (
     <MapContainer
       center={defaultCenter}
+      maxBounds={[
+        [-mapLibreMaxLatitude, Number.NEGATIVE_INFINITY],
+        [mapLibreMaxLatitude, Number.POSITIVE_INFINITY],
+      ]}
+      maxBoundsViscosity={1}
+      minZoom={1}
       zoom={13}
       scrollWheelZoom
       className={`bike-map bike-map-${theme}`}
@@ -1030,10 +1054,7 @@ export default function CycleParkingMap({
         mobileSheetState={mobileSheetState}
         onViewportChange={handleViewportChange}
       />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <MapLibreBasemap />
       <MapFocus
         currentLocationFocusRequestId={currentLocationFocusRequestId}
         highlightedPoints={highlightedPoints}
