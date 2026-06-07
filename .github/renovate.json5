@@ -17,6 +17,24 @@
   // Package rules for different update schedules
   packageRules: [
     {
+      description: 'Wait one day before updating npm packages',
+      matchDatasources: ['npm'],
+      minimumReleaseAge: '1 day',
+      internalChecksFilter: 'strict',
+    },
+    {
+      description: 'Review lockfile maintenance with pnpm release-age enforcement',
+      matchUpdateTypes: ['lockFileMaintenance'],
+    },
+    {
+      description: 'Review package replacement updates with pnpm release-age enforcement',
+      matchUpdateTypes: ['replacement'],
+    },
+    {
+      description: 'Review package pinning updates with pnpm release-age enforcement',
+      matchUpdateTypes: ['pin'],
+    },
+    {
       description: 'Update dependencies every weekday morning',
       matchDepTypes: [
         'dependencies',
