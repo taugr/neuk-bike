@@ -1386,7 +1386,7 @@ export default function CycleParkingFinder() {
                   </a>
                   <span>
                     Map interface by{' '}
-                    <a href="https://leafletjs.com/">Leaflet</a>.
+                    <a href="https://maplibre.org/">MapLibre GL JS</a>.
                   </span>
                   {hasUsedPlaceSearch ? (
                     <span>
