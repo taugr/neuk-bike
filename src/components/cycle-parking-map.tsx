@@ -1,15 +1,17 @@
 'use client';
 
-import L from 'leaflet';
-import {
-  MapContainer,
-  Marker,
-  Polyline,
-  Popup,
-  TileLayer,
-  useMap,
-  useMapEvents,
-} from 'react-leaflet';
+import maplibregl from 'maplibre-gl';
+import type {
+  FilterSpecification,
+  GeoJSONSource,
+  LineLayerSpecification,
+  Map as MapLibreMap,
+  Marker as MapLibreMarker,
+  PaddingOptions,
+  PositionAnchor,
+  Popup as MapLibrePopup,
+  StyleSpecification,
+} from 'maplibre-gl';
 import {
   Bike,
   Boxes,
@@ -31,6 +33,9 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { createRoot } from 'react-dom/client';
+import type { Root } from 'react-dom/client';
 import type { ParkingPoint, UserLocation } from '@/lib/types';
 import { getParkingPopupDetails } from '@/lib/parking';
 import type { ParkingPopupIcon } from '@/lib/parking';
@@ -69,13 +74,69 @@ type CycleParkingMapProps = {
   theme: 'light' | 'dark';
   canRequestDirections: boolean;
   canShowStreetView: boolean;
+  onClearSelection: () => void;
   onSelectPoint: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   onOpenStreetView: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
 };
 
-const defaultCenter: [number, number] = [55.9533, -3.1883];
+type VisibleMapArea = {
+  bottom: number;
+  center: { x: number; y: number };
+  height: number;
+  left: number;
+  right: number;
+  top: number;
+  width: number;
+};
+
+type RenderedMarker = {
+  anchor?: PositionAnchor;
+  element?: HTMLElement;
+  marker: MapLibreMarker;
+  popup?: MapLibrePopup;
+  popupRoot?: Root;
+};
+
+type LineLayerStyle = {
+  color: string;
+  dashArray?: number[];
+  opacity: number;
+  width: number;
+};
+
+type RouteLineData = {
+  features: {
+    geometry: {
+      coordinates: [number, number][];
+      type: 'LineString';
+    };
+    properties: Record<string, never>;
+    type: 'Feature';
+  }[];
+  type: 'FeatureCollection';
+};
+
+type ParkingMarkerPresentation = {
+  anchor: PositionAnchor;
+  className: string;
+  label: string;
+  offset: [number, number];
+  popupAnchor: PositionAnchor;
+  zIndex: string;
+};
+
+const defaultCenter: CycleRoutePoint = [55.9533, -3.1883];
+const mapLibreBasemapStyleUrls = {
+  dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+  light: 'https://tiles.openfreemap.org/styles/liberty',
+} satisfies Record<'dark' | 'light', string>;
+const mapLibreShieldLayerIds = new Set([
+  'highway-shield-non-us',
+  'highway-shield-us-interstate',
+  'road_shield_us',
+]);
 const highlightedRankCount = 3;
 const rankedPointCount = 8;
 const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
@@ -94,26 +155,102 @@ const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
   unknown: CircleHelp,
 };
 
-type PopupWithMap = L.Popup & {
-  _map?: L.Map;
-};
+function toLngLat(point: CycleRoutePoint): [number, number] {
+  return [point[1], point[0]];
+}
 
-type VisibleMapArea = {
-  bottom: number;
-  center: L.Point;
-  height: number;
-  left: number;
-  right: number;
-  top: number;
-  width: number;
-};
+function getMapLibreWorldSize(zoom: number) {
+  return 512 * 2 ** zoom;
+}
 
-function getVisibleMapArea(map: L.Map): VisibleMapArea {
+function projectPointAtZoom(point: CycleRoutePoint, zoom: number) {
+  const coordinate = maplibregl.MercatorCoordinate.fromLngLat({
+    lat: point[0],
+    lng: point[1],
+  });
+  const worldSize = getMapLibreWorldSize(zoom);
+
+  return {
+    x: coordinate.x * worldSize,
+    y: coordinate.y * worldSize,
+  };
+}
+
+function unprojectPointAtZoom(
+  point: { x: number; y: number },
+  zoom: number,
+): [number, number] {
+  const worldSize = getMapLibreWorldSize(zoom);
+  const x = point.x / worldSize;
+  const y = point.y / worldSize;
+  const lng = x * 360 - 180;
+  const lat = (Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180) / Math.PI;
+
+  return [lng, lat];
+}
+
+function patchOpenFreeMapLibertyStyle(
+  style: StyleSpecification,
+): StyleSpecification {
+  return {
+    ...style,
+    layers: style.layers.map((layer) => {
+      if (!mapLibreShieldLayerIds.has(layer.id)) {
+        return layer;
+      }
+
+      const existingFilter = 'filter' in layer ? layer.filter : undefined;
+
+      return {
+        ...layer,
+        filter: [
+          'all',
+          ['!=', ['get', 'ref_length'], null],
+          ...(existingFilter ? [existingFilter] : []),
+        ] as FilterSpecification,
+      };
+    }),
+  };
+}
+
+async function loadMapLibreBasemapStyle(
+  signal: AbortSignal,
+  theme: 'dark' | 'light',
+) {
+  const response = await fetch(mapLibreBasemapStyleUrls[theme], { signal });
+
+  if (!response.ok) {
+    throw new Error(`Map style request failed with ${response.status}`);
+  }
+
+  const style = (await response.json()) as StyleSpecification;
+
+  return theme === 'light' ? patchOpenFreeMapLibertyStyle(style) : style;
+}
+
+function userLocationToPoint(userLocation: UserLocation): CycleRoutePoint {
+  return [userLocation.latitude, userLocation.longitude];
+}
+
+function parkingPointToRoutePoint(point: ParkingPoint): CycleRoutePoint {
+  return [point.latitude, point.longitude];
+}
+
+function getMapSize(map: MapLibreMap) {
+  const container = map.getContainer();
+
+  return {
+    x: container.clientWidth,
+    y: container.clientHeight,
+  };
+}
+
+function getVisibleMapArea(map: MapLibreMap): VisibleMapArea {
   const mapElement = map.getContainer();
-  const size = map.getSize();
+  const size = getMapSize(map);
   const fallbackArea = {
     bottom: size.y,
-    center: L.point(size.x / 2, size.y / 2),
+    center: { x: size.x / 2, y: size.y / 2 },
     height: size.y,
     left: 0,
     right: size.x,
@@ -189,7 +326,7 @@ function getVisibleMapArea(map: L.Map): VisibleMapArea {
 
   return {
     bottom,
-    center: L.point(left + width / 2, top + height / 2),
+    center: { x: left + width / 2, y: top + height / 2 },
     height,
     left,
     right,
@@ -198,15 +335,14 @@ function getVisibleMapArea(map: L.Map): VisibleMapArea {
   };
 }
 
-function centerPopupInVisibleMapArea(popup: L.Popup) {
+function centerPopupInVisibleMapArea(map: MapLibreMap, popup: MapLibrePopup) {
   if (!popup.isOpen()) {
     return;
   }
 
-  const map = (popup as PopupWithMap)._map;
   const popupElement = popup.getElement();
 
-  if (!map || !popupElement) {
+  if (!popupElement) {
     return;
   }
 
@@ -225,34 +361,34 @@ function centerPopupInVisibleMapArea(popup: L.Popup) {
   }
 
   map.panBy([panX, panY], {
-    animate: true,
-    duration: 0.65,
-    easeLinearity: 0.25,
+    duration: 650,
+    easing: (progress) => progress * (2 - progress),
   });
 }
 
-function getFocusPadding(map: L.Map): L.FitBoundsOptions {
+function getFocusPadding(map: MapLibreMap): PaddingOptions {
   const visibleArea = getVisibleMapArea(map);
-  const size = map.getSize();
+  const size = getMapSize(map);
   const coveredLeft = visibleArea.left;
   const coveredRight = size.x - visibleArea.right;
   const coveredTop = visibleArea.top;
   const coveredBottom = size.y - visibleArea.bottom;
 
   return {
-    paddingBottomRight: [40 + coveredRight, 40 + coveredBottom],
-    paddingTopLeft: [40 + coveredLeft, 40 + coveredTop],
+    bottom: 40 + coveredBottom,
+    left: 40 + coveredLeft,
+    right: 40 + coveredRight,
+    top: 40 + coveredTop,
   };
 }
 
 function getMapPointFocusCenter(
-  map: L.Map,
-  latLng: L.LatLngExpression,
+  map: MapLibreMap,
+  point: CycleRoutePoint,
   zoom: number,
   mobileSheetState: 'collapsed' | 'expanded',
-) {
-  const point = L.latLng(latLng);
-  const size = map.getSize();
+): [number, number] {
+  const size = getMapSize(map);
   const visibleArea = getVisibleMapArea(map);
 
   if (
@@ -261,7 +397,7 @@ function getMapPointFocusCenter(
     visibleArea.right === size.x &&
     visibleArea.bottom === size.y
   ) {
-    return point;
+    return toLngLat(point);
   }
 
   const targetY =
@@ -274,19 +410,23 @@ function getMapPointFocusCenter(
             Math.round(visibleArea.top + visibleArea.height * 0.75),
           ),
         );
-  const targetPoint = L.point(visibleArea.center.x, targetY);
-  const mapCenterPoint = L.point(size.x / 2, size.y / 2);
-  const projectedPoint = map.project(point, zoom);
-  const projectedCenter = projectedPoint.subtract(
-    targetPoint.subtract(mapCenterPoint),
-  );
+  const targetPoint = {
+    x: visibleArea.center.x,
+    y: targetY,
+  };
+  const mapCenterPoint = { x: size.x / 2, y: size.y / 2 };
+  const projectedPoint = projectPointAtZoom(point, zoom);
+  const projectedCenter = {
+    x: projectedPoint.x - (targetPoint.x - mapCenterPoint.x),
+    y: projectedPoint.y - (targetPoint.y - mapCenterPoint.y),
+  };
 
-  return map.unproject(projectedCenter, zoom);
+  return unprojectPointAtZoom(projectedCenter, zoom);
 }
 
-function isPointInVisibleMapArea(map: L.Map, latLng: L.LatLngExpression) {
+function isPointInVisibleMapArea(map: MapLibreMap, point: CycleRoutePoint) {
   const visibleArea = getVisibleMapArea(map);
-  const projectedPoint = map.latLngToContainerPoint(latLng);
+  const projectedPoint = map.project(toLngLat(point));
   const insetX = Math.min(32, visibleArea.width * 0.18);
   const insetY = Math.min(32, visibleArea.height * 0.18);
 
@@ -298,71 +438,172 @@ function isPointInVisibleMapArea(map: L.Map, latLng: L.LatLngExpression) {
   );
 }
 
-function createParkingIcon(
+function getVisibleMapBounds(map: MapLibreMap): ParkingMapBounds {
+  const visibleArea = getVisibleMapArea(map);
+  const northWest = map.unproject([visibleArea.left, visibleArea.top]);
+  const southEast = map.unproject([visibleArea.right, visibleArea.bottom]);
+
+  return {
+    east: southEast.lng,
+    north: northWest.lat,
+    south: southEast.lat,
+    west: northWest.lng,
+  };
+}
+
+function getDistanceMeters(a: CycleRoutePoint, b: CycleRoutePoint) {
+  const earthRadiusMeters = 6_371_000;
+  const lat1 = (a[0] * Math.PI) / 180;
+  const lat2 = (b[0] * Math.PI) / 180;
+  const deltaLat = ((b[0] - a[0]) * Math.PI) / 180;
+  const deltaLng = ((b[1] - a[1]) * Math.PI) / 180;
+  const haversine =
+    Math.sin(deltaLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
+  const centralAngle =
+    2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+
+  return earthRadiusMeters * centralAngle;
+}
+
+function createBounds(points: CycleRoutePoint[]) {
+  const bounds = new maplibregl.LngLatBounds();
+
+  points.forEach((point) => bounds.extend(toLngLat(point)));
+
+  return bounds;
+}
+
+function createMarkerElement(className: string, label = '') {
+  const element = document.createElement('div');
+  const span = document.createElement('span');
+  element.className = className;
+  span.textContent = label;
+  element.append(span);
+
+  return element;
+}
+
+function updateMarkerElement(
+  element: HTMLElement,
+  className: string,
+  label = '',
+) {
+  const mapLibreClasses = Array.from(element.classList).filter((className) =>
+    className.startsWith('maplibregl-'),
+  );
+  element.className = [className, ...mapLibreClasses].join(' ');
+
+  const labelElement = element.querySelector('span');
+
+  if (labelElement) {
+    labelElement.textContent = label;
+  }
+}
+
+function getParkingMarkerPresentation({
+  isDirectionsMode,
+  isSelected,
+  rank,
+}: {
+  isDirectionsMode: boolean;
+  isSelected: boolean;
+  rank: number | undefined;
+}): ParkingMarkerPresentation {
+  if (isSelected && isDirectionsMode) {
+    return {
+      anchor: 'bottom',
+      className: 'destination-marker',
+      label: '',
+      offset: [0, -34],
+      popupAnchor: 'bottom',
+      zIndex: '1000',
+    };
+  }
+
+  if (isSelected && rank !== undefined) {
+    return {
+      anchor: 'center',
+      className: 'parking-marker parking-marker-selected-ranked',
+      label: String(rank),
+      offset: [0, -18],
+      popupAnchor: 'bottom',
+      zIndex: '1000',
+    };
+  }
+
+  if (isSelected) {
+    return {
+      anchor: 'center',
+      className: 'parking-marker parking-marker-selected',
+      label: '',
+      offset: [0, -18],
+      popupAnchor: 'bottom',
+      zIndex: '1000',
+    };
+  }
+
+  if (rank !== undefined) {
+    return {
+      anchor: 'center',
+      className: `parking-marker parking-marker-ranked parking-marker-rank-${rank}`,
+      label: String(rank),
+      offset: [0, -18],
+      popupAnchor: 'bottom',
+      zIndex: '',
+    };
+  }
+
+  return {
+    anchor: 'center',
+    className: 'parking-marker parking-marker-default',
+    label: '',
+    offset: [0, -18],
+    popupAnchor: 'bottom',
+    zIndex: '',
+  };
+}
+
+function createParkingMarkerElement(
   kind: 'default' | 'selected' | 'selected-ranked',
   label = '',
 ) {
-  return L.divIcon({
-    className: `parking-marker parking-marker-${kind}`,
-    html: `<span>${label}</span>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -16],
-  });
+  return createMarkerElement(`parking-marker parking-marker-${kind}`, label);
 }
 
-function createRankedParkingIcon(rank: number) {
-  return L.divIcon({
-    className: `parking-marker parking-marker-ranked parking-marker-rank-${rank}`,
-    html: `<span>${rank}</span>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -16],
-  });
+function createRankedParkingMarkerElement(rank: number) {
+  return createMarkerElement(
+    `parking-marker parking-marker-ranked parking-marker-rank-${rank}`,
+    String(rank),
+  );
 }
 
-function ParkingPopupIcon({ icon }: { icon: ParkingPopupIcon }) {
-  const Icon = popupIconByName[icon] ?? MapPin;
-
-  return <Icon size={15} strokeWidth={2.25} aria-hidden="true" />;
+function createPinMarkerElement(className: string) {
+  return createMarkerElement(className);
 }
 
-const startIcon = L.divIcon({
-  className: 'start-marker',
-  html: '<span></span>',
-  iconSize: [32, 42],
-  iconAnchor: [16, 42],
-  popupAnchor: [0, -42],
-});
-
-const destinationIcon = L.divIcon({
-  className: 'destination-marker',
-  html: '<span></span>',
-  iconSize: [32, 42],
-  iconAnchor: [16, 42],
-  popupAnchor: [0, -42],
-});
-
-function createLiveRouteIcon({
+function createLiveRouteMarkerElement({
   headingDegrees,
   isOffRoute,
 }: {
   headingDegrees: number | null;
   isOffRoute: boolean;
 }) {
+  const element = document.createElement('div');
+  const span = document.createElement('span');
   const headingCue =
     headingDegrees === null
       ? ''
       : `<i class="live-route-heading" style="transform: translateX(-50%) rotate(${headingDegrees}deg)" aria-hidden="true"></i>`;
 
-  return L.divIcon({
-    className: isOffRoute
-      ? 'live-route-marker live-route-marker-off-route'
-      : 'live-route-marker',
-    html: `<span>${headingCue}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="m12 17.5 3-6 2 3h2"></path><path d="m5.5 17.5 3-6h4l3 6"></path><path d="m8.5 11.5 2-4h3.5"></path></svg></span>`,
-    iconSize: [34, 34],
-    iconAnchor: [17, 17],
-  });
+  element.className = isOffRoute
+    ? 'live-route-marker live-route-marker-off-route'
+    : 'live-route-marker';
+  element.dataset.testid = 'live-route-marker';
+  span.innerHTML = `${headingCue}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="m12 17.5 3-6 2 3h2"></path><path d="m5.5 17.5 3-6h4l3 6"></path><path d="m8.5 11.5 2-4h3.5"></path></svg>`;
+  element.append(span);
+
+  return element;
 }
 
 function getSelectedInstructionMarkerSvg(maneuver: RouteInstructionManeuver) {
@@ -385,30 +626,179 @@ function getSelectedInstructionMarkerSvg(maneuver: RouteInstructionManeuver) {
   return '<path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path>';
 }
 
-function createSelectedInstructionIcon(maneuver: RouteInstructionManeuver) {
-  return L.divIcon({
-    className: `selected-route-instruction-marker selected-route-instruction-marker-${maneuver}`,
-    html: `<span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4">${getSelectedInstructionMarkerSvg(maneuver)}</svg></span>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-  });
+function createSelectedInstructionMarkerElement(
+  maneuver: RouteInstructionManeuver,
+) {
+  const element = document.createElement('div');
+  const span = document.createElement('span');
+  element.className = `selected-route-instruction-marker selected-route-instruction-marker-${maneuver}`;
+  span.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4">${getSelectedInstructionMarkerSvg(maneuver)}</svg>`;
+  element.append(span);
+
+  return element;
+}
+
+function ParkingPopupIcon({ icon }: { icon: ParkingPopupIcon }) {
+  const Icon = popupIconByName[icon] ?? MapPin;
+
+  return <Icon size={15} strokeWidth={2.25} aria-hidden="true" />;
+}
+
+function ParkingPopupContent({
+  canRequestDirections,
+  canShowStreetView,
+  copiedShareButton,
+  isDirectionsMode,
+  onCopyParkingLink,
+  onOpenStreetView,
+  onRequestDirections,
+  point,
+}: {
+  canRequestDirections: boolean;
+  canShowStreetView: boolean;
+  copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
+  isDirectionsMode: boolean;
+  onCopyParkingLink: (point: ParkingPoint) => void;
+  onOpenStreetView: (point: ParkingPoint) => void;
+  onRequestDirections: (point: ParkingPoint) => void;
+  point: ParkingPoint;
+}) {
+  const popupDetails = getParkingPopupDetails(point);
+
+  return (
+    <div className="parking-popup">
+      <div className="parking-popup-title-row">
+        <strong>{point.name}</strong>
+        {popupDetails.metrics.map((metric) => (
+          <span
+            className="parking-popup-distance"
+            key={metric.label}
+            title={metric.label}
+          >
+            {metric.value}
+          </span>
+        ))}
+      </div>
+      <div
+        className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}
+        aria-label="Parking details"
+      >
+        {popupDetails.details.map((detail) => (
+          <div
+            aria-label={`${detail.label}: ${detail.value}`}
+            className={`parking-popup-detail parking-popup-tone-${detail.tone}`}
+            key={detail.label}
+          >
+            <span className="parking-popup-detail-icon">
+              {detail.emphasis ?? <ParkingPopupIcon icon={detail.icon} />}
+            </span>
+            <span className="parking-popup-detail-value">{detail.value}</span>
+          </div>
+        ))}
+      </div>
+      {isDirectionsMode ? null : (
+        <div className="parking-popup-actions">
+          <button
+            className="parking-popup-directions-button"
+            disabled={!canRequestDirections}
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onRequestDirections(point);
+            }}
+          >
+            <Navigation size={15} aria-hidden="true" />
+            Directions
+          </button>
+          {canShowStreetView ? (
+            <button
+              aria-label={`Open Street View for ${point.name}`}
+              className="parking-popup-street-view-button"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenStreetView(point);
+              }}
+            >
+              <ScanSearch size={15} aria-hidden="true" />
+              Street
+            </button>
+          ) : null}
+          <button
+            aria-label={`Copy link to ${point.name}`}
+            className="parking-popup-share-button"
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onCopyParkingLink(point);
+            }}
+          >
+            <Share2 size={15} aria-hidden="true" />
+            Share
+            {copiedShareButton?.source === 'popup' &&
+            copiedShareButton.parkingId === point.id ? (
+              <span className="parking-popup-share-feedback" role="status">
+                Copied
+              </span>
+            ) : null}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StartPopupContent() {
+  return (
+    <div className="parking-popup">
+      <strong>Start position</strong>
+      <span>Current location</span>
+    </div>
+  );
+}
+
+function createRenderedPopup(
+  content: ReactNode,
+  options: maplibregl.PopupOptions = {},
+) {
+  const container = document.createElement('div');
+  const root = createRoot(container);
+  root.render(content);
+
+  return {
+    popup: new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      focusAfterOpen: false,
+      maxWidth: '340px',
+      ...options,
+    }).setDOMContent(container),
+    root,
+  };
+}
+
+function cleanupRenderedMarker(renderedMarker: RenderedMarker | null) {
+  if (!renderedMarker) {
+    return;
+  }
+
+  renderedMarker.popup?.remove();
+  renderedMarker.marker.remove();
+  renderedMarker.popupRoot?.unmount();
 }
 
 function getFinalApproachPositions(
   route: CycleRoute | null,
   selectedPoint: ParkingPoint | null,
-): [number, number][] | null {
+): CycleRoutePoint[] | null {
   const routeEnd = route?.points.at(-1);
 
   if (!routeEnd || !selectedPoint) {
     return null;
   }
 
-  const destination: [number, number] = [
-    selectedPoint.latitude,
-    selectedPoint.longitude,
-  ];
-  const distanceMeters = L.latLng(routeEnd).distanceTo(destination);
+  const destination = parkingPointToRoutePoint(selectedPoint);
+  const distanceMeters = getDistanceMeters(routeEnd, destination);
 
   if (distanceMeters < 2) {
     return null;
@@ -420,18 +810,15 @@ function getFinalApproachPositions(
 function getInitialApproachPositions(
   route: CycleRoute | null,
   userLocation: UserLocation,
-): [number, number][] | null {
+): CycleRoutePoint[] | null {
   const routeStart = route?.points.at(0);
 
   if (!routeStart) {
     return null;
   }
 
-  const start: [number, number] = [
-    userLocation.latitude,
-    userLocation.longitude,
-  ];
-  const distanceMeters = L.latLng(start).distanceTo(routeStart);
+  const start = userLocationToPoint(userLocation);
+  const distanceMeters = getDistanceMeters(start, routeStart);
 
   if (distanceMeters < 2) {
     return null;
@@ -440,342 +827,75 @@ function getInitialApproachPositions(
   return [start, routeStart];
 }
 
-function MapFocus({
-  currentLocationFocusRequestId,
-  highlightedPoints,
-  mobileSheetState,
-  nearestPoint,
-  route,
-  selectedPoint,
-  userLocation,
-}: {
-  currentLocationFocusRequestId: number;
-  highlightedPoints: ParkingPoint[];
-  mobileSheetState: 'collapsed' | 'expanded';
-  nearestPoint: ParkingPoint | null;
-  route: CycleRoute | null;
-  selectedPoint: ParkingPoint | null;
-  userLocation: UserLocation;
-}) {
-  const map = useMap();
-  const previousRouteRef = useRef(route);
-
-  useEffect(() => {
-    const hadRoute = previousRouteRef.current !== null;
-    previousRouteRef.current = route;
-
-    map.stop();
-
-    if (!route && hadRoute) {
-      return;
-    }
-
-    if (route && selectedPoint) {
-      const bounds = L.latLngBounds([
-        [userLocation.latitude, userLocation.longitude],
-        [selectedPoint.latitude, selectedPoint.longitude],
-        ...route.points,
-      ]);
-
-      map.fitBounds(bounds, {
-        animate: true,
-        duration: 0.7,
-        maxZoom: 17,
-        ...getFocusPadding(map),
-      });
-      return;
-    }
-
-    const focusPoints =
-      highlightedPoints.length > 0
-        ? highlightedPoints
-        : nearestPoint
-          ? [nearestPoint]
-          : [];
-
-    if (selectedPoint) {
-      if (mobileSheetState === 'collapsed') {
-        return;
-      }
-
-      if (
-        selectedPoint.id === nearestPoint?.id &&
-        mobileSheetState === 'expanded'
-      ) {
-        const bounds = L.latLngBounds([
-          [userLocation.latitude, userLocation.longitude],
-          ...focusPoints.map(
-            (point) => [point.latitude, point.longitude] as [number, number],
-          ),
-        ]);
-
-        map.fitBounds(bounds, {
-          animate: true,
-          duration: 0.7,
-          maxZoom: 17,
-          ...getFocusPadding(map),
-        });
-        return;
-      }
-
-      const zoom = Math.max(map.getZoom(), 16);
-      map.flyTo(
-        getMapPointFocusCenter(
-          map,
-          [selectedPoint.latitude, selectedPoint.longitude],
-          zoom,
-          mobileSheetState,
-        ),
-        zoom,
-        {
-          duration: 0.7,
-        },
-      );
-      return;
-    }
-
-    if (focusPoints.length > 0) {
-      const bounds = L.latLngBounds([
-        [userLocation.latitude, userLocation.longitude],
-        ...focusPoints.map(
-          (point) => [point.latitude, point.longitude] as [number, number],
-        ),
-      ]);
-
-      map.fitBounds(bounds, {
-        animate: true,
-        duration: 0.7,
-        maxZoom: 17,
-        ...getFocusPadding(map),
-      });
-      return;
-    }
-
-    map.setView([userLocation.latitude, userLocation.longitude], 16);
-  }, [
-    currentLocationFocusRequestId,
-    highlightedPoints,
-    map,
-    nearestPoint,
-    route,
-    selectedPoint,
-    userLocation,
-  ]);
-
-  return null;
-}
-
-function LiveRouteFollower({
-  marker,
-  mobileSheetState,
-  shouldFollow,
-}: {
-  marker: {
-    position: CycleRoutePoint;
-    updatedAt: number;
-  } | null;
-  mobileSheetState: 'collapsed' | 'expanded';
-  shouldFollow: boolean;
-}) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!marker || !shouldFollow) {
-      return;
-    }
-
-    const nextCenter = L.latLng(marker.position);
-
-    if (isPointInVisibleMapArea(map, nextCenter)) {
-      return;
-    }
-
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-
-    map.panTo(
-      getMapPointFocusCenter(map, nextCenter, map.getZoom(), mobileSheetState),
-      {
-        animate: !prefersReducedMotion,
-        duration: 0.45,
-        easeLinearity: 0.25,
-      },
-    );
-  }, [map, marker, marker?.updatedAt, mobileSheetState, shouldFollow]);
-
-  return null;
-}
-
-function RouteInstructionFocus({
-  focusRequest,
-  mobileSheetState,
-  route,
-}: {
-  focusRequest: {
-    id: string;
-    requestId: number;
-  } | null;
-  mobileSheetState: 'collapsed' | 'expanded';
-  route: CycleRoute | null;
-}) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!focusRequest || !route) {
-      return;
-    }
-
-    const instruction = route.instructions.find(
-      (candidate) => candidate.id === focusRequest.id,
-    );
-
-    if (!instruction) {
-      return;
-    }
-
-    const zoom = Math.max(map.getZoom(), 16);
-    map.flyTo(
-      getMapPointFocusCenter(map, instruction.anchor, zoom, mobileSheetState),
-      zoom,
-      {
-        duration: 0.65,
-      },
-    );
-  }, [focusRequest, focusRequest?.requestId, map, mobileSheetState, route]);
-
-  return null;
-}
-
-function AttributionPrefix() {
-  const map = useMap();
-
-  useEffect(() => {
-    map.attributionControl.setPrefix(false);
-  }, [map]);
-
-  return null;
-}
-
-function MapThemeClass({ theme }: { theme: 'light' | 'dark' }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const container = map.getContainer();
-    container.classList.toggle('bike-map-dark', theme === 'dark');
-    container.classList.toggle('bike-map-light', theme === 'light');
-  }, [map, theme]);
-
-  return null;
-}
-
-function getVisibleMapBounds(map: L.Map): ParkingMapBounds {
-  const visibleArea = getVisibleMapArea(map);
-  const northWest = map.containerPointToLatLng([
-    visibleArea.left,
-    visibleArea.top,
-  ]);
-  const southEast = map.containerPointToLatLng([
-    visibleArea.right,
-    visibleArea.bottom,
-  ]);
-
+function createLineData(positions: CycleRoutePoint[] | null): RouteLineData {
   return {
-    east: southEast.lng,
-    north: northWest.lat,
-    south: southEast.lat,
-    west: northWest.lng,
+    features: positions
+      ? [
+          {
+            geometry: {
+              coordinates: positions.map(toLngLat),
+              type: 'LineString',
+            },
+            properties: {},
+            type: 'Feature',
+          },
+        ]
+      : [],
+    type: 'FeatureCollection',
   };
 }
 
-function MapViewportTracker({
-  mobileSheetState,
-  onViewportChange,
+function syncLineLayer({
+  data,
+  id,
+  map,
+  style,
 }: {
-  mobileSheetState: 'collapsed' | 'expanded';
-  onViewportChange: (viewport: {
-    bounds: ParkingMapBounds;
-    zoom: number;
-  }) => void;
+  data: RouteLineData;
+  id: string;
+  map: MapLibreMap;
+  style: LineLayerStyle;
 }) {
-  const map = useMap();
-  const frameRef = useRef<number | null>(null);
-  const updateViewport = useCallback(() => {
-    if (frameRef.current !== null) {
-      return;
-    }
+  const layerId = `${id}-layer`;
+  const source = map.getSource(id) as GeoJSONSource | undefined;
 
-    frameRef.current = window.requestAnimationFrame(() => {
-      frameRef.current = null;
-      onViewportChange({
-        bounds: getVisibleMapBounds(map),
-        zoom: map.getZoom(),
-      });
+  if (source) {
+    source.setData(data);
+  } else {
+    map.addSource(id, {
+      data,
+      type: 'geojson',
     });
-  }, [map, onViewportChange]);
+  }
 
-  useMapEvents({
-    move: () => {
-      updateViewport();
+  if (map.getLayer(layerId)) {
+    map.setPaintProperty(layerId, 'line-color', style.color);
+    map.setPaintProperty(layerId, 'line-opacity', style.opacity);
+    map.setPaintProperty(layerId, 'line-width', style.width);
+    map.setPaintProperty(layerId, 'line-dasharray', style.dashArray ?? [1, 0]);
+    return;
+  }
+
+  const paint: NonNullable<LineLayerSpecification['paint']> = {
+    'line-color': style.color,
+    'line-opacity': style.opacity,
+    'line-width': style.width,
+  };
+
+  if (style.dashArray) {
+    paint['line-dasharray'] = style.dashArray;
+  }
+
+  map.addLayer({
+    id: layerId,
+    layout: {
+      'line-cap': 'round',
+      'line-join': 'round',
     },
-    moveend: () => {
-      onViewportChange({
-        bounds: getVisibleMapBounds(map),
-        zoom: map.getZoom(),
-      });
-    },
-    zoom: () => {
-      updateViewport();
-    },
-    zoomend: () => {
-      onViewportChange({
-        bounds: getVisibleMapBounds(map),
-        zoom: map.getZoom(),
-      });
-    },
+    paint,
+    source: id,
+    type: 'line',
   });
-
-  useEffect(() => {
-    onViewportChange({
-      bounds: getVisibleMapBounds(map),
-      zoom: map.getZoom(),
-    });
-  }, [map, mobileSheetState, onViewportChange]);
-
-  useEffect(() => {
-    const mapElement = map.getContainer();
-    const controlPane = document.querySelector<HTMLElement>('.control-pane');
-
-    if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', updateViewport);
-
-      return () => window.removeEventListener('resize', updateViewport);
-    }
-
-    const resizeObserver = new ResizeObserver(() => updateViewport());
-    resizeObserver.observe(mapElement);
-
-    if (controlPane) {
-      resizeObserver.observe(controlPane);
-    }
-
-    window.addEventListener('resize', updateViewport);
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', updateViewport);
-    };
-  }, [map, updateViewport]);
-
-  useEffect(() => {
-    return () => {
-      if (frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current);
-      }
-    };
-  }, []);
-
-  return null;
 }
 
 export default function CycleParkingMap({
@@ -795,15 +915,30 @@ export default function CycleParkingMap({
   theme,
   canRequestDirections,
   canShowStreetView,
+  onClearSelection,
   onSelectPoint,
   onRequestDirections,
   onOpenStreetView,
   onCopyParkingLink,
 }: CycleParkingMapProps) {
-  const markerRefs = useRef(new Map<string, L.Marker>());
-  const hadRouteRef = useRef(false);
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
+  const parkingMarkerRefs = useRef(new Map<string, RenderedMarker>());
+  const startMarkerRef = useRef<RenderedMarker | null>(null);
+  const liveMarkerRef = useRef<RenderedMarker | null>(null);
+  const instructionMarkerRef = useRef<RenderedMarker | null>(null);
+  const previousFocusRouteRef = useRef(route);
   const mobileSheetStateRef = useRef(mobileSheetState);
   const previousMobileSheetStateRef = useRef(mobileSheetState);
+  const previousRouteSheetStateRef = useRef(mobileSheetState);
+  const centeredCollapsedPopupPointRef = useRef<string | null>(null);
+  const suppressNextSelectionClearFocusRef = useRef(false);
+  const frameRef = useRef<number | null>(null);
+  const initialBasemapThemeRef = useRef(theme);
+  const activeBasemapThemeRef = useRef(theme);
+  const [map, setMap] = useState<MapLibreMap | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [styleRevision, setStyleRevision] = useState(0);
   const [viewport, setViewport] = useState<{
     bounds: ParkingMapBounds | null;
     zoom: number;
@@ -829,37 +964,24 @@ export default function CycleParkingMap({
     },
     [],
   );
-  const icons = useMemo(
-    () => ({
-      default: createParkingIcon('default'),
-      selected: createParkingIcon('selected'),
-    }),
-    [],
-  );
-  const liveRouteIcon = useMemo(
-    () =>
-      createLiveRouteIcon({
-        headingDegrees: liveRouteMarker?.headingDegrees ?? null,
-        isOffRoute: liveRouteMarker?.isOffRoute ?? false,
-      }),
-    [liveRouteMarker?.headingDegrees, liveRouteMarker?.isOffRoute],
-  );
-  const rankedIcons = useMemo(() => {
-    return new Map(
-      Array.from({ length: rankedPointCount }, (_, index) => {
-        const rank = index + 1;
-        return [rank, createRankedParkingIcon(rank)];
-      }),
-    );
-  }, []);
-  const selectedRankedIcons = useMemo(() => {
-    return new Map(
-      Array.from({ length: rankedPointCount }, (_, index) => {
-        const rank = index + 1;
-        return [rank, createParkingIcon('selected-ranked', String(rank))];
-      }),
-    );
-  }, []);
+  const updateViewport = useCallback(() => {
+    if (!mapRef.current || frameRef.current !== null) {
+      return;
+    }
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+
+      if (!mapRef.current) {
+        return;
+      }
+
+      handleViewportChange({
+        bounds: getVisibleMapBounds(mapRef.current),
+        zoom: mapRef.current.getZoom(),
+      });
+    });
+  }, [handleViewportChange]);
   const selectedInstruction = useMemo(() => {
     if (!route || !routeInstructionFocusRequest) {
       return null;
@@ -871,15 +993,6 @@ export default function CycleParkingMap({
       ) ?? null
     );
   }, [route, routeInstructionFocusRequest]);
-  const selectedInstructionIcon = useMemo(() => {
-    if (!selectedInstruction) {
-      return null;
-    }
-
-    return createSelectedInstructionIcon(
-      getRouteInstructionManeuver(selectedInstruction),
-    );
-  }, [selectedInstruction]);
   const rankedPointRanks = useMemo(() => {
     return new Map(
       rankedPoints
@@ -925,6 +1038,585 @@ export default function CycleParkingMap({
   }, [mobileSheetState]);
 
   useEffect(() => {
+    const container = mapContainerRef.current;
+
+    if (!container || mapRef.current) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    let nextMap: MapLibreMap | null = null;
+    let isDisposed = false;
+
+    const createMap = (style: StyleSpecification | string) => {
+      if (isDisposed) {
+        return;
+      }
+
+      nextMap = new maplibregl.Map({
+        attributionControl: false,
+        center: toLngLat(defaultCenter),
+        container,
+        dragRotate: false,
+        minZoom: 1,
+        pitchWithRotate: false,
+        style,
+        touchPitch: false,
+        zoom: 13,
+      });
+      nextMap.touchZoomRotate.disableRotation();
+      const navigationControl = new maplibregl.NavigationControl({
+        showCompass: false,
+      });
+      const attributionControl = new maplibregl.AttributionControl({
+        compact: false,
+      });
+
+      nextMap.addControl(navigationControl, 'top-left');
+      nextMap.addControl(attributionControl, 'bottom-right');
+      nextMap.on('styleimagemissing', (event) => {
+        if (!nextMap || nextMap.hasImage(event.id)) {
+          return;
+        }
+
+        nextMap.addImage(event.id, {
+          data: new Uint8Array([0, 0, 0, 0]),
+          height: 1,
+          width: 1,
+        });
+      });
+      nextMap.on('load', () => {
+        if (!nextMap) {
+          return;
+        }
+
+        setIsMapLoaded(true);
+        setStyleRevision((revision) => revision + 1);
+        handleViewportChange({
+          bounds: getVisibleMapBounds(nextMap),
+          zoom: nextMap.getZoom(),
+        });
+      });
+      nextMap.on('moveend', () => {
+        if (!nextMap) {
+          return;
+        }
+
+        handleViewportChange({
+          bounds: getVisibleMapBounds(nextMap),
+          zoom: nextMap.getZoom(),
+        });
+      });
+      nextMap.on('zoomend', () => {
+        if (!nextMap) {
+          return;
+        }
+
+        handleViewportChange({
+          bounds: getVisibleMapBounds(nextMap),
+          zoom: nextMap.getZoom(),
+        });
+      });
+
+      mapRef.current = nextMap;
+      setMap(nextMap);
+    };
+
+    void loadMapLibreBasemapStyle(
+      abortController.signal,
+      initialBasemapThemeRef.current,
+    )
+      .then(createMap)
+      .catch((error: unknown) => {
+        if (abortController.signal.aborted) {
+          return;
+        }
+
+        console.warn('Falling back to unpatched MapLibre style.', error);
+        createMap(mapLibreBasemapStyleUrls[initialBasemapThemeRef.current]);
+      });
+
+    return () => {
+      isDisposed = true;
+      abortController.abort();
+
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+
+      parkingMarkerRefs.current.forEach(cleanupRenderedMarker);
+      parkingMarkerRefs.current.clear();
+      cleanupRenderedMarker(startMarkerRef.current);
+      cleanupRenderedMarker(liveMarkerRef.current);
+      cleanupRenderedMarker(instructionMarkerRef.current);
+      startMarkerRef.current = null;
+      liveMarkerRef.current = null;
+      instructionMarkerRef.current = null;
+      nextMap?.remove();
+      mapRef.current = null;
+      setMap(null);
+      setIsMapLoaded(false);
+    };
+  }, [handleViewportChange, updateViewport]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const container = map.getContainer();
+    container.classList.toggle('bike-map-dark', theme === 'dark');
+    container.classList.toggle('bike-map-light', theme === 'light');
+  }, [map, theme]);
+
+  useEffect(() => {
+    if (!map || activeBasemapThemeRef.current === theme) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    let isActive = true;
+
+    const handleStyleLoad = () => {
+      if (!isActive) {
+        return;
+      }
+
+      activeBasemapThemeRef.current = theme;
+      setIsMapLoaded(true);
+      setStyleRevision((revision) => revision + 1);
+      handleViewportChange({
+        bounds: getVisibleMapBounds(map),
+        zoom: map.getZoom(),
+      });
+    };
+    const applyStyle = (style: StyleSpecification | string) => {
+      if (!isActive) {
+        return;
+      }
+
+      setIsMapLoaded(false);
+      void map.once('style.load', handleStyleLoad);
+      map.setStyle(style);
+    };
+
+    void loadMapLibreBasemapStyle(abortController.signal, theme)
+      .then(applyStyle)
+      .catch((error: unknown) => {
+        if (abortController.signal.aborted) {
+          return;
+        }
+
+        console.warn('Falling back to unpatched MapLibre style.', error);
+        applyStyle(mapLibreBasemapStyleUrls[theme]);
+      });
+
+    return () => {
+      isActive = false;
+      abortController.abort();
+      map.off('style.load', handleStyleLoad);
+    };
+  }, [handleViewportChange, map, theme]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const mapElement = map.getContainer();
+    const controlPane = document.querySelector<HTMLElement>('.control-pane');
+    const resizeMap = () => {
+      map.resize();
+      updateViewport();
+    };
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', resizeMap);
+
+      return () => window.removeEventListener('resize', resizeMap);
+    }
+
+    const resizeObserver = new ResizeObserver(resizeMap);
+    resizeObserver.observe(mapElement);
+
+    if (controlPane) {
+      resizeObserver.observe(controlPane);
+    }
+
+    window.addEventListener('resize', resizeMap);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', resizeMap);
+    };
+  }, [map, mobileSheetState, updateViewport]);
+
+  useEffect(() => {
+    if (!map || !isMapLoaded) {
+      return;
+    }
+
+    syncLineLayer({
+      data: createLineData(route?.points ?? null),
+      id: 'route-line',
+      map,
+      style:
+        route?.source === 'local'
+          ? {
+              color: '#f97316',
+              dashArray: [1.5, 2],
+              opacity: 0.9,
+              width: 4,
+            }
+          : {
+              color: '#2563eb',
+              opacity: 0.82,
+              width: 6,
+            },
+    });
+    syncLineLayer({
+      data: createLineData(initialApproachPositions),
+      id: 'initial-approach-line',
+      map,
+      style: {
+        color: '#f97316',
+        dashArray: [1.5, 2],
+        opacity: 0.9,
+        width: 4,
+      },
+    });
+    syncLineLayer({
+      data: createLineData(finalApproachPositions),
+      id: 'final-approach-line',
+      map,
+      style: {
+        color: '#f97316',
+        dashArray: [1.5, 2],
+        opacity: 0.9,
+        width: 4,
+      },
+    });
+  }, [
+    finalApproachPositions,
+    initialApproachPositions,
+    isMapLoaded,
+    map,
+    route,
+    styleRevision,
+  ]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    cleanupRenderedMarker(startMarkerRef.current);
+
+    const { popup, root } = createRenderedPopup(<StartPopupContent />, {
+      closeButton: true,
+      closeOnClick: true,
+      offset: [0, -32],
+    });
+    const element = createPinMarkerElement('start-marker');
+    const marker = new maplibregl.Marker({
+      anchor: 'bottom',
+      element,
+    })
+      .setLngLat([userLocation.longitude, userLocation.latitude])
+      .setPopup(popup)
+      .addTo(map);
+
+    startMarkerRef.current = {
+      marker,
+      popup,
+      popupRoot: root,
+    };
+
+    return () => {
+      cleanupRenderedMarker(startMarkerRef.current);
+      startMarkerRef.current = null;
+    };
+  }, [map, userLocation]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    cleanupRenderedMarker(liveMarkerRef.current);
+    liveMarkerRef.current = null;
+
+    if (!liveRouteMarker) {
+      return;
+    }
+
+    const element = createLiveRouteMarkerElement({
+      headingDegrees: liveRouteMarker.headingDegrees,
+      isOffRoute: liveRouteMarker.isOffRoute,
+    });
+    element.style.zIndex = '1250';
+
+    const marker = new maplibregl.Marker({
+      anchor: 'center',
+      element,
+    })
+      .setLngLat(toLngLat(liveRouteMarker.position))
+      .addTo(map);
+
+    liveMarkerRef.current = { marker };
+
+    return () => {
+      cleanupRenderedMarker(liveMarkerRef.current);
+      liveMarkerRef.current = null;
+    };
+  }, [liveRouteMarker, map]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    cleanupRenderedMarker(instructionMarkerRef.current);
+    instructionMarkerRef.current = null;
+
+    if (!selectedInstruction) {
+      return;
+    }
+
+    const element = createSelectedInstructionMarkerElement(
+      getRouteInstructionManeuver(selectedInstruction),
+    );
+    element.style.zIndex = '900';
+
+    const marker = new maplibregl.Marker({
+      anchor: 'center',
+      element,
+    })
+      .setLngLat(toLngLat(selectedInstruction.anchor))
+      .addTo(map);
+
+    instructionMarkerRef.current = { marker };
+
+    return () => {
+      cleanupRenderedMarker(instructionMarkerRef.current);
+      instructionMarkerRef.current = null;
+    };
+  }, [map, selectedInstruction]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    if (!selectedPoint) {
+      centeredCollapsedPopupPointRef.current = null;
+    }
+
+    let centerTimeoutId: number | null = null;
+    const reconciledVisiblePoints =
+      selectedPoint &&
+      !visiblePoints.some((point) => point.id === selectedPoint.id)
+        ? [selectedPoint, ...visiblePoints]
+        : visiblePoints;
+    const visiblePointIds = new Set(
+      reconciledVisiblePoints.map((point) => point.id),
+    );
+
+    parkingMarkerRefs.current.forEach((renderedMarker, pointId) => {
+      if (!visiblePointIds.has(pointId)) {
+        cleanupRenderedMarker(renderedMarker);
+        parkingMarkerRefs.current.delete(pointId);
+      }
+    });
+
+    reconciledVisiblePoints.forEach((point) => {
+      const rank = rankedPointRanks.get(point.id);
+      const isSelected = point.id === selectedPoint?.id;
+      const presentation = getParkingMarkerPresentation({
+        isDirectionsMode,
+        isSelected,
+        rank,
+      });
+      const popupContent = (
+        <ParkingPopupContent
+          canRequestDirections={canRequestDirections}
+          canShowStreetView={canShowStreetView}
+          copiedShareButton={copiedShareButton}
+          isDirectionsMode={isDirectionsMode}
+          onCopyParkingLink={onCopyParkingLink}
+          onOpenStreetView={onOpenStreetView}
+          onRequestDirections={onRequestDirections}
+          point={point}
+        />
+      );
+      const existingMarker = parkingMarkerRefs.current.get(point.id);
+      const canReuseMarker =
+        existingMarker?.element &&
+        existingMarker.anchor === presentation.anchor;
+      let renderedMarker = existingMarker;
+
+      if (existingMarker && !canReuseMarker) {
+        cleanupRenderedMarker(existingMarker);
+        renderedMarker = undefined;
+      }
+
+      if (renderedMarker?.element && renderedMarker.popupRoot) {
+        updateMarkerElement(
+          renderedMarker.element,
+          presentation.className,
+          presentation.label,
+        );
+        renderedMarker.element.style.zIndex = presentation.zIndex;
+        renderedMarker.popupRoot.render(popupContent);
+        renderedMarker.popup?.setOffset(presentation.offset);
+        renderedMarker.marker.setLngLat([point.longitude, point.latitude]);
+      } else {
+        const { popup, root } = createRenderedPopup(popupContent, {
+          anchor: presentation.popupAnchor,
+          offset: presentation.offset,
+        });
+        const element = createMarkerElement(
+          presentation.className,
+          presentation.label,
+        );
+        const marker = new maplibregl.Marker({
+          anchor: presentation.anchor,
+          element,
+        })
+          .setLngLat([point.longitude, point.latitude])
+          .setPopup(popup)
+          .addTo(map);
+
+        renderedMarker = {
+          anchor: presentation.anchor,
+          element,
+          marker,
+          popup,
+          popupRoot: root,
+        };
+        parkingMarkerRefs.current.set(point.id, renderedMarker);
+      }
+
+      const markerElement = renderedMarker.element;
+
+      if (!markerElement) {
+        return;
+      }
+
+      markerElement.onclick = isDirectionsMode
+        ? null
+        : (event) => {
+            event.stopImmediatePropagation();
+            renderedMarker.popup
+              ?.setLngLat([point.longitude, point.latitude])
+              .addTo(map);
+            onSelectPoint(point.id);
+          };
+
+      if (isSelected) {
+        markerElement.style.zIndex = presentation.zIndex;
+
+        if (route) {
+          renderedMarker.popup?.remove();
+        }
+      } else {
+        renderedMarker.popup?.remove();
+      }
+    });
+
+    const currentSelectedPoint = selectedPoint;
+    const selectedEntry = currentSelectedPoint
+      ? parkingMarkerRefs.current.get(currentSelectedPoint.id)
+      : null;
+
+    if (currentSelectedPoint && selectedEntry?.popup && !route) {
+      const shouldCenterCollapsedPopup =
+        mobileSheetStateRef.current === 'collapsed';
+      selectedEntry.popup
+        .setLngLat([
+          currentSelectedPoint.longitude,
+          currentSelectedPoint.latitude,
+        ])
+        .addTo(map);
+
+      if (
+        shouldCenterCollapsedPopup &&
+        centeredCollapsedPopupPointRef.current !== currentSelectedPoint.id
+      ) {
+        centeredCollapsedPopupPointRef.current = currentSelectedPoint.id;
+        centerTimeoutId = window.setTimeout(
+          () =>
+            selectedEntry.popup &&
+            centerPopupInVisibleMapArea(map, selectedEntry.popup),
+          100,
+        );
+      }
+    }
+
+    return () => {
+      if (centerTimeoutId !== null) {
+        window.clearTimeout(centerTimeoutId);
+      }
+    };
+  }, [
+    canRequestDirections,
+    canShowStreetView,
+    copiedShareButton,
+    isDirectionsMode,
+    map,
+    onCopyParkingLink,
+    onOpenStreetView,
+    onRequestDirections,
+    onSelectPoint,
+    rankedPointRanks,
+    route,
+    selectedPoint,
+    visiblePoints,
+  ]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const handleMapClick = (event: maplibregl.MapMouseEvent) => {
+      if (!selectedPoint || route) {
+        return;
+      }
+
+      const clearSelectionWithoutRefocus = () => {
+        suppressNextSelectionClearFocusRef.current = true;
+        onClearSelection();
+      };
+      const target = event.originalEvent.target;
+
+      if (!(target instanceof Element)) {
+        clearSelectionWithoutRefocus();
+        return;
+      }
+
+      if (
+        target.closest('.parking-marker, .maplibregl-popup, .maplibregl-ctrl')
+      ) {
+        return;
+      }
+
+      clearSelectionWithoutRefocus();
+    };
+
+    map.on('click', handleMapClick);
+
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [map, onClearSelection, route, selectedPoint]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
     const previousMobileSheetState = previousMobileSheetStateRef.current;
     previousMobileSheetStateRef.current = mobileSheetState;
 
@@ -937,317 +1629,240 @@ export default function CycleParkingMap({
     }
 
     const timeoutId = window.setTimeout(() => {
-      const popup = markerRefs.current.get(selectedPoint.id)?.getPopup();
+      const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
 
       if (!popup?.isOpen()) {
         return;
       }
 
       if (mobileSheetState === 'collapsed') {
-        centerPopupInVisibleMapArea(popup);
+        centeredCollapsedPopupPointRef.current = selectedPoint.id;
+        centerPopupInVisibleMapArea(map, popup);
         return;
       }
 
-      const map = (popup as PopupWithMap)._map;
-
-      if (map) {
-        map.panTo(
-          getMapPointFocusCenter(
-            map,
-            [selectedPoint.latitude, selectedPoint.longitude],
-            map.getZoom(),
-            mobileSheetState,
-          ),
-          {
-            animate: true,
-            duration: 0.65,
-            easeLinearity: 0.25,
-          },
-        );
-      }
+      const zoom = map.getZoom();
+      map.panTo(
+        getMapPointFocusCenter(
+          map,
+          parkingPointToRoutePoint(selectedPoint),
+          zoom,
+          mobileSheetState,
+        ),
+        {
+          duration: 650,
+          easing: (progress) => progress * (2 - progress),
+        },
+      );
     }, 380);
 
     return () => window.clearTimeout(timeoutId);
-  }, [mobileSheetState, route, selectedPoint]);
+  }, [map, mobileSheetState, route, selectedPoint]);
 
   useEffect(() => {
-    const hadRoute = hadRouteRef.current;
-    hadRouteRef.current = route !== null;
-
-    if (route) {
-      markerRefs.current.forEach((marker) => marker.closePopup());
+    if (!map || !route || !selectedPoint) {
+      previousRouteSheetStateRef.current = mobileSheetState;
       return;
     }
 
-    if (!selectedPoint || hadRoute) {
+    const previousRouteSheetState = previousRouteSheetStateRef.current;
+    previousRouteSheetStateRef.current = mobileSheetState;
+
+    if (previousRouteSheetState === mobileSheetState) {
       return;
     }
 
-    let centerTimeoutId: number | null = null;
-    const openTimeoutId = window.setTimeout(() => {
-      const marker = markerRefs.current.get(selectedPoint.id);
-      const popup = marker?.getPopup();
-      const shouldCenterCollapsedPopup =
-        mobileSheetStateRef.current === 'collapsed';
+    const timeoutId = window.setTimeout(() => {
+      const bounds = createBounds([
+        userLocationToPoint(userLocation),
+        parkingPointToRoutePoint(selectedPoint),
+        ...route.points,
+      ]);
 
-      if (popup) {
-        popup.options.autoPan = !shouldCenterCollapsedPopup;
+      map.fitBounds(bounds, {
+        duration: 700,
+        maxZoom: 17,
+        padding: getFocusPadding(map),
+      });
+    }, 380);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [map, mobileSheetState, route, selectedPoint, userLocation]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const hadRoute = previousFocusRouteRef.current !== null;
+    previousFocusRouteRef.current = route;
+
+    map.stop();
+
+    if (
+      !route &&
+      !selectedPoint &&
+      suppressNextSelectionClearFocusRef.current
+    ) {
+      suppressNextSelectionClearFocusRef.current = false;
+      return;
+    }
+
+    if (!route && hadRoute) {
+      return;
+    }
+
+    if (route && selectedPoint) {
+      const bounds = createBounds([
+        userLocationToPoint(userLocation),
+        parkingPointToRoutePoint(selectedPoint),
+        ...route.points,
+      ]);
+
+      map.fitBounds(bounds, {
+        duration: 700,
+        maxZoom: 17,
+        padding: getFocusPadding(map),
+      });
+      return;
+    }
+
+    const focusPoints =
+      highlightedPoints.length > 0
+        ? highlightedPoints
+        : nearestPoint
+          ? [nearestPoint]
+          : [];
+
+    if (selectedPoint) {
+      if (mobileSheetState === 'collapsed') {
+        return;
       }
 
-      marker?.openPopup();
+      if (
+        selectedPoint.id === nearestPoint?.id &&
+        mobileSheetState === 'expanded'
+      ) {
+        const bounds = createBounds([
+          userLocationToPoint(userLocation),
+          ...focusPoints.map(parkingPointToRoutePoint),
+        ]);
 
-      if (popup) {
-        popup.options.autoPan = false;
-
-        if (shouldCenterCollapsedPopup) {
-          centerTimeoutId = window.setTimeout(
-            () => centerPopupInVisibleMapArea(popup),
-            100,
-          );
-        }
+        map.fitBounds(bounds, {
+          duration: 700,
+          maxZoom: 17,
+          padding: getFocusPadding(map),
+        });
+        return;
       }
-    }, 250);
 
-    return () => {
-      window.clearTimeout(openTimeoutId);
+      const zoom = Math.max(map.getZoom(), 16);
+      map.flyTo({
+        center: getMapPointFocusCenter(
+          map,
+          parkingPointToRoutePoint(selectedPoint),
+          zoom,
+          mobileSheetState,
+        ),
+        duration: 700,
+        zoom,
+      });
+      return;
+    }
 
-      if (centerTimeoutId !== null) {
-        window.clearTimeout(centerTimeoutId);
-      }
-    };
-  }, [route, selectedPoint]);
+    if (focusPoints.length > 0) {
+      const bounds = createBounds([
+        userLocationToPoint(userLocation),
+        ...focusPoints.map(parkingPointToRoutePoint),
+      ]);
 
-  return (
-    <MapContainer
-      center={defaultCenter}
-      zoom={13}
-      scrollWheelZoom
-      className={`bike-map bike-map-${theme}`}
-    >
-      <AttributionPrefix />
-      <MapThemeClass theme={theme} />
-      <MapViewportTracker
-        mobileSheetState={mobileSheetState}
-        onViewportChange={handleViewportChange}
-      />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <MapFocus
-        currentLocationFocusRequestId={currentLocationFocusRequestId}
-        highlightedPoints={highlightedPoints}
-        mobileSheetState={mobileSheetState}
-        nearestPoint={nearestPoint}
-        route={route}
-        selectedPoint={selectedPoint}
-        userLocation={userLocation}
-      />
-      <LiveRouteFollower
-        marker={liveRouteMarker}
-        mobileSheetState={mobileSheetState}
-        shouldFollow={shouldFollowLiveRoute}
-      />
-      <RouteInstructionFocus
-        focusRequest={routeInstructionFocusRequest}
-        mobileSheetState={mobileSheetState}
-        route={route}
-      />
-      {route ? (
-        <Polyline
-          pathOptions={
-            route.source === 'local'
-              ? {
-                  color: '#f97316',
-                  dashArray: '6 8',
-                  lineCap: 'round',
-                  opacity: 0.9,
-                  weight: 4,
-                }
-              : {
-                  color: '#2563eb',
-                  opacity: 0.82,
-                  weight: 6,
-                }
-          }
-          positions={route.points}
-        />
-      ) : null}
-      {initialApproachPositions ? (
-        <Polyline
-          pathOptions={{
-            color: '#f97316',
-            dashArray: '6 8',
-            lineCap: 'round',
-            opacity: 0.9,
-            weight: 4,
-          }}
-          positions={initialApproachPositions}
-        />
-      ) : null}
-      {finalApproachPositions ? (
-        <Polyline
-          pathOptions={{
-            color: '#f97316',
-            dashArray: '6 8',
-            lineCap: 'round',
-            opacity: 0.9,
-            weight: 4,
-          }}
-          positions={finalApproachPositions}
-        />
-      ) : null}
-      <Marker
-        position={[userLocation.latitude, userLocation.longitude]}
-        icon={startIcon}
-      >
-        <Popup keepInView={false}>
-          <div className="parking-popup">
-            <strong>Start position</strong>
-            <span>Current location</span>
-          </div>
-        </Popup>
-      </Marker>
-      {liveRouteMarker ? (
-        <Marker
-          position={liveRouteMarker.position}
-          icon={liveRouteIcon}
-          zIndexOffset={1250}
-        />
-      ) : null}
-      {selectedInstruction && selectedInstructionIcon ? (
-        <Marker
-          position={selectedInstruction.anchor}
-          icon={selectedInstructionIcon}
-          zIndexOffset={900}
-        />
-      ) : null}
-      {visiblePoints.map((point) => {
-        const rank = rankedPointRanks.get(point.id);
-        const popupDetails = getParkingPopupDetails(point);
-        const isSelected = point.id === selectedPoint?.id;
-        const icon = isSelected
-          ? isDirectionsMode
-            ? destinationIcon
-            : rank !== undefined
-              ? (selectedRankedIcons.get(rank) ?? icons.selected)
-              : icons.selected
-          : rank !== undefined
-            ? (rankedIcons.get(rank) ?? icons.default)
-            : icons.default;
+      map.fitBounds(bounds, {
+        duration: 700,
+        maxZoom: 17,
+        padding: getFocusPadding(map),
+      });
+      return;
+    }
 
-        return (
-          <Marker
-            key={point.id}
-            ref={(marker) => {
-              if (marker) {
-                markerRefs.current.set(point.id, marker);
-              } else {
-                markerRefs.current.delete(point.id);
-              }
-            }}
-            position={[point.latitude, point.longitude]}
-            icon={icon}
-            zIndexOffset={isSelected ? 1000 : 0}
-            eventHandlers={
-              isDirectionsMode
-                ? undefined
-                : {
-                    click: () => onSelectPoint(point.id),
-                  }
-            }
-          >
-            <Popup keepInView={false}>
-              <div className="parking-popup">
-                <div className="parking-popup-title-row">
-                  <strong>{point.name}</strong>
-                  {popupDetails.metrics.map((metric) => (
-                    <span
-                      className="parking-popup-distance"
-                      key={metric.label}
-                      title={metric.label}
-                    >
-                      {metric.value}
-                    </span>
-                  ))}
-                </div>
-                <div
-                  className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}
-                  aria-label="Parking details"
-                >
-                  {popupDetails.details.map((detail) => (
-                    <div
-                      aria-label={`${detail.label}: ${detail.value}`}
-                      className={`parking-popup-detail parking-popup-tone-${detail.tone}`}
-                      key={detail.label}
-                    >
-                      <span className="parking-popup-detail-icon">
-                        {detail.emphasis ?? (
-                          <ParkingPopupIcon icon={detail.icon} />
-                        )}
-                      </span>
-                      <span className="parking-popup-detail-value">
-                        {detail.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                {isDirectionsMode ? null : (
-                  <div className="parking-popup-actions">
-                    <button
-                      className="parking-popup-directions-button"
-                      disabled={!canRequestDirections}
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onRequestDirections(point);
-                      }}
-                    >
-                      <Navigation size={15} aria-hidden="true" />
-                      Directions
-                    </button>
-                    {canShowStreetView ? (
-                      <button
-                        aria-label={`Open Street View for ${point.name}`}
-                        className="parking-popup-street-view-button"
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onOpenStreetView(point);
-                        }}
-                      >
-                        <ScanSearch size={15} aria-hidden="true" />
-                        Street
-                      </button>
-                    ) : null}
-                    <button
-                      aria-label={`Copy link to ${point.name}`}
-                      className="parking-popup-share-button"
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onCopyParkingLink(point);
-                      }}
-                    >
-                      <Share2 size={15} aria-hidden="true" />
-                      Share
-                      {copiedShareButton?.source === 'popup' &&
-                      copiedShareButton.parkingId === point.id ? (
-                        <span
-                          className="parking-popup-share-feedback"
-                          role="status"
-                        >
-                          Copied
-                        </span>
-                      ) : null}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </MapContainer>
-  );
+    map.jumpTo({
+      center: [userLocation.longitude, userLocation.latitude],
+      zoom: 16,
+    });
+  }, [
+    currentLocationFocusRequestId,
+    highlightedPoints,
+    map,
+    mobileSheetState,
+    nearestPoint,
+    route,
+    selectedPoint,
+    userLocation,
+  ]);
+
+  useEffect(() => {
+    if (!map || !liveRouteMarker || !shouldFollowLiveRoute) {
+      return;
+    }
+
+    if (isPointInVisibleMapArea(map, liveRouteMarker.position)) {
+      return;
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    map.panTo(
+      getMapPointFocusCenter(
+        map,
+        liveRouteMarker.position,
+        map.getZoom(),
+        mobileSheetState,
+      ),
+      {
+        duration: prefersReducedMotion ? 0 : 450,
+        easing: (progress) => progress * (2 - progress),
+      },
+    );
+  }, [
+    liveRouteMarker,
+    liveRouteMarker?.updatedAt,
+    map,
+    mobileSheetState,
+    shouldFollowLiveRoute,
+  ]);
+
+  useEffect(() => {
+    if (!map || !routeInstructionFocusRequest || !route) {
+      return;
+    }
+
+    const instruction = route.instructions.find(
+      (candidate) => candidate.id === routeInstructionFocusRequest.id,
+    );
+
+    if (!instruction) {
+      return;
+    }
+
+    const zoom = Math.max(map.getZoom(), 16);
+    map.flyTo({
+      center: getMapPointFocusCenter(
+        map,
+        instruction.anchor,
+        zoom,
+        mobileSheetState,
+      ),
+      duration: 650,
+      zoom,
+    });
+  }, [
+    map,
+    mobileSheetState,
+    route,
+    routeInstructionFocusRequest,
+    routeInstructionFocusRequest?.requestId,
+  ]);
+
+  return <div className={`bike-map bike-map-${theme}`} ref={mapContainerRef} />;
 }

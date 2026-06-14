@@ -116,6 +116,7 @@ test('tracks a mocked live route through arrival', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Start route' }).click();
 
+  await expect(page.getByTestId('live-route-marker')).toBeVisible();
   await expect(page.getByText('Arrived at bike parking.')).toBeVisible({
     timeout: 5_000,
   });

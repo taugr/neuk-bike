@@ -95,6 +95,7 @@ import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
 import { buildGoogleStreetViewEmbedUrl } from '@/lib/street-view';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { captureAnalyticsEvent } from '@/lib/analytics';
+import { copyTextToClipboard } from '@/lib/clipboard';
 
 const CycleParkingMap = dynamic(
   () => import('@/components/cycle-parking-map'),
@@ -300,15 +301,6 @@ function resolveTheme(mode: ThemeMode, prefersDark: boolean): ResolvedTheme {
   }
 
   return mode;
-}
-
-async function copyTextToClipboard(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 export default function CycleParkingFinder() {
@@ -1133,6 +1125,10 @@ export default function CycleParkingFinder() {
     clearDirections();
   }
 
+  function clearSelectedParkingPoint() {
+    setSelectedId(null);
+  }
+
   async function requestDirectionsToPoint(point: ParkingPoint) {
     if (!isClientReady) {
       return;
@@ -1386,7 +1382,7 @@ export default function CycleParkingFinder() {
                   </a>
                   <span>
                     Map interface by{' '}
-                    <a href="https://leafletjs.com/">Leaflet</a>.
+                    <a href="https://maplibre.org/">MapLibre GL JS</a>.
                   </span>
                   {hasUsedPlaceSearch ? (
                     <span>
@@ -1451,6 +1447,7 @@ export default function CycleParkingFinder() {
             theme={resolvedTheme}
             canRequestDirections={isClientReady}
             canShowStreetView={googleStreetViewApiKey.length > 0}
+            onClearSelection={clearSelectedParkingPoint}
             onSelectPoint={selectParkingPoint}
             onRequestDirections={(point) => {
               void requestDirectionsToPoint(point);
