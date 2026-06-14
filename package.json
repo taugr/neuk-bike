@@ -38,23 +38,23 @@
     "prepare": "node scripts/prepare.mjs"
   },
   "dependencies": {
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^1.18.0",
     "maplibre-gl": "^5.24.0",
     "motion": "^12.40.0",
-    "next": "^16.2.7",
-    "posthog-js": "^1.379.1",
+    "next": "^16.2.9",
+    "posthog-js": "^1.386.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.1",
-    "@types/react": "^19.2.16",
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
-    "oxfmt": "^0.53.0",
-    "oxlint": "^1.68.0",
+    "oxfmt": "^0.54.0",
+    "oxlint": "^1.69.0",
     "oxlint-tsgolint": "^0.23.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
