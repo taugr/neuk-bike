@@ -1932,13 +1932,9 @@ a {
     right: 0.65rem;
     height: calc(
       var(--mobile-sheet-collapsed-height) +
-        (
-          (
-              var(--mobile-sheet-expanded-height) -
-                var(--mobile-sheet-collapsed-height)
-            ) *
-            var(--mobile-sheet-drag-progress, 1)
-        )
+        ((var(--mobile-sheet-expanded-height) -
+            var(--mobile-sheet-collapsed-height)) *
+          var(--mobile-sheet-drag-progress, 1))
     );
     max-height: 54dvh;
     transition:
