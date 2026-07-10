@@ -5,10 +5,14 @@ import {
   AnimatePresence,
   LayoutGroup,
   MotionConfig,
+  animate,
   motion,
+  type MotionStyle,
   type TargetAndTransition,
   type Transition,
+  useMotionValue,
   useReducedMotion,
+  useTransform,
 } from 'motion/react';
 import {
   ArrowUp,
@@ -44,7 +48,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type FormEvent,
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
@@ -84,6 +87,7 @@ import {
   sortByDistance,
 } from '@/lib/geo';
 import { getParkingPopupDetails, type ParkingPopupIcon } from '@/lib/parking';
+import { getParkingDisplayName } from '@/lib/parking-names';
 import {
   getBearingDegrees,
   getLiveRouteProgress,
@@ -105,14 +109,21 @@ const CycleParkingMap = dynamic(
   },
 );
 
-const parkingPoints = cycleParkingDataset.points as ParkingPoint[];
+const parkingPoints = (cycleParkingDataset.points as ParkingPoint[]).map(
+  (point) => ({
+    ...point,
+    name: getParkingDisplayName(point),
+  }),
+);
 const maxPlaceSearchCacheEntries = 12;
 const closestParkingResultCount = 8;
 const copiedMessageDurationMs = 1_800;
 const defaultLocale = 'en-GB';
 const themeStorageKey = 'cycle-parking-theme';
-const mobileSheetDragThresholdPx = 48;
-const mobileSheetDragRangePx = 320;
+const mobileSheetCollapsedHeightRem = 5.4;
+const mobileSheetDragIntentThresholdPx = 6;
+const mobileSheetExpandedViewportRatio = 0.52;
+const mobileSheetFlickVelocityPxPerMs = 0.45;
 const googleStreetViewApiKey =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY?.trim() ?? '';
 type PresenceMotion = {
@@ -349,8 +360,24 @@ export default function CycleParkingFinder() {
   const [isClientReady, setIsClientReady] = useState(false);
   const [mobileSheetState, setMobileSheetState] =
     useState<MobileSheetState>('expanded');
-  const [mobileSheetDragProgress, setMobileSheetDragProgress] = useState(0);
   const [isMobileSheetDragging, setIsMobileSheetDragging] = useState(false);
+  const mobileSheetProgressValue = useMotionValue(1);
+  const mobileSheetBodyOffset = useTransform(
+    mobileSheetProgressValue,
+    (progress) => `${((1 - progress) * 10).toFixed(2)}px`,
+  );
+  const mobileSheetBodyOpacity = useTransform(
+    mobileSheetProgressValue,
+    (progress) => Math.max(0, Math.min(1, (progress - 0.15) / 0.7)),
+  );
+  const mobileSheetSummaryOffset = useTransform(
+    mobileSheetProgressValue,
+    (progress) => `${(progress * -6).toFixed(2)}px`,
+  );
+  const mobileSheetSummaryOpacity = useTransform(
+    mobileSheetProgressValue,
+    (progress) => Math.max(0, Math.min(1, (0.4 - progress) / 0.4)),
+  );
   const { canInstall, installApp } = usePwaInstallPrompt();
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
   const directionsCache = useRef(new Map<string, CycleRoute>());
@@ -362,11 +389,15 @@ export default function CycleParkingFinder() {
   const attributionDialog = useRef<HTMLDialogElement>(null);
   const streetViewDialog = useRef<HTMLDialogElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
-  const settingsMenu = useRef<HTMLDivElement>(null);
   const mobileSheetDrag = useRef<{
     currentY: number;
+    lastTimestamp: number;
+    lastY: number;
     pointerId: number;
+    rangePx: number;
+    startProgress: number;
     startY: number;
+    velocityY: number;
   } | null>(null);
   const ignoreNextSheetGripClick = useRef(false);
   const subtleTap = shouldReduceMotion ? undefined : buttonTap;
@@ -531,7 +562,9 @@ export default function CycleParkingFinder() {
     }
 
     function handlePointerDown(event: PointerEvent) {
-      if (!settingsMenu.current?.contains(event.target as Node)) {
+      const target = event.target;
+
+      if (!(target instanceof Element) || !target.closest('.settings-menu')) {
         setIsSettingsMenuOpen(false);
       }
     }
@@ -573,10 +606,12 @@ export default function CycleParkingFinder() {
     }
   }, [streetViewPoint]);
 
-  function closeAttributionDialogAfterExit() {
+  function closeAttributionDialog() {
     const dialog = attributionDialog.current;
 
-    if (!isAttributionModalOpen && dialog?.open) {
+    setIsAttributionModalOpen(false);
+
+    if (dialog?.open) {
       dialog.close();
     }
   }
@@ -664,6 +699,7 @@ export default function CycleParkingFinder() {
   useEffect(() => {
     if (isDirectionsMode) {
       setMobileSheetState('expanded');
+      animateMobileSheetTo('expanded');
     }
   }, [isDirectionsMode]);
 
@@ -705,34 +741,88 @@ export default function CycleParkingFinder() {
   }, [liveRouteProgress?.activeInstructionId]);
 
   function toggleMobileSheet() {
-    setMobileSheetState((current) =>
-      current === 'expanded' ? 'collapsed' : 'expanded',
-    );
+    const nextState =
+      mobileSheetState === 'expanded' ? 'collapsed' : 'expanded';
+    setMobileSheetState(nextState);
+    animateMobileSheetTo(nextState);
   }
 
-  function snapMobileSheetFromDrag(deltaY: number) {
-    if (Math.abs(deltaY) < mobileSheetDragThresholdPx) {
-      setIsMobileSheetDragging(false);
-      setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
+  function animateMobileSheetTo(nextState: MobileSheetState) {
+    const targetProgress = nextState === 'expanded' ? 1 : 0;
+
+    mobileSheetProgressValue.stop();
+    if (shouldReduceMotion) {
+      mobileSheetProgressValue.set(targetProgress);
       return;
     }
 
+    animate(mobileSheetProgressValue, targetProgress, {
+      duration: 0.26,
+      ease: [0.22, 1, 0.36, 1],
+    });
+  }
+
+  function snapMobileSheetFromDrag(
+    drag: NonNullable<typeof mobileSheetDrag.current>,
+    releaseTimestamp: number,
+  ) {
+    const deltaY = drag.currentY - drag.startY;
+    if (Math.abs(deltaY) < mobileSheetDragIntentThresholdPx) {
+      setIsMobileSheetDragging(false);
+      animateMobileSheetTo(drag.startProgress === 1 ? 'expanded' : 'collapsed');
+      return;
+    }
+
+    const finalProgress = Math.max(
+      0,
+      Math.min(1, drag.startProgress - deltaY / drag.rangePx),
+    );
+    const releaseVelocityY =
+      releaseTimestamp - drag.lastTimestamp <= 80 ? drag.velocityY : 0;
+    const nextState =
+      Math.abs(releaseVelocityY) >= mobileSheetFlickVelocityPxPerMs
+        ? releaseVelocityY < 0
+          ? 'expanded'
+          : 'collapsed'
+        : finalProgress >= 0.5
+          ? 'expanded'
+          : 'collapsed';
+
     ignoreNextSheetGripClick.current = true;
-    setMobileSheetState(deltaY > 0 ? 'collapsed' : 'expanded');
+    setMobileSheetState(nextState);
     setIsMobileSheetDragging(false);
-    setMobileSheetDragProgress(deltaY > 0 ? 0 : 1);
+    animateMobileSheetTo(nextState);
   }
 
   function handleSheetGripPointerDown(
     event: ReactPointerEvent<HTMLButtonElement>,
   ) {
+    const rootFontSize = Number.parseFloat(
+      window.getComputedStyle(document.documentElement).fontSize,
+    );
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const collapsedHeight =
+      (Number.isFinite(rootFontSize) ? rootFontSize : 16) *
+      mobileSheetCollapsedHeightRem;
+    const rangePx = Math.max(
+      viewportHeight * mobileSheetExpandedViewportRatio - collapsedHeight,
+      1,
+    );
+    const startProgress = mobileSheetState === 'expanded' ? 1 : 0;
+
     mobileSheetDrag.current = {
       currentY: event.clientY,
+      lastTimestamp: event.timeStamp,
+      lastY: event.clientY,
       pointerId: event.pointerId,
+      rangePx,
+      startProgress,
       startY: event.clientY,
+      velocityY: 0,
     };
-    setIsMobileSheetDragging(false);
-    setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
+    mobileSheetProgressValue.stop();
+    mobileSheetProgressValue.set(startProgress);
+    setIsMobileSheetDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
@@ -745,17 +835,21 @@ export default function CycleParkingFinder() {
     }
 
     drag.currentY = event.clientY;
-    const rawDeltaY = event.clientY - drag.startY;
-    const dragDistance =
-      mobileSheetState === 'expanded'
-        ? Math.max(0, rawDeltaY)
-        : Math.max(0, -rawDeltaY);
-    const dragProgress =
-      mobileSheetState === 'expanded'
-        ? 1 - Math.min(dragDistance / mobileSheetDragRangePx, 1)
-        : Math.min(dragDistance / mobileSheetDragRangePx, 1);
-    setIsMobileSheetDragging(dragDistance > 0);
-    setMobileSheetDragProgress(dragProgress);
+    const elapsedMs = event.timeStamp - drag.lastTimestamp;
+    if (elapsedMs > 0) {
+      drag.velocityY = (event.clientY - drag.lastY) / elapsedMs;
+    }
+    drag.lastTimestamp = event.timeStamp;
+    drag.lastY = event.clientY;
+
+    const dragProgress = Math.max(
+      0,
+      Math.min(
+        1,
+        drag.startProgress - (event.clientY - drag.startY) / drag.rangePx,
+      ),
+    );
+    mobileSheetProgressValue.set(dragProgress);
   }
 
   function handleSheetGripPointerEnd(
@@ -772,7 +866,7 @@ export default function CycleParkingFinder() {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
-    snapMobileSheetFromDrag(drag.currentY - drag.startY);
+    snapMobileSheetFromDrag(drag, event.timeStamp);
   }
 
   function handleSheetGripClick() {
@@ -793,20 +887,16 @@ export default function CycleParkingFinder() {
 
     mobileSheetDrag.current = null;
     setIsMobileSheetDragging(false);
-    setMobileSheetDragProgress(mobileSheetState === 'expanded' ? 1 : 0);
+    animateMobileSheetTo(mobileSheetState);
   }
 
-  const mobileSheetProgress =
-    mobileSheetDrag.current !== null
-      ? mobileSheetDragProgress
-      : mobileSheetState === 'expanded'
-        ? 1
-        : 0;
   const controlPaneStyle = {
-    '--mobile-sheet-drag-progress': isMobileSheetDragging
-      ? mobileSheetProgress
-      : undefined,
-  } as CSSProperties;
+    '--mobile-sheet-body-offset': mobileSheetBodyOffset,
+    '--mobile-sheet-body-opacity': mobileSheetBodyOpacity,
+    '--mobile-sheet-drag-progress': mobileSheetProgressValue,
+    '--mobile-sheet-summary-offset': mobileSheetSummaryOffset,
+    '--mobile-sheet-summary-opacity': mobileSheetSummaryOpacity,
+  } as MotionStyle;
 
   function clearLiveRouteWatch() {
     if (liveRouteWatchId.current === null) {
@@ -1280,18 +1370,37 @@ export default function CycleParkingFinder() {
     void installApp();
   }
 
-  function renderThemeSettings() {
+  function openAttributionsFromSettings() {
+    setIsSettingsMenuOpen(false);
+    setIsAttributionModalOpen(true);
+  }
+
+  function renderThemeSettings(
+    className = '',
+    triggerVariant: 'brand' | 'settings' = 'settings',
+  ) {
+    const isBrandTrigger = triggerVariant === 'brand';
+
     return (
-      <div className="settings-menu" ref={settingsMenu}>
+      <div className={['settings-menu', className].filter(Boolean).join(' ')}>
         <motion.button
           aria-expanded={isSettingsMenuOpen}
-          aria-label="Theme settings"
-          className="settings-trigger"
+          aria-label={isBrandTrigger ? 'Bike Neuks menu' : 'Theme settings'}
+          className={[
+            'settings-trigger',
+            isBrandTrigger ? 'settings-trigger--brand' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
           type="button"
           whileTap={subtleTap}
           onClick={() => setIsSettingsMenuOpen((isOpen) => !isOpen)}
         >
-          <Settings size={18} aria-hidden="true" />
+          {isBrandTrigger ? (
+            <img src="favicon.svg" alt="" aria-hidden="true" />
+          ) : (
+            <Settings size={18} aria-hidden="true" />
+          )}
         </motion.button>
         <AnimatePresence initial={false}>
           {isSettingsMenuOpen ? (
@@ -1299,7 +1408,7 @@ export default function CycleParkingFinder() {
               {...popoverPresence}
               className="settings-popover"
               role="menu"
-              aria-label="Settings"
+              aria-label={isBrandTrigger ? 'Bike Neuks menu' : 'Settings'}
             >
               <span className="settings-label">Theme</span>
               <div className="theme-options" role="group" aria-label="Theme">
@@ -1331,10 +1440,141 @@ export default function CycleParkingFinder() {
                   </motion.button>
                 </Fragment>
               ) : null}
+              <span className="settings-label">About</span>
+              <motion.button
+                className="settings-action-button"
+                type="button"
+                whileTap={subtleTap}
+                onClick={openAttributionsFromSettings}
+              >
+                <CircleHelp size={15} aria-hidden="true" />
+                Attributions
+              </motion.button>
             </motion.div>
           ) : null}
         </AnimatePresence>
       </div>
+    );
+  }
+
+  function renderPlaceSearchPanel(surface: 'desktop' | 'mobile') {
+    return (
+      <section
+        className={`reference-panel reference-panel--${surface}`}
+        aria-label="Search from"
+      >
+        <form
+          className="place-search-form"
+          onSubmit={(event) => {
+            void searchForPlace(event);
+          }}
+        >
+          <label className="search-box">
+            <Search size={17} aria-hidden="true" />
+            <span className="sr-only">Search from a place</span>
+            <input
+              id={`place-search-${surface}`}
+              name="place-search"
+              type="search"
+              value={placeQuery}
+              placeholder="Place or postcode"
+              onChange={(event) => setPlaceQuery(event.target.value)}
+            />
+          </label>
+          <motion.button
+            aria-label={
+              locationState.status === 'locating'
+                ? 'Locating'
+                : 'Use current location'
+            }
+            className="secondary-location-button"
+            title={
+              locationState.status === 'locating'
+                ? 'Locating'
+                : 'Use current location'
+            }
+            type="button"
+            onClick={() => {
+              captureAnalyticsEvent('location_requested');
+              requestLocation();
+            }}
+            disabled={locationState.status === 'locating'}
+            whileTap={
+              locationState.status === 'locating' ? undefined : subtleTap
+            }
+          >
+            {locationState.status === 'locating' ? (
+              <Crosshair size={18} aria-hidden="true" />
+            ) : (
+              <LocateFixed size={18} aria-hidden="true" />
+            )}
+            <span className="sr-only">
+              {locationState.status === 'locating' ? 'Locating' : 'Near me'}
+            </span>
+          </motion.button>
+          <motion.button
+            className={[
+              'place-search-button',
+              surface === 'mobile' ? 'place-search-button--mobile' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            type="submit"
+            disabled={isPlaceSearching || placeQuery.trim().length === 0}
+            whileTap={
+              isPlaceSearching || placeQuery.trim().length === 0
+                ? undefined
+                : subtleTap
+            }
+          >
+            <Search size={18} aria-hidden="true" />
+            <span className="mobile-action-label">
+              {isPlaceSearching ? 'Searching' : 'Search'}
+            </span>
+          </motion.button>
+        </form>
+
+        <AnimatePresence initial={false}>
+          {placeResults.length > 0 ? (
+            <motion.ol
+              {...risePresence}
+              layout
+              className="place-results"
+              aria-label="Place search results"
+            >
+              {placeResults.map((result) => (
+                <motion.li
+                  layout
+                  key={result.id}
+                  transition={rowLayoutTransition}
+                >
+                  <motion.button
+                    type="button"
+                    whileTap={subtleTap}
+                    onClick={() => selectPlace(result)}
+                  >
+                    <MapPin size={16} aria-hidden="true" />
+                    <span>{result.name}</span>
+                  </motion.button>
+                </motion.li>
+              ))}
+            </motion.ol>
+          ) : null}
+        </AnimatePresence>
+
+        <AnimatePresence initial={false}>
+          {placeSearchMessage ? (
+            <motion.div
+              {...risePresence}
+              key={placeSearchMessage}
+              className="place-search-message"
+              role="status"
+            >
+              {placeSearchMessage}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </section>
     );
   }
 
@@ -1357,15 +1597,12 @@ export default function CycleParkingFinder() {
           aria-labelledby="attribution-modal-title"
           onClick={(event) => {
             if (event.target === event.currentTarget) {
-              setIsAttributionModalOpen(false);
+              closeAttributionDialog();
             }
           }}
           onClose={() => setIsAttributionModalOpen(false)}
         >
-          <AnimatePresence
-            initial={false}
-            onExitComplete={closeAttributionDialogAfterExit}
-          >
+          <AnimatePresence initial={false}>
             {isAttributionModalOpen ? (
               <motion.div
                 {...popoverPresence}
@@ -1404,7 +1641,7 @@ export default function CycleParkingFinder() {
                     className="attribution-modal-close"
                     type="button"
                     whileTap={subtleTap}
-                    onClick={() => setIsAttributionModalOpen(false)}
+                    onClick={closeAttributionDialog}
                   >
                     Close
                   </motion.button>
@@ -1464,6 +1701,19 @@ export default function CycleParkingFinder() {
             }}
           />
         </section>
+
+        {!isDirectionsMode ? (
+          <section
+            className="mobile-map-toolbar"
+            aria-label="Find nearby cycle parking"
+          >
+            <header className="app-header app-header--mobile">
+              {renderThemeSettings('settings-menu--mobile', 'brand')}
+              <h1 className="sr-only">Bike Neuks</h1>
+              {renderPlaceSearchPanel('mobile')}
+            </header>
+          </section>
+        ) : null}
 
         <motion.aside
           className="control-pane"
@@ -1828,7 +2078,10 @@ export default function CycleParkingFinder() {
                   transition={panelSlideTransition}
                   variants={panelSlideVariants}
                 >
-                  <header className="app-header" key="finder-header">
+                  <header
+                    className="app-header app-header--desktop"
+                    key="finder-header"
+                  >
                     <div className="brand-mark" aria-hidden="true">
                       <img src="favicon.svg" alt="" />
                     </div>
@@ -1839,133 +2092,25 @@ export default function CycleParkingFinder() {
                         Edinburgh
                       </p>
                     </div>
-                    {renderThemeSettings()}
+                    {renderThemeSettings('settings-menu--desktop')}
                   </header>
 
+                  <div className="mobile-sheet-summary" aria-hidden="true">
+                    <span>
+                      <strong>Nearby bike neuks</strong>
+                      <small>{closestPoints.length} closest</small>
+                    </span>
+                    <span className="mobile-sheet-summary-location">
+                      {nearestPoint?.name}
+                    </span>
+                  </div>
+
                   <div className="mobile-sheet-body">
-                    <section
-                      className="reference-panel"
-                      aria-label="Search from"
-                    >
-                      <form
-                        className="place-search-form"
-                        onSubmit={(event) => {
-                          void searchForPlace(event);
-                        }}
-                      >
-                        <label className="search-box">
-                          <Search size={17} aria-hidden="true" />
-                          <span className="sr-only">Search from a place</span>
-                          <input
-                            id="place-search"
-                            name="place-search"
-                            type="search"
-                            value={placeQuery}
-                            placeholder="Place or postcode"
-                            onChange={(event) =>
-                              setPlaceQuery(event.target.value)
-                            }
-                          />
-                        </label>
-                        <motion.button
-                          aria-label={
-                            locationState.status === 'locating'
-                              ? 'Locating'
-                              : 'Use current location'
-                          }
-                          className="secondary-location-button"
-                          title={
-                            locationState.status === 'locating'
-                              ? 'Locating'
-                              : 'Use current location'
-                          }
-                          type="button"
-                          onClick={() => {
-                            captureAnalyticsEvent('location_requested');
-                            requestLocation();
-                          }}
-                          disabled={locationState.status === 'locating'}
-                          whileTap={
-                            locationState.status === 'locating'
-                              ? undefined
-                              : subtleTap
-                          }
-                        >
-                          {locationState.status === 'locating' ? (
-                            <Crosshair size={18} aria-hidden="true" />
-                          ) : (
-                            <LocateFixed size={18} aria-hidden="true" />
-                          )}
-                          <span className="sr-only">
-                            {locationState.status === 'locating'
-                              ? 'Locating'
-                              : 'Near me'}
-                          </span>
-                        </motion.button>
-                        <motion.button
-                          className="place-search-button"
-                          type="submit"
-                          disabled={
-                            isPlaceSearching || placeQuery.trim().length === 0
-                          }
-                          whileTap={
-                            isPlaceSearching || placeQuery.trim().length === 0
-                              ? undefined
-                              : subtleTap
-                          }
-                        >
-                          <Search size={18} aria-hidden="true" />
-                          <span className="mobile-action-label">
-                            {isPlaceSearching ? 'Searching' : 'Search'}
-                          </span>
-                        </motion.button>
-                      </form>
-
-                      <AnimatePresence initial={false}>
-                        {placeResults.length > 0 ? (
-                          <motion.ol
-                            {...risePresence}
-                            layout
-                            className="place-results"
-                            aria-label="Place search results"
-                          >
-                            {placeResults.map((result) => (
-                              <motion.li
-                                layout
-                                key={result.id}
-                                transition={rowLayoutTransition}
-                              >
-                                <motion.button
-                                  type="button"
-                                  whileTap={subtleTap}
-                                  onClick={() => selectPlace(result)}
-                                >
-                                  <MapPin size={16} aria-hidden="true" />
-                                  <span>{result.name}</span>
-                                </motion.button>
-                              </motion.li>
-                            ))}
-                          </motion.ol>
-                        ) : null}
-                      </AnimatePresence>
-
-                      <AnimatePresence initial={false}>
-                        {placeSearchMessage ? (
-                          <motion.div
-                            {...risePresence}
-                            key={placeSearchMessage}
-                            className="place-search-message"
-                            role="status"
-                          >
-                            {placeSearchMessage}
-                          </motion.div>
-                        ) : null}
-                      </AnimatePresence>
-                    </section>
+                    {renderPlaceSearchPanel('desktop')}
 
                     <div className="list-heading">
                       <h2>
-                        Nearby cycle parking{' '}
+                        Nearby bike neuks{' '}
                         <span>· {closestPoints.length} closest</span>
                       </h2>
                     </div>
@@ -2002,7 +2147,7 @@ export default function CycleParkingFinder() {
                         layout="position"
                         className="parking-list"
                         data-testid="parking-list"
-                        aria-label="Nearby cycle parking locations"
+                        aria-label="Nearby bike neuks"
                       >
                         {closestPoints.map((point, index) => {
                           return (
@@ -2025,7 +2170,9 @@ export default function CycleParkingFinder() {
                               <motion.button
                                 className={[
                                   'parking-row',
-                                  index === 0 ? 'closest' : null,
+                                  index === 0 && !explicitSelectedPoint
+                                    ? 'closest'
+                                    : null,
                                   point.id === explicitSelectedPoint?.id
                                     ? 'selected'
                                     : null,
@@ -2060,6 +2207,9 @@ export default function CycleParkingFinder() {
                                 }}
                               >
                                 <Navigation size={17} aria-hidden="true" />
+                                <span className="parking-action-label">
+                                  Directions
+                                </span>
                               </motion.button>
                               <motion.button
                                 aria-label={`Copy link to ${point.name}`}

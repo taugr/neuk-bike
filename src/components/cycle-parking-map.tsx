@@ -321,6 +321,31 @@ function getVisibleMapArea(map: MapLibreMap): VisibleMapArea {
     );
   }
 
+  const mobileToolbar = document.querySelector<HTMLElement>(
+    '.mobile-map-toolbar',
+  );
+
+  if (mobileToolbar) {
+    const toolbarRect = mobileToolbar.getBoundingClientRect();
+    const toolbarOverlapLeft = Math.max(mapRect.left, toolbarRect.left);
+    const toolbarOverlapRight = Math.min(mapRect.right, toolbarRect.right);
+    const toolbarOverlapWidth = toolbarOverlapRight - toolbarOverlapLeft;
+
+    if (
+      toolbarOverlapWidth > size.x * 0.5 &&
+      toolbarRect.bottom > mapRect.top &&
+      toolbarRect.bottom < mapRect.bottom
+    ) {
+      top = Math.max(
+        top,
+        Math.min(
+          size.y - minVisibleHeight,
+          Math.round(toolbarRect.bottom - mapRect.top + 12),
+        ),
+      );
+    }
+  }
+
   const width = right - left;
   const height = bottom - top;
 
@@ -1319,6 +1344,9 @@ export default function CycleParkingMap({
       offset: [0, -32],
     });
     const element = createPinMarkerElement('start-marker');
+    element.setAttribute('aria-label', 'Current location');
+    element.setAttribute('role', 'button');
+    element.tabIndex = 0;
     const marker = new maplibregl.Marker({
       anchor: 'bottom',
       element,
@@ -1326,6 +1354,25 @@ export default function CycleParkingMap({
       .setLngLat([userLocation.longitude, userLocation.latitude])
       .setPopup(popup)
       .addTo(map);
+
+    const openStartPopup = () => {
+      popup
+        .setLngLat([userLocation.longitude, userLocation.latitude])
+        .addTo(map);
+    };
+    element.onclick = (event) => {
+      event.stopImmediatePropagation();
+      openStartPopup();
+    };
+    element.onkeydown = (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openStartPopup();
+    };
 
     startMarkerRef.current = {
       marker,
@@ -1504,9 +1551,35 @@ export default function CycleParkingMap({
         return;
       }
 
+      const markerLabel = [
+        point.name,
+        rank ? `rank ${rank}` : 'cycle parking',
+        isSelected ? 'selected' : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+      markerElement.setAttribute('aria-label', markerLabel);
+      markerElement.setAttribute('role', 'button');
+      markerElement.setAttribute('title', point.name);
+      markerElement.tabIndex = isDirectionsMode ? -1 : 0;
+
       markerElement.onclick = isDirectionsMode
         ? null
         : (event) => {
+            event.stopImmediatePropagation();
+            renderedMarker.popup
+              ?.setLngLat([point.longitude, point.latitude])
+              .addTo(map);
+            onSelectPoint(point.id);
+          };
+      markerElement.onkeydown = isDirectionsMode
+        ? null
+        : (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') {
+              return;
+            }
+
+            event.preventDefault();
             event.stopImmediatePropagation();
             renderedMarker.popup
               ?.setLngLat([point.longitude, point.latitude])
@@ -1531,8 +1604,6 @@ export default function CycleParkingMap({
       : null;
 
     if (currentSelectedPoint && selectedEntry?.popup && !route) {
-      const shouldCenterCollapsedPopup =
-        mobileSheetStateRef.current === 'collapsed';
       selectedEntry.popup
         .setLngLat([
           currentSelectedPoint.longitude,
@@ -1540,10 +1611,7 @@ export default function CycleParkingMap({
         ])
         .addTo(map);
 
-      if (
-        shouldCenterCollapsedPopup &&
-        centeredCollapsedPopupPointRef.current !== currentSelectedPoint.id
-      ) {
+      if (centeredCollapsedPopupPointRef.current !== currentSelectedPoint.id) {
         centeredCollapsedPopupPointRef.current = currentSelectedPoint.id;
         centerTimeoutId = window.setTimeout(
           () =>
