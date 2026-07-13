@@ -659,6 +659,20 @@ a {
   border-color: var(--accent);
 }
 
+.settings-credit {
+  border-top: 1px solid var(--subtle);
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.25;
+  margin: 0.15rem 0 0;
+  padding: 0.55rem 0.2rem 0;
+}
+
+.settings-credit a {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
 .status-message {
   align-items: flex-start;
   border: 1px solid var(--subtle);
@@ -1979,6 +1993,10 @@ a {
   .settings-menu--mobile .settings-popover {
     left: 0;
     right: auto;
+  }
+
+  .control-pane .attribution {
+    display: none;
   }
 
   .reference-panel--mobile {

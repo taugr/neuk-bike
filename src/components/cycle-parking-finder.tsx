@@ -1450,6 +1450,11 @@ export default function CycleParkingFinder() {
                 <CircleHelp size={15} aria-hidden="true" />
                 Attributions
               </motion.button>
+              {isBrandTrigger ? (
+                <p className="settings-credit">
+                  Built by <a href="https://tau.gr">taugr</a>
+                </p>
+              ) : null}
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -1591,65 +1596,6 @@ export default function CycleParkingFinder() {
         <span className="built-by-credit">
           Built by <a href="https://tau.gr">taugr</a>
         </span>
-        <dialog
-          ref={attributionDialog}
-          className="attribution-modal"
-          aria-labelledby="attribution-modal-title"
-          onClick={(event) => {
-            if (event.target === event.currentTarget) {
-              closeAttributionDialog();
-            }
-          }}
-          onClose={() => setIsAttributionModalOpen(false)}
-        >
-          <AnimatePresence initial={false}>
-            {isAttributionModalOpen ? (
-              <motion.div
-                {...popoverPresence}
-                key="attribution-modal-content"
-                className="attribution-modal-content"
-              >
-                <div className="attribution-modal-header">
-                  <h2 id="attribution-modal-title">Attributions</h2>
-                </div>
-                <div className="attribution-details">
-                  <span>{cycleParkingDataset.metadata.attribution}</span>
-                  <a href={cycleParkingDataset.metadata.licenceUrl}>
-                    Open Government Licence v3.0
-                  </a>
-                  <span>
-                    Map interface by{' '}
-                    <a href="https://maplibre.org/">MapLibre GL JS</a>.
-                  </span>
-                  {hasUsedPlaceSearch ? (
-                    <span>
-                      Place search by{' '}
-                      <a href="https://nominatim.openstreetmap.org/">
-                        Nominatim
-                      </a>{' '}
-                      using OpenStreetMap data.
-                    </span>
-                  ) : null}
-                  <span>
-                    Cycle directions by{' '}
-                    <a href="https://www.cyclestreets.net/">CycleStreets</a>
-                    {'.'}
-                  </span>
-                </div>
-                <div className="attribution-modal-footer">
-                  <motion.button
-                    className="attribution-modal-close"
-                    type="button"
-                    whileTap={subtleTap}
-                    onClick={closeAttributionDialog}
-                  >
-                    Close
-                  </motion.button>
-                </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </dialog>
       </footer>
     );
   }
@@ -2248,6 +2194,65 @@ export default function CycleParkingFinder() {
             </AnimatePresence>
           </LayoutGroup>
         </motion.aside>
+        <dialog
+          ref={attributionDialog}
+          className="attribution-modal"
+          aria-labelledby="attribution-modal-title"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              closeAttributionDialog();
+            }
+          }}
+          onClose={() => setIsAttributionModalOpen(false)}
+        >
+          <AnimatePresence initial={false}>
+            {isAttributionModalOpen ? (
+              <motion.div
+                {...popoverPresence}
+                key="attribution-modal-content"
+                className="attribution-modal-content"
+              >
+                <div className="attribution-modal-header">
+                  <h2 id="attribution-modal-title">Attributions</h2>
+                </div>
+                <div className="attribution-details">
+                  <span>{cycleParkingDataset.metadata.attribution}</span>
+                  <a href={cycleParkingDataset.metadata.licenceUrl}>
+                    Open Government Licence v3.0
+                  </a>
+                  <span>
+                    Map interface by{' '}
+                    <a href="https://maplibre.org/">MapLibre GL JS</a>.
+                  </span>
+                  {hasUsedPlaceSearch ? (
+                    <span>
+                      Place search by{' '}
+                      <a href="https://nominatim.openstreetmap.org/">
+                        Nominatim
+                      </a>{' '}
+                      using OpenStreetMap data.
+                    </span>
+                  ) : null}
+                  <span>
+                    Cycle directions by{' '}
+                    <a href="https://www.cyclestreets.net/">CycleStreets</a>
+                    {'.'}
+                  </span>
+                </div>
+                <div className="attribution-modal-footer">
+                  <motion.button
+                    className="attribution-modal-close"
+                    type="button"
+                    whileTap={subtleTap}
+                    onClick={closeAttributionDialog}
+                  >
+                    Close
+                  </motion.button>
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
+        </dialog>
         <dialog
           ref={streetViewDialog}
           className="street-view-modal"
