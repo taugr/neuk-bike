@@ -117,13 +117,55 @@ export function isLocationInParkingCoverage(
   location: UserLocation,
   manifest: ParkingDataManifest,
 ) {
-  const { bounds } = manifest.coverage;
-  return (
-    location.latitude >= bounds.south &&
-    location.latitude <= bounds.north &&
-    location.longitude >= bounds.west &&
-    location.longitude <= bounds.east
-  );
+  return manifest.coverage.areas.some((area) => {
+    const { bounds } = area;
+    if (
+      location.latitude < bounds.south ||
+      location.latitude > bounds.north ||
+      location.longitude < bounds.west ||
+      location.longitude > bounds.east
+    ) {
+      return false;
+    }
+
+    const included = area.rings.some(
+      (ring) => !ring.exclude && isPointInRing(location, ring.coordinates),
+    );
+    const excluded = area.rings.some(
+      (ring) => ring.exclude && isPointInRing(location, ring.coordinates),
+    );
+    return included && !excluded;
+  });
+}
+
+function isPointInRing(
+  location: UserLocation,
+  coordinates: [number, number][],
+) {
+  let inside = false;
+  for (
+    let current = 0, previous = coordinates.length - 1;
+    current < coordinates.length;
+    previous = current, current += 1
+  ) {
+    const [currentLongitude, currentLatitude] = coordinates[current];
+    const [previousLongitude, previousLatitude] = coordinates[previous];
+    const crossesLatitude =
+      currentLatitude > location.latitude !==
+      previousLatitude > location.latitude;
+    if (!crossesLatitude) {
+      continue;
+    }
+    const boundaryLongitude =
+      ((previousLongitude - currentLongitude) *
+        (location.latitude - currentLatitude)) /
+        (previousLatitude - currentLatitude) +
+      currentLongitude;
+    if (location.longitude < boundaryLongitude) {
+      inside = !inside;
+    }
+  }
+  return inside;
 }
 
 export function getParkingDataBaseUrl(currentUrl: string) {
@@ -134,12 +176,13 @@ function assertManifest(value: unknown): asserts value is ParkingDataManifest {
   const candidate = value as Partial<ParkingDataManifest> | null;
   if (
     !candidate ||
-    candidate.schemaVersion !== 1 ||
+    candidate.schemaVersion !== 2 ||
     typeof candidate.chunkZoom !== 'number' ||
     typeof candidate.recordCount !== 'number' ||
     typeof candidate.pointIndexPath !== 'string' ||
     !candidate.chunks ||
     !candidate.coverage ||
+    !Array.isArray(candidate.coverage.areas) ||
     !Array.isArray(candidate.sources)
   ) {
     throw new Error('Parking manifest has an unsupported shape.');
@@ -153,7 +196,7 @@ function assertChunk(
   const candidate = value as Partial<ParkingDataChunk> | null;
   if (
     !candidate ||
-    candidate.schemaVersion !== 1 ||
+    candidate.schemaVersion !== 2 ||
     candidate.key !== key ||
     !Array.isArray(candidate.points)
   ) {

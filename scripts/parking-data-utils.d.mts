@@ -42,6 +42,23 @@ export function mergeParkingSources(
   points: GeneratedParkingPoint[];
   suppressedOsmIds: Set<string>;
 };
+export function deduplicateParkingPoints(points: GeneratedParkingPoint[]): {
+  duplicateIds: string[];
+  points: GeneratedParkingPoint[];
+};
+export function parseGeofabrikPoly(
+  content: string,
+  id: string,
+  label: string,
+): {
+  bounds: { east: number; north: number; south: number; west: number };
+  id: string;
+  label: string;
+  rings: Array<{
+    coordinates: [number, number][];
+    exclude: boolean;
+  }>;
+};
 export function representativePoint(
   coordinates: Array<Coordinate | null | undefined>,
 ): Coordinate | null;

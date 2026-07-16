@@ -10,13 +10,13 @@
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="license" />
   </a>
   <br />
-  Static, mobile-friendly map for finding nearby cycle parking across Scotland.
+  Static, mobile-friendly map for finding nearby cycle parking across the UK and Ireland.
 </p>
 
 ## Features
 
-- Find nearby cycle parking from your current location anywhere in Scotland
-- Search from a Scottish street, postcode, town, or place
+- Find nearby cycle parking from your current location in the UK or Ireland
+- Search from a UK or Irish street, postcode, town, or place
 - Browse a map-first interface without an app account or backend
 - Show cycle directions to a selected parking place with CycleStreets
 - See capacity, access, cover, and stand type when mapped
@@ -49,31 +49,34 @@ The generated parking release combines two free sources:
 
 - City of Edinburgh Council public cycle-parking GeoJSON, preferred within
   Edinburgh
-- OpenStreetMap `amenity=bicycle_parking` features from the Geofabrik Scotland
-  PBF extract for national baseline coverage
+- OpenStreetMap `amenity=bicycle_parking` features from the Geofabrik Scotland,
+  Wales, and Ireland-and-Northern-Ireland extracts plus sequential England
+  county extracts for baseline coverage
 
 The refresh script normalizes both sources, suppresses likely Edinburgh
 duplicates in favour of council records, and writes source-qualified IDs such
 as `cec:1234` and `osm:node:98765`. It derives useful display names offline from
 OSM streets, junctions, nearby landmarks, and settlements when a source record
-only says "Cycle parking". It then creates a versioned static release:
+only says "Cycle parking". It then creates a content-addressed static release:
 
 ```text
 public/data/parking/manifest.json
-public/data/parking/{version}/12/{x}/{y}.json
-public/data/parking/{version}/point-index.json
+public/data/parking/chunks/12/{x}/{y}.{content-hash}.json
+public/data/parking/indexes/point-index.{content-hash}.json
 src/data/cycle-parking-report.json
 ```
 
 The browser first loads the manifest and a 3×3 neighbourhood of zoom-12 chunks
 around the current location. Map movement loads additional bounded chunks. A
 24-chunk in-memory LRU cache prevents unbounded growth. The point index is only
-loaded when a `?parking=` deep link needs it. The full Scotland dataset is not
-included in the JavaScript bundle.
+loaded when a `?parking=` deep link needs it. The full UK-and-Ireland
+dataset is not included in the JavaScript bundle.
 
-If geolocation is unavailable or the requested location is outside Scotland,
-the app falls back to central Edinburgh and explains what happened. Place
-search uses Nominatim and OpenStreetMap data.
+If geolocation is unavailable or the requested location is outside the UK and
+Ireland, the app falls back to central Edinburgh and explains what happened.
+Place search uses Nominatim and OpenStreetMap data, filters results through the
+same country-boundary polygons as the parking data, and does not use
+autocomplete.
 
 Directions use the CycleStreets v2 API from the browser. Add a public API key to
 `.env.local` for local development:
@@ -117,23 +120,34 @@ pnpm exec playwright install chromium
 `pnpm update:data` performs the complete release pipeline:
 
 1. fetch the current City of Edinburgh Council public GeoJSON;
-2. download or reuse `.cache/scotland-latest.osm.pbf` from Geofabrik;
-3. extract bicycle-parking nodes, ways, and relations;
-4. normalize fields and representative geometry;
-5. merge likely duplicates with deterministic council priority;
-6. derive descriptive names from nearby features in the same offline extract;
-7. replace `public/data/parking/` with a versioned manifest, chunks, and index;
-8. write the council snapshot and detailed quality report under `src/data/`.
+2. download or reuse the Scotland, Wales, and Ireland-and-Northern-Ireland PBFs
+   plus 47 England county PBFs from Geofabrik;
+3. process each region sequentially so contextual naming stays memory-bounded;
+4. extract bicycle-parking nodes, ways, and relations;
+5. normalize fields, representative geometry, and descriptive names;
+6. deduplicate overlapping county extracts by source-qualified OSM ID;
+7. merge likely Edinburgh duplicates with deterministic council priority;
+8. download or reuse the England, Scotland, Wales, and
+   Ireland-and-Northern-Ireland Geofabrik coverage polygons;
+9. replace `public/data/parking/` with a schema-v2 manifest,
+   content-addressed chunks, and point index;
+10. enforce file, asset, initial-payload, and total-data hard budgets;
+11. write the council snapshot and detailed quality report under `src/data/`.
 
-The Scotland PBF is roughly 320 MB and is ignored by Git. The generated report
-records source timestamps, the PBF SHA-256 checksum, geometry counts, field
-completeness, naming-tier counts and samples, discarded features, and every
-suppressed duplicate match.
+The cached inputs currently occupy about 2.4 GB and are ignored by Git. The
+first refresh depends on Geofabrik download speed and bounded retry delays; a
+cached refresh avoids those downloads. The generated report records source
+timestamps, per-input SHA-256 checksums and elapsed time, geometry counts,
+field completeness, naming-tier counts and samples, discarded features,
+cross-region duplicate IDs, council/OSM matches, peak memory, and output-size
+budgets.
 
-The current prototype release contains 5,573 merged parking points in 516
-chunks. It includes 1,454 council points and 5,517 OSM candidates, with 1,398
-likely duplicates suppressed in favour of council records. Treat these as a
-snapshot: `public/data/parking/manifest.json` and
+The current generated release contains 68,916 merged parking points in 3,213
+chunks. It includes 1,454 council points and 68,860 unique OSM records, with 207
+cross-region OSM duplicates removed and 1,398 likely Edinburgh duplicates
+suppressed in favour of council records. The parking release is about 20.6 MiB;
+the largest possible initial 3×3 payload is about 483 KiB compressed. Treat
+these as a snapshot: `public/data/parking/manifest.json` and
 `src/data/cycle-parking-report.json` are the source of truth after a refresh.
 
 Do not hand-edit `src/data/cycle-parking.json`, the report, or generated chunks.
@@ -143,14 +157,18 @@ Sources:
 
 - [City of Edinburgh Council cycle parking](https://www.edinburgh.gov.uk/cycling-walking/cycle-parking)
 - [Council Public Bike Parking FeatureServer](https://services-eu1.arcgis.com/FgpikkYuSUOuITxp/arcgis/rest/services/Public_Bike_Parking/FeatureServer/0)
+- [Geofabrik England extract and county inputs](https://download.geofabrik.de/europe/united-kingdom/england.html)
 - [Geofabrik Scotland extract](https://download.geofabrik.de/europe/united-kingdom/scotland.html)
+- [Geofabrik Wales extract](https://download.geofabrik.de/europe/united-kingdom/wales.html)
+- [Geofabrik Ireland and Northern Ireland extract](https://download.geofabrik.de/europe/ireland-and-northern-ireland.html)
 
 ## Offline behaviour
 
 The service worker caches the app shell. The manifest uses network-first
 caching, while immutable versioned parking chunks and the point index use
 cache-first behaviour. Previously visited areas can therefore remain useful
-offline, but the app does not promise Scotland-wide offline coverage.
+offline, but the app does not promise UK-and-Ireland-wide offline
+coverage.
 
 Live place search, CycleStreets directions, uncached map tiles, and uncached
 parking areas still need a network connection.
@@ -161,7 +179,7 @@ Parking links use a stable query such as `/?parking=cec%3A1`. The point index
 loads the correct spatial chunk even when the stand is not near the current map
 view. Legacy Edinburgh IDs such as `?parking=1` are resolved to their `cec:` ID.
 
-The Scotland build deliberately no longer creates one HTML page and SVG social
+The static build deliberately does not create one HTML page and SVG social
 image per parking point. Regular sharing works, but every stand uses the site's
 general social preview.
 
@@ -183,7 +201,7 @@ Production hosts always use the browser geolocation API.
 
 ### Production: Cloudflare Pages
 
-Cloudflare Pages is the production host for this static prototype.
+Cloudflare Pages is the production host for this static app.
 It can serve the existing `out/` directory directly, adds edge delivery and
 compression, and applies the cache and security policy in `public/_headers`.
 No Worker runtime, database, paid API, or new application dependency is needed.

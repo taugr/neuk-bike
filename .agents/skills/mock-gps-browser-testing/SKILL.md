@@ -33,7 +33,7 @@ Append one mock case at a time:
 - Moving mid-route: `&mockGpsPath=55.94155,-3.29625,5;55.9412,-3.2957,5&mockGpsStepMs=5000`
 - Arrival: `&mockGpsPath=55.94155,-3.29625,5;55.9412,-3.2957,5;55.94085,-3.2951,5;55.9406042783081,-3.29451047885751,5&mockGpsStepMs=500`
 - Off-route: `&mockGpsPath=55.94155,-3.29625,5;55.94155,-3.28625,5&mockGpsStepMs=5000`
-- Too far from Edinburgh: `&mockGps=51.5072,-0.1276,5`
+- Outside the UK and Ireland: `&mockGps=54.1523,-4.4861,5`
 - Permission denied: `&mockGps=denied`
 - Unavailable location: `&mockGps=unavailable`
 - Invalid null-island location: `&mockGps=null-island`
@@ -67,7 +67,7 @@ Prefer direct DOM inspection for state checks. Avoid screenshots unless the user
 - `Exit directions`, route changes, geolocation errors, and unmount should clear the watch and remove live marker state.
 - Off-route state keeps directions open and shows amber `.live-route-marker-off-route`.
 - Permission denied shows `Enable location permissions to start route.` with no live marker.
-- Too-far location shows `Start route is only available near Edinburgh.` with no live marker.
+- Outside-coverage location shows `Start route is only available within the UK and Ireland.` with no live marker.
 - Unavailable or invalid location shows `Live location is unavailable.` and does not remain in `Starting...`.
 - Mobile collapsed directions panel hides live controls/current guidance while keeping `Exit directions` accessible.
 - No live GPS coordinates, progress, heading, or accuracy values are sent to analytics.

@@ -553,7 +553,7 @@ export default function CycleParkingFinder() {
         setParkingDataStatus('ready');
         setParkingDataMessage(
           selectedParkingId && !selectedPoint
-            ? 'That parking link is not in the current Scotland dataset.'
+            ? 'That parking link is not in the current UK and Ireland dataset.'
             : null,
         );
 
@@ -1364,7 +1364,7 @@ export default function CycleParkingFinder() {
       setPlaceResults(cachedResults);
       setPlaceSearchMessage(
         cachedResults.length === 0
-          ? 'No matching Scottish places found.'
+          ? 'No matching places in the UK or Ireland found.'
           : null,
       );
       return;
@@ -1385,7 +1385,11 @@ export default function CycleParkingFinder() {
         throw new Error('Place search failed');
       }
 
-      const results = parsePlaceSearchResults(await response.json());
+      const manifest = parkingDataClient.current?.getManifest();
+      const results = parsePlaceSearchResults(await response.json()).filter(
+        (result) =>
+          !manifest || isLocationInParkingCoverage(result.location, manifest),
+      );
       placeSearchCache.current.set(cacheKey, results);
       if (placeSearchCache.current.size > maxPlaceSearchCacheEntries) {
         const oldestKey = placeSearchCache.current.keys().next().value;
@@ -1398,7 +1402,9 @@ export default function CycleParkingFinder() {
       });
       setPlaceResults(results);
       setPlaceSearchMessage(
-        results.length === 0 ? 'No matching Scottish places found.' : null,
+        results.length === 0
+          ? 'No matching places in the UK or Ireland found.'
+          : null,
       );
       setHasUsedPlaceSearch(true);
     } catch {
@@ -1817,7 +1823,11 @@ export default function CycleParkingFinder() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className="app-shell" data-theme={resolvedTheme}>
+      <main
+        className="app-shell"
+        data-directions-mode={isDirectionsMode ? 'true' : undefined}
+        data-theme={resolvedTheme}
+      >
         <section className="map-pane" aria-label="Cycle parking map">
           <CycleParkingMap
             points={nearbyPoints}
@@ -2023,7 +2033,7 @@ export default function CycleParkingFinder() {
                         {liveRouteTracking.status === 'denied'
                           ? 'Enable location permissions to start route.'
                           : liveRouteTracking.status === 'too-far'
-                            ? 'Start route is only available within Scotland.'
+                            ? 'Start route is only available within the UK and Ireland.'
                             : 'Live location is unavailable.'}
                       </motion.p>
                     ) : null}
@@ -2251,7 +2261,7 @@ export default function CycleParkingFinder() {
                       <h1>Bike Neuks</h1>
                       <p>
                         {formattedParkingLocationCount} cycle parking spots in
-                        Scotland
+                        the UK and Ireland
                       </p>
                     </div>
                     {renderThemeSettings('settings-menu--desktop')}
@@ -2318,8 +2328,8 @@ export default function CycleParkingFinder() {
                             className="parking-list-context"
                             role="status"
                           >
-                            That location is outside Scotland, showing bike
-                            parking near Edinburgh.
+                            That location is outside the UK and Ireland, showing
+                            bike parking near Edinburgh.
                           </motion.div>
                         ) : null}
                       </AnimatePresence>

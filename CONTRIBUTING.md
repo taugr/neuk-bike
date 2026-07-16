@@ -7,7 +7,7 @@ Thanks for contributing.
 Requirements:
 
 - Node.js 20+
-- `pnpm` 10+
+- `pnpm` 11+
 
 Clone the repo and install dependencies:
 
@@ -48,15 +48,20 @@ pnpm run deploy:cloudflare
 
 ## Parking data
 
-`pnpm update:data` downloads the current council feed and downloads or reuses a
-roughly 320 MB cached Geofabrik Scotland PBF. It replaces the generated council
-snapshot, quality report, manifest, versioned chunks, and point index.
+`pnpm update:data` downloads the current council feed and downloads or reuses
+the Geofabrik Scotland, Wales, and Ireland-and-Northern-Ireland PBFs, 47 England
+county PBFs, and four coverage polygons. The cached inputs currently require
+about 2.4 GB. Inputs are processed
+sequentially to keep contextual naming memory bounded. The command replaces the
+generated council snapshot, quality report, schema-v2 manifest,
+content-addressed chunks, and point index.
 
 Do not hand-edit files under `public/data/parking/` or generated JSON under
 `src/data/`. Change the normalizer or merge rules in `scripts/`, add focused
 tests, rerun the refresh, and review record counts, completeness, discarded
-features, source timestamps, checksum, duplicate matches, and naming-tier counts
-and samples before committing.
+features, per-input source timestamps and checksums, cross-region and council
+duplicate matches, naming-tier counts and samples, peak memory, asset budgets,
+and representative UK and Ireland locations before committing.
 
 ## Testing
 

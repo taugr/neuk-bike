@@ -1,10 +1,10 @@
 /data/parking/manifest.json
   Cache-Control: public, max-age=300, must-revalidate
 
-/data/parking/:version/point-index.json
+/data/parking/indexes/*
   Cache-Control: public, max-age=31536000, immutable
 
-/data/parking/:version/:zoom/:x/:y.json
+/data/parking/chunks/*
   Cache-Control: public, max-age=31536000, immutable
 
 /_next/static/*

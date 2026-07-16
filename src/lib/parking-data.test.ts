@@ -28,13 +28,87 @@ const manifest: ParkingDataManifest = {
     },
   },
   coverage: {
-    bounds: { east: -0.5, north: 60.9, south: 54.55, west: -8.7 },
-    label: 'Scotland',
+    areas: [
+      {
+        bounds: { east: -0.5, north: 60.9, south: 54.55, west: -8.7 },
+        id: 'scotland',
+        label: 'Scotland',
+        rings: [
+          {
+            coordinates: [
+              [-8.7, 54.55],
+              [-0.5, 54.55],
+              [-0.5, 60.9],
+              [-8.7, 60.9],
+            ],
+            exclude: false,
+          },
+        ],
+      },
+      {
+        bounds: { east: 2, north: 56, south: 49.8, west: -6 },
+        id: 'england',
+        label: 'England',
+        rings: [
+          {
+            coordinates: [
+              [-6, 49.8],
+              [2, 49.8],
+              [2, 56],
+              [-6, 56],
+            ],
+            exclude: false,
+          },
+          {
+            coordinates: [
+              [-5.5, 51],
+              [-2.5, 51],
+              [-2.5, 53.5],
+              [-5.5, 53.5],
+            ],
+            exclude: true,
+          },
+        ],
+      },
+      {
+        bounds: { east: -2.5, north: 53.5, south: 51.3, west: -5.5 },
+        id: 'wales',
+        label: 'Wales',
+        rings: [
+          {
+            coordinates: [
+              [-5.5, 51.3],
+              [-2.5, 51.3],
+              [-2.5, 53.5],
+              [-5.5, 53.5],
+            ],
+            exclude: false,
+          },
+        ],
+      },
+      {
+        bounds: { east: -5.3, north: 55.5, south: 51.3, west: -10.8 },
+        id: 'ireland-and-northern-ireland',
+        label: 'Ireland and Northern Ireland',
+        rings: [
+          {
+            coordinates: [
+              [-10.8, 51.3],
+              [-5.3, 51.3],
+              [-5.3, 55.5],
+              [-10.8, 55.5],
+            ],
+            exclude: false,
+          },
+        ],
+      },
+    ],
+    label: 'UK and Ireland',
   },
   pointIndexPath: 'version/point-index.json',
   recordCount: 2,
   refreshedAt: '2026-07-15T00:00:00.000Z',
-  schemaVersion: 1,
+  schemaVersion: 2,
   sources: [],
 };
 const centerPoint: ParkingPoint = {
@@ -54,7 +128,7 @@ describe('parking data tiling', () => {
     );
   });
 
-  it('selects viewport chunks and respects the coverage bounds', () => {
+  it('selects viewport chunks and respects regional coverage polygons', () => {
     expect(
       getParkingTileKeysForBounds(
         { east: -3.05, north: 55.99, south: 55.91, west: -3.25 },
@@ -65,6 +139,24 @@ describe('parking data tiling', () => {
     expect(
       isLocationInParkingCoverage(
         { latitude: 51.5072, longitude: -0.1276 },
+        manifest,
+      ),
+    ).toBe(true);
+    expect(
+      isLocationInParkingCoverage(
+        { latitude: 51.4816, longitude: -3.1791 },
+        manifest,
+      ),
+    ).toBe(true);
+    expect(
+      isLocationInParkingCoverage(
+        { latitude: 53.3498, longitude: -6.2603 },
+        manifest,
+      ),
+    ).toBe(true);
+    expect(
+      isLocationInParkingCoverage(
+        { latitude: 49.2144, longitude: -2.1313 },
         manifest,
       ),
     ).toBe(false);
@@ -96,11 +188,11 @@ describe('ParkingDataClient', () => {
         return Response.json({
           key: centerKey,
           points: [centerPoint],
-          schemaVersion: 1,
+          schemaVersion: 2,
         });
       }
       if (path.endsWith(`/${eastKey}.json`)) {
-        return Response.json({ key: eastKey, points: [], schemaVersion: 1 });
+        return Response.json({ key: eastKey, points: [], schemaVersion: 2 });
       }
       return new Response(null, { status: 404 });
     });
@@ -157,14 +249,14 @@ describe('ParkingDataClient', () => {
         return Response.json({
           key: centerKey,
           points: [centerPoint],
-          schemaVersion: 1,
+          schemaVersion: 2,
         });
       }
       if (path.endsWith(`/${eastKey}.json`)) {
         return Response.json({
           key: eastKey,
           points: [eastPoint],
-          schemaVersion: 1,
+          schemaVersion: 2,
         });
       }
       if (path.endsWith(`/${westKey}.json`)) {
@@ -175,7 +267,7 @@ describe('ParkingDataClient', () => {
         return Response.json({
           key: westKey,
           points: [westPoint],
-          schemaVersion: 1,
+          schemaVersion: 2,
         });
       }
       return new Response(null, { status: 404 });

@@ -7,7 +7,7 @@ import './globals.css';
 const siteUrl = 'https://neuk.bike';
 const sitePath = '/';
 const siteTitle = 'Bike Neuks';
-const siteDescription = 'Find nearby cycle parking across Scotland.';
+const siteDescription = 'Find nearby cycle parking across the UK and Ireland.';
 const socialImage = '/og-image.png';
 const lightThemeColor = '#0f766e';
 const darkThemeColor = '#0f1715';
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         url: socialImage,
         width: 1200,
         height: 630,
-        alt: 'Scotland Cycle Parking map preview',
+        alt: 'UK and Ireland cycle parking map preview',
       },
     ],
     locale: 'en_GB',

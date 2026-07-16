@@ -145,6 +145,7 @@ const mapLibreShieldLayerIds = new Set([
 ]);
 const highlightedRankCount = 3;
 const rankedPointCount = 8;
+const nearbyFocusMaximumDistanceMeters = 50_000;
 const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
   'access-open': LockOpen,
   building: Building2,
@@ -961,6 +962,7 @@ export default function CycleParkingMap({
   const instructionMarkerRef = useRef<RenderedMarker | null>(null);
   const previousFocusTargetRef = useRef<MapFocusTarget | null>(null);
   const hasAppliedNearbyFocusRef = useRef(false);
+  const isAutomaticFocusAnimationRef = useRef(false);
   const mobileSheetStateRef = useRef(mobileSheetState);
   const previousMobileSheetStateRef = useRef(mobileSheetState);
   const previousRouteSheetStateRef = useRef(mobileSheetState);
@@ -1081,6 +1083,14 @@ export default function CycleParkingMap({
     const abortController = new AbortController();
     let nextMap: MapLibreMap | null = null;
     let isDisposed = false;
+    const stopAutomaticFocusOnInteraction = () => {
+      if (!isAutomaticFocusAnimationRef.current) {
+        return;
+      }
+
+      isAutomaticFocusAnimationRef.current = false;
+      nextMap?.stop();
+    };
 
     const createMap = (style: StyleSpecification | string) => {
       if (isDisposed) {
@@ -1099,6 +1109,18 @@ export default function CycleParkingMap({
         zoom: 13,
       });
       nextMap.touchZoomRotate.disableRotation();
+      container.addEventListener(
+        'pointerdown',
+        stopAutomaticFocusOnInteraction,
+        { capture: true },
+      );
+      container.addEventListener('wheel', stopAutomaticFocusOnInteraction, {
+        capture: true,
+        passive: true,
+      });
+      container.addEventListener('keydown', stopAutomaticFocusOnInteraction, {
+        capture: true,
+      });
       const navigationControl = new maplibregl.NavigationControl({
         showCompass: false,
       });
@@ -1136,6 +1158,7 @@ export default function CycleParkingMap({
           return;
         }
 
+        isAutomaticFocusAnimationRef.current = false;
         handleViewportChange({
           bounds: getVisibleMapBounds(nextMap),
           zoom: nextMap.getZoom(),
@@ -1173,6 +1196,19 @@ export default function CycleParkingMap({
     return () => {
       isDisposed = true;
       abortController.abort();
+      container.removeEventListener(
+        'pointerdown',
+        stopAutomaticFocusOnInteraction,
+        { capture: true },
+      );
+      container.removeEventListener('wheel', stopAutomaticFocusOnInteraction, {
+        capture: true,
+      });
+      container.removeEventListener(
+        'keydown',
+        stopAutomaticFocusOnInteraction,
+        { capture: true },
+      );
 
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);
@@ -1719,6 +1755,7 @@ export default function CycleParkingMap({
       }
 
       const zoom = map.getZoom();
+      isAutomaticFocusAnimationRef.current = true;
       map.panTo(
         getMapPointFocusCenter(
           map,
@@ -1756,6 +1793,7 @@ export default function CycleParkingMap({
         ...route.points,
       ]);
 
+      isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
         duration: 700,
         maxZoom: 17,
@@ -1783,12 +1821,20 @@ export default function CycleParkingMap({
       previousFocusTarget,
       nextFocusTarget,
     );
-    const focusPoints =
+    const focusCandidates =
       highlightedPoints.length > 0
         ? highlightedPoints
         : nearestPoint
           ? [nearestPoint]
           : [];
+    const currentLocationPoint = userLocationToPoint(userLocation);
+    const focusPoints = focusCandidates.filter(
+      (point) =>
+        getDistanceMeters(
+          currentLocationPoint,
+          parkingPointToRoutePoint(point),
+        ) <= nearbyFocusMaximumDistanceMeters,
+    );
     if (
       !shouldApplyMapFocus({
         hasAppliedNearbyFocus: hasAppliedNearbyFocusRef.current,
@@ -1807,6 +1853,7 @@ export default function CycleParkingMap({
       hasAppliedNearbyFocusRef.current = false;
     }
 
+    isAutomaticFocusAnimationRef.current = false;
     map.stop();
 
     if (
@@ -1831,6 +1878,7 @@ export default function CycleParkingMap({
         ...route.points,
       ]);
 
+      isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
         duration: 700,
         maxZoom: 17,
@@ -1853,6 +1901,7 @@ export default function CycleParkingMap({
           ...focusPoints.map(parkingPointToRoutePoint),
         ]);
 
+        isAutomaticFocusAnimationRef.current = true;
         map.fitBounds(bounds, {
           duration: 700,
           maxZoom: 17,
@@ -1862,6 +1911,7 @@ export default function CycleParkingMap({
       }
 
       const zoom = Math.max(map.getZoom(), 16);
+      isAutomaticFocusAnimationRef.current = true;
       map.flyTo({
         center: getMapPointFocusCenter(
           map,
@@ -1878,10 +1928,11 @@ export default function CycleParkingMap({
     if (focusPoints.length > 0) {
       hasAppliedNearbyFocusRef.current = true;
       const bounds = createBounds([
-        userLocationToPoint(userLocation),
+        currentLocationPoint,
         ...focusPoints.map(parkingPointToRoutePoint),
       ]);
 
+      isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
         duration: 700,
         maxZoom: 17,
@@ -1890,6 +1941,7 @@ export default function CycleParkingMap({
       return;
     }
 
+    isAutomaticFocusAnimationRef.current = false;
     map.jumpTo({
       center: [userLocation.longitude, userLocation.latitude],
       zoom: 16,

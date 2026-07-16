@@ -1,5 +1,5 @@
 {
-  "chunkCount": 516,
+  "chunkCount": 3213,
   "chunkZoom": 12,
   "councilRecordCount": 1454,
   "duplicateMatches": [
@@ -6994,22 +6994,128 @@
       "osmId": "osm:node:7347033811"
     }
   ],
-  "mergedRecordCount": 5573,
+  "duplicateRegionIds": {
+    "count": 207,
+    "samples": [
+      "osm:node:10282007314",
+      "osm:node:10282007711",
+      "osm:node:10282009620",
+      "osm:node:10282010033",
+      "osm:node:10282010034",
+      "osm:node:10282015733",
+      "osm:node:10282015748",
+      "osm:node:10282016921",
+      "osm:node:10282016922",
+      "osm:node:10284570185",
+      "osm:node:10761831125",
+      "osm:node:10761831126",
+      "osm:node:1077357609",
+      "osm:node:11057617852",
+      "osm:node:11150211366",
+      "osm:node:11150211367",
+      "osm:node:11150211368",
+      "osm:node:11238049701",
+      "osm:node:11682715331",
+      "osm:node:11682715333",
+      "osm:node:12056660385",
+      "osm:node:12090451271",
+      "osm:node:12124905095",
+      "osm:node:12435600963",
+      "osm:node:12455586708",
+      "osm:node:12455586710",
+      "osm:node:12677584974",
+      "osm:node:12731874985",
+      "osm:node:12768371827",
+      "osm:node:12852552659",
+      "osm:node:13009875035",
+      "osm:node:1302091975",
+      "osm:node:13137046584",
+      "osm:node:13343240230",
+      "osm:node:13439046087",
+      "osm:node:1347068287",
+      "osm:node:13509327459",
+      "osm:node:13566397158",
+      "osm:node:13606024903",
+      "osm:node:13789451660",
+      "osm:node:13821329777",
+      "osm:node:1392692644",
+      "osm:node:1393554182",
+      "osm:node:1393554183",
+      "osm:node:1401108060",
+      "osm:node:1401108063",
+      "osm:node:1401108080",
+      "osm:node:1401111984",
+      "osm:node:14017615589",
+      "osm:node:1461440949",
+      "osm:node:1461440953",
+      "osm:node:1538769367",
+      "osm:node:1710694789",
+      "osm:node:1794727397",
+      "osm:node:1794727413",
+      "osm:node:1881728303",
+      "osm:node:1915288312",
+      "osm:node:2174159041",
+      "osm:node:2251004056",
+      "osm:node:2251004078",
+      "osm:node:2318877398",
+      "osm:node:2320709764",
+      "osm:node:2320709765",
+      "osm:node:2324140764",
+      "osm:node:2324140782",
+      "osm:node:2324140866",
+      "osm:node:2324140900",
+      "osm:node:2324140919",
+      "osm:node:2324140950",
+      "osm:node:2324140955",
+      "osm:node:2479989987",
+      "osm:node:2598401319",
+      "osm:node:2598401325",
+      "osm:node:2598401326",
+      "osm:node:2598401333",
+      "osm:node:2598401337",
+      "osm:node:271805127",
+      "osm:node:2780044194",
+      "osm:node:2840570401",
+      "osm:node:2840580601",
+      "osm:node:2871492264",
+      "osm:node:3186379903",
+      "osm:node:327183313",
+      "osm:node:3554536841",
+      "osm:node:3559661693",
+      "osm:node:3559661694",
+      "osm:node:3657150630",
+      "osm:node:3659515928",
+      "osm:node:366948370",
+      "osm:node:3729795514",
+      "osm:node:3754280727",
+      "osm:node:3890283880",
+      "osm:node:4024220923",
+      "osm:node:412945323",
+      "osm:node:413023517",
+      "osm:node:413023519",
+      "osm:node:4327212256",
+      "osm:node:4403429491",
+      "osm:node:459107366",
+      "osm:node:4886250816"
+    ]
+  },
+  "generatedAssets": {
+    "fileCount": 3215,
+    "largestAssetBytes": 2549261,
+    "manifestBytes": 595345,
+    "maximumInitialCompressedBytes": 494434,
+    "parkingDataBytes": 21653089,
+    "pointIndexBytes": 2549261
+  },
+  "mergedRecordCount": 68916,
   "naming": {
-    "contextCounts": {
-      "junctions": 25993,
-      "landmarks": 35786,
-      "nearbyNodes": 3582169,
-      "places": 21061,
-      "roadSamples": 308486
-    },
     "counts": {
       "generic": 0,
-      "junction": 3117,
-      "landmark": 1329,
-      "place": 129,
-      "source": 33,
-      "street": 965
+      "junction": 46047,
+      "landmark": 12434,
+      "place": 843,
+      "source": 1097,
+      "street": 8495
     },
     "genericPercent": 0,
     "samples": [
@@ -7138,24 +7244,24 @@
   "osm": {
     "completeness": {
       "name": {
-        "count": 59,
-        "percent": 1.1
+        "count": 68860,
+        "percent": 100
       },
       "capacity": {
-        "count": 4842,
-        "percent": 87.8
+        "count": 59449,
+        "percent": 86.3
       },
       "covered": {
-        "count": 4472,
-        "percent": 81.1
+        "count": 49270,
+        "percent": 71.6
       },
       "access": {
-        "count": 1356,
-        "percent": 24.6
+        "count": 17159,
+        "percent": 24.9
       },
       "bicycle_pa": {
-        "count": 4836,
-        "percent": 87.7
+        "count": 59548,
+        "percent": 86.5
       }
     },
     "discarded": {
@@ -7163,14 +7269,2968 @@
       "way": 0
     },
     "geometryCounts": {
-      "node": 5206,
-      "relation": 2,
-      "way": 309
+      "node": 64850,
+      "relation": 5,
+      "way": 4212
     },
-    "pbfSha256": "7bf400d6012f6a1a01c0176fa7ecb6c8a294dbd72b6947c24b11b744ca168025",
-    "recordCount": 5517,
-    "sourceTimestamp": "2026-07-14T20:20:59.000Z"
+    "inputs": [
+      {
+        "completeness": {
+          "name": {
+            "count": 5517,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 4842,
+            "percent": 87.8
+          },
+          "covered": {
+            "count": 4472,
+            "percent": 81.1
+          },
+          "access": {
+            "count": 1356,
+            "percent": 24.6
+          },
+          "bicycle_pa": {
+            "count": 4836,
+            "percent": 87.7
+          }
+        },
+        "countryId": "scotland",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 133.4,
+        "geometryCounts": {
+          "node": 5206,
+          "relation": 2,
+          "way": 309
+        },
+        "id": "scotland",
+        "label": "Scotland",
+        "naming": {
+          "contextCounts": {
+            "junctions": 25995,
+            "landmarks": 35788,
+            "nearbyNodes": 3582801,
+            "places": 21061,
+            "roadSamples": 308521
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 3996,
+            "landmark": 1579,
+            "place": 144,
+            "source": 59,
+            "street": 1193
+          }
+        },
+        "pbfSha256": "7bf400d6012f6a1a01c0176fa7ecb6c8a294dbd72b6947c24b11b744ca168025",
+        "peakRssBytes": 1746288640,
+        "recordCount": 5517,
+        "sourceTimestamp": "2026-07-14T20:20:59.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 259,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 198,
+            "percent": 76.4
+          },
+          "covered": {
+            "count": 205,
+            "percent": 79.2
+          },
+          "access": {
+            "count": 63,
+            "percent": 24.3
+          },
+          "bicycle_pa": {
+            "count": 221,
+            "percent": 85.3
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 4,
+        "geometryCounts": {
+          "node": 224,
+          "relation": 0,
+          "way": 35
+        },
+        "id": "bedfordshire",
+        "label": "Bedfordshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1266,
+            "landmarks": 2658,
+            "nearbyNodes": 141793,
+            "places": 388,
+            "roadSamples": 14290
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 103,
+            "landmark": 86,
+            "place": 1,
+            "source": 12,
+            "street": 57
+          }
+        },
+        "pbfSha256": "64e6fb54eba2d5d5c02987f606b0aefa0b1cf9c7705da465855f45b543f0b10c",
+        "peakRssBytes": 1995554816,
+        "recordCount": 259,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 582,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 418,
+            "percent": 71.8
+          },
+          "covered": {
+            "count": 448,
+            "percent": 77
+          },
+          "access": {
+            "count": 124,
+            "percent": 21.3
+          },
+          "bicycle_pa": {
+            "count": 446,
+            "percent": 76.6
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 6.5,
+        "geometryCounts": {
+          "node": 531,
+          "relation": 0,
+          "way": 51
+        },
+        "id": "berkshire",
+        "label": "Berkshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 3166,
+            "landmarks": 4384,
+            "nearbyNodes": 336981,
+            "places": 689,
+            "roadSamples": 44150
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 301,
+            "landmark": 160,
+            "place": 21,
+            "source": 10,
+            "street": 90
+          }
+        },
+        "pbfSha256": "720333f8d862f174a6f2a2c841d02c586adb6424e88c3b52ed399dea00920d8f",
+        "peakRssBytes": 2395013120,
+        "recordCount": 582,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1220,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 1112,
+            "percent": 91.1
+          },
+          "covered": {
+            "count": 1030,
+            "percent": 84.4
+          },
+          "access": {
+            "count": 105,
+            "percent": 8.6
+          },
+          "bicycle_pa": {
+            "count": 1048,
+            "percent": 85.9
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 6.8,
+        "geometryCounts": {
+          "node": 1152,
+          "relation": 0,
+          "way": 68
+        },
+        "id": "bristol",
+        "label": "Bristol",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4609,
+            "landmarks": 5763,
+            "nearbyNodes": 637525,
+            "places": 124,
+            "roadSamples": 42544
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 980,
+            "landmark": 152,
+            "place": 2,
+            "source": 2,
+            "street": 84
+          }
+        },
+        "pbfSha256": "43a4809dba0caedcff0d8e4aa58f3d7efc77b77b9fdc4842f7932683a60396db",
+        "peakRssBytes": 2598600704,
+        "recordCount": 1220,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 357,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 242,
+            "percent": 67.8
+          },
+          "covered": {
+            "count": 176,
+            "percent": 49.3
+          },
+          "access": {
+            "count": 48,
+            "percent": 13.4
+          },
+          "bicycle_pa": {
+            "count": 252,
+            "percent": 70.6
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 5.9,
+        "geometryCounts": {
+          "node": 306,
+          "relation": 0,
+          "way": 51
+        },
+        "id": "buckinghamshire",
+        "label": "Buckinghamshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1914,
+            "landmarks": 3531,
+            "nearbyNodes": 202826,
+            "places": 758,
+            "roadSamples": 22358
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 168,
+            "landmark": 122,
+            "place": 9,
+            "source": 5,
+            "street": 53
+          }
+        },
+        "pbfSha256": "edb6b9cc1b8ced300ab47d6231169258c0dc28a9cc31deb0442839281627a197",
+        "peakRssBytes": 2445574144,
+        "recordCount": 357,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 2362,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 1942,
+            "percent": 82.2
+          },
+          "covered": {
+            "count": 1702,
+            "percent": 72.1
+          },
+          "access": {
+            "count": 960,
+            "percent": 40.6
+          },
+          "bicycle_pa": {
+            "count": 1991,
+            "percent": 84.3
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 11.5,
+        "geometryCounts": {
+          "node": 2022,
+          "relation": 0,
+          "way": 340
+        },
+        "id": "cambridgeshire",
+        "label": "Cambridgeshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 5176,
+            "landmarks": 5467,
+            "nearbyNodes": 746977,
+            "places": 1025,
+            "roadSamples": 61884
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 1223,
+            "landmark": 546,
+            "place": 45,
+            "source": 13,
+            "street": 535
+          }
+        },
+        "pbfSha256": "e57e1a2bf75ffc483c08db4a49f0d344f946844bc9fc103b5860f878d46966cf",
+        "peakRssBytes": 2508996608,
+        "recordCount": 2362,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 550,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 455,
+            "percent": 82.7
+          },
+          "covered": {
+            "count": 446,
+            "percent": 81.1
+          },
+          "access": {
+            "count": 209,
+            "percent": 38
+          },
+          "bicycle_pa": {
+            "count": 479,
+            "percent": 87.1
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 10.8,
+        "geometryCounts": {
+          "node": 506,
+          "relation": 0,
+          "way": 44
+        },
+        "id": "cheshire",
+        "label": "Cheshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4399,
+            "landmarks": 6183,
+            "nearbyNodes": 450042,
+            "places": 1116,
+            "roadSamples": 51167
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 297,
+            "landmark": 124,
+            "place": 7,
+            "source": 41,
+            "street": 81
+          }
+        },
+        "pbfSha256": "2b81fe99cece835d7f03ac43ee052dd6efb54d746a2f8806b82887ce2310978c",
+        "peakRssBytes": 2543271936,
+        "recordCount": 550,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 274,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 200,
+            "percent": 73
+          },
+          "covered": {
+            "count": 208,
+            "percent": 75.9
+          },
+          "access": {
+            "count": 43,
+            "percent": 15.7
+          },
+          "bicycle_pa": {
+            "count": 233,
+            "percent": 85
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 9.5,
+        "geometryCounts": {
+          "node": 256,
+          "relation": 0,
+          "way": 18
+        },
+        "id": "cornwall",
+        "label": "Cornwall",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1747,
+            "landmarks": 2979,
+            "nearbyNodes": 236394,
+            "places": 2396,
+            "roadSamples": 21805
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 126,
+            "landmark": 103,
+            "place": 7,
+            "source": 0,
+            "street": 38
+          }
+        },
+        "pbfSha256": "6d1d5bf8829f52f57f43c01602dc71048a5a2764c07c5157ff48841a5711d8fb",
+        "peakRssBytes": 2550513664,
+        "recordCount": 274,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 377,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 303,
+            "percent": 80.4
+          },
+          "covered": {
+            "count": 310,
+            "percent": 82.2
+          },
+          "access": {
+            "count": 170,
+            "percent": 45.1
+          },
+          "bicycle_pa": {
+            "count": 338,
+            "percent": 89.7
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 13.3,
+        "geometryCounts": {
+          "node": 342,
+          "relation": 0,
+          "way": 35
+        },
+        "id": "cumbria",
+        "label": "Cumbria",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2541,
+            "landmarks": 4402,
+            "nearbyNodes": 249634,
+            "places": 5844,
+            "roadSamples": 26712
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 186,
+            "landmark": 121,
+            "place": 12,
+            "source": 1,
+            "street": 57
+          }
+        },
+        "pbfSha256": "be3ea27fe1e2063e1e50121041c53845a99099978f2eeb0416b92c5d08223e82",
+        "peakRssBytes": 2421669888,
+        "recordCount": 377,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 511,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 359,
+            "percent": 70.3
+          },
+          "covered": {
+            "count": 317,
+            "percent": 62
+          },
+          "access": {
+            "count": 134,
+            "percent": 26.2
+          },
+          "bicycle_pa": {
+            "count": 392,
+            "percent": 76.7
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 11.8,
+        "geometryCounts": {
+          "node": 497,
+          "relation": 0,
+          "way": 14
+        },
+        "id": "derbyshire",
+        "label": "Derbyshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 3161,
+            "landmarks": 5655,
+            "nearbyNodes": 395257,
+            "places": 1052,
+            "roadSamples": 39823
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 255,
+            "landmark": 157,
+            "place": 13,
+            "source": 8,
+            "street": 78
+          }
+        },
+        "pbfSha256": "1174ccb269d4a6e79d1495db3444f0f8344b4ad2457961fef560af29f32c2b5e",
+        "peakRssBytes": 2455388160,
+        "recordCount": 511,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 904,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 696,
+            "percent": 77
+          },
+          "covered": {
+            "count": 689,
+            "percent": 76.2
+          },
+          "access": {
+            "count": 242,
+            "percent": 26.8
+          },
+          "bicycle_pa": {
+            "count": 736,
+            "percent": 81.4
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 17,
+        "geometryCounts": {
+          "node": 851,
+          "relation": 0,
+          "way": 53
+        },
+        "id": "devon",
+        "label": "Devon",
+        "naming": {
+          "contextCounts": {
+            "junctions": 5587,
+            "landmarks": 6772,
+            "nearbyNodes": 649865,
+            "places": 3912,
+            "roadSamples": 69522
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 516,
+            "landmark": 219,
+            "place": 13,
+            "source": 5,
+            "street": 151
+          }
+        },
+        "pbfSha256": "114dbb1795a6675cfb01c4c74f06cb99ebbf91c50504ab6676b7a824ef19db1f",
+        "peakRssBytes": 2455388160,
+        "recordCount": 904,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 519,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 446,
+            "percent": 85.9
+          },
+          "covered": {
+            "count": 447,
+            "percent": 86.1
+          },
+          "access": {
+            "count": 72,
+            "percent": 13.9
+          },
+          "bicycle_pa": {
+            "count": 465,
+            "percent": 89.6
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 8.5,
+        "geometryCounts": {
+          "node": 494,
+          "relation": 0,
+          "way": 25
+        },
+        "id": "dorset",
+        "label": "Dorset",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2862,
+            "landmarks": 5118,
+            "nearbyNodes": 311071,
+            "places": 1239,
+            "roadSamples": 29563
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 315,
+            "landmark": 127,
+            "place": 10,
+            "source": 1,
+            "street": 66
+          }
+        },
+        "pbfSha256": "4c1f4c9659483e4bffd63e2007c77a530751f7ed59713607dc66562269cdc509",
+        "peakRssBytes": 2461466624,
+        "recordCount": 519,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 375,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 303,
+            "percent": 80.8
+          },
+          "covered": {
+            "count": 271,
+            "percent": 72.3
+          },
+          "access": {
+            "count": 91,
+            "percent": 24.3
+          },
+          "bicycle_pa": {
+            "count": 283,
+            "percent": 75.5
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 6,
+        "geometryCounts": {
+          "node": 351,
+          "relation": 0,
+          "way": 24
+        },
+        "id": "durham",
+        "label": "Durham",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2424,
+            "landmarks": 4096,
+            "nearbyNodes": 210240,
+            "places": 1766,
+            "roadSamples": 26272
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 158,
+            "landmark": 134,
+            "place": 12,
+            "source": 6,
+            "street": 65
+          }
+        },
+        "pbfSha256": "76e1ce5933c784062f28c6514a2c179209d27bc5250f950a6d14d59186e072de",
+        "peakRssBytes": 2478145536,
+        "recordCount": 375,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 245,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 205,
+            "percent": 83.7
+          },
+          "covered": {
+            "count": 207,
+            "percent": 84.5
+          },
+          "access": {
+            "count": 87,
+            "percent": 35.5
+          },
+          "bicycle_pa": {
+            "count": 209,
+            "percent": 85.3
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 5.6,
+        "geometryCounts": {
+          "node": 229,
+          "relation": 0,
+          "way": 16
+        },
+        "id": "east-sussex",
+        "label": "East Sussex",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1579,
+            "landmarks": 3255,
+            "nearbyNodes": 221023,
+            "places": 955,
+            "roadSamples": 17976
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 131,
+            "landmark": 72,
+            "place": 2,
+            "source": 2,
+            "street": 38
+          }
+        },
+        "pbfSha256": "9c24018acdcaf096f39dbbf29075fe9496ebf02e1321d412cecff7eae6399099",
+        "peakRssBytes": 2493612032,
+        "recordCount": 245,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 226,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 194,
+            "percent": 85.8
+          },
+          "covered": {
+            "count": 196,
+            "percent": 86.7
+          },
+          "access": {
+            "count": 20,
+            "percent": 8.8
+          },
+          "bicycle_pa": {
+            "count": 196,
+            "percent": 86.7
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 5.2,
+        "geometryCounts": {
+          "node": 216,
+          "relation": 0,
+          "way": 10
+        },
+        "id": "east-yorkshire-with-hull",
+        "label": "East Yorkshire with Hull",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1764,
+            "landmarks": 1864,
+            "nearbyNodes": 147000,
+            "places": 1216,
+            "roadSamples": 14760
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 152,
+            "landmark": 44,
+            "place": 5,
+            "source": 0,
+            "street": 25
+          }
+        },
+        "pbfSha256": "39c68c93671ec2737b0bb724731bfab01d34fa5ad4acb13af55a20b3d058efcd",
+        "peakRssBytes": 2508881920,
+        "recordCount": 226,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 735,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 515,
+            "percent": 70.1
+          },
+          "covered": {
+            "count": 508,
+            "percent": 69.1
+          },
+          "access": {
+            "count": 209,
+            "percent": 28.4
+          },
+          "bicycle_pa": {
+            "count": 514,
+            "percent": 69.9
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 13.2,
+        "geometryCounts": {
+          "node": 678,
+          "relation": 0,
+          "way": 57
+        },
+        "id": "essex",
+        "label": "Essex",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4362,
+            "landmarks": 6378,
+            "nearbyNodes": 443618,
+            "places": 1228,
+            "roadSamples": 53290
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 349,
+            "landmark": 199,
+            "place": 18,
+            "source": 12,
+            "street": 157
+          }
+        },
+        "pbfSha256": "b0adf2a7485e3498f429cf845fc3a13e2256a7b616f706c0cc7958ea12f440c7",
+        "peakRssBytes": 2551545856,
+        "recordCount": 735,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 940,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 761,
+            "percent": 81
+          },
+          "covered": {
+            "count": 772,
+            "percent": 82.1
+          },
+          "access": {
+            "count": 177,
+            "percent": 18.8
+          },
+          "bicycle_pa": {
+            "count": 777,
+            "percent": 82.7
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 12.7,
+        "geometryCounts": {
+          "node": 857,
+          "relation": 0,
+          "way": 83
+        },
+        "id": "gloucestershire",
+        "label": "Gloucestershire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4195,
+            "landmarks": 6044,
+            "nearbyNodes": 655237,
+            "places": 1425,
+            "roadSamples": 55417
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 509,
+            "landmark": 252,
+            "place": 11,
+            "source": 0,
+            "street": 168
+          }
+        },
+        "pbfSha256": "3d22722e441ba49214e2cdaeed9d3c9f282514b2b29f8efd771169aedf6a8db3",
+        "peakRssBytes": 2485321728,
+        "recordCount": 940,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 27262,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 25615,
+            "percent": 94
+          },
+          "covered": {
+            "count": 16759,
+            "percent": 61.5
+          },
+          "access": {
+            "count": 5094,
+            "percent": 18.7
+          },
+          "bicycle_pa": {
+            "count": 25030,
+            "percent": 91.8
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 93.8,
+        "geometryCounts": {
+          "node": 26737,
+          "relation": 1,
+          "way": 524
+        },
+        "id": "greater-london",
+        "label": "Greater London",
+        "naming": {
+          "contextCounts": {
+            "junctions": 66298,
+            "landmarks": 86920,
+            "nearbyNodes": 7179693,
+            "places": 1064,
+            "roadSamples": 752763
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 22670,
+            "landmark": 2320,
+            "place": 97,
+            "source": 213,
+            "street": 1962
+          }
+        },
+        "pbfSha256": "53847c6722384ce023e8cc6def77d8a26e24511aa8adc1e7236bc68d5619512e",
+        "peakRssBytes": 2826731520,
+        "recordCount": 27262,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1195,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 884,
+            "percent": 74
+          },
+          "covered": {
+            "count": 910,
+            "percent": 76.2
+          },
+          "access": {
+            "count": 376,
+            "percent": 31.5
+          },
+          "bicycle_pa": {
+            "count": 1080,
+            "percent": 90.4
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 16.2,
+        "geometryCounts": {
+          "node": 1081,
+          "relation": 0,
+          "way": 114
+        },
+        "id": "greater-manchester",
+        "label": "Greater Manchester",
+        "naming": {
+          "contextCounts": {
+            "junctions": 10916,
+            "landmarks": 11183,
+            "nearbyNodes": 809517,
+            "places": 771,
+            "roadSamples": 100863
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 809,
+            "landmark": 189,
+            "place": 11,
+            "source": 18,
+            "street": 168
+          }
+        },
+        "pbfSha256": "647b487ac6f8a78094c9c739f57563a67876b4b6c3b44390d161f3e041c9deae",
+        "peakRssBytes": 2480160768,
+        "recordCount": 1195,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1621,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 1352,
+            "percent": 83.4
+          },
+          "covered": {
+            "count": 1391,
+            "percent": 85.8
+          },
+          "access": {
+            "count": 264,
+            "percent": 16.3
+          },
+          "bicycle_pa": {
+            "count": 1381,
+            "percent": 85.2
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 20.1,
+        "geometryCounts": {
+          "node": 1443,
+          "relation": 0,
+          "way": 178
+        },
+        "id": "hampshire",
+        "label": "Hampshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 8839,
+            "landmarks": 10829,
+            "nearbyNodes": 1138712,
+            "places": 4322,
+            "roadSamples": 118553
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 925,
+            "landmark": 372,
+            "place": 22,
+            "source": 46,
+            "street": 256
+          }
+        },
+        "pbfSha256": "1be769148eb8cc62558029a3b89ff8a4c3e658913a4bfdf1f71338b32ac34be5",
+        "peakRssBytes": 2527133696,
+        "recordCount": 1621,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 42,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 32,
+            "percent": 76.2
+          },
+          "covered": {
+            "count": 29,
+            "percent": 69
+          },
+          "access": {
+            "count": 2,
+            "percent": 4.8
+          },
+          "bicycle_pa": {
+            "count": 33,
+            "percent": 78.6
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 2.8,
+        "geometryCounts": {
+          "node": 38,
+          "relation": 0,
+          "way": 4
+        },
+        "id": "herefordshire",
+        "label": "Herefordshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 306,
+            "landmarks": 643,
+            "nearbyNodes": 29953,
+            "places": 648,
+            "roadSamples": 3128
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 25,
+            "landmark": 10,
+            "place": 1,
+            "source": 0,
+            "street": 6
+          }
+        },
+        "pbfSha256": "bd1011ebf322f5983e2de39a043b574db94ed2730dc2663b9202c22b09e074ef",
+        "peakRssBytes": 2488156160,
+        "recordCount": 42,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 567,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 388,
+            "percent": 68.4
+          },
+          "covered": {
+            "count": 422,
+            "percent": 74.4
+          },
+          "access": {
+            "count": 114,
+            "percent": 20.1
+          },
+          "bicycle_pa": {
+            "count": 450,
+            "percent": 79.4
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 11.1,
+        "geometryCounts": {
+          "node": 485,
+          "relation": 0,
+          "way": 82
+        },
+        "id": "hertfordshire",
+        "label": "Hertfordshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 3224,
+            "landmarks": 5117,
+            "nearbyNodes": 492587,
+            "places": 774,
+            "roadSamples": 43755
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 304,
+            "landmark": 139,
+            "place": 5,
+            "source": 28,
+            "street": 91
+          }
+        },
+        "pbfSha256": "4b263ea99e0e01e6b5430d478dd0daf501df58f4a9c70c4dcaa74aedcfbe8526",
+        "peakRssBytes": 2521825280,
+        "recordCount": 567,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 153,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 125,
+            "percent": 81.7
+          },
+          "covered": {
+            "count": 127,
+            "percent": 83
+          },
+          "access": {
+            "count": 36,
+            "percent": 23.5
+          },
+          "bicycle_pa": {
+            "count": 117,
+            "percent": 76.5
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 2.2,
+        "geometryCounts": {
+          "node": 151,
+          "relation": 0,
+          "way": 2
+        },
+        "id": "isle-of-wight",
+        "label": "Isle of Wight",
+        "naming": {
+          "contextCounts": {
+            "junctions": 814,
+            "landmarks": 1867,
+            "nearbyNodes": 117785,
+            "places": 422,
+            "roadSamples": 9171
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 92,
+            "landmark": 33,
+            "place": 10,
+            "source": 2,
+            "street": 16
+          }
+        },
+        "pbfSha256": "2ecbbc832cd0a478ed4ad6ad33acc00fd94aa0fd890ead5449c4b816afbf80f2",
+        "peakRssBytes": 2529263616,
+        "recordCount": 153,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1382,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 1214,
+            "percent": 87.8
+          },
+          "covered": {
+            "count": 1164,
+            "percent": 84.2
+          },
+          "access": {
+            "count": 198,
+            "percent": 14.3
+          },
+          "bicycle_pa": {
+            "count": 1135,
+            "percent": 82.1
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 15.5,
+        "geometryCounts": {
+          "node": 1326,
+          "relation": 0,
+          "way": 56
+        },
+        "id": "kent",
+        "label": "Kent",
+        "naming": {
+          "contextCounts": {
+            "junctions": 7068,
+            "landmarks": 9679,
+            "nearbyNodes": 808491,
+            "places": 1612,
+            "roadSamples": 91125
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 764,
+            "landmark": 397,
+            "place": 22,
+            "source": 14,
+            "street": 185
+          }
+        },
+        "pbfSha256": "ab93adea0b5159b8db53652f360c9bfb9898756da89586230b7a9bab59d744ed",
+        "peakRssBytes": 2558525440,
+        "recordCount": 1382,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 631,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 539,
+            "percent": 85.4
+          },
+          "covered": {
+            "count": 547,
+            "percent": 86.7
+          },
+          "access": {
+            "count": 351,
+            "percent": 55.6
+          },
+          "bicycle_pa": {
+            "count": 595,
+            "percent": 94.3
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 11.6,
+        "geometryCounts": {
+          "node": 558,
+          "relation": 0,
+          "way": 73
+        },
+        "id": "lancashire",
+        "label": "Lancashire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4777,
+            "landmarks": 5300,
+            "nearbyNodes": 364730,
+            "places": 1340,
+            "roadSamples": 42029
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 368,
+            "landmark": 161,
+            "place": 10,
+            "source": 2,
+            "street": 90
+          }
+        },
+        "pbfSha256": "077eca38ffe82be5f004bec5a71be0b98325f0543806d454470eea6dd177dae3",
+        "peakRssBytes": 2486878208,
+        "recordCount": 631,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 403,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 276,
+            "percent": 68.5
+          },
+          "covered": {
+            "count": 317,
+            "percent": 78.7
+          },
+          "access": {
+            "count": 79,
+            "percent": 19.6
+          },
+          "bicycle_pa": {
+            "count": 315,
+            "percent": 78.2
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 5.6,
+        "geometryCounts": {
+          "node": 344,
+          "relation": 0,
+          "way": 59
+        },
+        "id": "leicestershire",
+        "label": "Leicestershire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2583,
+            "landmarks": 3649,
+            "nearbyNodes": 200692,
+            "places": 775,
+            "roadSamples": 25794
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 239,
+            "landmark": 68,
+            "place": 13,
+            "source": 9,
+            "street": 74
+          }
+        },
+        "pbfSha256": "81874db365630889e120e5f6adadc3d2f404be5b928469a1ce55df1060797af2",
+        "peakRssBytes": 2503557120,
+        "recordCount": 403,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 299,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 211,
+            "percent": 70.6
+          },
+          "covered": {
+            "count": 174,
+            "percent": 58.2
+          },
+          "access": {
+            "count": 83,
+            "percent": 27.8
+          },
+          "bicycle_pa": {
+            "count": 236,
+            "percent": 78.9
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 11.8,
+        "geometryCounts": {
+          "node": 262,
+          "relation": 0,
+          "way": 37
+        },
+        "id": "lincolnshire",
+        "label": "Lincolnshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2230,
+            "landmarks": 4028,
+            "nearbyNodes": 248860,
+            "places": 11330,
+            "roadSamples": 24763
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 147,
+            "landmark": 80,
+            "place": 15,
+            "source": 7,
+            "street": 50
+          }
+        },
+        "pbfSha256": "8e02adbf0f2fa98f694dda552f23612a74a7d4051bd0934e27154c457f6c8dd8",
+        "peakRssBytes": 2520481792,
+        "recordCount": 299,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 444,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 327,
+            "percent": 73.6
+          },
+          "covered": {
+            "count": 294,
+            "percent": 66.2
+          },
+          "access": {
+            "count": 166,
+            "percent": 37.4
+          },
+          "bicycle_pa": {
+            "count": 348,
+            "percent": 78.4
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 9.1,
+        "geometryCounts": {
+          "node": 391,
+          "relation": 1,
+          "way": 52
+        },
+        "id": "merseyside",
+        "label": "Merseyside",
+        "naming": {
+          "contextCounts": {
+            "junctions": 3584,
+            "landmarks": 4295,
+            "nearbyNodes": 315323,
+            "places": 289,
+            "roadSamples": 29558
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 291,
+            "landmark": 83,
+            "place": 6,
+            "source": 9,
+            "street": 55
+          }
+        },
+        "pbfSha256": "a54a96e8e838b8a3464f854299977910e695ef53b352539bb434e3b616ebfab1",
+        "peakRssBytes": 2551840768,
+        "recordCount": 444,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 907,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 784,
+            "percent": 86.4
+          },
+          "covered": {
+            "count": 727,
+            "percent": 80.2
+          },
+          "access": {
+            "count": 90,
+            "percent": 9.9
+          },
+          "bicycle_pa": {
+            "count": 727,
+            "percent": 80.2
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 13,
+        "geometryCounts": {
+          "node": 871,
+          "relation": 0,
+          "way": 36
+        },
+        "id": "norfolk",
+        "label": "Norfolk",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4520,
+            "landmarks": 6739,
+            "nearbyNodes": 546272,
+            "places": 2012,
+            "roadSamples": 60532
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 438,
+            "landmark": 207,
+            "place": 11,
+            "source": 117,
+            "street": 134
+          }
+        },
+        "pbfSha256": "464737663d97a2f2bef1a757d4c853906904fff35f29f7a37fe095331da02993",
+        "peakRssBytes": 2580922368,
+        "recordCount": 907,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1309,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 1180,
+            "percent": 90.1
+          },
+          "covered": {
+            "count": 1183,
+            "percent": 90.4
+          },
+          "access": {
+            "count": 751,
+            "percent": 57.4
+          },
+          "bicycle_pa": {
+            "count": 1233,
+            "percent": 94.2
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 17.4,
+        "geometryCounts": {
+          "node": 1178,
+          "relation": 0,
+          "way": 131
+        },
+        "id": "north-yorkshire",
+        "label": "North Yorkshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 5486,
+            "landmarks": 7921,
+            "nearbyNodes": 626574,
+            "places": 5921,
+            "roadSamples": 58950
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 635,
+            "landmark": 379,
+            "place": 11,
+            "source": 36,
+            "street": 248
+          }
+        },
+        "pbfSha256": "2a2e46fc10f399211054bbfc0e310f717908d9652cd2fd262739ab009d084350",
+        "peakRssBytes": 2514960384,
+        "recordCount": 1309,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 311,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 275,
+            "percent": 88.4
+          },
+          "covered": {
+            "count": 268,
+            "percent": 86.2
+          },
+          "access": {
+            "count": 210,
+            "percent": 67.5
+          },
+          "bicycle_pa": {
+            "count": 267,
+            "percent": 85.9
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 6,
+        "geometryCounts": {
+          "node": 300,
+          "relation": 0,
+          "way": 11
+        },
+        "id": "northamptonshire",
+        "label": "Northamptonshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1580,
+            "landmarks": 3191,
+            "nearbyNodes": 171007,
+            "places": 549,
+            "roadSamples": 19556
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 158,
+            "landmark": 104,
+            "place": 6,
+            "source": 2,
+            "street": 41
+          }
+        },
+        "pbfSha256": "f164599afc3323e5420e2f654ce70edec58607ee05674d55880a67bf2781f8f8",
+        "peakRssBytes": 2530820096,
+        "recordCount": 311,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 176,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 148,
+            "percent": 84.1
+          },
+          "covered": {
+            "count": 144,
+            "percent": 81.8
+          },
+          "access": {
+            "count": 38,
+            "percent": 21.6
+          },
+          "bicycle_pa": {
+            "count": 146,
+            "percent": 83
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 6.8,
+        "geometryCounts": {
+          "node": 161,
+          "relation": 0,
+          "way": 15
+        },
+        "id": "northumberland",
+        "label": "Northumberland",
+        "naming": {
+          "contextCounts": {
+            "junctions": 958,
+            "landmarks": 1945,
+            "nearbyNodes": 114116,
+            "places": 3495,
+            "roadSamples": 10653
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 63,
+            "landmark": 80,
+            "place": 5,
+            "source": 0,
+            "street": 28
+          }
+        },
+        "pbfSha256": "e1f6d651d87fd397dcab15a026bfe858a4688b76e57759c9c62c6fb8909f41dd",
+        "peakRssBytes": 2538733568,
+        "recordCount": 176,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 864,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 721,
+            "percent": 83.4
+          },
+          "covered": {
+            "count": 683,
+            "percent": 79.1
+          },
+          "access": {
+            "count": 244,
+            "percent": 28.2
+          },
+          "bicycle_pa": {
+            "count": 675,
+            "percent": 78.1
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 11.6,
+        "geometryCounts": {
+          "node": 788,
+          "relation": 0,
+          "way": 76
+        },
+        "id": "nottinghamshire",
+        "label": "Nottinghamshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 5065,
+            "landmarks": 7554,
+            "nearbyNodes": 685946,
+            "places": 960,
+            "roadSamples": 57456
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 455,
+            "landmark": 235,
+            "place": 13,
+            "source": 31,
+            "street": 130
+          }
+        },
+        "pbfSha256": "9bb9b340cb78be6f24c22eac9f9d92b36b822dffb1da9c46e9fafcac711a391e",
+        "peakRssBytes": 2597355520,
+        "recordCount": 864,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1349,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 1000,
+            "percent": 74.1
+          },
+          "covered": {
+            "count": 938,
+            "percent": 69.5
+          },
+          "access": {
+            "count": 304,
+            "percent": 22.5
+          },
+          "bicycle_pa": {
+            "count": 1013,
+            "percent": 75.1
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 9.1,
+        "geometryCounts": {
+          "node": 1145,
+          "relation": 0,
+          "way": 204
+        },
+        "id": "oxfordshire",
+        "label": "Oxfordshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4213,
+            "landmarks": 5260,
+            "nearbyNodes": 621318,
+            "places": 839,
+            "roadSamples": 56553
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 779,
+            "landmark": 310,
+            "place": 24,
+            "source": 12,
+            "street": 224
+          }
+        },
+        "pbfSha256": "dc5f90da104ef1d9dfafce898ede1ba98506aec3d3b78103e5e2318e7d22dc21",
+        "peakRssBytes": 2479816704,
+        "recordCount": 1349,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 8,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 4,
+            "percent": 50
+          },
+          "covered": {
+            "count": 5,
+            "percent": 62.5
+          },
+          "access": {
+            "count": 1,
+            "percent": 12.5
+          },
+          "bicycle_pa": {
+            "count": 3,
+            "percent": 37.5
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 0.3,
+        "geometryCounts": {
+          "node": 8,
+          "relation": 0,
+          "way": 0
+        },
+        "id": "rutland",
+        "label": "Rutland",
+        "naming": {
+          "contextCounts": {
+            "junctions": 66,
+            "landmarks": 206,
+            "nearbyNodes": 4366,
+            "places": 350,
+            "roadSamples": 773
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 5,
+            "landmark": 2,
+            "place": 0,
+            "source": 0,
+            "street": 1
+          }
+        },
+        "pbfSha256": "f9af317aebfeaa7ff02421b6a8657754c5340583c98e5ca43a2bc92233ea08e4",
+        "peakRssBytes": 2466496512,
+        "recordCount": 8,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 244,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 183,
+            "percent": 75
+          },
+          "covered": {
+            "count": 204,
+            "percent": 83.6
+          },
+          "access": {
+            "count": 119,
+            "percent": 48.8
+          },
+          "bicycle_pa": {
+            "count": 207,
+            "percent": 84.8
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 6.8,
+        "geometryCounts": {
+          "node": 231,
+          "relation": 0,
+          "way": 13
+        },
+        "id": "shropshire",
+        "label": "Shropshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1434,
+            "landmarks": 2501,
+            "nearbyNodes": 160469,
+            "places": 1322,
+            "roadSamples": 17993
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 122,
+            "landmark": 84,
+            "place": 3,
+            "source": 10,
+            "street": 25
+          }
+        },
+        "pbfSha256": "36a5993b0b53518bc82e5db46740cce81453c1b8abd0a30dd7cdcf332345d020",
+        "peakRssBytes": 2481979392,
+        "recordCount": 244,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 802,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 698,
+            "percent": 87
+          },
+          "covered": {
+            "count": 624,
+            "percent": 77.8
+          },
+          "access": {
+            "count": 154,
+            "percent": 19.2
+          },
+          "bicycle_pa": {
+            "count": 658,
+            "percent": 82
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 14.7,
+        "geometryCounts": {
+          "node": 729,
+          "relation": 0,
+          "way": 73
+        },
+        "id": "somerset",
+        "label": "Somerset",
+        "naming": {
+          "contextCounts": {
+            "junctions": 3699,
+            "landmarks": 5522,
+            "nearbyNodes": 575423,
+            "places": 1985,
+            "roadSamples": 51705
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 474,
+            "landmark": 184,
+            "place": 25,
+            "source": 5,
+            "street": 114
+          }
+        },
+        "pbfSha256": "1945bad1825b84bf2e878d9876f4ea6493919ad1a8c424549d73f99a50dee247",
+        "peakRssBytes": 2544992256,
+        "recordCount": 802,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 891,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 774,
+            "percent": 86.9
+          },
+          "covered": {
+            "count": 766,
+            "percent": 86
+          },
+          "access": {
+            "count": 441,
+            "percent": 49.5
+          },
+          "bicycle_pa": {
+            "count": 787,
+            "percent": 88.3
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 8.6,
+        "geometryCounts": {
+          "node": 860,
+          "relation": 0,
+          "way": 31
+        },
+        "id": "south-yorkshire",
+        "label": "South Yorkshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4999,
+            "landmarks": 6896,
+            "nearbyNodes": 467445,
+            "places": 931,
+            "roadSamples": 54283
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 622,
+            "landmark": 148,
+            "place": 3,
+            "source": 7,
+            "street": 111
+          }
+        },
+        "pbfSha256": "5854091c89419f761082336a655d53d0762e01ee1109f1d1f278399156a650e2",
+        "peakRssBytes": 2451456000,
+        "recordCount": 891,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 275,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 215,
+            "percent": 78.2
+          },
+          "covered": {
+            "count": 225,
+            "percent": 81.8
+          },
+          "access": {
+            "count": 107,
+            "percent": 38.9
+          },
+          "bicycle_pa": {
+            "count": 225,
+            "percent": 81.8
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 8.1,
+        "geometryCounts": {
+          "node": 260,
+          "relation": 0,
+          "way": 15
+        },
+        "id": "staffordshire",
+        "label": "Staffordshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2281,
+            "landmarks": 2956,
+            "nearbyNodes": 180105,
+            "places": 855,
+            "roadSamples": 22186
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 143,
+            "landmark": 78,
+            "place": 2,
+            "source": 5,
+            "street": 47
+          }
+        },
+        "pbfSha256": "c25c2a222c8a167f1ddbbc3974a73aa67384afb7da3200c9028aa7251e0e65ca",
+        "peakRssBytes": 2458664960,
+        "recordCount": 275,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 459,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 356,
+            "percent": 77.6
+          },
+          "covered": {
+            "count": 333,
+            "percent": 72.5
+          },
+          "access": {
+            "count": 72,
+            "percent": 15.7
+          },
+          "bicycle_pa": {
+            "count": 366,
+            "percent": 79.7
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 9.2,
+        "geometryCounts": {
+          "node": 425,
+          "relation": 0,
+          "way": 34
+        },
+        "id": "suffolk",
+        "label": "Suffolk",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2578,
+            "landmarks": 4487,
+            "nearbyNodes": 320898,
+            "places": 1063,
+            "roadSamples": 31780
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 241,
+            "landmark": 137,
+            "place": 9,
+            "source": 9,
+            "street": 63
+          }
+        },
+        "pbfSha256": "8a6ddba8bf403567fb471ce9773ea5a7c73a0aba87e2ba0b50fd442ab1ed1a69",
+        "peakRssBytes": 2457993216,
+        "recordCount": 459,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 710,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 525,
+            "percent": 73.9
+          },
+          "covered": {
+            "count": 512,
+            "percent": 72.1
+          },
+          "access": {
+            "count": 132,
+            "percent": 18.6
+          },
+          "bicycle_pa": {
+            "count": 546,
+            "percent": 76.9
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 12.1,
+        "geometryCounts": {
+          "node": 640,
+          "relation": 0,
+          "way": 70
+        },
+        "id": "surrey",
+        "label": "Surrey",
+        "naming": {
+          "contextCounts": {
+            "junctions": 3966,
+            "landmarks": 6264,
+            "nearbyNodes": 561908,
+            "places": 1387,
+            "roadSamples": 58359
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 407,
+            "landmark": 196,
+            "place": 7,
+            "source": 10,
+            "street": 90
+          }
+        },
+        "pbfSha256": "9de2e3d1182d1704a619135708397e2f93778e3e2f018eac7470a68a7db71cfd",
+        "peakRssBytes": 2518646784,
+        "recordCount": 710,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 738,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 631,
+            "percent": 85.5
+          },
+          "covered": {
+            "count": 601,
+            "percent": 81.4
+          },
+          "access": {
+            "count": 242,
+            "percent": 32.8
+          },
+          "bicycle_pa": {
+            "count": 655,
+            "percent": 88.8
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 5.8,
+        "geometryCounts": {
+          "node": 721,
+          "relation": 0,
+          "way": 17
+        },
+        "id": "tyne-and-wear",
+        "label": "Tyne and Wear",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4003,
+            "landmarks": 6261,
+            "nearbyNodes": 287344,
+            "places": 289,
+            "roadSamples": 38605
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 420,
+            "landmark": 211,
+            "place": 5,
+            "source": 5,
+            "street": 97
+          }
+        },
+        "pbfSha256": "85f62a2d67dfcab1c914c8de4ff1bc9b90f48438acbafbf95c7a163290746811",
+        "peakRssBytes": 2482290688,
+        "recordCount": 738,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 363,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 307,
+            "percent": 84.6
+          },
+          "covered": {
+            "count": 311,
+            "percent": 85.7
+          },
+          "access": {
+            "count": 89,
+            "percent": 24.5
+          },
+          "bicycle_pa": {
+            "count": 310,
+            "percent": 85.4
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 7,
+        "geometryCounts": {
+          "node": 322,
+          "relation": 0,
+          "way": 41
+        },
+        "id": "warwickshire",
+        "label": "Warwickshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1720,
+            "landmarks": 3044,
+            "nearbyNodes": 256612,
+            "places": 509,
+            "roadSamples": 27162
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 157,
+            "landmark": 124,
+            "place": 22,
+            "source": 11,
+            "street": 49
+          }
+        },
+        "pbfSha256": "03e27d8e720d3802da6a11933baf3b0173ce7a64259d600c6aeb6c5527b46700",
+        "peakRssBytes": 2453159936,
+        "recordCount": 363,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1575,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 1340,
+            "percent": 85.1
+          },
+          "covered": {
+            "count": 1140,
+            "percent": 72.4
+          },
+          "access": {
+            "count": 388,
+            "percent": 24.6
+          },
+          "bicycle_pa": {
+            "count": 1206,
+            "percent": 76.6
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 17.9,
+        "geometryCounts": {
+          "node": 1450,
+          "relation": 0,
+          "way": 125
+        },
+        "id": "west-midlands",
+        "label": "West Midlands",
+        "naming": {
+          "contextCounts": {
+            "junctions": 8230,
+            "landmarks": 14472,
+            "nearbyNodes": 1074061,
+            "places": 676,
+            "roadSamples": 97551
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 851,
+            "landmark": 332,
+            "place": 12,
+            "source": 177,
+            "street": 203
+          }
+        },
+        "pbfSha256": "aa39f5d57665d26a71db7154880fa59ecb2c87eb66ce07a37d8036989d557f14",
+        "peakRssBytes": 2523512832,
+        "recordCount": 1575,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 969,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 722,
+            "percent": 74.5
+          },
+          "covered": {
+            "count": 717,
+            "percent": 74
+          },
+          "access": {
+            "count": 220,
+            "percent": 22.7
+          },
+          "bicycle_pa": {
+            "count": 788,
+            "percent": 81.3
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 16,
+        "geometryCounts": {
+          "node": 821,
+          "relation": 0,
+          "way": 148
+        },
+        "id": "west-sussex",
+        "label": "West Sussex",
+        "naming": {
+          "contextCounts": {
+            "junctions": 4877,
+            "landmarks": 8798,
+            "nearbyNodes": 807324,
+            "places": 1867,
+            "roadSamples": 59033
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 639,
+            "landmark": 153,
+            "place": 6,
+            "source": 53,
+            "street": 118
+          }
+        },
+        "pbfSha256": "471d65369f2b9217b901bcfded1510e80e452b1c17e2d1d6a3cc876d2752b5a3",
+        "peakRssBytes": 2550693888,
+        "recordCount": 969,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 921,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 745,
+            "percent": 80.9
+          },
+          "covered": {
+            "count": 739,
+            "percent": 80.2
+          },
+          "access": {
+            "count": 358,
+            "percent": 38.9
+          },
+          "bicycle_pa": {
+            "count": 816,
+            "percent": 88.6
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 17.6,
+        "geometryCounts": {
+          "node": 784,
+          "relation": 1,
+          "way": 136
+        },
+        "id": "west-yorkshire",
+        "label": "West Yorkshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 9226,
+            "landmarks": 11315,
+            "nearbyNodes": 574189,
+            "places": 1806,
+            "roadSamples": 73954
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 611,
+            "landmark": 183,
+            "place": 7,
+            "source": 23,
+            "street": 97
+          }
+        },
+        "pbfSha256": "9c18b0f4f8bd32572d3089a7ee332761c578716237f717ef0529d797e8ae6ca2",
+        "peakRssBytes": 2614362112,
+        "recordCount": 921,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 377,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 302,
+            "percent": 80.1
+          },
+          "covered": {
+            "count": 314,
+            "percent": 83.3
+          },
+          "access": {
+            "count": 122,
+            "percent": 32.4
+          },
+          "bicycle_pa": {
+            "count": 278,
+            "percent": 73.7
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 10.7,
+        "geometryCounts": {
+          "node": 331,
+          "relation": 0,
+          "way": 46
+        },
+        "id": "wiltshire",
+        "label": "Wiltshire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 2506,
+            "landmarks": 3226,
+            "nearbyNodes": 370385,
+            "places": 1474,
+            "roadSamples": 45266
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 179,
+            "landmark": 121,
+            "place": 11,
+            "source": 1,
+            "street": 65
+          }
+        },
+        "pbfSha256": "e583871346a28336c8cee1ca1c74f819f6fcefcadf29263967c3feef02f0a9b6",
+        "peakRssBytes": 2648014848,
+        "recordCount": 377,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 255,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 216,
+            "percent": 84.7
+          },
+          "covered": {
+            "count": 181,
+            "percent": 71
+          },
+          "access": {
+            "count": 32,
+            "percent": 12.5
+          },
+          "bicycle_pa": {
+            "count": 190,
+            "percent": 74.5
+          }
+        },
+        "countryId": "england",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 5.6,
+        "geometryCounts": {
+          "node": 241,
+          "relation": 0,
+          "way": 14
+        },
+        "id": "worcestershire",
+        "label": "Worcestershire",
+        "naming": {
+          "contextCounts": {
+            "junctions": 1490,
+            "landmarks": 2464,
+            "nearbyNodes": 153711,
+            "places": 654,
+            "roadSamples": 16572
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 133,
+            "landmark": 75,
+            "place": 5,
+            "source": 1,
+            "street": 41
+          }
+        },
+        "pbfSha256": "51885b085912cec7da9063c4d84693e50633e955181e9d261c9218443071efee",
+        "peakRssBytes": 2663481344,
+        "recordCount": 255,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 1198,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 888,
+            "percent": 74.1
+          },
+          "covered": {
+            "count": 728,
+            "percent": 60.8
+          },
+          "access": {
+            "count": 243,
+            "percent": 20.3
+          },
+          "bicycle_pa": {
+            "count": 817,
+            "percent": 68.2
+          }
+        },
+        "countryId": "wales",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 44.6,
+        "geometryCounts": {
+          "node": 1058,
+          "relation": 0,
+          "way": 140
+        },
+        "id": "wales",
+        "label": "Wales",
+        "naming": {
+          "contextCounts": {
+            "junctions": 7046,
+            "landmarks": 13111,
+            "nearbyNodes": 1072172,
+            "places": 5278,
+            "roadSamples": 87263
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 595,
+            "landmark": 329,
+            "place": 23,
+            "source": 50,
+            "street": 201
+          }
+        },
+        "pbfSha256": "c4c3aa28ac3cd0279bee696e98bece7856479717ce5da1fd45b7ffab123cc818",
+        "peakRssBytes": 2722529280,
+        "recordCount": 1198,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-latest.osm.pbf"
+      },
+      {
+        "completeness": {
+          "name": {
+            "count": 4414,
+            "percent": 100
+          },
+          "capacity": {
+            "count": 3421,
+            "percent": 77.5
+          },
+          "covered": {
+            "count": 3527,
+            "percent": 79.9
+          },
+          "access": {
+            "count": 1965,
+            "percent": 44.5
+          },
+          "bicycle_pa": {
+            "count": 3648,
+            "percent": 82.6
+          }
+        },
+        "countryId": "ireland",
+        "discarded": {
+          "relation": 0,
+          "way": 0
+        },
+        "elapsedSeconds": 137.7,
+        "geometryCounts": {
+          "node": 3992,
+          "relation": 0,
+          "way": 422
+        },
+        "id": "ireland-and-northern-ireland",
+        "label": "Ireland and Northern Ireland",
+        "naming": {
+          "contextCounts": {
+            "junctions": 18390,
+            "landmarks": 33278,
+            "nearbyNodes": 3653806,
+            "places": 18689,
+            "roadSamples": 257809
+          },
+          "counts": {
+            "generic": 0,
+            "junction": 2474,
+            "landmark": 1021,
+            "place": 108,
+            "source": 39,
+            "street": 772
+          }
+        },
+        "pbfSha256": "124f51c52b3945c5ab4d6816cd7d2c370e642d93d38af66dbb27fdd236a6bf45",
+        "peakRssBytes": 2724003840,
+        "recordCount": 4414,
+        "sourceTimestamp": "2026-07-15T20:21:10.000Z",
+        "sourceUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf"
+      }
+    ],
+    "recordCount": 68860
   },
-  "refreshedAt": "2026-07-15T21:21:27.298Z",
-  "schemaVersion": 1
+  "refreshedAt": "2026-07-16T15:41:31.822Z",
+  "resourceUsage": {
+    "elapsedSeconds": 871.9,
+    "peakRssBytes": 2826731520
+  },
+  "schemaVersion": 2
 }

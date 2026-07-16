@@ -24,6 +24,16 @@ export type ParkingDataSource = {
   sourceUrl: string;
 };
 
+export type ParkingCoverageArea = {
+  bounds: { east: number; north: number; south: number; west: number };
+  id: string;
+  label: string;
+  rings: {
+    coordinates: [number, number][];
+    exclude: boolean;
+  }[];
+};
+
 export type ParkingDataManifest = {
   chunkZoom: number;
   chunks: Record<
@@ -35,7 +45,7 @@ export type ParkingDataManifest = {
     }
   >;
   coverage: {
-    bounds: { east: number; north: number; south: number; west: number };
+    areas: ParkingCoverageArea[];
     label: string;
   };
   pointIndexPath: string;

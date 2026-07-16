@@ -2,9 +2,11 @@
 
 ## Project Shape
 
-- This is a static, backend-free Next.js app for finding cycle parking across Scotland.
+- This is a static, backend-free Next.js app for finding cycle parking across
+  the UK and Ireland.
 - The generated release combines City of Edinburgh Council data with
-  OpenStreetMap coverage from the Geofabrik Scotland extract.
+  OpenStreetMap coverage from Geofabrik extracts for Scotland, Wales, Ireland
+  and Northern Ireland, plus sequential England county extracts.
 - Runtime parking data is loaded from versioned zoom-12 chunks under
   `public/data/parking/`; there is no database or server API.
 - `src/data/cycle-parking.json` is the generated council snapshot, while
@@ -24,7 +26,7 @@
 
 - Refresh cycle parking data with `pnpm update:data`.
 - The refresh script downloads public council GeoJSON, downloads or reuses the
-  cached Scotland PBF, normalizes and merges both sources, derives contextual
+  cached regional PBFs, normalizes and merges all sources, derives contextual
   names offline, and rewrites the generated snapshot, report, manifest, chunks,
   and point index.
 - Treat `src/data/cycle-parking.json`, `src/data/cycle-parking-report.json`, and

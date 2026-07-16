@@ -1,4 +1,4 @@
-export const PARKING_SCHEMA_VERSION = 1;
+export const PARKING_SCHEMA_VERSION = 2;
 export const PARKING_CHUNK_ZOOM = 12;
 
 const earthRadiusMeters = 6_371_000;
@@ -94,32 +94,24 @@ export function shouldMergeCouncilAndOsm(councilPoint, osmPoint) {
 export function mergeParkingSources(councilPoints, osmPoints) {
   const suppressedOsmIds = new Set();
   const matches = [];
+  const osmIndex = createSpatialIndex(osmPoints);
 
   for (const councilPoint of councilPoints) {
-    let bestMatch = null;
-    let bestDistance = Number.POSITIVE_INFINITY;
+    const nearest = nearestEntry(
+      osmIndex,
+      councilPoint,
+      15,
+      (osmPoint) =>
+        !suppressedOsmIds.has(osmPoint.id) &&
+        shouldMergeCouncilAndOsm(councilPoint, osmPoint),
+    );
 
-    for (const osmPoint of osmPoints) {
-      if (suppressedOsmIds.has(osmPoint.id)) {
-        continue;
-      }
-
-      const separation = distanceMeters(councilPoint, osmPoint);
-      if (
-        separation < bestDistance &&
-        shouldMergeCouncilAndOsm(councilPoint, osmPoint)
-      ) {
-        bestDistance = separation;
-        bestMatch = osmPoint;
-      }
-    }
-
-    if (bestMatch) {
-      suppressedOsmIds.add(bestMatch.id);
+    if (nearest) {
+      suppressedOsmIds.add(nearest.entry.id);
       matches.push({
         councilId: councilPoint.id,
-        distanceMeters: Number(bestDistance.toFixed(2)),
-        osmId: bestMatch.id,
+        distanceMeters: Number(nearest.distance.toFixed(2)),
+        osmId: nearest.entry.id,
       });
     }
   }
@@ -131,6 +123,84 @@ export function mergeParkingSources(councilPoints, osmPoints) {
       ...osmPoints.filter((point) => !suppressedOsmIds.has(point.id)),
     ],
     suppressedOsmIds,
+  };
+}
+
+export function deduplicateParkingPoints(points) {
+  const pointsById = new Map();
+  const duplicateIds = new Set();
+
+  for (const point of points) {
+    if (pointsById.has(point.id)) {
+      duplicateIds.add(point.id);
+      continue;
+    }
+    pointsById.set(point.id, point);
+  }
+
+  return {
+    duplicateIds: [...duplicateIds].sort((left, right) =>
+      left.localeCompare(right),
+    ),
+    points: [...pointsById.values()].sort((left, right) =>
+      left.id.localeCompare(right.id),
+    ),
+  };
+}
+
+export function parseGeofabrikPoly(content, id, label) {
+  const lines = content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const rings = [];
+  let index = 1;
+
+  while (index < lines.length) {
+    const header = lines[index];
+    index += 1;
+    if (header === 'END') {
+      break;
+    }
+
+    const coordinates = [];
+    while (index < lines.length && lines[index] !== 'END') {
+      const [longitude, latitude] = lines[index].split(/\s+/).map(Number);
+      if (Number.isFinite(longitude) && Number.isFinite(latitude)) {
+        coordinates.push([longitude, latitude]);
+      }
+      index += 1;
+    }
+    index += 1;
+
+    if (coordinates.length >= 3) {
+      rings.push({
+        coordinates,
+        exclude: header.startsWith('!'),
+      });
+    }
+  }
+
+  const includedCoordinates = rings
+    .filter((ring) => !ring.exclude)
+    .flatMap((ring) => ring.coordinates);
+  if (includedCoordinates.length === 0) {
+    throw new Error(`Coverage polygon ${id} did not include any outer rings.`);
+  }
+
+  const longitudes = includedCoordinates.map(([longitude]) => longitude);
+  const latitudes = includedCoordinates.map(([, latitude]) => latitude);
+
+  return {
+    bounds: {
+      east: Math.max(...longitudes),
+      north: Math.max(...latitudes),
+      south: Math.min(...latitudes),
+      west: Math.min(...longitudes),
+    },
+    id,
+    label,
+    rings,
   };
 }
 

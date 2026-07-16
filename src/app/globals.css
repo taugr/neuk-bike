@@ -2196,6 +2196,7 @@ a {
     min-height: 0;
     opacity: var(--mobile-sheet-body-opacity, 1);
     overflow: hidden;
+    padding-top: 0.25rem;
     transform: translateY(var(--mobile-sheet-body-offset, 0px));
     transition: visibility 0s linear 0s;
     visibility: visible;
@@ -2455,6 +2456,14 @@ a {
     top: 4.75rem;
   }
 
+  .app-shell[data-directions-mode='true'] .maplibregl-ctrl-bottom-right {
+    top: max(0.25rem, env(safe-area-inset-top));
+  }
+
+  .app-shell[data-directions-mode='true'] .maplibregl-ctrl-top-left {
+    top: max(0.65rem, env(safe-area-inset-top));
+  }
+
   .app-header {
     gap: 0.65rem;
   }
@@ -2482,7 +2491,7 @@ a {
   }
 
   .list-heading {
-    margin-top: 0.1rem;
+    margin-top: 0;
   }
 
   .attribution {

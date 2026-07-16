@@ -28,6 +28,37 @@ async function expectFinderReady(page: Page) {
   await expect(page.locator('.parking-list-item')).not.toHaveCount(0);
 }
 
+async function expectMapFocusedAt(
+  page: Page,
+  latitude: number,
+  longitude: number,
+) {
+  const map = page.getByTestId('parking-map');
+  await expect
+    .poll(async () => {
+      const [zoom, west, east, south, north] = await Promise.all(
+        [
+          'data-map-zoom',
+          'data-map-west',
+          'data-map-east',
+          'data-map-south',
+          'data-map-north',
+        ].map((attribute) => map.getAttribute(attribute)),
+      );
+      if ([zoom, west, east, south, north].some((value) => value === null)) {
+        return false;
+      }
+      return (
+        Number(zoom) > 10 &&
+        Number(west) < longitude &&
+        Number(east) > longitude &&
+        Number(south) < latitude &&
+        Number(north) > latitude
+      );
+    })
+    .toBe(true);
+}
+
 async function openShortRouteDirections(page: Page) {
   await page.goto(
     parkingOneReferenceUrl({
@@ -62,17 +93,18 @@ test('keeps manual zoom after background parking chunks load', async ({
   page,
 }) => {
   const loadedParkingChunks = new Set<string>();
-  const selectedParkingChunkPath = '/12/1962/1255.json';
+  const selectedParkingChunkPath = '/chunks/12/1962/1255.';
 
   await page.route('**/data/parking/**/*.json', async (route) => {
     const pathname = new URL(route.request().url()).pathname;
+    const chunkCoordinates = pathname.match(
+      /\/chunks\/12\/(\d+)\/(\d+)\.[a-f0-9]+\.json$/,
+    );
+    const isSelectedAreaChunk =
+      chunkCoordinates !== null && Number(chunkCoordinates[1]) < 2_000;
 
-    if (
-      !pathname.endsWith('/manifest.json') &&
-      !pathname.endsWith('/point-index.json') &&
-      !pathname.endsWith(selectedParkingChunkPath)
-    ) {
-      await new Promise((resolve) => setTimeout(resolve, 2_500));
+    if (isSelectedAreaChunk && !pathname.includes(selectedParkingChunkPath)) {
+      await new Promise((resolve) => setTimeout(resolve, 3_500));
     }
 
     await route.continue();
@@ -83,13 +115,15 @@ test('keeps manual zoom after background parking chunks load', async ({
     if (
       url.pathname.includes('/data/parking/') &&
       !url.pathname.endsWith('/manifest.json') &&
-      !url.pathname.endsWith('/point-index.json')
+      !url.pathname.includes('/indexes/point-index.')
     ) {
       loadedParkingChunks.add(url.pathname);
     }
   });
 
-  await page.goto('/?parking=osm%3Anode%3A13854635677');
+  await page.goto(
+    '/?mockGps=56.9560572,-7.4919592,5&parking=osm%3Anode%3A13854635677',
+  );
   await expectFinderReady(page);
 
   const selectedParkingMarker = page.getByRole('button', {
@@ -99,8 +133,10 @@ test('keeps manual zoom after background parking chunks load', async ({
   const zoomOutButton = page.getByRole('button', { name: 'Zoom out' });
   const map = page.getByTestId('parking-map');
   await expect(selectedParkingMarker).toBeVisible();
+  await page.waitForTimeout(1_200);
   loadedParkingChunks.clear();
 
+  const initialZoom = Number(await map.getAttribute('data-map-zoom'));
   for (let index = 0; index < 4; index += 1) {
     await zoomOutButton.click();
     await page.waitForTimeout(450);
@@ -108,6 +144,7 @@ test('keeps manual zoom after background parking chunks load', async ({
 
   const markerAfterZoom = await selectedParkingMarker.boundingBox();
   const zoomAfterManualZoom = Number(await map.getAttribute('data-map-zoom'));
+  expect(zoomAfterManualZoom).toBeLessThan(initialZoom - 0.5);
   const westAfterManualZoom = Number(await map.getAttribute('data-map-west'));
   const northAfterManualZoom = Number(await map.getAttribute('data-map-north'));
   await page.waitForTimeout(3_000);
@@ -121,9 +158,10 @@ test('keeps manual zoom after background parking chunks load', async ({
   expect(loadedParkingChunks.size).toBeGreaterThan(0);
   expect(markerAfterZoom).not.toBeNull();
   expect(markerAfterChunkLoading).not.toBeNull();
-  expect(Math.abs(zoomAfterChunkLoading - zoomAfterManualZoom)).toBeLessThan(
-    0.01,
-  );
+  expect(
+    Math.abs(zoomAfterChunkLoading - zoomAfterManualZoom),
+    `map zoom changed from ${zoomAfterManualZoom} to ${zoomAfterChunkLoading}`,
+  ).toBeLessThan(0.01);
   expect(Math.abs(westAfterChunkLoading - westAfterManualZoom)).toBeLessThan(
     0.01,
   );
@@ -263,6 +301,45 @@ for (const [place, mockGps] of [
   test(`loads mapped cycle parking near ${place}`, async ({ page }) => {
     await page.goto(`/?mockGps=${mockGps}`);
     await expectFinderReady(page);
+    const [latitude, longitude] = mockGps.split(',').map(Number);
+    await expectMapFocusedAt(page, latitude, longitude);
+  });
+}
+
+for (const [place, mockGps] of [
+  ['Cardiff', '51.4816,-3.1791,5'],
+  ['Swansea', '51.6214,-3.9436,5'],
+  ['Aberystwyth', '52.4153,-4.0829,5'],
+  ['Holyhead', '53.3094,-4.6321,5'],
+  ['Belfast', '54.5973,-5.9301,5'],
+  ['Derry', '54.9966,-7.3086,5'],
+  ['Dublin', '53.3498,-6.2603,5'],
+  ['Cork', '51.8985,-8.4756,5'],
+  ['Galway', '53.2707,-9.0568,5'],
+] as const) {
+  test(`loads mapped cycle parking near ${place}`, async ({ page }) => {
+    await page.goto(`/?mockGps=${mockGps}`);
+    await expectFinderReady(page);
+    const [latitude, longitude] = mockGps.split(',').map(Number);
+    await expectMapFocusedAt(page, latitude, longitude);
+  });
+}
+
+for (const [place, mockGps] of [
+  ['London', '51.5072,-0.1276,5'],
+  ['Manchester', '53.4808,-2.2426,5'],
+  ['Birmingham', '52.4862,-1.8904,5'],
+  ['Bristol', '51.4545,-2.5879,5'],
+  ['Newcastle', '54.9783,-1.6178,5'],
+  ['Cambridge', '52.2053,0.1218,5'],
+  ['Truro', '50.2632,-5.0510,5'],
+  ['Carlisle', '54.8925,-2.9329,5'],
+] as const) {
+  test(`loads mapped cycle parking near ${place}`, async ({ page }) => {
+    await page.goto(`/?mockGps=${mockGps}`);
+    await expectFinderReady(page);
+    const [latitude, longitude] = mockGps.split(',').map(Number);
+    await expectMapFocusedAt(page, latitude, longitude);
   });
 }
 
@@ -276,14 +353,14 @@ for (const mockGps of ['denied', 'unavailable'] as const) {
   });
 }
 
-test('explains the Scotland boundary for an outside location', async ({
+test('explains the UK and Ireland boundary for an outside location', async ({
   page,
 }) => {
-  await page.goto('/?mockGps=51.5072,-0.1276,5');
+  await page.goto('/?mockGps=54.1523,-4.4861,5');
   await expectFinderReady(page);
   await expect(
     page.getByText(
-      'That location is outside Scotland, showing bike parking near Edinburgh.',
+      'That location is outside the UK and Ireland, showing bike parking near Edinburgh.',
     ),
   ).toBeVisible();
   await expect(page.getByTestId('parking-row-cec:178')).toBeVisible();

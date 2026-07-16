@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  deduplicateParkingPoints,
   deriveParkingNames,
   getTileKey,
   isGenericParkingName,
   mergeParkingSources,
   normalizeOsmProperties,
+  parseGeofabrikPoly,
   representativePoint,
   shouldMergeCouncilAndOsm,
 } from '../../scripts/parking-data-utils.mjs';
@@ -56,6 +58,29 @@ describe('parking data generation utilities', () => {
     expect(merged.matches).toEqual([
       expect.objectContaining({ councilId: council.id, osmId: osm.id }),
     ]);
+  });
+
+  it('deduplicates overlapping regional extracts by stable OSM ID', () => {
+    const original = point('osm:node:1', 55.95, -3.19);
+    const duplicate = { ...original, name: 'Duplicate copy' };
+    const other = point('osm:node:2', 51.5, -0.12);
+
+    expect(deduplicateParkingPoints([original, duplicate, other])).toEqual({
+      duplicateIds: ['osm:node:1'],
+      points: [original, other],
+    });
+  });
+
+  it('parses included and excluded Geofabrik polygon rings', () => {
+    const area = parseGeofabrikPoly(
+      `example\n1\n -5 50\n 2 50\n 2 56\n -5 56\nEND\n!2\n -4 51\n -3 51\n -3 52\n -4 52\nEND\nEND\n`,
+      'england',
+      'England',
+    );
+
+    expect(area.bounds).toEqual({ east: 2, north: 56, south: 50, west: -5 });
+    expect(area.rings).toHaveLength(2);
+    expect(area.rings[1].exclude).toBe(true);
   });
 
   it('normalizes useful OSM fields without shipping every raw tag', () => {

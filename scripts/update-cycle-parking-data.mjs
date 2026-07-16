@@ -1,12 +1,14 @@
 import { createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 import { createOSMStream } from 'osm-pbf-parser-node';
 import {
+  deduplicateParkingPoints,
   deriveParkingNames,
   distanceMeters,
   getTileBounds,
@@ -14,10 +16,18 @@ import {
   isGenericParkingName,
   mergeParkingSources,
   normalizeOsmProperties,
+  parseGeofabrikPoly,
   PARKING_CHUNK_ZOOM,
   PARKING_SCHEMA_VERSION,
   representativePoint,
 } from './parking-data-utils.mjs';
+import {
+  coverageLabel,
+  coverageInputs,
+  osmCatalogueUrl,
+  osmInputs,
+  osmLicenceUrl,
+} from './parking-data-sources.mjs';
 
 const councilSourceUrl =
   'https://services-eu1.arcgis.com/FgpikkYuSUOuITxp/arcgis/rest/services/Public_Bike_Parking/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson';
@@ -25,9 +35,6 @@ const councilLicenceUrl =
   'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/';
 const councilAttribution =
   'Copyright City of Edinburgh Council, contains Ordnance Survey data (c) Crown copyright and database right 2026.';
-const osmSourceUrl =
-  'https://download.geofabrik.de/europe/united-kingdom/scotland-latest.osm.pbf';
-const osmLicenceUrl = 'https://opendatacommons.org/licenses/odbl/1-0/';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const councilOutputPath = resolve(repoRoot, 'src/data/cycle-parking.json');
 const reportOutputPath = resolve(
@@ -35,7 +42,7 @@ const reportOutputPath = resolve(
   'src/data/cycle-parking-report.json',
 );
 const parkingOutputRoot = resolve(repoRoot, 'public/data/parking');
-const defaultPbfPath = resolve(repoRoot, '.cache/scotland-latest.osm.pbf');
+const cacheRoot = resolve(repoRoot, '.cache');
 const selectedOsmTagKeys = [
   'access',
   'amenity',
@@ -73,12 +80,43 @@ const excludedLandmarkAmenities = new Set([
 function parseArguments() {
   const args = process.argv.slice(2);
   const pbfIndex = args.indexOf('--osm-pbf');
+  const regionsArgument = args.find((argument) =>
+    argument.startsWith('--regions='),
+  );
+  const requestedRegionIds = regionsArgument
+    ? new Set(
+        regionsArgument
+          .slice('--regions='.length)
+          .split(',')
+          .map((region) => region.trim())
+          .filter(Boolean),
+      )
+    : null;
+  const selectedInputs = requestedRegionIds
+    ? osmInputs.filter((input) => requestedRegionIds.has(input.id))
+    : osmInputs;
+
+  if (requestedRegionIds && selectedInputs.length !== requestedRegionIds.size) {
+    const knownIds = new Set(selectedInputs.map((input) => input.id));
+    const unknownIds = [...requestedRegionIds].filter(
+      (id) => !knownIds.has(id),
+    );
+    throw new Error(`Unknown OSM region IDs: ${unknownIds.join(', ')}`);
+  }
+
   return {
     forceDownload: args.includes('--force-download'),
-    pbfPath:
+    inputs: selectedInputs.map((input) => ({
+      ...input,
+      pbfPath:
+        input.id === 'scotland' && pbfIndex >= 0 && args[pbfIndex + 1]
+          ? resolve(process.cwd(), args[pbfIndex + 1])
+          : resolve(cacheRoot, `${input.id}-latest.osm.pbf`),
+    })),
+    scotlandPbfOverride:
       pbfIndex >= 0 && args[pbfIndex + 1]
         ? resolve(process.cwd(), args[pbfIndex + 1])
-        : defaultPbfPath,
+        : null,
   };
 }
 
@@ -183,12 +221,12 @@ async function fetchCouncilDataset(refreshedAt) {
   return points;
 }
 
-async function downloadPbf(pbfPath, forceDownload) {
+async function downloadFile({ forceDownload, label, outputPath, url }) {
   if (!forceDownload) {
     try {
-      const details = await stat(pbfPath);
+      const details = await stat(outputPath);
       if (details.size > 0) {
-        console.log(`Using cached Scotland OSM extract at ${pbfPath}`);
+        console.log(`Using cached ${label} at ${outputPath}`);
         return;
       }
     } catch {
@@ -196,21 +234,44 @@ async function downloadPbf(pbfPath, forceDownload) {
     }
   }
 
-  await mkdir(dirname(pbfPath), { recursive: true });
-  const temporaryPath = `${pbfPath}.download`;
-  const response = await fetch(osmSourceUrl);
-  if (!response.ok || !response.body) {
-    throw new Error(
-      `Failed to download Scotland OSM extract: ${response.status} ${response.statusText}`,
-    );
+  await mkdir(dirname(outputPath), { recursive: true });
+  const temporaryPath = `${outputPath}.download`;
+  const maximumAttempts = 4;
+  for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
+    try {
+      await rm(temporaryPath, { force: true });
+      console.log(
+        `Downloading ${label} from ${url}${attempt > 1 ? ` (attempt ${attempt}/${maximumAttempts})` : ''}`,
+      );
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(120_000),
+      });
+      if (!response.ok || !response.body) {
+        throw new Error(`${response.status} ${response.statusText}`);
+      }
+      await pipeline(
+        Readable.fromWeb(response.body),
+        createWriteStream(temporaryPath),
+      );
+      await rename(temporaryPath, outputPath);
+      return;
+    } catch (error) {
+      await rm(temporaryPath, { force: true });
+      if (attempt === maximumAttempts) {
+        throw new Error(
+          `Failed to download ${label} after ${maximumAttempts} attempts.`,
+          { cause: error },
+        );
+      }
+      const retryDelaySeconds = attempt * 15;
+      console.warn(
+        `${label} download failed; retrying in ${retryDelaySeconds}s.`,
+      );
+      await new Promise((resolvePromise) =>
+        setTimeout(resolvePromise, retryDelaySeconds * 1_000),
+      );
+    }
   }
-
-  console.log(`Downloading Scotland OSM extract from ${osmSourceUrl}`);
-  await pipeline(
-    Readable.fromWeb(response.body),
-    createWriteStream(temporaryPath),
-  );
-  await rename(temporaryPath, pbfPath);
 }
 
 async function sha256File(path) {
@@ -219,11 +280,46 @@ async function sha256File(path) {
   return hash.digest('hex');
 }
 
+function sha256Content(content) {
+  return createHash('sha256').update(content).digest('hex');
+}
+
+function createResourceMonitor() {
+  const startedAt = performance.now();
+  let peakRssBytes = process.memoryUsage().rss;
+  const timer = setInterval(() => {
+    peakRssBytes = Math.max(peakRssBytes, process.memoryUsage().rss);
+  }, 250);
+  timer.unref();
+
+  return {
+    finish() {
+      clearInterval(timer);
+      peakRssBytes = Math.max(peakRssBytes, process.memoryUsage().rss);
+      return {
+        elapsedSeconds: Number(
+          ((performance.now() - startedAt) / 1_000).toFixed(1),
+        ),
+        peakRssBytes,
+      };
+    },
+    snapshot() {
+      peakRssBytes = Math.max(peakRssBytes, process.memoryUsage().rss);
+      return {
+        elapsedSeconds: Number(
+          ((performance.now() - startedAt) / 1_000).toFixed(1),
+        ),
+        peakRssBytes,
+      };
+    },
+  };
+}
+
 function isParkingElement(item) {
   return item?.tags?.amenity === 'bicycle_parking';
 }
 
-async function extractOsmParking(pbfPath) {
+async function extractOsmParking(pbfPath, label) {
   const parkingNodes = [];
   const parkingWays = [];
   const parkingRelations = [];
@@ -231,7 +327,7 @@ async function extractOsmParking(pbfPath) {
   const relationWayIds = new Set();
   let sourceTimestamp = null;
 
-  console.log('Scanning OSM extract for bicycle parking features...');
+  console.log(`Scanning ${label} for bicycle parking features...`);
   for await (const item of createOSMStream(pbfPath, {
     withInfo: false,
     withTags: {
@@ -272,7 +368,7 @@ async function extractOsmParking(pbfPath) {
 
   const relationWays = new Map();
   if (relationWayIds.size > 0) {
-    console.log('Resolving relation member ways...');
+    console.log(`Resolving ${label} relation member ways...`);
     for await (const item of createOSMStream(pbfPath, {
       withInfo: false,
       withTags: false,
@@ -294,7 +390,7 @@ async function extractOsmParking(pbfPath) {
   );
   if (requiredNodeIds.size > 0) {
     console.log(
-      `Resolving ${requiredNodeIds.size.toLocaleString()} geometry nodes...`,
+      `Resolving ${requiredNodeIds.size.toLocaleString()} ${label} geometry nodes...`,
     );
     for await (const item of createOSMStream(pbfPath, {
       withInfo: false,
@@ -429,7 +525,7 @@ function isUsefulLandmark(tags) {
   );
 }
 
-async function extractOsmNamingContext(pbfPath, parkingPoints) {
+async function extractOsmNamingContext(pbfPath, parkingPoints, label) {
   const parkingIndex = createParkingContextIndex(parkingPoints);
   const nearbyNodeCoordinates = new Map();
   const roadNamesByNodeId = new Map();
@@ -437,7 +533,9 @@ async function extractOsmNamingContext(pbfPath, parkingPoints) {
   const landmarks = [];
   const places = [];
 
-  console.log('Extracting nearby streets, junctions, landmarks, and places...');
+  console.log(
+    `Extracting ${label} nearby streets, junctions, landmarks, and places...`,
+  );
   for await (const item of createOSMStream(pbfPath, {
     withInfo: false,
     withTags: {
@@ -539,17 +637,110 @@ function summarizeCompleteness(points) {
   );
 }
 
+function addCountObjects(target, addition) {
+  for (const [key, value] of Object.entries(addition)) {
+    target[key] = (target[key] ?? 0) + value;
+  }
+  return target;
+}
+
+function summarizeNamingCounts(points) {
+  const counts = {
+    generic: 0,
+    junction: 0,
+    landmark: 0,
+    place: 0,
+    source: 0,
+    street: 0,
+  };
+  for (const point of points) {
+    const source = point.properties.nameSource;
+    if (typeof source === 'string' && Object.hasOwn(counts, source)) {
+      counts[source] += 1;
+    } else {
+      counts.generic += 1;
+    }
+  }
+  return counts;
+}
+
+async function loadCoverageAreas(forceDownload) {
+  const areas = [];
+  for (const input of coverageInputs) {
+    const outputPath = resolve(cacheRoot, `${input.id}.poly`);
+    await downloadFile({
+      forceDownload,
+      label: `${input.label} coverage polygon`,
+      outputPath,
+      url: input.url,
+    });
+    areas.push(
+      parseGeofabrikPoly(
+        await readFile(outputPath, 'utf8'),
+        input.id,
+        input.label,
+      ),
+    );
+  }
+  return areas;
+}
+
+function maximumInitialCompressedBytes(chunkContents) {
+  let maximum = 0;
+  for (const key of chunkContents.keys()) {
+    const [zoom, x, y] = key.split('/').map(Number);
+    let total = 0;
+    for (let yOffset = -1; yOffset <= 1; yOffset += 1) {
+      for (let xOffset = -1; xOffset <= 1; xOffset += 1) {
+        const content = chunkContents.get(
+          `${zoom}/${x + xOffset}/${y + yOffset}`,
+        );
+        if (content) {
+          total += gzipSync(content).byteLength;
+        }
+      }
+    }
+    maximum = Math.max(maximum, total);
+  }
+  return maximum;
+}
+
+function assertGeneratedAssetBudgets(metrics) {
+  const mebibyte = 1_048_576;
+  const failures = [];
+  if (metrics.parkingDataBytes > 75 * mebibyte) {
+    failures.push('parking data exceeds 75 MiB');
+  }
+  if (metrics.fileCount > 15_000) {
+    failures.push('parking file count exceeds 15,000');
+  }
+  if (metrics.largestAssetBytes > 20 * mebibyte) {
+    failures.push('a generated parking asset exceeds 20 MiB');
+  }
+  if (metrics.manifestBytes > mebibyte) {
+    failures.push('manifest exceeds 1 MiB');
+  }
+  if (metrics.pointIndexBytes > 5 * mebibyte) {
+    failures.push('point index exceeds 5 MiB');
+  }
+  if (metrics.maximumInitialCompressedBytes > mebibyte) {
+    failures.push('a 3×3 initial parking payload exceeds 1 MiB compressed');
+  }
+  if (failures.length > 0) {
+    throw new Error(`Generated asset budget failed: ${failures.join('; ')}`);
+  }
+}
+
 async function writeSpatialOutput({
   councilPoints,
+  coverageAreas,
+  duplicateRegionIds,
   merged,
-  naming,
-  namingContext,
-  osm,
-  pbfChecksum,
+  osmInputsReport,
+  osmPoints,
   refreshedAt,
+  resourceUsage,
 }) {
-  const dataVersion = refreshedAt.replaceAll(/[-:.]/g, '').replace('Z', 'Z');
-  const versionOutputRoot = resolve(parkingOutputRoot, dataVersion);
   const chunks = new Map();
   const pointIndex = {};
 
@@ -562,19 +753,26 @@ async function writeSpatialOutput({
   }
 
   await rm(parkingOutputRoot, { force: true, recursive: true });
-  await mkdir(versionOutputRoot, { recursive: true });
+  await mkdir(parkingOutputRoot, { recursive: true });
   const chunkManifest = {};
+  const chunkContents = new Map();
+  let largestAssetBytes = 0;
+  let parkingDataBytes = 0;
 
   for (const [key, points] of [...chunks.entries()].sort(([left], [right]) =>
     left.localeCompare(right),
   )) {
-    const path = `${dataVersion}/${key}.json`;
+    points.sort((left, right) => left.id.localeCompare(right.id));
+    const content = `${JSON.stringify({ key, points, schemaVersion: PARKING_SCHEMA_VERSION })}\n`;
+    const contentHash = sha256Content(content).slice(0, 16);
+    const path = `chunks/${key}.${contentHash}.json`;
     const outputPath = resolve(parkingOutputRoot, path);
     await mkdir(dirname(outputPath), { recursive: true });
-    await writeFile(
-      outputPath,
-      `${JSON.stringify({ key, points, schemaVersion: PARKING_SCHEMA_VERSION })}\n`,
-    );
+    await writeFile(outputPath, content);
+    chunkContents.set(key, content);
+    const contentBytes = Buffer.byteLength(content);
+    largestAssetBytes = Math.max(largestAssetBytes, contentBytes);
+    parkingDataBytes += contentBytes;
     chunkManifest[key] = {
       bounds: getTileBounds(key),
       count: points.length,
@@ -582,8 +780,9 @@ async function writeSpatialOutput({
     };
   }
 
-  const sources = [
-    {
+  const sources = [];
+  if (councilPoints.length > 0) {
+    sources.push({
       attribution: councilAttribution,
       id: 'cec',
       label: 'City of Edinburgh Council',
@@ -591,39 +790,78 @@ async function writeSpatialOutput({
       licenceUrl: councilLicenceUrl,
       recordCount: councilPoints.length,
       sourceUrl: councilSourceUrl,
-    },
-    {
-      attribution: 'Data © OpenStreetMap contributors',
-      id: 'osm',
-      label: 'OpenStreetMap',
-      licenceName: 'Open Database Licence 1.0',
-      licenceUrl: osmLicenceUrl,
-      recordCount: osm.points.length,
-      sourceTimestamp: osm.sourceTimestamp,
-      sourceUrl: osmSourceUrl,
-    },
-  ];
+    });
+  }
+  sources.push({
+    attribution: 'Data © OpenStreetMap contributors',
+    id: 'osm',
+    label: 'OpenStreetMap',
+    licenceName: 'Open Database Licence 1.0',
+    licenceUrl: osmLicenceUrl,
+    recordCount: osmPoints.length,
+    sourceTimestamp:
+      osmInputsReport
+        .map((input) => input.sourceTimestamp)
+        .filter(Boolean)
+        .sort()
+        .at(-1) ?? null,
+    sourceUrl: osmCatalogueUrl,
+  });
+
+  const pointIndexContent = `${JSON.stringify(pointIndex)}\n`;
+  const pointIndexHash = sha256Content(pointIndexContent).slice(0, 16);
+  const pointIndexPath = `indexes/point-index.${pointIndexHash}.json`;
   const manifest = {
     chunkZoom: PARKING_CHUNK_ZOOM,
     chunks: chunkManifest,
     coverage: {
-      bounds: { east: -0.5, north: 60.9, south: 54.55, west: -8.7 },
-      label: 'Scotland',
+      areas: coverageAreas,
+      label: coverageLabel,
     },
     recordCount: merged.points.length,
     refreshedAt,
-    pointIndexPath: `${dataVersion}/point-index.json`,
+    pointIndexPath,
     schemaVersion: PARKING_SCHEMA_VERSION,
     sources,
   };
 
+  const manifestContent = `${JSON.stringify(manifest)}\n`;
+  await mkdir(resolve(parkingOutputRoot, 'indexes'), { recursive: true });
+  await writeFile(resolve(parkingOutputRoot, 'manifest.json'), manifestContent);
   await writeFile(
-    resolve(parkingOutputRoot, 'manifest.json'),
-    `${JSON.stringify(manifest)}\n`,
+    resolve(parkingOutputRoot, pointIndexPath),
+    pointIndexContent,
   );
-  await writeFile(
-    resolve(versionOutputRoot, 'point-index.json'),
-    `${JSON.stringify(pointIndex)}\n`,
+
+  const manifestBytes = Buffer.byteLength(manifestContent);
+  const pointIndexBytes = Buffer.byteLength(pointIndexContent);
+  largestAssetBytes = Math.max(
+    largestAssetBytes,
+    manifestBytes,
+    pointIndexBytes,
+  );
+  parkingDataBytes += manifestBytes + pointIndexBytes;
+  const generatedAssets = {
+    fileCount: chunks.size + 2,
+    largestAssetBytes,
+    manifestBytes,
+    maximumInitialCompressedBytes: maximumInitialCompressedBytes(chunkContents),
+    parkingDataBytes,
+    pointIndexBytes,
+  };
+  assertGeneratedAssetBudgets(generatedAssets);
+
+  const namingCounts = summarizeNamingCounts(merged.points);
+  const geometryCounts = addCountObjects(
+    { node: 0, relation: 0, way: 0 },
+    osmInputsReport.reduce(
+      (counts, input) => addCountObjects(counts, input.geometryCounts),
+      { node: 0, relation: 0, way: 0 },
+    ),
+  );
+  const discarded = osmInputsReport.reduce(
+    (counts, input) => addCountObjects(counts, input.discarded),
+    { relation: 0, way: 0 },
   );
 
   const report = {
@@ -631,18 +869,16 @@ async function writeSpatialOutput({
     chunkZoom: PARKING_CHUNK_ZOOM,
     councilRecordCount: councilPoints.length,
     duplicateMatches: merged.matches,
+    duplicateRegionIds: {
+      count: duplicateRegionIds.length,
+      samples: duplicateRegionIds.slice(0, 100),
+    },
+    generatedAssets,
     mergedRecordCount: merged.points.length,
     naming: {
-      contextCounts: {
-        junctions: namingContext.junctions.length,
-        landmarks: namingContext.landmarks.length,
-        nearbyNodes: namingContext.nearbyNodeCount,
-        places: namingContext.places.length,
-        roadSamples: namingContext.roads.length,
-      },
-      counts: naming.counts,
+      counts: namingCounts,
       genericPercent: Number(
-        ((naming.counts.generic / merged.points.length) * 100).toFixed(1),
+        ((namingCounts.generic / merged.points.length) * 100).toFixed(1),
       ),
       samples: merged.points
         .filter((point) => point.properties.nameSource !== 'source')
@@ -654,14 +890,14 @@ async function writeSpatialOutput({
         })),
     },
     osm: {
-      completeness: summarizeCompleteness(osm.points),
-      discarded: osm.discarded,
-      geometryCounts: osm.geometryCounts,
-      pbfSha256: pbfChecksum,
-      recordCount: osm.points.length,
-      sourceTimestamp: osm.sourceTimestamp,
+      completeness: summarizeCompleteness(osmPoints),
+      discarded,
+      geometryCounts,
+      inputs: osmInputsReport,
+      recordCount: osmPoints.length,
     },
     refreshedAt,
+    resourceUsage,
     schemaVersion: PARKING_SCHEMA_VERSION,
   };
   await writeFile(reportOutputPath, `${JSON.stringify(report, null, 2)}\n`);
@@ -669,36 +905,107 @@ async function writeSpatialOutput({
 }
 
 async function main() {
-  const { forceDownload, pbfPath } = parseArguments();
+  const { forceDownload, inputs } = parseArguments();
+  if (inputs.length === 0) {
+    throw new Error('At least one OSM input is required.');
+  }
+  const resourceMonitor = createResourceMonitor();
   const refreshedAt = new Date().toISOString();
-  const councilPoints = await fetchCouncilDataset(refreshedAt);
-  await downloadPbf(pbfPath, forceDownload);
-  const [osm, pbfChecksum] = await Promise.all([
-    extractOsmParking(pbfPath),
-    sha256File(pbfPath),
-  ]);
-  const mergedSources = mergeParkingSources(councilPoints, osm.points);
-  const namingContext = await extractOsmNamingContext(
-    pbfPath,
-    mergedSources.points,
+  const includesScotland = inputs.some(
+    (input) => input.countryId === 'scotland',
   );
-  const naming = deriveParkingNames(mergedSources.points, namingContext);
-  const merged = { ...mergedSources, points: naming.points };
+  const rawCouncilPoints = includesScotland
+    ? await fetchCouncilDataset(refreshedAt)
+    : [];
+  let councilPoints = rawCouncilPoints;
+  const allOsmPoints = [];
+  const osmInputsReport = [];
+
+  for (const input of inputs) {
+    await downloadFile({
+      forceDownload,
+      label: `${input.label} OSM extract`,
+      outputPath: input.pbfPath,
+      url: input.url,
+    });
+    const inputMonitor = createResourceMonitor();
+    const [osm, pbfChecksum] = await Promise.all([
+      extractOsmParking(input.pbfPath, input.label),
+      sha256File(input.pbfPath),
+    ]);
+    const pointsForNaming =
+      input.countryId === 'scotland'
+        ? [...osm.points, ...rawCouncilPoints]
+        : osm.points;
+    const namingContext = await extractOsmNamingContext(
+      input.pbfPath,
+      pointsForNaming,
+      input.label,
+    );
+    const naming = deriveParkingNames(pointsForNaming, namingContext);
+    const namedOsmPoints = naming.points.filter(
+      (point) => point.sourceId === 'osm',
+    );
+    allOsmPoints.push(...namedOsmPoints);
+    if (input.countryId === 'scotland') {
+      councilPoints = naming.points.filter((point) => point.sourceId === 'cec');
+    }
+    const inputUsage = inputMonitor.finish();
+    osmInputsReport.push({
+      completeness: summarizeCompleteness(namedOsmPoints),
+      countryId: input.countryId,
+      discarded: osm.discarded,
+      elapsedSeconds: inputUsage.elapsedSeconds,
+      geometryCounts: osm.geometryCounts,
+      id: input.id,
+      label: input.label,
+      naming: {
+        contextCounts: {
+          junctions: namingContext.junctions.length,
+          landmarks: namingContext.landmarks.length,
+          nearbyNodes: namingContext.nearbyNodeCount,
+          places: namingContext.places.length,
+          roadSamples: namingContext.roads.length,
+        },
+        counts: naming.counts,
+      },
+      pbfSha256: pbfChecksum,
+      peakRssBytes: inputUsage.peakRssBytes,
+      recordCount: namedOsmPoints.length,
+      sourceTimestamp: osm.sourceTimestamp,
+      sourceUrl: input.url,
+    });
+    console.log(
+      `Processed ${namedOsmPoints.length.toLocaleString()} ${input.label} parking records in ${inputUsage.elapsedSeconds.toLocaleString()}s.`,
+    );
+  }
+
+  const deduplicatedOsm = deduplicateParkingPoints(allOsmPoints);
+  const merged = mergeParkingSources(councilPoints, deduplicatedOsm.points);
+  const coverageAreas = await loadCoverageAreas(forceDownload);
+  const resourceUsage = resourceMonitor.snapshot();
   const report = await writeSpatialOutput({
     councilPoints,
+    coverageAreas,
+    duplicateRegionIds: deduplicatedOsm.duplicateIds,
     merged,
-    naming,
-    namingContext,
-    osm,
-    pbfChecksum,
+    osmInputsReport,
+    osmPoints: deduplicatedOsm.points,
     refreshedAt,
+    resourceUsage,
   });
+  const finalUsage = resourceMonitor.finish();
+  report.resourceUsage = finalUsage;
+  await writeFile(reportOutputPath, `${JSON.stringify(report, null, 2)}\n`);
 
   console.log(
-    `Generated ${report.mergedRecordCount.toLocaleString()} Scotland parking records in ${report.chunkCount} chunks.`,
+    `Generated ${report.mergedRecordCount.toLocaleString()} ${coverageLabel} parking records in ${report.chunkCount.toLocaleString()} chunks.`,
   );
   console.log(
     `Matched ${report.duplicateMatches.length.toLocaleString()} Edinburgh/OSM duplicates.`,
+  );
+  console.log(
+    `Parking assets use ${(report.generatedAssets.parkingDataBytes / 1_048_576).toFixed(1)} MiB across ${report.generatedAssets.fileCount.toLocaleString()} files; peak RSS ${(finalUsage.peakRssBytes / 1_073_741_824).toFixed(2)} GiB.`,
   );
 }
 
