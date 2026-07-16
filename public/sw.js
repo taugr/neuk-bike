@@ -1,5 +1,5 @@
 const cachePrefix = 'neuk-bike-';
-const cacheName = `${cachePrefix}v4`;
+const cacheName = `${cachePrefix}v5`;
 const scopePath = new URL(self.registration.scope).pathname;
 const appBasePath = scopePath.endsWith('/')
   ? scopePath.slice(0, -1)

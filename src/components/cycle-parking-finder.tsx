@@ -629,7 +629,6 @@ export default function CycleParkingFinder() {
             prepareParkingPoints(client.getLoadedPoints()),
           ),
         );
-        requestCurrentLocationFocus();
         setParkingDataStatus('ready');
         setParkingDataMessage(null);
       })

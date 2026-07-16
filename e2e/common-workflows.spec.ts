@@ -62,6 +62,21 @@ test('keeps manual zoom after background parking chunks load', async ({
   page,
 }) => {
   const loadedParkingChunks = new Set<string>();
+  const selectedParkingChunkPath = '/12/1962/1255.json';
+
+  await page.route('**/data/parking/**/*.json', async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+
+    if (
+      !pathname.endsWith('/manifest.json') &&
+      !pathname.endsWith('/point-index.json') &&
+      !pathname.endsWith(selectedParkingChunkPath)
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 2_500));
+    }
+
+    await route.continue();
+  });
   page.on('response', (response) => {
     const url = new URL(response.url());
 
@@ -74,15 +89,16 @@ test('keeps manual zoom after background parking chunks load', async ({
     }
   });
 
-  await page.goto('/?mockGps=55.8642,-4.2518,5');
+  await page.goto('/?parking=osm%3Anode%3A13854635677');
   await expectFinderReady(page);
 
-  const currentLocationMarker = page.getByRole('button', {
+  const selectedParkingMarker = page.getByRole('button', {
     exact: true,
-    name: 'Current location',
+    name: 'The Square cycle parking, rank 1, selected',
   });
   const zoomOutButton = page.getByRole('button', { name: 'Zoom out' });
-  await expect(currentLocationMarker).toBeVisible();
+  const map = page.getByTestId('parking-map');
+  await expect(selectedParkingMarker).toBeVisible();
   loadedParkingChunks.clear();
 
   for (let index = 0; index < 4; index += 1) {
@@ -90,13 +106,30 @@ test('keeps manual zoom after background parking chunks load', async ({
     await page.waitForTimeout(450);
   }
 
-  const markerAfterZoom = await currentLocationMarker.boundingBox();
-  await page.waitForTimeout(1_500);
-  const markerAfterChunkLoading = await currentLocationMarker.boundingBox();
+  const markerAfterZoom = await selectedParkingMarker.boundingBox();
+  const zoomAfterManualZoom = Number(await map.getAttribute('data-map-zoom'));
+  const westAfterManualZoom = Number(await map.getAttribute('data-map-west'));
+  const northAfterManualZoom = Number(await map.getAttribute('data-map-north'));
+  await page.waitForTimeout(3_000);
+  const markerAfterChunkLoading = await selectedParkingMarker.boundingBox();
+  const zoomAfterChunkLoading = Number(await map.getAttribute('data-map-zoom'));
+  const westAfterChunkLoading = Number(await map.getAttribute('data-map-west'));
+  const northAfterChunkLoading = Number(
+    await map.getAttribute('data-map-north'),
+  );
 
   expect(loadedParkingChunks.size).toBeGreaterThan(0);
   expect(markerAfterZoom).not.toBeNull();
   expect(markerAfterChunkLoading).not.toBeNull();
+  expect(Math.abs(zoomAfterChunkLoading - zoomAfterManualZoom)).toBeLessThan(
+    0.01,
+  );
+  expect(Math.abs(westAfterChunkLoading - westAfterManualZoom)).toBeLessThan(
+    0.01,
+  );
+  expect(Math.abs(northAfterChunkLoading - northAfterManualZoom)).toBeLessThan(
+    0.01,
+  );
   expect(
     Math.abs(markerAfterChunkLoading!.x - markerAfterZoom!.x),
   ).toBeLessThan(2);

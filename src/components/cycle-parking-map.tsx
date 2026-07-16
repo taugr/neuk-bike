@@ -1970,5 +1970,16 @@ export default function CycleParkingMap({
     routeInstructionFocusRequest?.requestId,
   ]);
 
-  return <div className={`bike-map bike-map-${theme}`} ref={mapContainerRef} />;
+  return (
+    <div
+      className={`bike-map bike-map-${theme}`}
+      data-map-east={viewport.bounds?.east}
+      data-map-north={viewport.bounds?.north}
+      data-map-south={viewport.bounds?.south}
+      data-map-west={viewport.bounds?.west}
+      data-map-zoom={viewport.zoom}
+      data-testid="parking-map"
+      ref={mapContainerRef}
+    />
+  );
 }

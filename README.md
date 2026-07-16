@@ -187,6 +187,9 @@ Cloudflare Pages is the preferred production host for this static prototype.
 It can serve the existing `out/` directory directly, adds edge delivery and
 compression, and applies the cache and security policy in `public/_headers`.
 No Worker runtime, database, paid API, or new application dependency is needed.
+The verified Cloudflare deployment is available at
+[neuk-bike.pages.dev](https://neuk-bike.pages.dev/); `neuk.bike` remains on
+GitHub Pages until the custom-domain cutover is deliberately completed.
 
 The repository includes `wrangler.jsonc` and a repeatable direct-upload command.
 Create the project once with:

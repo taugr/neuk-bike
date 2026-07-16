@@ -153,11 +153,19 @@ Status: complete locally
 
 External release follow-up:
 
-- [ ] Create the Cloudflare Pages project with Wrangler Direct Upload.
-- [ ] Verify the `pages.dev` preview, headers, caching, PWA, and environment
+- [x] Create the Cloudflare Pages project with Wrangler Direct Upload.
+- [x] Verify the `pages.dev` preview, headers, caching, PWA, and environment
       variables.
 - [ ] Attach `neuk.bike`, move DNS, and verify HTTPS before disabling GitHub
       Pages.
+
+Release evidence (2026-07-16): the Scotland prototype is live at
+[`neuk-bike.pages.dev`](https://neuk-bike.pages.dev/). The published manifest
+and sample chunk match the local build hashes; the manifest uses a five-minute
+revalidation policy, while the versioned point index, chunks, and framework
+assets are immutable. The PWA manifest, service worker, security headers,
+public build-time integrations, contextual names, popup details, and manual map
+zoom behavior were verified on the deployed site.
 
 ## Refresh and release runbook
 
