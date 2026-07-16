@@ -1,10 +1,5 @@
 import type { ParkingPoint, UserLocation } from '@/lib/types';
 
-export const SCOTLAND_FALLBACK_LOCATION: UserLocation = {
-  latitude: 56.1165,
-  longitude: -3.9369,
-};
-
 export const EDINBURGH_FALLBACK_LOCATION: UserLocation = {
   latitude: 55.9533,
   longitude: -3.1883,

@@ -71,9 +71,9 @@ around the current location. Map movement loads additional bounded chunks. A
 loaded when a `?parking=` deep link needs it. The full Scotland dataset is not
 included in the JavaScript bundle.
 
-If geolocation is unavailable or outside the prototype boundary, the app falls
-back to Stirling and explains what happened. Place search uses Nominatim and
-OpenStreetMap data.
+If geolocation is unavailable or the requested location is outside Scotland,
+the app falls back to central Edinburgh and explains what happened. Place
+search uses Nominatim and OpenStreetMap data.
 
 Directions use the CycleStreets v2 API from the browser. Add a public API key to
 `.env.local` for local development:

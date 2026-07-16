@@ -266,10 +266,25 @@ for (const [place, mockGps] of [
   });
 }
 
+for (const mockGps of ['denied', 'unavailable'] as const) {
+  test(`falls back to Edinburgh when location is ${mockGps}`, async ({
+    page,
+  }) => {
+    await page.goto(`/?mockGps=${mockGps}`);
+    await expectFinderReady(page);
+    await expect(page.getByTestId('parking-row-cec:178')).toBeVisible();
+  });
+}
+
 test('explains the Scotland boundary for an outside location', async ({
   page,
 }) => {
   await page.goto('/?mockGps=51.5072,-0.1276,5');
   await expectFinderReady(page);
-  await expect(page.getByText(/outside the Scotland prototype/)).toBeVisible();
+  await expect(
+    page.getByText(
+      'That location is outside Scotland, showing bike parking near Edinburgh.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByTestId('parking-row-cec:178')).toBeVisible();
 });

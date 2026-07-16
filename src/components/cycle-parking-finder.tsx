@@ -83,7 +83,7 @@ import type {
   UserLocation,
 } from '@/lib/types';
 import {
-  SCOTLAND_FALLBACK_LOCATION,
+  EDINBURGH_FALLBACK_LOCATION,
   formatDistance,
   distanceMeters,
   isResolvedLocation,
@@ -339,7 +339,7 @@ export default function CycleParkingFinder() {
   const shouldReduceMotion = useReducedMotion();
   const [locationState, setLocationState] = useState<LocationState>({
     status: 'fallback',
-    location: SCOTLAND_FALLBACK_LOCATION,
+    location: EDINBURGH_FALLBACK_LOCATION,
   });
   const [parkingPoints, setParkingPoints] = useState<ParkingPoint[]>([]);
   const [parkingManifest, setParkingManifest] =
@@ -533,7 +533,7 @@ export default function CycleParkingFinder() {
           window.location.search,
         );
         await client.loadLocation(
-          referenceLocation ?? SCOTLAND_FALLBACK_LOCATION,
+          referenceLocation ?? EDINBURGH_FALLBACK_LOCATION,
         );
         const selectedPoint = selectedParkingId
           ? await client.loadPoint(selectedParkingId)
@@ -568,7 +568,7 @@ export default function CycleParkingFinder() {
             setSelectedId(null);
             setLocationState({
               status: 'too-far',
-              location: SCOTLAND_FALLBACK_LOCATION,
+              location: EDINBURGH_FALLBACK_LOCATION,
             });
           }
           return;
@@ -1238,13 +1238,13 @@ export default function CycleParkingFinder() {
   ) {
     setLocationState({
       status,
-      location: SCOTLAND_FALLBACK_LOCATION,
+      location: EDINBURGH_FALLBACK_LOCATION,
     });
     const client = parkingDataClient.current;
     const manifest = client?.getManifest();
     if (client && manifest) {
       void client
-        .loadLocation(SCOTLAND_FALLBACK_LOCATION)
+        .loadLocation(EDINBURGH_FALLBACK_LOCATION)
         .then(() => {
           setParkingPoints((current) =>
             keepParkingPointsWhenUnchanged(
@@ -2318,8 +2318,8 @@ export default function CycleParkingFinder() {
                             className="parking-list-context"
                             role="status"
                           >
-                            That location is outside the Scotland prototype,
-                            showing bike parking near Stirling.
+                            That location is outside Scotland, showing bike
+                            parking near Edinburgh.
                           </motion.div>
                         ) : null}
                       </AnimatePresence>
