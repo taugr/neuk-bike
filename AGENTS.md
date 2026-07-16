@@ -52,6 +52,9 @@
 - Cloudflare Pages is the production host and serves the generated
   `out/` directory as static assets. `public/_headers` defines its caching and
   security policy.
+- Successful pushes to `main` deploy through the GitHub Actions quality gate to
+  the existing Direct Upload project. `pnpm deploy:cloudflare` is the manual
+  fallback.
 - `neuk.bike` is attached to the `neuk-bike` Pages project; the provider URL is
   `neuk-bike.pages.dev`.
 - GitHub Pages is retired. Use Cloudflare Pages deployment history and the

@@ -208,14 +208,28 @@ No Worker runtime, database, paid API, or new application dependency is needed.
 The custom domain is [neuk.bike](https://neuk.bike/), and the same deployment
 is available at [neuk-bike.pages.dev](https://neuk-bike.pages.dev/).
 
-The repository includes `wrangler.jsonc` and a repeatable direct-upload command.
-Create the project once with:
+The existing `neuk-bike` Pages project uses Direct Upload. Successful pushes to
+`main` run the GitHub Actions quality checks, rebuild the production export with
+the repository's public environment secrets, and deploy `out/` to Cloudflare
+with Wrangler. Pull requests run the same quality checks without deploying.
+
+The deployment job requires these GitHub Actions secrets:
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`, scoped to Account > Cloudflare Pages > Edit
+- `NEXT_PUBLIC_CYCLESTREETS_API_KEY`
+- `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY`
+- `NEXT_PUBLIC_POSTHOG_HOST`
+- `NEXT_PUBLIC_POSTHOG_KEY`
+
+The repository also includes `wrangler.jsonc` and a repeatable manual fallback.
+Create a new Direct Upload project only when bootstrapping a separate host:
 
 ```bash
 pnpm exec wrangler pages project create neuk-bike --production-branch main
 ```
 
-Deploy the production branch with:
+Deploy manually when the automatic workflow is unavailable with:
 
 ```bash
 pnpm deploy:cloudflare
@@ -231,9 +245,9 @@ and [custom header documentation](https://developers.cloudflare.com/pages/config
 ### Previous host: GitHub Pages
 
 GitHub Pages was retired after the Cloudflare custom domain, HTTPS, environment
-features, caching, and PWA behaviour were verified. Pull requests and pushes
-still run the GitHub Actions quality checks, but deployment is performed with
-`pnpm deploy:cloudflare`.
+features, caching, and PWA behaviour were verified. Pull requests run the
+GitHub Actions quality checks, and successful pushes to `main` deploy the static
+export to the existing Cloudflare Pages Direct Upload project.
 
 ## Attribution
 

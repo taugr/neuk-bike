@@ -39,6 +39,10 @@ pnpm run update:data
 pnpm run deploy:cloudflare
 ```
 
+Successful pushes to `main` deploy automatically to the existing Cloudflare
+Pages project after the quality job passes. `pnpm run deploy:cloudflare` is the
+manual fallback and requires an authenticated Wrangler session.
+
 ## Workflow
 
 1. Make changes under `src/` and add or update focused tests near the changed code.
