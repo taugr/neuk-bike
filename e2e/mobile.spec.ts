@@ -70,6 +70,18 @@ test('keeps the nearby heading clear after collapsing and expanding', async ({
     page.getByRole('button', { name: 'Collapse results panel' }),
   ).toBeVisible();
 
+  const parkingRows = page.locator('[data-testid^="parking-row-"]');
+  await expect(parkingRows).toHaveCount(8);
+  await parkingRows.last().click();
+
+  await expect
+    .poll(() =>
+      page
+        .locator('.mobile-sheet-body')
+        .evaluate((element) => element.scrollTop),
+    )
+    .toBe(0);
+
   const heading = page.getByRole('heading', { name: /Nearby bike neuks/ });
   await expect(heading).toBeVisible();
 

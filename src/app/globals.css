@@ -2196,6 +2196,7 @@ a {
     min-height: 0;
     opacity: var(--mobile-sheet-body-opacity, 1);
     overflow: hidden;
+    overflow: clip;
     padding-top: 0.25rem;
     transform: translateY(var(--mobile-sheet-body-offset, 0px));
     transition: visibility 0s linear 0s;

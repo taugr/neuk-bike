@@ -418,6 +418,7 @@ export default function CycleParkingFinder() {
   const copiedMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
   const streetViewDialog = useRef<HTMLDialogElement>(null);
+  const parkingListScroll = useRef<HTMLDivElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
   const mobileSheetDrag = useRef<{
     currentY: number;
@@ -876,8 +877,9 @@ export default function CycleParkingFinder() {
     }
 
     const selectedListItem = parkingListItemRefs.current.get(selectedId);
+    const scrollContainer = parkingListScroll.current;
 
-    if (!selectedListItem) {
+    if (!selectedListItem || !scrollContainer) {
       return;
     }
 
@@ -885,9 +887,22 @@ export default function CycleParkingFinder() {
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    selectedListItem.scrollIntoView({
+    const containerBounds = scrollContainer.getBoundingClientRect();
+    const itemBounds = selectedListItem.getBoundingClientRect();
+    const scrollDelta =
+      itemBounds.top < containerBounds.top
+        ? itemBounds.top - containerBounds.top
+        : itemBounds.bottom > containerBounds.bottom
+          ? itemBounds.bottom - containerBounds.bottom
+          : 0;
+
+    if (scrollDelta === 0) {
+      return;
+    }
+
+    scrollContainer.scrollTo({
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
-      block: 'nearest',
+      top: scrollContainer.scrollTop + scrollDelta,
     });
   }, [selectedId, closestPoints]);
 
@@ -2300,7 +2315,10 @@ export default function CycleParkingFinder() {
                       ) : null}
                     </AnimatePresence>
 
-                    <div className="parking-list-scroll">
+                    <div
+                      className="parking-list-scroll"
+                      ref={parkingListScroll}
+                    >
                       <AnimatePresence initial={false}>
                         {parkingDataMessage ? (
                           <motion.div
