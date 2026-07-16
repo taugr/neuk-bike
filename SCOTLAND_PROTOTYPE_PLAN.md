@@ -7,9 +7,9 @@ Edinburgh council data with OpenStreetMap coverage, publishes a reproducible
 static data release, loads only nearby spatial chunks, preserves map-first
 mobile behaviour, and can be hosted at no API cost.
 
-The implementation is complete locally. Cloudflare Pages is the recommended
-production host, but the external project/DNS cutover is deliberately separate
-from this prototype and the existing GitHub Pages deployment remains intact.
+The implementation is complete and released. Cloudflare Pages serves both the
+`neuk.bike` custom domain and the `neuk-bike.pages.dev` provider URL; GitHub
+Pages has been retired after the verified cutover.
 
 ## Product decisions
 
@@ -19,8 +19,8 @@ from this prototype and the existing GitHub Pages deployment remains intact.
 - Sources: City of Edinburgh Council is preferred in Edinburgh; Geofabrik's
   Scotland OSM extract provides baseline national coverage.
 - Cost/privacy: no paid APIs, accounts, database, or personal-location storage.
-- Hosting: prepare the output for Cloudflare Pages edge caching, while retaining
-  GitHub Pages until a verified custom-domain cutover.
+- Hosting: Cloudflare Pages serves the static export and applies the checked-in
+  cache/security headers; previous Pages deployments provide rollback.
 - Sharing: stable query links and a point index replace per-record HTML/SVG
   generation; the general site preview is used for all stands.
 
@@ -137,11 +137,11 @@ Status: complete
 - [x] Use the general site social preview for prototype parking links.
 - [x] Re-measure output and build performance.
 - [x] Add immutable cache policy for versioned chunks and framework assets.
-- [x] Document GitHub Pages continuity and the Cloudflare Pages migration.
+- [x] Document and complete the Cloudflare Pages migration.
 
 ### Phase 6 — Validation and refresh operation
 
-Status: complete locally
+Status: complete
 
 - [x] Make `pnpm update:data` the complete validated refresh command.
 - [x] Run focused tests, type checking, lint, formatting, and static build.
@@ -156,16 +156,19 @@ External release follow-up:
 - [x] Create the Cloudflare Pages project with Wrangler Direct Upload.
 - [x] Verify the `pages.dev` preview, headers, caching, PWA, and environment
       variables.
-- [ ] Attach `neuk.bike`, move DNS, and verify HTTPS before disabling GitHub
+- [x] Attach `neuk.bike`, move DNS, and verify HTTPS before disabling GitHub
       Pages.
 
 Release evidence (2026-07-16): the Scotland prototype is live at
-[`neuk-bike.pages.dev`](https://neuk-bike.pages.dev/). The published manifest
-and sample chunk match the local build hashes; the manifest uses a five-minute
-revalidation policy, while the versioned point index, chunks, and framework
-assets are immutable. The PWA manifest, service worker, security headers,
-public build-time integrations, contextual names, popup details, and manual map
-zoom behavior were verified on the deployed site.
+[`neuk.bike`](https://neuk.bike/) and
+[`neuk-bike.pages.dev`](https://neuk-bike.pages.dev/). The custom domain serves
+the Cloudflare Pages response and no longer exposes GitHub/Fastly origin
+headers. The published manifest and sample chunk match the local build hashes;
+the manifest uses a five-minute revalidation policy, while the versioned point
+index, chunks, and framework assets are immutable. HTTPS, the PWA manifest,
+service worker, security headers, public build-time integrations, contextual
+names, popup details, and manual map zoom behavior were verified on the
+deployed site.
 
 ## Refresh and release runbook
 

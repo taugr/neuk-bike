@@ -4,7 +4,7 @@
   <img src="./public/icon-192.png" alt="Bike Neuks icon" width="140" />
   <br />
   <a href="https://neuk.bike/">
-    <img src="https://img.shields.io/badge/live-GitHub%20Pages-0f766e" alt="live app" />
+    <img src="https://img.shields.io/badge/live-Cloudflare%20Pages-0f766e" alt="live app" />
   </a>
   <a href="./LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="license" />
@@ -27,8 +27,8 @@
 ## Live app
 
 Open [neuk.bike](https://neuk.bike/). The deployed site currently runs on
-GitHub Pages while the Cloudflare Pages migration described below remains an
-explicit release step.
+Cloudflare Pages, with [neuk-bike.pages.dev](https://neuk-bike.pages.dev/) as
+the provider URL and rollback entry point.
 
 The app runs entirely in the browser. It has no backend, database, paid API, or
 personal-location storage.
@@ -181,15 +181,14 @@ Production hosts always use the browser geolocation API.
 
 ## Deployment
 
-### Recommended: Cloudflare Pages
+### Production: Cloudflare Pages
 
-Cloudflare Pages is the preferred production host for this static prototype.
+Cloudflare Pages is the production host for this static prototype.
 It can serve the existing `out/` directory directly, adds edge delivery and
 compression, and applies the cache and security policy in `public/_headers`.
 No Worker runtime, database, paid API, or new application dependency is needed.
-The verified Cloudflare deployment is available at
-[neuk-bike.pages.dev](https://neuk-bike.pages.dev/); `neuk.bike` remains on
-GitHub Pages until the custom-domain cutover is deliberately completed.
+The custom domain is [neuk.bike](https://neuk.bike/), and the same deployment
+is available at [neuk-bike.pages.dev](https://neuk-bike.pages.dev/).
 
 The repository includes `wrangler.jsonc` and a repeatable direct-upload command.
 Create the project once with:
@@ -205,18 +204,18 @@ pnpm deploy:cloudflare
 ```
 
 This builds locally with the existing public environment variables and uploads
-the unchanged `out/` export. Verify the generated `pages.dev` URL, then attach
-`neuk.bike` and move DNS. Keep GitHub Pages active until that preview and
-custom-domain cutover are verified.
+the unchanged `out/` export. Verify both the generated `pages.dev` URL and
+`neuk.bike` after every production deployment. Cloudflare Pages deployment
+history and the provider URL provide the rollback path.
 See Cloudflare's [static Next.js guide](https://developers.cloudflare.com/pages/framework-guides/nextjs/deploy-a-static-nextjs-site/)
 and [custom header documentation](https://developers.cloudflare.com/pages/configuration/headers/).
 
-### Current fallback: GitHub Pages
+### Previous host: GitHub Pages
 
-The existing GitHub Actions workflow still builds and publishes the root-hosted
-`out/` export. `public/CNAME` continues to declare the current `neuk.bike`
-custom domain. This path remains valid until the Cloudflare cutover is
-deliberately completed.
+GitHub Pages was retired after the Cloudflare custom domain, HTTPS, environment
+features, caching, and PWA behaviour were verified. Pull requests and pushes
+still run the GitHub Actions quality checks, but deployment is performed with
+`pnpm deploy:cloudflare`.
 
 ## Attribution
 

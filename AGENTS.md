@@ -47,13 +47,13 @@
 ## Deployment
 
 - The app uses static export via `next.config.ts`.
-- Cloudflare Pages is the preferred production host and serves the generated
+- Cloudflare Pages is the production host and serves the generated
   `out/` directory as static assets. `public/_headers` defines its caching and
   security policy.
-- GitHub Pages remains the fallback until the Cloudflare `pages.dev` deployment,
-  custom domain, HTTPS, environment-dependent features, and PWA are verified.
-- Do not disable the GitHub Pages workflow or move `neuk.bike` without verifying
-  the Cloudflare deployment and preserving a rollback path.
+- `neuk.bike` is attached to the `neuk-bike` Pages project; the provider URL is
+  `neuk-bike.pages.dev`.
+- GitHub Pages is retired. Use Cloudflare Pages deployment history and the
+  provider URL as the rollback path, and verify both URLs after deployment.
 
 ## Verification
 
