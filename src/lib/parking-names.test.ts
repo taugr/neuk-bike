@@ -20,19 +20,20 @@ function parkingPoint(id: string, name: string): ParkingPoint {
       northings: 0,
       operator: '',
     },
+    sourceId: 'cec',
   };
 }
 
 describe('getParkingDisplayName', () => {
   it('uses a human-readable name for a curated central location', () => {
     expect(
-      getParkingDisplayName(parkingPoint('178', 'Cycle parking 178')),
+      getParkingDisplayName(parkingPoint('cec:178', 'Cycle parking 178')),
     ).toBe('Princes Street by Waverley Steps');
   });
 
   it('keeps the source name when no curated name exists', () => {
     expect(
-      getParkingDisplayName(parkingPoint('999', 'Cycle parking 999')),
+      getParkingDisplayName(parkingPoint('cec:999', 'Cycle parking 999')),
     ).toBe('Cycle parking 999');
   });
 });

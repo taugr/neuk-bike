@@ -14,7 +14,6 @@ import {
 } from '@/lib/parking';
 import {
   buildParkingShareUrl,
-  findSharedParkingPoint,
   parseShareLinkState,
   parseUrlLocation,
   parseUrlParkingId,
@@ -28,6 +27,7 @@ const points: ParkingPoint[] = [
     latitude: 55.9605,
     longitude: -3.21,
     properties: {},
+    sourceId: 'test',
   },
   {
     id: 'near',
@@ -35,6 +35,7 @@ const points: ParkingPoint[] = [
     latitude: 55.9534,
     longitude: -3.1884,
     properties: {},
+    sourceId: 'test',
   },
 ];
 
@@ -49,6 +50,7 @@ function parkingPoint(
     longitude: -3.1883,
     distanceMeters,
     properties,
+    sourceId: 'test',
   };
 }
 
@@ -136,6 +138,7 @@ describe('geo utilities', () => {
         covered: ' ',
         access: null,
       },
+      sourceId: 'test',
     });
 
     expect(distance?.value).toBe('42 m away');
@@ -324,6 +327,25 @@ describe('geo utilities', () => {
     ).toHaveLength(0);
   });
 
+  it('keeps dataset provenance out of popup details', () => {
+    expect(
+      getParkingPopupDetails(
+        parkingPoint({
+          capacity: 12,
+          sourceLabel: 'OpenStreetMap',
+        }),
+      ).details,
+    ).toEqual([
+      {
+        emphasis: '12',
+        icon: 'parking',
+        label: 'Spaces',
+        tone: 'green',
+        value: 'Spaces',
+      },
+    ]);
+  });
+
   it('summarizes populated parking details', () => {
     expect(
       describeParkingPoint({
@@ -336,6 +358,7 @@ describe('geo utilities', () => {
           bicycle_pa: 'stands',
           covered: 'no',
         },
+        sourceId: 'test',
       }),
     ).toBe('8 spaces, stands, not covered');
   });
@@ -352,6 +375,7 @@ describe('geo utilities', () => {
           bicycle_pa: ' ',
           covered: ' ',
         },
+        sourceId: 'test',
       }),
     ).toBe('20 spaces, type not listed');
   });
@@ -395,13 +419,8 @@ describe('geo utilities', () => {
     expect(parseUrlParkingId('?parking=')).toBeNull();
   });
 
-  it('finds shared parking points and ignores unknown ids', () => {
-    expect(findSharedParkingPoint('?parking=near', points)?.id).toBe('near');
-    expect(findSharedParkingPoint('?parking=missing', points)).toBeNull();
-  });
-
   it('parses parking links without treating the parking point as the reference location', () => {
-    expect(parseShareLinkState('?parking=near', points)).toEqual({
+    expect(parseShareLinkState('?parking=near')).toEqual({
       selectedParkingId: 'near',
       referenceLocation: null,
     });
@@ -409,7 +428,7 @@ describe('geo utilities', () => {
 
   it('parses parking links with explicit URL coordinates as the reference location', () => {
     expect(
-      parseShareLinkState('?parking=near&lat=55.9533&lng=-3.1883', points),
+      parseShareLinkState('?parking=near&lat=55.9533&lng=-3.1883'),
     ).toEqual({
       selectedParkingId: 'near',
       referenceLocation: {
@@ -419,11 +438,11 @@ describe('geo utilities', () => {
     });
   });
 
-  it('ignores unknown parking ids while preserving explicit URL coordinates', () => {
+  it('keeps parking ids for the spatial point index while preserving URL coordinates', () => {
     expect(
-      parseShareLinkState('?parking=missing&lat=55.9533&lng=-3.1883', points),
+      parseShareLinkState('?parking=missing&lat=55.9533&lng=-3.1883'),
     ).toEqual({
-      selectedParkingId: null,
+      selectedParkingId: 'missing',
       referenceLocation: {
         latitude: 55.9533,
         longitude: -3.1883,
@@ -434,12 +453,12 @@ describe('geo utilities', () => {
   it('builds parking share links without dropping the current base path', () => {
     expect(
       buildParkingShareUrl('https://taugr.github.io', '/neuk-bike', 'near'),
-    ).toBe('https://taugr.github.io/neuk-bike/parking/near/');
+    ).toBe('https://taugr.github.io/neuk-bike/?parking=near');
   });
 
   it('builds root-hosted parking share links for the custom domain', () => {
     expect(buildParkingShareUrl('https://neuk.bike', '/', 'near')).toBe(
-      'https://neuk.bike/parking/near/',
+      'https://neuk.bike/?parking=near',
     );
   });
 
@@ -450,7 +469,7 @@ describe('geo utilities', () => {
         '/neuk-bike/parking/near',
         'far',
       ),
-    ).toBe('https://taugr.github.io/neuk-bike/parking/far/');
+    ).toBe('https://taugr.github.io/neuk-bike/?parking=far');
   });
 
   it('parses valid URL coordinates and rejects invalid coordinates', () => {

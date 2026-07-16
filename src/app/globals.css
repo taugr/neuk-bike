@@ -879,6 +879,18 @@ a {
   padding: 0.55rem 0.65rem;
 }
 
+.parking-retry-button {
+  background: transparent;
+  border: 0;
+  color: currentColor;
+  font: inherit;
+  font-weight: 750;
+  margin-left: 0.45rem;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
 .parking-list-item {
   align-items: stretch;
   background: var(--surface-muted);

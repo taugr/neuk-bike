@@ -1,0 +1,7176 @@
+{
+  "chunkCount": 516,
+  "chunkZoom": 12,
+  "councilRecordCount": 1454,
+  "duplicateMatches": [
+    {
+      "councilId": "cec:1",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:29173154"
+    },
+    {
+      "councilId": "cec:10",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:253694066"
+    },
+    {
+      "councilId": "cec:100",
+      "distanceMeters": 0.07,
+      "osmId": "osm:node:550114466"
+    },
+    {
+      "councilId": "cec:1000",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:7366925993"
+    },
+    {
+      "councilId": "cec:1001",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:7416576016"
+    },
+    {
+      "councilId": "cec:1002",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:7418979986"
+    },
+    {
+      "councilId": "cec:1003",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:7418979998"
+    },
+    {
+      "councilId": "cec:1004",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:7467568157"
+    },
+    {
+      "councilId": "cec:1005",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:7515370339"
+    },
+    {
+      "councilId": "cec:1006",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:7528683438"
+    },
+    {
+      "councilId": "cec:1007",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:7572116254"
+    },
+    {
+      "councilId": "cec:1008",
+      "distanceMeters": 1,
+      "osmId": "osm:node:7572220467"
+    },
+    {
+      "councilId": "cec:1009",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:7572237724"
+    },
+    {
+      "councilId": "cec:101",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:552758010"
+    },
+    {
+      "councilId": "cec:1010",
+      "distanceMeters": 0.92,
+      "osmId": "osm:node:7575690395"
+    },
+    {
+      "councilId": "cec:1011",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:7578921119"
+    },
+    {
+      "councilId": "cec:1012",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:7578921120"
+    },
+    {
+      "councilId": "cec:1013",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:7595144643"
+    },
+    {
+      "councilId": "cec:1014",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:7595147277"
+    },
+    {
+      "councilId": "cec:1015",
+      "distanceMeters": 0.24,
+      "osmId": "osm:node:7595147278"
+    },
+    {
+      "councilId": "cec:1016",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:7609585534"
+    },
+    {
+      "councilId": "cec:1017",
+      "distanceMeters": 2.82,
+      "osmId": "osm:node:7614751386"
+    },
+    {
+      "councilId": "cec:1018",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:7638753801"
+    },
+    {
+      "councilId": "cec:1019",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:7655700068"
+    },
+    {
+      "councilId": "cec:102",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:555131349"
+    },
+    {
+      "councilId": "cec:1020",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:7658035447"
+    },
+    {
+      "councilId": "cec:1021",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:7659070289"
+    },
+    {
+      "councilId": "cec:1022",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:7660876085"
+    },
+    {
+      "councilId": "cec:1023",
+      "distanceMeters": 0.16,
+      "osmId": "osm:node:7705339535"
+    },
+    {
+      "councilId": "cec:1024",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:7707395603"
+    },
+    {
+      "councilId": "cec:1025",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:7714319224"
+    },
+    {
+      "councilId": "cec:1026",
+      "distanceMeters": 1,
+      "osmId": "osm:node:7719543453"
+    },
+    {
+      "councilId": "cec:1027",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:7721568486"
+    },
+    {
+      "councilId": "cec:1028",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:7726195260"
+    },
+    {
+      "councilId": "cec:1029",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:7728068084"
+    },
+    {
+      "councilId": "cec:103",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:561542577"
+    },
+    {
+      "councilId": "cec:1030",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:7746679765"
+    },
+    {
+      "councilId": "cec:1031",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:7794586034"
+    },
+    {
+      "councilId": "cec:1032",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:7796616518"
+    },
+    {
+      "councilId": "cec:1033",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:7809754613"
+    },
+    {
+      "councilId": "cec:1034",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:7809754614"
+    },
+    {
+      "councilId": "cec:1035",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:7850646617"
+    },
+    {
+      "councilId": "cec:1036",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:7850646618"
+    },
+    {
+      "councilId": "cec:1037",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:7850646619"
+    },
+    {
+      "councilId": "cec:1038",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:7850646620"
+    },
+    {
+      "councilId": "cec:1039",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:7852682721"
+    },
+    {
+      "councilId": "cec:104",
+      "distanceMeters": 1,
+      "osmId": "osm:node:568525673"
+    },
+    {
+      "councilId": "cec:1040",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:7859114041"
+    },
+    {
+      "councilId": "cec:1041",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:7878836212"
+    },
+    {
+      "councilId": "cec:1042",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:7878836213"
+    },
+    {
+      "councilId": "cec:1043",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:7878836214"
+    },
+    {
+      "councilId": "cec:1044",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:7878836215"
+    },
+    {
+      "councilId": "cec:1045",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:7878836216"
+    },
+    {
+      "councilId": "cec:1046",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:7878836219"
+    },
+    {
+      "councilId": "cec:1047",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:7878836222"
+    },
+    {
+      "councilId": "cec:1048",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:7881422280"
+    },
+    {
+      "councilId": "cec:1049",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:7890888310"
+    },
+    {
+      "councilId": "cec:105",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:581870351"
+    },
+    {
+      "councilId": "cec:1050",
+      "distanceMeters": 12.84,
+      "osmId": "osm:node:290954288"
+    },
+    {
+      "councilId": "cec:1051",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:7973600271"
+    },
+    {
+      "councilId": "cec:1052",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:7973600272"
+    },
+    {
+      "councilId": "cec:1053",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:7982652178"
+    },
+    {
+      "councilId": "cec:1054",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:7982675804"
+    },
+    {
+      "councilId": "cec:1055",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:7982675805"
+    },
+    {
+      "councilId": "cec:1056",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:7997570665"
+    },
+    {
+      "councilId": "cec:1057",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:8016055581"
+    },
+    {
+      "councilId": "cec:1058",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:8018318559"
+    },
+    {
+      "councilId": "cec:1059",
+      "distanceMeters": 8.73,
+      "osmId": "osm:node:12269343568"
+    },
+    {
+      "councilId": "cec:106",
+      "distanceMeters": 6.52,
+      "osmId": "osm:node:587915571"
+    },
+    {
+      "councilId": "cec:1060",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:8041961623"
+    },
+    {
+      "councilId": "cec:1061",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:8041979749"
+    },
+    {
+      "councilId": "cec:1062",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:8043902321"
+    },
+    {
+      "councilId": "cec:1063",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:8043902332"
+    },
+    {
+      "councilId": "cec:1064",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:8047545482"
+    },
+    {
+      "councilId": "cec:1065",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:8066495994"
+    },
+    {
+      "councilId": "cec:1066",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:8071629203"
+    },
+    {
+      "councilId": "cec:1067",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:8091471228"
+    },
+    {
+      "councilId": "cec:1069",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:8091471260"
+    },
+    {
+      "councilId": "cec:107",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:588498436"
+    },
+    {
+      "councilId": "cec:1070",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:8091471261"
+    },
+    {
+      "councilId": "cec:1071",
+      "distanceMeters": 7.11,
+      "osmId": "osm:node:8091471262"
+    },
+    {
+      "councilId": "cec:1072",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:8091471263"
+    },
+    {
+      "councilId": "cec:1073",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:8091471264"
+    },
+    {
+      "councilId": "cec:1074",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:8093399707"
+    },
+    {
+      "councilId": "cec:1075",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:8093399708"
+    },
+    {
+      "councilId": "cec:1076",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:8093399709"
+    },
+    {
+      "councilId": "cec:1077",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:8096902965"
+    },
+    {
+      "councilId": "cec:1078",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:8096902984"
+    },
+    {
+      "councilId": "cec:108",
+      "distanceMeters": 1.17,
+      "osmId": "osm:node:590030747"
+    },
+    {
+      "councilId": "cec:1082",
+      "distanceMeters": 0.13,
+      "osmId": "osm:node:8147016344"
+    },
+    {
+      "councilId": "cec:1083",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:8196151161"
+    },
+    {
+      "councilId": "cec:1084",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:8241084491"
+    },
+    {
+      "councilId": "cec:1085",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:8245437917"
+    },
+    {
+      "councilId": "cec:1086",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:8252434776"
+    },
+    {
+      "councilId": "cec:1087",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:8257776639"
+    },
+    {
+      "councilId": "cec:1088",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:8258427061"
+    },
+    {
+      "councilId": "cec:1089",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:8270433198"
+    },
+    {
+      "councilId": "cec:109",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:590030807"
+    },
+    {
+      "councilId": "cec:1090",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:8270866235"
+    },
+    {
+      "councilId": "cec:1091",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:8273715632"
+    },
+    {
+      "councilId": "cec:1092",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:8306586129"
+    },
+    {
+      "councilId": "cec:1093",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:8308414220"
+    },
+    {
+      "councilId": "cec:1094",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:8330307908"
+    },
+    {
+      "councilId": "cec:1095",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:8330607644"
+    },
+    {
+      "councilId": "cec:1096",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:8354280814"
+    },
+    {
+      "councilId": "cec:1097",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:8354672887"
+    },
+    {
+      "councilId": "cec:1098",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:8463715680"
+    },
+    {
+      "councilId": "cec:1099",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:8513464183"
+    },
+    {
+      "councilId": "cec:11",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:253757406"
+    },
+    {
+      "councilId": "cec:110",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:590030892"
+    },
+    {
+      "councilId": "cec:1100",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:8513549351"
+    },
+    {
+      "councilId": "cec:1101",
+      "distanceMeters": 1.19,
+      "osmId": "osm:node:8585611034"
+    },
+    {
+      "councilId": "cec:1102",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:8592703242"
+    },
+    {
+      "councilId": "cec:1103",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:8594807990"
+    },
+    {
+      "councilId": "cec:1104",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:8594807991"
+    },
+    {
+      "councilId": "cec:1106",
+      "distanceMeters": 5.78,
+      "osmId": "osm:node:8643354350"
+    },
+    {
+      "councilId": "cec:1107",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:8661427415"
+    },
+    {
+      "councilId": "cec:1108",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:8662876827"
+    },
+    {
+      "councilId": "cec:1109",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:8662876842"
+    },
+    {
+      "councilId": "cec:111",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:590885186"
+    },
+    {
+      "councilId": "cec:1110",
+      "distanceMeters": 0.16,
+      "osmId": "osm:node:8689919869"
+    },
+    {
+      "councilId": "cec:1111",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:8689919870"
+    },
+    {
+      "councilId": "cec:1112",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:8690748856"
+    },
+    {
+      "councilId": "cec:1113",
+      "distanceMeters": 0.1,
+      "osmId": "osm:node:8691041509"
+    },
+    {
+      "councilId": "cec:1114",
+      "distanceMeters": 1.08,
+      "osmId": "osm:node:8702586108"
+    },
+    {
+      "councilId": "cec:1115",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:8714979797"
+    },
+    {
+      "councilId": "cec:1116",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:8739988816"
+    },
+    {
+      "councilId": "cec:1117",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:8740037017"
+    },
+    {
+      "councilId": "cec:1118",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:8740037019"
+    },
+    {
+      "councilId": "cec:1119",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:8740037020"
+    },
+    {
+      "councilId": "cec:112",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:600952954"
+    },
+    {
+      "councilId": "cec:1120",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:8740037021"
+    },
+    {
+      "councilId": "cec:1121",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:8740037022"
+    },
+    {
+      "councilId": "cec:1122",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:8740037032"
+    },
+    {
+      "councilId": "cec:1123",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:8740037033"
+    },
+    {
+      "councilId": "cec:1124",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:8740037034"
+    },
+    {
+      "councilId": "cec:1125",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:8740037035"
+    },
+    {
+      "councilId": "cec:1126",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:8740037039"
+    },
+    {
+      "councilId": "cec:1127",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:8740037040"
+    },
+    {
+      "councilId": "cec:1128",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:8740037042"
+    },
+    {
+      "councilId": "cec:1129",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:8740037043"
+    },
+    {
+      "councilId": "cec:113",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:607466257"
+    },
+    {
+      "councilId": "cec:1130",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:8740037044"
+    },
+    {
+      "councilId": "cec:1131",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:8740037045"
+    },
+    {
+      "councilId": "cec:1132",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:8740037046"
+    },
+    {
+      "councilId": "cec:1133",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:8740037047"
+    },
+    {
+      "councilId": "cec:1134",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:8740037048"
+    },
+    {
+      "councilId": "cec:1135",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:8757510569"
+    },
+    {
+      "councilId": "cec:1136",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:8758070589"
+    },
+    {
+      "councilId": "cec:1137",
+      "distanceMeters": 4.81,
+      "osmId": "osm:node:8829187130"
+    },
+    {
+      "councilId": "cec:1138",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:8832666705"
+    },
+    {
+      "councilId": "cec:1139",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:8832666706"
+    },
+    {
+      "councilId": "cec:114",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:616683228"
+    },
+    {
+      "councilId": "cec:1140",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:8832666707"
+    },
+    {
+      "councilId": "cec:1141",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:8832666715"
+    },
+    {
+      "councilId": "cec:1142",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:8832666716"
+    },
+    {
+      "councilId": "cec:1143",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:8832682384"
+    },
+    {
+      "councilId": "cec:1144",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:8832682385"
+    },
+    {
+      "councilId": "cec:1145",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:8832682387"
+    },
+    {
+      "councilId": "cec:1146",
+      "distanceMeters": 0.16,
+      "osmId": "osm:node:8832692217"
+    },
+    {
+      "councilId": "cec:1147",
+      "distanceMeters": 2.77,
+      "osmId": "osm:node:8832692218"
+    },
+    {
+      "councilId": "cec:1148",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:8832692219"
+    },
+    {
+      "councilId": "cec:1149",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:8832692224"
+    },
+    {
+      "councilId": "cec:115",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:652874346"
+    },
+    {
+      "councilId": "cec:1150",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:8832692225"
+    },
+    {
+      "councilId": "cec:1151",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:8832692226"
+    },
+    {
+      "councilId": "cec:1152",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:8832692227"
+    },
+    {
+      "councilId": "cec:1153",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:8832692228"
+    },
+    {
+      "councilId": "cec:1154",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:8832692229"
+    },
+    {
+      "councilId": "cec:1155",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:8860617080"
+    },
+    {
+      "councilId": "cec:1157",
+      "distanceMeters": 2.91,
+      "osmId": "osm:node:8860617082"
+    },
+    {
+      "councilId": "cec:1158",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:8860617083"
+    },
+    {
+      "councilId": "cec:1159",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:8860617084"
+    },
+    {
+      "councilId": "cec:116",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:652874930"
+    },
+    {
+      "councilId": "cec:1160",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:8860617085"
+    },
+    {
+      "councilId": "cec:1161",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:8860617086"
+    },
+    {
+      "councilId": "cec:1162",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:8860617087"
+    },
+    {
+      "councilId": "cec:1163",
+      "distanceMeters": 5.1,
+      "osmId": "osm:node:8860617088"
+    },
+    {
+      "councilId": "cec:1164",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:8860617093"
+    },
+    {
+      "councilId": "cec:1165",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:8860617094"
+    },
+    {
+      "councilId": "cec:1166",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:8860617095"
+    },
+    {
+      "councilId": "cec:1167",
+      "distanceMeters": 1.58,
+      "osmId": "osm:node:8860617096"
+    },
+    {
+      "councilId": "cec:1168",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:8860617097"
+    },
+    {
+      "councilId": "cec:1169",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:8862809875"
+    },
+    {
+      "councilId": "cec:117",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:670412682"
+    },
+    {
+      "councilId": "cec:1170",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:8862809879"
+    },
+    {
+      "councilId": "cec:1171",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:8862809880"
+    },
+    {
+      "councilId": "cec:1172",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:8862809881"
+    },
+    {
+      "councilId": "cec:1173",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:8862809904"
+    },
+    {
+      "councilId": "cec:1174",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:8862809905"
+    },
+    {
+      "councilId": "cec:1175",
+      "distanceMeters": 5.32,
+      "osmId": "osm:node:8862809906"
+    },
+    {
+      "councilId": "cec:1176",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:8866031263"
+    },
+    {
+      "councilId": "cec:1177",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:8866031264"
+    },
+    {
+      "councilId": "cec:1178",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:8867580696"
+    },
+    {
+      "councilId": "cec:1179",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:8867580697"
+    },
+    {
+      "councilId": "cec:118",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:670937962"
+    },
+    {
+      "councilId": "cec:1180",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:8869720992"
+    },
+    {
+      "councilId": "cec:1181",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:8869789218"
+    },
+    {
+      "councilId": "cec:1182",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:8869789219"
+    },
+    {
+      "councilId": "cec:1183",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:8904827637"
+    },
+    {
+      "councilId": "cec:1184",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:8904827638"
+    },
+    {
+      "councilId": "cec:1185",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:8904827639"
+    },
+    {
+      "councilId": "cec:1186",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:8904827641"
+    },
+    {
+      "councilId": "cec:1187",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:8904827642"
+    },
+    {
+      "councilId": "cec:1188",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:8904827643"
+    },
+    {
+      "councilId": "cec:1189",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:8904827644"
+    },
+    {
+      "councilId": "cec:119",
+      "distanceMeters": 2.31,
+      "osmId": "osm:node:672637956"
+    },
+    {
+      "councilId": "cec:1190",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:8904827645"
+    },
+    {
+      "councilId": "cec:1191",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:8904827646"
+    },
+    {
+      "councilId": "cec:1192",
+      "distanceMeters": 0.23,
+      "osmId": "osm:node:8904827647"
+    },
+    {
+      "councilId": "cec:1193",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:8904827648"
+    },
+    {
+      "councilId": "cec:1194",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:8904827649"
+    },
+    {
+      "councilId": "cec:1195",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:8904827650"
+    },
+    {
+      "councilId": "cec:1196",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:8904827652"
+    },
+    {
+      "councilId": "cec:1197",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:8904827653"
+    },
+    {
+      "councilId": "cec:1198",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:8904827654"
+    },
+    {
+      "councilId": "cec:1199",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:8904827656"
+    },
+    {
+      "councilId": "cec:12",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:254511785"
+    },
+    {
+      "councilId": "cec:120",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:672638849"
+    },
+    {
+      "councilId": "cec:1200",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:8904827659"
+    },
+    {
+      "councilId": "cec:1201",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:8904827660"
+    },
+    {
+      "councilId": "cec:1202",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:8904827661"
+    },
+    {
+      "councilId": "cec:1203",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:8904827664"
+    },
+    {
+      "councilId": "cec:1204",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:8904827665"
+    },
+    {
+      "councilId": "cec:1205",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:8944024658"
+    },
+    {
+      "councilId": "cec:1206",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:8944024659"
+    },
+    {
+      "councilId": "cec:1207",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:8954537259"
+    },
+    {
+      "councilId": "cec:1208",
+      "distanceMeters": 3.9,
+      "osmId": "osm:way:1251555802"
+    },
+    {
+      "councilId": "cec:1209",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:8954654852"
+    },
+    {
+      "councilId": "cec:121",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:691499129"
+    },
+    {
+      "councilId": "cec:1210",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:8954654853"
+    },
+    {
+      "councilId": "cec:1211",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:8954654854"
+    },
+    {
+      "councilId": "cec:1212",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:8954654855"
+    },
+    {
+      "councilId": "cec:1213",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:8954654856"
+    },
+    {
+      "councilId": "cec:1214",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:8989460147"
+    },
+    {
+      "councilId": "cec:1215",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:8989612425"
+    },
+    {
+      "councilId": "cec:1216",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:8990003116"
+    },
+    {
+      "councilId": "cec:1217",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:8993555186"
+    },
+    {
+      "councilId": "cec:1218",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:9004168219"
+    },
+    {
+      "councilId": "cec:1219",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:9007417197"
+    },
+    {
+      "councilId": "cec:1220",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:9026135805"
+    },
+    {
+      "councilId": "cec:1221",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:9032074612"
+    },
+    {
+      "councilId": "cec:1222",
+      "distanceMeters": 1.18,
+      "osmId": "osm:node:9042659195"
+    },
+    {
+      "councilId": "cec:1223",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:9043582842"
+    },
+    {
+      "councilId": "cec:1224",
+      "distanceMeters": 1,
+      "osmId": "osm:node:9074992518"
+    },
+    {
+      "councilId": "cec:1225",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:9079501828"
+    },
+    {
+      "councilId": "cec:1226",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:9084232466"
+    },
+    {
+      "councilId": "cec:1227",
+      "distanceMeters": 0.06,
+      "osmId": "osm:node:9084232495"
+    },
+    {
+      "councilId": "cec:1228",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:9084232496"
+    },
+    {
+      "councilId": "cec:1229",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:9084232497"
+    },
+    {
+      "councilId": "cec:123",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:693646813"
+    },
+    {
+      "councilId": "cec:1230",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:9084232498"
+    },
+    {
+      "councilId": "cec:1231",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:9084232499"
+    },
+    {
+      "councilId": "cec:1232",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:9084232500"
+    },
+    {
+      "councilId": "cec:1233",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:9101993361"
+    },
+    {
+      "councilId": "cec:1234",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:9127673992"
+    },
+    {
+      "councilId": "cec:1235",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:9131509898"
+    },
+    {
+      "councilId": "cec:1236",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:9160843137"
+    },
+    {
+      "councilId": "cec:1237",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:9162681505"
+    },
+    {
+      "councilId": "cec:1238",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:9162681506"
+    },
+    {
+      "councilId": "cec:1239",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:9251290488"
+    },
+    {
+      "councilId": "cec:124",
+      "distanceMeters": 0.26,
+      "osmId": "osm:node:693774627"
+    },
+    {
+      "councilId": "cec:1240",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:9251290489"
+    },
+    {
+      "councilId": "cec:1241",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:9251290490"
+    },
+    {
+      "councilId": "cec:1242",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:9251290491"
+    },
+    {
+      "councilId": "cec:1243",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:9283622011"
+    },
+    {
+      "councilId": "cec:1244",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:9334437595"
+    },
+    {
+      "councilId": "cec:1245",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:9348640252"
+    },
+    {
+      "councilId": "cec:1246",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:9441998357"
+    },
+    {
+      "councilId": "cec:1247",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:9441998358"
+    },
+    {
+      "councilId": "cec:1248",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:9443212178"
+    },
+    {
+      "councilId": "cec:1249",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:9459963317"
+    },
+    {
+      "councilId": "cec:125",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:725595709"
+    },
+    {
+      "councilId": "cec:1250",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:9460514288"
+    },
+    {
+      "councilId": "cec:1251",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:9480827630"
+    },
+    {
+      "councilId": "cec:1252",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:9480827631"
+    },
+    {
+      "councilId": "cec:1253",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:9517097000"
+    },
+    {
+      "councilId": "cec:1254",
+      "distanceMeters": 0.13,
+      "osmId": "osm:node:9517166158"
+    },
+    {
+      "councilId": "cec:1255",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:9517166159"
+    },
+    {
+      "councilId": "cec:1256",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:9517176860"
+    },
+    {
+      "councilId": "cec:1257",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:9583792727"
+    },
+    {
+      "councilId": "cec:1258",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:9654675146"
+    },
+    {
+      "councilId": "cec:1259",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:9661543728"
+    },
+    {
+      "councilId": "cec:126",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:734404332"
+    },
+    {
+      "councilId": "cec:1260",
+      "distanceMeters": 0.24,
+      "osmId": "osm:node:9664465126"
+    },
+    {
+      "councilId": "cec:1261",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:9664465133"
+    },
+    {
+      "councilId": "cec:1262",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:9664469847"
+    },
+    {
+      "councilId": "cec:1263",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:9664491043"
+    },
+    {
+      "councilId": "cec:1264",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:9664491044"
+    },
+    {
+      "councilId": "cec:1265",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:9669819349"
+    },
+    {
+      "councilId": "cec:1266",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:9680748220"
+    },
+    {
+      "councilId": "cec:1267",
+      "distanceMeters": 1,
+      "osmId": "osm:node:9725385485"
+    },
+    {
+      "councilId": "cec:1268",
+      "distanceMeters": 0.92,
+      "osmId": "osm:node:9739211684"
+    },
+    {
+      "councilId": "cec:1269",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:9777313598"
+    },
+    {
+      "councilId": "cec:127",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:735134821"
+    },
+    {
+      "councilId": "cec:1270",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:9789290072"
+    },
+    {
+      "councilId": "cec:1271",
+      "distanceMeters": 10.58,
+      "osmId": "osm:node:9797443317"
+    },
+    {
+      "councilId": "cec:1272",
+      "distanceMeters": 3.76,
+      "osmId": "osm:node:9802565107"
+    },
+    {
+      "councilId": "cec:1273",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:9811371575"
+    },
+    {
+      "councilId": "cec:1274",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:9937982200"
+    },
+    {
+      "councilId": "cec:1275",
+      "distanceMeters": 0.23,
+      "osmId": "osm:node:9937982201"
+    },
+    {
+      "councilId": "cec:1276",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:9937982202"
+    },
+    {
+      "councilId": "cec:1277",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:9939877994"
+    },
+    {
+      "councilId": "cec:1278",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:9939877995"
+    },
+    {
+      "councilId": "cec:1279",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:9948886682"
+    },
+    {
+      "councilId": "cec:128",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:738971734"
+    },
+    {
+      "councilId": "cec:1280",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:9949148921"
+    },
+    {
+      "councilId": "cec:1281",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:9963765111"
+    },
+    {
+      "councilId": "cec:1282",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:9963765112"
+    },
+    {
+      "councilId": "cec:1283",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:9979507540"
+    },
+    {
+      "councilId": "cec:1284",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:9983027102"
+    },
+    {
+      "councilId": "cec:1285",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:10002289617"
+    },
+    {
+      "councilId": "cec:1286",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:10039652102"
+    },
+    {
+      "councilId": "cec:1287",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:10051004207"
+    },
+    {
+      "councilId": "cec:1288",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:10072561745"
+    },
+    {
+      "councilId": "cec:1289",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:10072673856"
+    },
+    {
+      "councilId": "cec:129",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:739398131"
+    },
+    {
+      "councilId": "cec:1290",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:10072673857"
+    },
+    {
+      "councilId": "cec:1291",
+      "distanceMeters": 1.18,
+      "osmId": "osm:node:6487152286"
+    },
+    {
+      "councilId": "cec:1292",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:10076848849"
+    },
+    {
+      "councilId": "cec:1293",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:10076848850"
+    },
+    {
+      "councilId": "cec:1294",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:10076848851"
+    },
+    {
+      "councilId": "cec:1295",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:10084927425"
+    },
+    {
+      "councilId": "cec:1296",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:10091807539"
+    },
+    {
+      "councilId": "cec:1297",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:10092239290"
+    },
+    {
+      "councilId": "cec:1298",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:10102775438"
+    },
+    {
+      "councilId": "cec:1299",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:10116287609"
+    },
+    {
+      "councilId": "cec:13",
+      "distanceMeters": 0.23,
+      "osmId": "osm:node:255108315"
+    },
+    {
+      "councilId": "cec:130",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:766185381"
+    },
+    {
+      "councilId": "cec:1300",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:10128108796"
+    },
+    {
+      "councilId": "cec:1301",
+      "distanceMeters": 1.09,
+      "osmId": "osm:node:10128108797"
+    },
+    {
+      "councilId": "cec:1302",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:10128176176"
+    },
+    {
+      "councilId": "cec:1303",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:10137460719"
+    },
+    {
+      "councilId": "cec:1304",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:10144975206"
+    },
+    {
+      "councilId": "cec:1305",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:10144975207"
+    },
+    {
+      "councilId": "cec:1306",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:10152535653"
+    },
+    {
+      "councilId": "cec:1307",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:10154772892"
+    },
+    {
+      "councilId": "cec:1308",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:10157215633"
+    },
+    {
+      "councilId": "cec:1309",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:10157350796"
+    },
+    {
+      "councilId": "cec:131",
+      "distanceMeters": 6.01,
+      "osmId": "osm:node:766185387"
+    },
+    {
+      "councilId": "cec:1310",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:10173784070"
+    },
+    {
+      "councilId": "cec:1311",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:10180341910"
+    },
+    {
+      "councilId": "cec:1312",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:10185851358"
+    },
+    {
+      "councilId": "cec:1313",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:10199790805"
+    },
+    {
+      "councilId": "cec:1314",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:10215251660"
+    },
+    {
+      "councilId": "cec:1315",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:10218744625"
+    },
+    {
+      "councilId": "cec:1316",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:10229080675"
+    },
+    {
+      "councilId": "cec:1317",
+      "distanceMeters": 0.06,
+      "osmId": "osm:node:10230345113"
+    },
+    {
+      "councilId": "cec:1318",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:10232741040"
+    },
+    {
+      "councilId": "cec:1319",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:10554253485"
+    },
+    {
+      "councilId": "cec:132",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:783231951"
+    },
+    {
+      "councilId": "cec:1320",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:10607824226"
+    },
+    {
+      "councilId": "cec:1321",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:10609056534"
+    },
+    {
+      "councilId": "cec:1322",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:10611966160"
+    },
+    {
+      "councilId": "cec:1323",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:10678726974"
+    },
+    {
+      "councilId": "cec:1324",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:10709040035"
+    },
+    {
+      "councilId": "cec:1325",
+      "distanceMeters": 1.1,
+      "osmId": "osm:node:10717736642"
+    },
+    {
+      "councilId": "cec:1326",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:10717736643"
+    },
+    {
+      "councilId": "cec:1327",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:10717736644"
+    },
+    {
+      "councilId": "cec:1328",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:10717802705"
+    },
+    {
+      "councilId": "cec:1329",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:10717928029"
+    },
+    {
+      "councilId": "cec:1330",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:10764563811"
+    },
+    {
+      "councilId": "cec:1331",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:10764563846"
+    },
+    {
+      "councilId": "cec:1332",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:10764563864"
+    },
+    {
+      "councilId": "cec:1333",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:10764736428"
+    },
+    {
+      "councilId": "cec:1334",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:10821754662"
+    },
+    {
+      "councilId": "cec:1335",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:10821844486"
+    },
+    {
+      "councilId": "cec:1336",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:10824607214"
+    },
+    {
+      "councilId": "cec:1337",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:10837331475"
+    },
+    {
+      "councilId": "cec:1338",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:10855818058"
+    },
+    {
+      "councilId": "cec:1339",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:10855818059"
+    },
+    {
+      "councilId": "cec:134",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:783575106"
+    },
+    {
+      "councilId": "cec:1340",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:10856724747"
+    },
+    {
+      "councilId": "cec:1341",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:10887706784"
+    },
+    {
+      "councilId": "cec:1342",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:10915654970"
+    },
+    {
+      "councilId": "cec:1343",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:10915654971"
+    },
+    {
+      "councilId": "cec:1344",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:10915663932"
+    },
+    {
+      "councilId": "cec:1345",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:10915663935"
+    },
+    {
+      "councilId": "cec:1346",
+      "distanceMeters": 14.41,
+      "osmId": "osm:node:10915663936"
+    },
+    {
+      "councilId": "cec:1347",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:10915664332"
+    },
+    {
+      "councilId": "cec:1348",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:10928975086"
+    },
+    {
+      "councilId": "cec:1349",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:10928975087"
+    },
+    {
+      "councilId": "cec:135",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:783575119"
+    },
+    {
+      "councilId": "cec:1350",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:10937098243"
+    },
+    {
+      "councilId": "cec:1351",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:10937098244"
+    },
+    {
+      "councilId": "cec:1352",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:10940018743"
+    },
+    {
+      "councilId": "cec:1353",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:10940023572"
+    },
+    {
+      "councilId": "cec:1354",
+      "distanceMeters": 1.05,
+      "osmId": "osm:node:10940024395"
+    },
+    {
+      "councilId": "cec:1355",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:10940026641"
+    },
+    {
+      "councilId": "cec:1356",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:10940030851"
+    },
+    {
+      "councilId": "cec:1357",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:10940698324"
+    },
+    {
+      "councilId": "cec:1358",
+      "distanceMeters": 6.75,
+      "osmId": "osm:node:10941924473"
+    },
+    {
+      "councilId": "cec:1359",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:10943810979"
+    },
+    {
+      "councilId": "cec:136",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:795246249"
+    },
+    {
+      "councilId": "cec:1360",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:10943810980"
+    },
+    {
+      "councilId": "cec:1361",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:10943810981"
+    },
+    {
+      "councilId": "cec:1362",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:10961131627"
+    },
+    {
+      "councilId": "cec:1363",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:10969071739"
+    },
+    {
+      "councilId": "cec:1364",
+      "distanceMeters": 0.18,
+      "osmId": "osm:node:10971060101"
+    },
+    {
+      "councilId": "cec:1365",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:10971482073"
+    },
+    {
+      "councilId": "cec:1366",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:10975467915"
+    },
+    {
+      "councilId": "cec:1367",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:10975467916"
+    },
+    {
+      "councilId": "cec:1368",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:10983155860"
+    },
+    {
+      "councilId": "cec:137",
+      "distanceMeters": 0.09,
+      "osmId": "osm:node:797762767"
+    },
+    {
+      "councilId": "cec:1370",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:11017376793"
+    },
+    {
+      "councilId": "cec:1371",
+      "distanceMeters": 0.26,
+      "osmId": "osm:node:11033299048"
+    },
+    {
+      "councilId": "cec:1372",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:11033299051"
+    },
+    {
+      "councilId": "cec:1373",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:11038791992"
+    },
+    {
+      "councilId": "cec:1374",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:11041931717"
+    },
+    {
+      "councilId": "cec:1375",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:11053796505"
+    },
+    {
+      "councilId": "cec:1376",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:11055268386"
+    },
+    {
+      "councilId": "cec:1377",
+      "distanceMeters": 1.12,
+      "osmId": "osm:node:11060358975"
+    },
+    {
+      "councilId": "cec:1378",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:11060358979"
+    },
+    {
+      "councilId": "cec:1379",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:11139017076"
+    },
+    {
+      "councilId": "cec:138",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:797762770"
+    },
+    {
+      "councilId": "cec:1380",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:11141879355"
+    },
+    {
+      "councilId": "cec:1381",
+      "distanceMeters": 0.15,
+      "osmId": "osm:node:11189814531"
+    },
+    {
+      "councilId": "cec:1382",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:11189814533"
+    },
+    {
+      "councilId": "cec:1383",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:11222223312"
+    },
+    {
+      "councilId": "cec:1384",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:11222223313"
+    },
+    {
+      "councilId": "cec:1385",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:11234557374"
+    },
+    {
+      "councilId": "cec:1387",
+      "distanceMeters": 1.66,
+      "osmId": "osm:way:187616434"
+    },
+    {
+      "councilId": "cec:1388",
+      "distanceMeters": 2.18,
+      "osmId": "osm:way:187616436"
+    },
+    {
+      "councilId": "cec:1389",
+      "distanceMeters": 2.49,
+      "osmId": "osm:way:254388363"
+    },
+    {
+      "councilId": "cec:139",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:797762779"
+    },
+    {
+      "councilId": "cec:1390",
+      "distanceMeters": 5.43,
+      "osmId": "osm:way:254388369"
+    },
+    {
+      "councilId": "cec:1391",
+      "distanceMeters": 2.4,
+      "osmId": "osm:way:259445050"
+    },
+    {
+      "councilId": "cec:1393",
+      "distanceMeters": 7.95,
+      "osmId": "osm:way:289421903"
+    },
+    {
+      "councilId": "cec:1394",
+      "distanceMeters": 5.42,
+      "osmId": "osm:way:372690298"
+    },
+    {
+      "councilId": "cec:1395",
+      "distanceMeters": 1.61,
+      "osmId": "osm:way:399403382"
+    },
+    {
+      "councilId": "cec:1396",
+      "distanceMeters": 4.23,
+      "osmId": "osm:way:422614248"
+    },
+    {
+      "councilId": "cec:1397",
+      "distanceMeters": 2.61,
+      "osmId": "osm:way:444441789"
+    },
+    {
+      "councilId": "cec:1398",
+      "distanceMeters": 2.63,
+      "osmId": "osm:way:444441790"
+    },
+    {
+      "councilId": "cec:1399",
+      "distanceMeters": 2.61,
+      "osmId": "osm:way:444441791"
+    },
+    {
+      "councilId": "cec:14",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:256221327"
+    },
+    {
+      "councilId": "cec:140",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:797762780"
+    },
+    {
+      "councilId": "cec:1400",
+      "distanceMeters": 2.77,
+      "osmId": "osm:way:444441792"
+    },
+    {
+      "councilId": "cec:1401",
+      "distanceMeters": 1.04,
+      "osmId": "osm:way:480655083"
+    },
+    {
+      "councilId": "cec:1402",
+      "distanceMeters": 3.11,
+      "osmId": "osm:way:495068007"
+    },
+    {
+      "councilId": "cec:1403",
+      "distanceMeters": 1.87,
+      "osmId": "osm:way:495068008"
+    },
+    {
+      "councilId": "cec:1404",
+      "distanceMeters": 11.36,
+      "osmId": "osm:way:541064193"
+    },
+    {
+      "councilId": "cec:1405",
+      "distanceMeters": 3.61,
+      "osmId": "osm:way:541064196"
+    },
+    {
+      "councilId": "cec:1406",
+      "distanceMeters": 5.95,
+      "osmId": "osm:way:583025278"
+    },
+    {
+      "councilId": "cec:1407",
+      "distanceMeters": 10.47,
+      "osmId": "osm:way:606056909"
+    },
+    {
+      "councilId": "cec:1408",
+      "distanceMeters": 6.57,
+      "osmId": "osm:way:706092450"
+    },
+    {
+      "councilId": "cec:1409",
+      "distanceMeters": 2.46,
+      "osmId": "osm:way:746467948"
+    },
+    {
+      "councilId": "cec:141",
+      "distanceMeters": 1,
+      "osmId": "osm:node:826663952"
+    },
+    {
+      "councilId": "cec:1410",
+      "distanceMeters": 2.81,
+      "osmId": "osm:way:854958383"
+    },
+    {
+      "councilId": "cec:1411",
+      "distanceMeters": 4.76,
+      "osmId": "osm:way:954327785"
+    },
+    {
+      "councilId": "cec:1412",
+      "distanceMeters": 2.01,
+      "osmId": "osm:way:954327786"
+    },
+    {
+      "councilId": "cec:1413",
+      "distanceMeters": 3.55,
+      "osmId": "osm:way:1034176163"
+    },
+    {
+      "councilId": "cec:1415",
+      "distanceMeters": 1.18,
+      "osmId": "osm:way:1057774050"
+    },
+    {
+      "councilId": "cec:1416",
+      "distanceMeters": 2.65,
+      "osmId": "osm:way:1060034129"
+    },
+    {
+      "councilId": "cec:1417",
+      "distanceMeters": 2.92,
+      "osmId": "osm:way:1086264952"
+    },
+    {
+      "councilId": "cec:1418",
+      "distanceMeters": 5.8,
+      "osmId": "osm:way:1086264953"
+    },
+    {
+      "councilId": "cec:1419",
+      "distanceMeters": 8.1,
+      "osmId": "osm:way:1087845958"
+    },
+    {
+      "councilId": "cec:142",
+      "distanceMeters": 1.13,
+      "osmId": "osm:node:826664043"
+    },
+    {
+      "councilId": "cec:1420",
+      "distanceMeters": 4.59,
+      "osmId": "osm:way:1087845981"
+    },
+    {
+      "councilId": "cec:1421",
+      "distanceMeters": 4.36,
+      "osmId": "osm:way:1087845982"
+    },
+    {
+      "councilId": "cec:1422",
+      "distanceMeters": 2.87,
+      "osmId": "osm:way:1087846098"
+    },
+    {
+      "councilId": "cec:1423",
+      "distanceMeters": 5.45,
+      "osmId": "osm:way:1087846099"
+    },
+    {
+      "councilId": "cec:1424",
+      "distanceMeters": 5.35,
+      "osmId": "osm:way:1087846100"
+    },
+    {
+      "councilId": "cec:1425",
+      "distanceMeters": 12.85,
+      "osmId": "osm:way:1109112310"
+    },
+    {
+      "councilId": "cec:1426",
+      "distanceMeters": 2.87,
+      "osmId": "osm:way:1112673360"
+    },
+    {
+      "councilId": "cec:1427",
+      "distanceMeters": 1.21,
+      "osmId": "osm:way:1126912336"
+    },
+    {
+      "councilId": "cec:1428",
+      "distanceMeters": 1.3,
+      "osmId": "osm:way:1126912337"
+    },
+    {
+      "councilId": "cec:1429",
+      "distanceMeters": 1.54,
+      "osmId": "osm:way:1126912338"
+    },
+    {
+      "councilId": "cec:143",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:836104582"
+    },
+    {
+      "councilId": "cec:1430",
+      "distanceMeters": 1.38,
+      "osmId": "osm:way:1126912339"
+    },
+    {
+      "councilId": "cec:1431",
+      "distanceMeters": 6.44,
+      "osmId": "osm:way:1210849779"
+    },
+    {
+      "councilId": "cec:1432",
+      "distanceMeters": 6.01,
+      "osmId": "osm:way:1210849780"
+    },
+    {
+      "councilId": "cec:1433",
+      "distanceMeters": 2.17,
+      "osmId": "osm:node:4718835683"
+    },
+    {
+      "councilId": "cec:1434",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:13247354293"
+    },
+    {
+      "councilId": "cec:1435",
+      "distanceMeters": 3.34,
+      "osmId": "osm:node:12435744726"
+    },
+    {
+      "councilId": "cec:144",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:846044148"
+    },
+    {
+      "councilId": "cec:1440",
+      "distanceMeters": 4.49,
+      "osmId": "osm:node:11854386245"
+    },
+    {
+      "councilId": "cec:1441",
+      "distanceMeters": 3.34,
+      "osmId": "osm:node:12117016623"
+    },
+    {
+      "councilId": "cec:1443",
+      "distanceMeters": 1.88,
+      "osmId": "osm:node:13056422045"
+    },
+    {
+      "councilId": "cec:1444",
+      "distanceMeters": 4.14,
+      "osmId": "osm:node:12013230724"
+    },
+    {
+      "councilId": "cec:1445",
+      "distanceMeters": 1.65,
+      "osmId": "osm:node:11449298907"
+    },
+    {
+      "councilId": "cec:1446",
+      "distanceMeters": 3.98,
+      "osmId": "osm:node:11449390541"
+    },
+    {
+      "councilId": "cec:145",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:846250817"
+    },
+    {
+      "councilId": "cec:1451",
+      "distanceMeters": 4.78,
+      "osmId": "osm:node:11936533225"
+    },
+    {
+      "councilId": "cec:1454",
+      "distanceMeters": 3.55,
+      "osmId": "osm:node:11514955726"
+    },
+    {
+      "councilId": "cec:146",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:856965215"
+    },
+    {
+      "councilId": "cec:147",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:857536055"
+    },
+    {
+      "councilId": "cec:148",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:871052956"
+    },
+    {
+      "councilId": "cec:149",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:918836749"
+    },
+    {
+      "councilId": "cec:15",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:256431015"
+    },
+    {
+      "councilId": "cec:150",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:927164222"
+    },
+    {
+      "councilId": "cec:151",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:929985041"
+    },
+    {
+      "councilId": "cec:152",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:937157559"
+    },
+    {
+      "councilId": "cec:153",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:937174828"
+    },
+    {
+      "councilId": "cec:154",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:951675455"
+    },
+    {
+      "councilId": "cec:155",
+      "distanceMeters": 2.42,
+      "osmId": "osm:node:951675473"
+    },
+    {
+      "councilId": "cec:156",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:951675475"
+    },
+    {
+      "councilId": "cec:157",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:951675477"
+    },
+    {
+      "councilId": "cec:159",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:955095474"
+    },
+    {
+      "councilId": "cec:16",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:258369451"
+    },
+    {
+      "councilId": "cec:160",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:955095481"
+    },
+    {
+      "councilId": "cec:161",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:958655412"
+    },
+    {
+      "councilId": "cec:162",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:961905984"
+    },
+    {
+      "councilId": "cec:163",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:961905995"
+    },
+    {
+      "councilId": "cec:164",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:965458177"
+    },
+    {
+      "councilId": "cec:165",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:965458180"
+    },
+    {
+      "councilId": "cec:166",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:965458184"
+    },
+    {
+      "councilId": "cec:167",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:965458188"
+    },
+    {
+      "councilId": "cec:168",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:970364919"
+    },
+    {
+      "councilId": "cec:169",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:970364957"
+    },
+    {
+      "councilId": "cec:17",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:258369933"
+    },
+    {
+      "councilId": "cec:170",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:970365005"
+    },
+    {
+      "councilId": "cec:171",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:970365020"
+    },
+    {
+      "councilId": "cec:172",
+      "distanceMeters": 1,
+      "osmId": "osm:node:977802405"
+    },
+    {
+      "councilId": "cec:173",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:977802406"
+    },
+    {
+      "councilId": "cec:174",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:977802408"
+    },
+    {
+      "councilId": "cec:175",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:977802411"
+    },
+    {
+      "councilId": "cec:176",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:981773772"
+    },
+    {
+      "councilId": "cec:177",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:981773776"
+    },
+    {
+      "councilId": "cec:178",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:1004534928"
+    },
+    {
+      "councilId": "cec:179",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:1004534942"
+    },
+    {
+      "councilId": "cec:18",
+      "distanceMeters": 0.12,
+      "osmId": "osm:node:258370105"
+    },
+    {
+      "councilId": "cec:180",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:1075308160"
+    },
+    {
+      "councilId": "cec:181",
+      "distanceMeters": 9.11,
+      "osmId": "osm:node:1094601974"
+    },
+    {
+      "councilId": "cec:182",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:1151066365"
+    },
+    {
+      "councilId": "cec:183",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:1151066371"
+    },
+    {
+      "councilId": "cec:184",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:1186458524"
+    },
+    {
+      "councilId": "cec:185",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:1205837260"
+    },
+    {
+      "councilId": "cec:186",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:1205837264"
+    },
+    {
+      "councilId": "cec:187",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:1205837275"
+    },
+    {
+      "councilId": "cec:188",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:1215191754"
+    },
+    {
+      "councilId": "cec:189",
+      "distanceMeters": 6.39,
+      "osmId": "osm:node:1218308343"
+    },
+    {
+      "councilId": "cec:19",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:258370263"
+    },
+    {
+      "councilId": "cec:190",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:1219195174"
+    },
+    {
+      "councilId": "cec:191",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:1219195176"
+    },
+    {
+      "councilId": "cec:192",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:1219195178"
+    },
+    {
+      "councilId": "cec:193",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:1221491441"
+    },
+    {
+      "councilId": "cec:194",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:1238753822"
+    },
+    {
+      "councilId": "cec:195",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:1239055313"
+    },
+    {
+      "councilId": "cec:196",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:1247631692"
+    },
+    {
+      "councilId": "cec:197",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:1255637533"
+    },
+    {
+      "councilId": "cec:198",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:1286589469"
+    },
+    {
+      "councilId": "cec:199",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:1287452670"
+    },
+    {
+      "councilId": "cec:2",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:33214579"
+    },
+    {
+      "councilId": "cec:200",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:1287452934"
+    },
+    {
+      "councilId": "cec:201",
+      "distanceMeters": 0.16,
+      "osmId": "osm:node:1290726803"
+    },
+    {
+      "councilId": "cec:202",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:1303838741"
+    },
+    {
+      "councilId": "cec:203",
+      "distanceMeters": 1.05,
+      "osmId": "osm:node:1305696035"
+    },
+    {
+      "councilId": "cec:204",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:1305696036"
+    },
+    {
+      "councilId": "cec:205",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:1305696037"
+    },
+    {
+      "councilId": "cec:206",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:1307096070"
+    },
+    {
+      "councilId": "cec:207",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:1327812690"
+    },
+    {
+      "councilId": "cec:208",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:1327812693"
+    },
+    {
+      "councilId": "cec:209",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:1334662197"
+    },
+    {
+      "councilId": "cec:21",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:258451558"
+    },
+    {
+      "councilId": "cec:210",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:1334662198"
+    },
+    {
+      "councilId": "cec:211",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:1354637177"
+    },
+    {
+      "councilId": "cec:214",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:1354642729"
+    },
+    {
+      "councilId": "cec:215",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:1354645772"
+    },
+    {
+      "councilId": "cec:216",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:1354645774"
+    },
+    {
+      "councilId": "cec:217",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:1365038328"
+    },
+    {
+      "councilId": "cec:218",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:1365653837"
+    },
+    {
+      "councilId": "cec:22",
+      "distanceMeters": 0.34,
+      "osmId": "osm:node:258452315"
+    },
+    {
+      "councilId": "cec:220",
+      "distanceMeters": 0.13,
+      "osmId": "osm:node:1375267086"
+    },
+    {
+      "councilId": "cec:221",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:1375267087"
+    },
+    {
+      "councilId": "cec:222",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:1378615498"
+    },
+    {
+      "councilId": "cec:223",
+      "distanceMeters": 0.08,
+      "osmId": "osm:node:1378615515"
+    },
+    {
+      "councilId": "cec:224",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:1402771783"
+    },
+    {
+      "councilId": "cec:225",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:1402771787"
+    },
+    {
+      "councilId": "cec:226",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:1402771789"
+    },
+    {
+      "councilId": "cec:227",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:1403557496"
+    },
+    {
+      "councilId": "cec:229",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:1407114152"
+    },
+    {
+      "councilId": "cec:23",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:258452635"
+    },
+    {
+      "councilId": "cec:230",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:1407569848"
+    },
+    {
+      "councilId": "cec:231",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:1407569851"
+    },
+    {
+      "councilId": "cec:232",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:1407569856"
+    },
+    {
+      "councilId": "cec:233",
+      "distanceMeters": 3.11,
+      "osmId": "osm:way:478674513"
+    },
+    {
+      "councilId": "cec:234",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:1414758527"
+    },
+    {
+      "councilId": "cec:235",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:1417615713"
+    },
+    {
+      "councilId": "cec:236",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:1433084527"
+    },
+    {
+      "councilId": "cec:237",
+      "distanceMeters": 12.03,
+      "osmId": "osm:node:1433098177"
+    },
+    {
+      "councilId": "cec:238",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:1433102257"
+    },
+    {
+      "councilId": "cec:239",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:1436552014"
+    },
+    {
+      "councilId": "cec:24",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:258452650"
+    },
+    {
+      "councilId": "cec:240",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:1437786346"
+    },
+    {
+      "councilId": "cec:241",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:1490092250"
+    },
+    {
+      "councilId": "cec:242",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:1504383697"
+    },
+    {
+      "councilId": "cec:243",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:1504384423"
+    },
+    {
+      "councilId": "cec:244",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:1510493884"
+    },
+    {
+      "councilId": "cec:245",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:1535728692"
+    },
+    {
+      "councilId": "cec:246",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:1586198651"
+    },
+    {
+      "councilId": "cec:247",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:1587689557"
+    },
+    {
+      "councilId": "cec:248",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:1587689560"
+    },
+    {
+      "councilId": "cec:249",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:1587689595"
+    },
+    {
+      "councilId": "cec:25",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:258454691"
+    },
+    {
+      "councilId": "cec:250",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:1620208361"
+    },
+    {
+      "councilId": "cec:251",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:1621716776"
+    },
+    {
+      "councilId": "cec:252",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:1621716780"
+    },
+    {
+      "councilId": "cec:253",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:1621721033"
+    },
+    {
+      "councilId": "cec:254",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:1623838709"
+    },
+    {
+      "councilId": "cec:255",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:1630623187"
+    },
+    {
+      "councilId": "cec:256",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:1631995177"
+    },
+    {
+      "councilId": "cec:257",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:1631995197"
+    },
+    {
+      "councilId": "cec:258",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:1634701014"
+    },
+    {
+      "councilId": "cec:259",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:1635296514"
+    },
+    {
+      "councilId": "cec:26",
+      "distanceMeters": 0.11,
+      "osmId": "osm:node:258454827"
+    },
+    {
+      "councilId": "cec:260",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:1651948101"
+    },
+    {
+      "councilId": "cec:261",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:1663413852"
+    },
+    {
+      "councilId": "cec:262",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:1670587017"
+    },
+    {
+      "councilId": "cec:263",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:1677703890"
+    },
+    {
+      "councilId": "cec:265",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:1707008745"
+    },
+    {
+      "councilId": "cec:266",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:1707008747"
+    },
+    {
+      "councilId": "cec:267",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:1707008760"
+    },
+    {
+      "councilId": "cec:268",
+      "distanceMeters": 0.92,
+      "osmId": "osm:node:1734633067"
+    },
+    {
+      "councilId": "cec:269",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:1735708105"
+    },
+    {
+      "councilId": "cec:27",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:258455238"
+    },
+    {
+      "councilId": "cec:270",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:1735708106"
+    },
+    {
+      "councilId": "cec:271",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:1746952783"
+    },
+    {
+      "councilId": "cec:272",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:1748697232"
+    },
+    {
+      "councilId": "cec:273",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:1756320250"
+    },
+    {
+      "councilId": "cec:275",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:1765552549"
+    },
+    {
+      "councilId": "cec:276",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:1765552550"
+    },
+    {
+      "councilId": "cec:277",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:1794979886"
+    },
+    {
+      "councilId": "cec:278",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:1806482026"
+    },
+    {
+      "councilId": "cec:279",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:1806482036"
+    },
+    {
+      "councilId": "cec:28",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:258455356"
+    },
+    {
+      "councilId": "cec:280",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:1835565708"
+    },
+    {
+      "councilId": "cec:281",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:1852121102"
+    },
+    {
+      "councilId": "cec:282",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:1864451695"
+    },
+    {
+      "councilId": "cec:283",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:1864451699"
+    },
+    {
+      "councilId": "cec:284",
+      "distanceMeters": 0.17,
+      "osmId": "osm:node:1864453094"
+    },
+    {
+      "councilId": "cec:285",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:1960815064"
+    },
+    {
+      "councilId": "cec:286",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:1995716064"
+    },
+    {
+      "councilId": "cec:287",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:1995716078"
+    },
+    {
+      "councilId": "cec:288",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:2022219531"
+    },
+    {
+      "councilId": "cec:289",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:2022222007"
+    },
+    {
+      "councilId": "cec:29",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:258455494"
+    },
+    {
+      "councilId": "cec:290",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:2072229262"
+    },
+    {
+      "councilId": "cec:291",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:2077839134"
+    },
+    {
+      "councilId": "cec:292",
+      "distanceMeters": 3.4,
+      "osmId": "osm:node:2116015843"
+    },
+    {
+      "councilId": "cec:293",
+      "distanceMeters": 0.24,
+      "osmId": "osm:node:2282974633"
+    },
+    {
+      "councilId": "cec:294",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:2299419520"
+    },
+    {
+      "councilId": "cec:295",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:2315164624"
+    },
+    {
+      "councilId": "cec:296",
+      "distanceMeters": 1,
+      "osmId": "osm:node:2329498453"
+    },
+    {
+      "councilId": "cec:297",
+      "distanceMeters": 2.39,
+      "osmId": "osm:node:2330903056"
+    },
+    {
+      "councilId": "cec:298",
+      "distanceMeters": 0.23,
+      "osmId": "osm:node:2339238160"
+    },
+    {
+      "councilId": "cec:299",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:2339238165"
+    },
+    {
+      "councilId": "cec:3",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:33396659"
+    },
+    {
+      "councilId": "cec:30",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:258455497"
+    },
+    {
+      "councilId": "cec:300",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:2343175736"
+    },
+    {
+      "councilId": "cec:301",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:2356304418"
+    },
+    {
+      "councilId": "cec:302",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:2366138555"
+    },
+    {
+      "councilId": "cec:303",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:2366237315"
+    },
+    {
+      "councilId": "cec:305",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:2395929664"
+    },
+    {
+      "councilId": "cec:306",
+      "distanceMeters": 5.27,
+      "osmId": "osm:node:2396866932"
+    },
+    {
+      "councilId": "cec:307",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:2411349583"
+    },
+    {
+      "councilId": "cec:308",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:2411349584"
+    },
+    {
+      "councilId": "cec:31",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:258455546"
+    },
+    {
+      "councilId": "cec:310",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:2421217500"
+    },
+    {
+      "councilId": "cec:311",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:2422648056"
+    },
+    {
+      "councilId": "cec:312",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:2422648057"
+    },
+    {
+      "councilId": "cec:313",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:2422648059"
+    },
+    {
+      "councilId": "cec:314",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:2422648060"
+    },
+    {
+      "councilId": "cec:315",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:2422648061"
+    },
+    {
+      "councilId": "cec:316",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:2422648064"
+    },
+    {
+      "councilId": "cec:318",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:2440523747"
+    },
+    {
+      "councilId": "cec:319",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:2440523750"
+    },
+    {
+      "councilId": "cec:32",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:258455753"
+    },
+    {
+      "councilId": "cec:320",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:2456095037"
+    },
+    {
+      "councilId": "cec:321",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:2479343766"
+    },
+    {
+      "councilId": "cec:322",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:2479343774"
+    },
+    {
+      "councilId": "cec:323",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:2493904900"
+    },
+    {
+      "councilId": "cec:324",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:2494820236"
+    },
+    {
+      "councilId": "cec:325",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:2494820237"
+    },
+    {
+      "councilId": "cec:326",
+      "distanceMeters": 0.11,
+      "osmId": "osm:node:2534717752"
+    },
+    {
+      "councilId": "cec:327",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:2548444249"
+    },
+    {
+      "councilId": "cec:328",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:2554320012"
+    },
+    {
+      "councilId": "cec:329",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:2555469693"
+    },
+    {
+      "councilId": "cec:33",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:258455895"
+    },
+    {
+      "councilId": "cec:330",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:2558423171"
+    },
+    {
+      "councilId": "cec:331",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:2558442565"
+    },
+    {
+      "councilId": "cec:332",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:2566376551"
+    },
+    {
+      "councilId": "cec:333",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:2570051506"
+    },
+    {
+      "councilId": "cec:334",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:2570051520"
+    },
+    {
+      "councilId": "cec:335",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:2570051524"
+    },
+    {
+      "councilId": "cec:336",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:2570051534"
+    },
+    {
+      "councilId": "cec:337",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:2571647429"
+    },
+    {
+      "councilId": "cec:338",
+      "distanceMeters": 8.56,
+      "osmId": "osm:node:2582942227"
+    },
+    {
+      "councilId": "cec:339",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:2583039175"
+    },
+    {
+      "councilId": "cec:34",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:258456350"
+    },
+    {
+      "councilId": "cec:340",
+      "distanceMeters": 1.16,
+      "osmId": "osm:node:2583039176"
+    },
+    {
+      "councilId": "cec:342",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:2584026710"
+    },
+    {
+      "councilId": "cec:343",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:2584028863"
+    },
+    {
+      "councilId": "cec:344",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:2584031919"
+    },
+    {
+      "councilId": "cec:345",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:2584035613"
+    },
+    {
+      "councilId": "cec:346",
+      "distanceMeters": 1,
+      "osmId": "osm:node:2584062021"
+    },
+    {
+      "councilId": "cec:347",
+      "distanceMeters": 0.24,
+      "osmId": "osm:node:2584062022"
+    },
+    {
+      "councilId": "cec:348",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:2584066739"
+    },
+    {
+      "councilId": "cec:349",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:2584067594"
+    },
+    {
+      "councilId": "cec:35",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:258456846"
+    },
+    {
+      "councilId": "cec:350",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:2584070152"
+    },
+    {
+      "councilId": "cec:351",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:2584076518"
+    },
+    {
+      "councilId": "cec:352",
+      "distanceMeters": 0.23,
+      "osmId": "osm:node:2585288869"
+    },
+    {
+      "councilId": "cec:353",
+      "distanceMeters": 2.98,
+      "osmId": "osm:node:2585288927"
+    },
+    {
+      "councilId": "cec:354",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:2590463331"
+    },
+    {
+      "councilId": "cec:355",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:2601831312"
+    },
+    {
+      "councilId": "cec:356",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:2606362232"
+    },
+    {
+      "councilId": "cec:357",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:2618687098"
+    },
+    {
+      "councilId": "cec:358",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:2618687111"
+    },
+    {
+      "councilId": "cec:359",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:2618687117"
+    },
+    {
+      "councilId": "cec:36",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:258456858"
+    },
+    {
+      "councilId": "cec:360",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:2618773076"
+    },
+    {
+      "councilId": "cec:361",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:2619940533"
+    },
+    {
+      "councilId": "cec:362",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:2643307277"
+    },
+    {
+      "councilId": "cec:363",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:2648536891"
+    },
+    {
+      "councilId": "cec:364",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:2648537090"
+    },
+    {
+      "councilId": "cec:365",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:2658646769"
+    },
+    {
+      "councilId": "cec:366",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:2661500424"
+    },
+    {
+      "councilId": "cec:367",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:2661571089"
+    },
+    {
+      "councilId": "cec:368",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:2661590925"
+    },
+    {
+      "councilId": "cec:369",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:2661590928"
+    },
+    {
+      "councilId": "cec:37",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:258457825"
+    },
+    {
+      "councilId": "cec:370",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:2662883674"
+    },
+    {
+      "councilId": "cec:371",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:2662883682"
+    },
+    {
+      "councilId": "cec:372",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:2665529030"
+    },
+    {
+      "councilId": "cec:373",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:2687496700"
+    },
+    {
+      "councilId": "cec:374",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:2688878676"
+    },
+    {
+      "councilId": "cec:375",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:2692340333"
+    },
+    {
+      "councilId": "cec:376",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:2692340335"
+    },
+    {
+      "councilId": "cec:377",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:2692340344"
+    },
+    {
+      "councilId": "cec:378",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:2692340350"
+    },
+    {
+      "councilId": "cec:379",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:2692340354"
+    },
+    {
+      "councilId": "cec:38",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:258458189"
+    },
+    {
+      "councilId": "cec:380",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:2692340356"
+    },
+    {
+      "councilId": "cec:381",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:2704823939"
+    },
+    {
+      "councilId": "cec:382",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:2752292752"
+    },
+    {
+      "councilId": "cec:383",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:2752292753"
+    },
+    {
+      "councilId": "cec:384",
+      "distanceMeters": 1,
+      "osmId": "osm:node:2752292754"
+    },
+    {
+      "councilId": "cec:385",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:2752292755"
+    },
+    {
+      "councilId": "cec:386",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:2752292757"
+    },
+    {
+      "councilId": "cec:387",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:2752292761"
+    },
+    {
+      "councilId": "cec:388",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:2752292762"
+    },
+    {
+      "councilId": "cec:389",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:2752292763"
+    },
+    {
+      "councilId": "cec:39",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:258458261"
+    },
+    {
+      "councilId": "cec:390",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:2752292765"
+    },
+    {
+      "councilId": "cec:391",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:2752292767"
+    },
+    {
+      "councilId": "cec:392",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:2754098246"
+    },
+    {
+      "councilId": "cec:393",
+      "distanceMeters": 11.35,
+      "osmId": "osm:node:2762267515"
+    },
+    {
+      "councilId": "cec:394",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:2770098071"
+    },
+    {
+      "councilId": "cec:395",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:2776826806"
+    },
+    {
+      "councilId": "cec:396",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:2776826808"
+    },
+    {
+      "councilId": "cec:397",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:2776826809"
+    },
+    {
+      "councilId": "cec:398",
+      "distanceMeters": 0.15,
+      "osmId": "osm:node:2776826810"
+    },
+    {
+      "councilId": "cec:399",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:2778226187"
+    },
+    {
+      "councilId": "cec:4",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:33847446"
+    },
+    {
+      "councilId": "cec:40",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:258458993"
+    },
+    {
+      "councilId": "cec:400",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:2781983746"
+    },
+    {
+      "councilId": "cec:401",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:2807416029"
+    },
+    {
+      "councilId": "cec:402",
+      "distanceMeters": 0.26,
+      "osmId": "osm:node:2811869667"
+    },
+    {
+      "councilId": "cec:403",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:2828573146"
+    },
+    {
+      "councilId": "cec:404",
+      "distanceMeters": 7.63,
+      "osmId": "osm:node:2868598747"
+    },
+    {
+      "councilId": "cec:405",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:2868685744"
+    },
+    {
+      "councilId": "cec:406",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:2880445273"
+    },
+    {
+      "councilId": "cec:407",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:2900962927"
+    },
+    {
+      "councilId": "cec:408",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:2904313710"
+    },
+    {
+      "councilId": "cec:409",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:2905854566"
+    },
+    {
+      "councilId": "cec:41",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:258459059"
+    },
+    {
+      "councilId": "cec:410",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:2905854572"
+    },
+    {
+      "councilId": "cec:411",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:2905854579"
+    },
+    {
+      "councilId": "cec:412",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:2905854706"
+    },
+    {
+      "councilId": "cec:413",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:2914623235"
+    },
+    {
+      "councilId": "cec:414",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:2921833207"
+    },
+    {
+      "councilId": "cec:415",
+      "distanceMeters": 1.86,
+      "osmId": "osm:node:2937181418"
+    },
+    {
+      "councilId": "cec:416",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:2969061062"
+    },
+    {
+      "councilId": "cec:417",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:2981247621"
+    },
+    {
+      "councilId": "cec:418",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:3019834360"
+    },
+    {
+      "councilId": "cec:419",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:3025664793"
+    },
+    {
+      "councilId": "cec:42",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:258459496"
+    },
+    {
+      "councilId": "cec:420",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:3027046849"
+    },
+    {
+      "councilId": "cec:421",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:3032896794"
+    },
+    {
+      "councilId": "cec:422",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:3037315771"
+    },
+    {
+      "councilId": "cec:423",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:3039886546"
+    },
+    {
+      "councilId": "cec:424",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:3039886547"
+    },
+    {
+      "councilId": "cec:425",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:3041668357"
+    },
+    {
+      "councilId": "cec:426",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:3041668419"
+    },
+    {
+      "councilId": "cec:427",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:3046177308"
+    },
+    {
+      "councilId": "cec:428",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:3046177334"
+    },
+    {
+      "councilId": "cec:429",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:3046177340"
+    },
+    {
+      "councilId": "cec:43",
+      "distanceMeters": 0.18,
+      "osmId": "osm:node:258459611"
+    },
+    {
+      "councilId": "cec:430",
+      "distanceMeters": 0.12,
+      "osmId": "osm:node:3046177345"
+    },
+    {
+      "councilId": "cec:431",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:3049505299"
+    },
+    {
+      "councilId": "cec:432",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:3057261119"
+    },
+    {
+      "councilId": "cec:433",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:3057261120"
+    },
+    {
+      "councilId": "cec:434",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:3057261436"
+    },
+    {
+      "councilId": "cec:435",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:3057443646"
+    },
+    {
+      "councilId": "cec:436",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:3084868659"
+    },
+    {
+      "councilId": "cec:438",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:3089036931"
+    },
+    {
+      "councilId": "cec:439",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:3089036932"
+    },
+    {
+      "councilId": "cec:44",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:258460080"
+    },
+    {
+      "councilId": "cec:440",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:3094513238"
+    },
+    {
+      "councilId": "cec:441",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:3094513239"
+    },
+    {
+      "councilId": "cec:442",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:3102742873"
+    },
+    {
+      "councilId": "cec:443",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:3140117970"
+    },
+    {
+      "councilId": "cec:444",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:3141658088"
+    },
+    {
+      "councilId": "cec:445",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:3141658089"
+    },
+    {
+      "councilId": "cec:446",
+      "distanceMeters": 0.05,
+      "osmId": "osm:node:3141658090"
+    },
+    {
+      "councilId": "cec:447",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:3191823984"
+    },
+    {
+      "councilId": "cec:448",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:3204960716"
+    },
+    {
+      "councilId": "cec:449",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:3223858110"
+    },
+    {
+      "councilId": "cec:45",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:258460131"
+    },
+    {
+      "councilId": "cec:450",
+      "distanceMeters": 1.1,
+      "osmId": "osm:node:3236168739"
+    },
+    {
+      "councilId": "cec:451",
+      "distanceMeters": 2.1,
+      "osmId": "osm:node:3236168741"
+    },
+    {
+      "councilId": "cec:452",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:3236168742"
+    },
+    {
+      "councilId": "cec:453",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:3236168744"
+    },
+    {
+      "councilId": "cec:454",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:3236168745"
+    },
+    {
+      "councilId": "cec:455",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:3236168747"
+    },
+    {
+      "councilId": "cec:456",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:3236168749"
+    },
+    {
+      "councilId": "cec:457",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:3236168755"
+    },
+    {
+      "councilId": "cec:458",
+      "distanceMeters": 1.24,
+      "osmId": "osm:node:3239850197"
+    },
+    {
+      "councilId": "cec:459",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:3239850203"
+    },
+    {
+      "councilId": "cec:46",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:258750130"
+    },
+    {
+      "councilId": "cec:460",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:3239850209"
+    },
+    {
+      "councilId": "cec:461",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:3239850218"
+    },
+    {
+      "councilId": "cec:462",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:3239850225"
+    },
+    {
+      "councilId": "cec:463",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:3244717938"
+    },
+    {
+      "councilId": "cec:464",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:3246854148"
+    },
+    {
+      "councilId": "cec:465",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:3247559011"
+    },
+    {
+      "councilId": "cec:466",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:3247559012"
+    },
+    {
+      "councilId": "cec:467",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:3247712490"
+    },
+    {
+      "councilId": "cec:468",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:3248033694"
+    },
+    {
+      "councilId": "cec:469",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:3254530628"
+    },
+    {
+      "councilId": "cec:47",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:258750151"
+    },
+    {
+      "councilId": "cec:470",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:3260120417"
+    },
+    {
+      "councilId": "cec:471",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:3260120418"
+    },
+    {
+      "councilId": "cec:472",
+      "distanceMeters": 1.12,
+      "osmId": "osm:node:3260120421"
+    },
+    {
+      "councilId": "cec:473",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:3260120422"
+    },
+    {
+      "councilId": "cec:474",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:3260120423"
+    },
+    {
+      "councilId": "cec:475",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:3273018257"
+    },
+    {
+      "councilId": "cec:476",
+      "distanceMeters": 0.08,
+      "osmId": "osm:node:3273020264"
+    },
+    {
+      "councilId": "cec:477",
+      "distanceMeters": 1.12,
+      "osmId": "osm:node:3273020272"
+    },
+    {
+      "councilId": "cec:478",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:3273020276"
+    },
+    {
+      "councilId": "cec:479",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:3273020282"
+    },
+    {
+      "councilId": "cec:48",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:258750152"
+    },
+    {
+      "councilId": "cec:480",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:3273020283"
+    },
+    {
+      "councilId": "cec:481",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:3273020284"
+    },
+    {
+      "councilId": "cec:482",
+      "distanceMeters": 1.03,
+      "osmId": "osm:node:3281074241"
+    },
+    {
+      "councilId": "cec:483",
+      "distanceMeters": 1.14,
+      "osmId": "osm:node:3281074245"
+    },
+    {
+      "councilId": "cec:484",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:3281074246"
+    },
+    {
+      "councilId": "cec:485",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:3286579290"
+    },
+    {
+      "councilId": "cec:486",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:3286579293"
+    },
+    {
+      "councilId": "cec:487",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:3294623567"
+    },
+    {
+      "councilId": "cec:488",
+      "distanceMeters": 0.13,
+      "osmId": "osm:node:3294766386"
+    },
+    {
+      "councilId": "cec:489",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:3294852669"
+    },
+    {
+      "councilId": "cec:49",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:258750154"
+    },
+    {
+      "councilId": "cec:490",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:3334240049"
+    },
+    {
+      "councilId": "cec:491",
+      "distanceMeters": 0.11,
+      "osmId": "osm:node:3334240051"
+    },
+    {
+      "councilId": "cec:492",
+      "distanceMeters": 1.05,
+      "osmId": "osm:node:3337645873"
+    },
+    {
+      "councilId": "cec:493",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:3337645874"
+    },
+    {
+      "councilId": "cec:495",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:3356240219"
+    },
+    {
+      "councilId": "cec:496",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:3356240221"
+    },
+    {
+      "councilId": "cec:497",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:3356785122"
+    },
+    {
+      "councilId": "cec:498",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:3358582087"
+    },
+    {
+      "councilId": "cec:499",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:3363952811"
+    },
+    {
+      "councilId": "cec:5",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:37903880"
+    },
+    {
+      "councilId": "cec:50",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:258750155"
+    },
+    {
+      "councilId": "cec:500",
+      "distanceMeters": 0.14,
+      "osmId": "osm:node:3384044263"
+    },
+    {
+      "councilId": "cec:501",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:3384044264"
+    },
+    {
+      "councilId": "cec:502",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:3384044265"
+    },
+    {
+      "councilId": "cec:503",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:3398469380"
+    },
+    {
+      "councilId": "cec:504",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:3455347846"
+    },
+    {
+      "councilId": "cec:505",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:3476999765"
+    },
+    {
+      "councilId": "cec:506",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:3477020059"
+    },
+    {
+      "councilId": "cec:507",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:3492678966"
+    },
+    {
+      "councilId": "cec:508",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:3522258360"
+    },
+    {
+      "councilId": "cec:509",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:3523420040"
+    },
+    {
+      "councilId": "cec:51",
+      "distanceMeters": 0.16,
+      "osmId": "osm:node:259768548"
+    },
+    {
+      "councilId": "cec:510",
+      "distanceMeters": 13.84,
+      "osmId": "osm:node:3523912048"
+    },
+    {
+      "councilId": "cec:511",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:3524115303"
+    },
+    {
+      "councilId": "cec:512",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:3576691504"
+    },
+    {
+      "councilId": "cec:513",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:3577110782"
+    },
+    {
+      "councilId": "cec:514",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:3577110783"
+    },
+    {
+      "councilId": "cec:515",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:3578238619"
+    },
+    {
+      "councilId": "cec:516",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:3579206143"
+    },
+    {
+      "councilId": "cec:517",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:3579206144"
+    },
+    {
+      "councilId": "cec:518",
+      "distanceMeters": 0.92,
+      "osmId": "osm:node:3579206148"
+    },
+    {
+      "councilId": "cec:519",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:3584384053"
+    },
+    {
+      "councilId": "cec:52",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:259768607"
+    },
+    {
+      "councilId": "cec:520",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:3599569936"
+    },
+    {
+      "councilId": "cec:521",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:3623834393"
+    },
+    {
+      "councilId": "cec:522",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:3623834394"
+    },
+    {
+      "councilId": "cec:523",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:3634841515"
+    },
+    {
+      "councilId": "cec:524",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:3634841520"
+    },
+    {
+      "councilId": "cec:525",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:3637122543"
+    },
+    {
+      "councilId": "cec:527",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:3638047878"
+    },
+    {
+      "councilId": "cec:528",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:3649681364"
+    },
+    {
+      "councilId": "cec:529",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:3673036199"
+    },
+    {
+      "councilId": "cec:53",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:259768608"
+    },
+    {
+      "councilId": "cec:530",
+      "distanceMeters": 0.15,
+      "osmId": "osm:node:3685521772"
+    },
+    {
+      "councilId": "cec:531",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:3691131113"
+    },
+    {
+      "councilId": "cec:532",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:3718677194"
+    },
+    {
+      "councilId": "cec:533",
+      "distanceMeters": 1.15,
+      "osmId": "osm:node:3720174807"
+    },
+    {
+      "councilId": "cec:534",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:3764274253"
+    },
+    {
+      "councilId": "cec:535",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:3766974427"
+    },
+    {
+      "councilId": "cec:536",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:3786489720"
+    },
+    {
+      "councilId": "cec:537",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:3790191063"
+    },
+    {
+      "councilId": "cec:538",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:3811639493"
+    },
+    {
+      "councilId": "cec:539",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:3814695844"
+    },
+    {
+      "councilId": "cec:54",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:260380163"
+    },
+    {
+      "councilId": "cec:540",
+      "distanceMeters": 0.23,
+      "osmId": "osm:node:3846610481"
+    },
+    {
+      "councilId": "cec:541",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:3851910945"
+    },
+    {
+      "councilId": "cec:542",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:3851910954"
+    },
+    {
+      "councilId": "cec:543",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:3858823371"
+    },
+    {
+      "councilId": "cec:544",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:3891014690"
+    },
+    {
+      "councilId": "cec:545",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:3898555461"
+    },
+    {
+      "councilId": "cec:546",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:3898555462"
+    },
+    {
+      "councilId": "cec:547",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:3902676944"
+    },
+    {
+      "councilId": "cec:548",
+      "distanceMeters": 0.17,
+      "osmId": "osm:node:3921024409"
+    },
+    {
+      "councilId": "cec:549",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:3925598399"
+    },
+    {
+      "councilId": "cec:55",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:260380176"
+    },
+    {
+      "councilId": "cec:550",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:3925643679"
+    },
+    {
+      "councilId": "cec:551",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:3925643703"
+    },
+    {
+      "councilId": "cec:552",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:3925643711"
+    },
+    {
+      "councilId": "cec:553",
+      "distanceMeters": 1.16,
+      "osmId": "osm:node:3925643714"
+    },
+    {
+      "councilId": "cec:554",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:3925643718"
+    },
+    {
+      "councilId": "cec:555",
+      "distanceMeters": 1.1,
+      "osmId": "osm:node:3925643720"
+    },
+    {
+      "councilId": "cec:556",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:3925643727"
+    },
+    {
+      "councilId": "cec:557",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:3925643739"
+    },
+    {
+      "councilId": "cec:558",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:3925643742"
+    },
+    {
+      "councilId": "cec:559",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:3925643743"
+    },
+    {
+      "councilId": "cec:56",
+      "distanceMeters": 1.62,
+      "osmId": "osm:node:260492035"
+    },
+    {
+      "councilId": "cec:560",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:3927451942"
+    },
+    {
+      "councilId": "cec:561",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:3927451953"
+    },
+    {
+      "councilId": "cec:562",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:3927454872"
+    },
+    {
+      "councilId": "cec:563",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:3946299981"
+    },
+    {
+      "councilId": "cec:564",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:3955123973"
+    },
+    {
+      "councilId": "cec:565",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:3961473225"
+    },
+    {
+      "councilId": "cec:566",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:3979869264"
+    },
+    {
+      "councilId": "cec:567",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:3995370306"
+    },
+    {
+      "councilId": "cec:568",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:3996393157"
+    },
+    {
+      "councilId": "cec:569",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:4031480962"
+    },
+    {
+      "councilId": "cec:57",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:279852158"
+    },
+    {
+      "councilId": "cec:570",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:4032638004"
+    },
+    {
+      "councilId": "cec:571",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:4041755107"
+    },
+    {
+      "councilId": "cec:572",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:4042155785"
+    },
+    {
+      "councilId": "cec:573",
+      "distanceMeters": 1.12,
+      "osmId": "osm:node:4058729719"
+    },
+    {
+      "councilId": "cec:574",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:4062464619"
+    },
+    {
+      "councilId": "cec:575",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:4068180811"
+    },
+    {
+      "councilId": "cec:576",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:4069196712"
+    },
+    {
+      "councilId": "cec:577",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:4070570352"
+    },
+    {
+      "councilId": "cec:578",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:4070577580"
+    },
+    {
+      "councilId": "cec:579",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:4075143885"
+    },
+    {
+      "councilId": "cec:58",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:279852182"
+    },
+    {
+      "councilId": "cec:580",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:4075146952"
+    },
+    {
+      "councilId": "cec:581",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:4080531593"
+    },
+    {
+      "councilId": "cec:582",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:4080531594"
+    },
+    {
+      "councilId": "cec:583",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:4080569221"
+    },
+    {
+      "councilId": "cec:584",
+      "distanceMeters": 1,
+      "osmId": "osm:node:4080569223"
+    },
+    {
+      "councilId": "cec:585",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:4135593477"
+    },
+    {
+      "councilId": "cec:586",
+      "distanceMeters": 0.59,
+      "osmId": "osm:node:4144656839"
+    },
+    {
+      "councilId": "cec:587",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:4157404493"
+    },
+    {
+      "councilId": "cec:588",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:4157404494"
+    },
+    {
+      "councilId": "cec:589",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:4157404496"
+    },
+    {
+      "councilId": "cec:59",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:279852541"
+    },
+    {
+      "councilId": "cec:590",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:4160748304"
+    },
+    {
+      "councilId": "cec:591",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:4196823643"
+    },
+    {
+      "councilId": "cec:592",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:4198193289"
+    },
+    {
+      "councilId": "cec:593",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:4198194189"
+    },
+    {
+      "councilId": "cec:594",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:4198195106"
+    },
+    {
+      "councilId": "cec:595",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:4198732324"
+    },
+    {
+      "councilId": "cec:596",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:4198732325"
+    },
+    {
+      "councilId": "cec:597",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:4198732326"
+    },
+    {
+      "councilId": "cec:598",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:4198732327"
+    },
+    {
+      "councilId": "cec:599",
+      "distanceMeters": 1,
+      "osmId": "osm:node:4198732330"
+    },
+    {
+      "councilId": "cec:6",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:38026748"
+    },
+    {
+      "councilId": "cec:60",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:279852745"
+    },
+    {
+      "councilId": "cec:600",
+      "distanceMeters": 0.34,
+      "osmId": "osm:node:4198732331"
+    },
+    {
+      "councilId": "cec:601",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:4198732335"
+    },
+    {
+      "councilId": "cec:602",
+      "distanceMeters": 0.11,
+      "osmId": "osm:node:4198732338"
+    },
+    {
+      "councilId": "cec:603",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:4198823928"
+    },
+    {
+      "councilId": "cec:604",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:4201765275"
+    },
+    {
+      "councilId": "cec:605",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:4204579393"
+    },
+    {
+      "councilId": "cec:606",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:4204634944"
+    },
+    {
+      "councilId": "cec:607",
+      "distanceMeters": 1.1,
+      "osmId": "osm:node:4204841753"
+    },
+    {
+      "councilId": "cec:608",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:4205283089"
+    },
+    {
+      "councilId": "cec:61",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:279854825"
+    },
+    {
+      "councilId": "cec:610",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:4205294839"
+    },
+    {
+      "councilId": "cec:611",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:4205314889"
+    },
+    {
+      "councilId": "cec:612",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:4205314891"
+    },
+    {
+      "councilId": "cec:613",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:4205987089"
+    },
+    {
+      "councilId": "cec:614",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:4205987090"
+    },
+    {
+      "councilId": "cec:615",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:4205987091"
+    },
+    {
+      "councilId": "cec:616",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:4205987092"
+    },
+    {
+      "councilId": "cec:617",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:4205993003"
+    },
+    {
+      "councilId": "cec:618",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:4205993004"
+    },
+    {
+      "councilId": "cec:619",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:4206484589"
+    },
+    {
+      "councilId": "cec:62",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:279856732"
+    },
+    {
+      "councilId": "cec:620",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:4206484590"
+    },
+    {
+      "councilId": "cec:621",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:4207153919"
+    },
+    {
+      "councilId": "cec:622",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:4207164890"
+    },
+    {
+      "councilId": "cec:623",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:4207169910"
+    },
+    {
+      "councilId": "cec:624",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:4210617189"
+    },
+    {
+      "councilId": "cec:625",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:4210783411"
+    },
+    {
+      "councilId": "cec:626",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:4210783413"
+    },
+    {
+      "councilId": "cec:627",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:4210783414"
+    },
+    {
+      "councilId": "cec:628",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:4210783415"
+    },
+    {
+      "councilId": "cec:629",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:4210962652"
+    },
+    {
+      "councilId": "cec:63",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:279856825"
+    },
+    {
+      "councilId": "cec:630",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:4210962653"
+    },
+    {
+      "councilId": "cec:631",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:4212051686"
+    },
+    {
+      "councilId": "cec:632",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:4212058796"
+    },
+    {
+      "councilId": "cec:633",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:4212170904"
+    },
+    {
+      "councilId": "cec:634",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:4212170910"
+    },
+    {
+      "councilId": "cec:636",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:4212298731"
+    },
+    {
+      "councilId": "cec:637",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:4215268449"
+    },
+    {
+      "councilId": "cec:638",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:4217161217"
+    },
+    {
+      "councilId": "cec:639",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:4217161218"
+    },
+    {
+      "councilId": "cec:64",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:279857510"
+    },
+    {
+      "councilId": "cec:640",
+      "distanceMeters": 0.13,
+      "osmId": "osm:node:4243237212"
+    },
+    {
+      "councilId": "cec:641",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:4219588089"
+    },
+    {
+      "councilId": "cec:642",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:4221076232"
+    },
+    {
+      "councilId": "cec:643",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:4221076233"
+    },
+    {
+      "councilId": "cec:644",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:4222455918"
+    },
+    {
+      "councilId": "cec:645",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:4230948489"
+    },
+    {
+      "councilId": "cec:646",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:4230957302"
+    },
+    {
+      "councilId": "cec:647",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:4235740419"
+    },
+    {
+      "councilId": "cec:648",
+      "distanceMeters": 1.8,
+      "osmId": "osm:node:4219574589"
+    },
+    {
+      "councilId": "cec:649",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:4243237213"
+    },
+    {
+      "councilId": "cec:65",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:279857615"
+    },
+    {
+      "councilId": "cec:650",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:4258387222"
+    },
+    {
+      "councilId": "cec:651",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:4258387228"
+    },
+    {
+      "councilId": "cec:652",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:4265942457"
+    },
+    {
+      "councilId": "cec:653",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:4266846888"
+    },
+    {
+      "councilId": "cec:654",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:4319209916"
+    },
+    {
+      "councilId": "cec:655",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:4338582499"
+    },
+    {
+      "councilId": "cec:656",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:4356168122"
+    },
+    {
+      "councilId": "cec:657",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:4356168131"
+    },
+    {
+      "councilId": "cec:658",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:4357466765"
+    },
+    {
+      "councilId": "cec:659",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:4357695664"
+    },
+    {
+      "councilId": "cec:66",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:287145744"
+    },
+    {
+      "councilId": "cec:660",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:4357695668"
+    },
+    {
+      "councilId": "cec:661",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:4357695671"
+    },
+    {
+      "councilId": "cec:662",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:4357695676"
+    },
+    {
+      "councilId": "cec:663",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:4357695679"
+    },
+    {
+      "councilId": "cec:664",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:4396577991"
+    },
+    {
+      "councilId": "cec:665",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:4396577992"
+    },
+    {
+      "councilId": "cec:666",
+      "distanceMeters": 1.05,
+      "osmId": "osm:node:4396577993"
+    },
+    {
+      "councilId": "cec:667",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:4409679874"
+    },
+    {
+      "councilId": "cec:668",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:4411388814"
+    },
+    {
+      "councilId": "cec:669",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:4443778479"
+    },
+    {
+      "councilId": "cec:67",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:289145805"
+    },
+    {
+      "councilId": "cec:670",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:4445289809"
+    },
+    {
+      "councilId": "cec:672",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:4451860263"
+    },
+    {
+      "councilId": "cec:673",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:4451895381"
+    },
+    {
+      "councilId": "cec:674",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:4451895382"
+    },
+    {
+      "councilId": "cec:675",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:4456323934"
+    },
+    {
+      "councilId": "cec:676",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:4464837736"
+    },
+    {
+      "councilId": "cec:677",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:4464837739"
+    },
+    {
+      "councilId": "cec:678",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:4477059985"
+    },
+    {
+      "councilId": "cec:679",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:4506622354"
+    },
+    {
+      "councilId": "cec:68",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:289600492"
+    },
+    {
+      "councilId": "cec:680",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:4512629856"
+    },
+    {
+      "councilId": "cec:681",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:4515658316"
+    },
+    {
+      "councilId": "cec:682",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:4515668143"
+    },
+    {
+      "councilId": "cec:683",
+      "distanceMeters": 0.26,
+      "osmId": "osm:node:4515671387"
+    },
+    {
+      "councilId": "cec:684",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:4523705044"
+    },
+    {
+      "councilId": "cec:685",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:4536195148"
+    },
+    {
+      "councilId": "cec:686",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:4537612672"
+    },
+    {
+      "councilId": "cec:687",
+      "distanceMeters": 1.08,
+      "osmId": "osm:node:4549296211"
+    },
+    {
+      "councilId": "cec:688",
+      "distanceMeters": 0.16,
+      "osmId": "osm:node:4556021895"
+    },
+    {
+      "councilId": "cec:689",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:4566682010"
+    },
+    {
+      "councilId": "cec:690",
+      "distanceMeters": 1.14,
+      "osmId": "osm:node:4568679129"
+    },
+    {
+      "councilId": "cec:691",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:4575954317"
+    },
+    {
+      "councilId": "cec:692",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:4578013819"
+    },
+    {
+      "councilId": "cec:694",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:4587421655"
+    },
+    {
+      "councilId": "cec:695",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:4587553915"
+    },
+    {
+      "councilId": "cec:696",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:4587553939"
+    },
+    {
+      "councilId": "cec:697",
+      "distanceMeters": 1,
+      "osmId": "osm:node:4595156762"
+    },
+    {
+      "councilId": "cec:698",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:4595156771"
+    },
+    {
+      "councilId": "cec:699",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:4595156772"
+    },
+    {
+      "councilId": "cec:7",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:60896338"
+    },
+    {
+      "councilId": "cec:70",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:297676249"
+    },
+    {
+      "councilId": "cec:700",
+      "distanceMeters": 1.09,
+      "osmId": "osm:node:4595156779"
+    },
+    {
+      "councilId": "cec:701",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:4595156780"
+    },
+    {
+      "councilId": "cec:702",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:4595156792"
+    },
+    {
+      "councilId": "cec:703",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:4605666289"
+    },
+    {
+      "councilId": "cec:704",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:4619335509"
+    },
+    {
+      "councilId": "cec:705",
+      "distanceMeters": 0.04,
+      "osmId": "osm:node:4625188938"
+    },
+    {
+      "councilId": "cec:706",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:4625188939"
+    },
+    {
+      "councilId": "cec:707",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:4625188940"
+    },
+    {
+      "councilId": "cec:708",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:4625188941"
+    },
+    {
+      "councilId": "cec:709",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:4667341486"
+    },
+    {
+      "councilId": "cec:710",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:4677262946"
+    },
+    {
+      "councilId": "cec:711",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:4678954507"
+    },
+    {
+      "councilId": "cec:712",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:4686852028"
+    },
+    {
+      "councilId": "cec:713",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:4697848461"
+    },
+    {
+      "councilId": "cec:714",
+      "distanceMeters": 0.32,
+      "osmId": "osm:node:4703498046"
+    },
+    {
+      "councilId": "cec:715",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:4705750355"
+    },
+    {
+      "councilId": "cec:716",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:4705750356"
+    },
+    {
+      "councilId": "cec:717",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:4708341833"
+    },
+    {
+      "councilId": "cec:718",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:4710038737"
+    },
+    {
+      "councilId": "cec:719",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:4710039653"
+    },
+    {
+      "councilId": "cec:72",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:297676995"
+    },
+    {
+      "councilId": "cec:720",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:4710280284"
+    },
+    {
+      "councilId": "cec:721",
+      "distanceMeters": 0.78,
+      "osmId": "osm:node:4711620563"
+    },
+    {
+      "councilId": "cec:723",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:4724771301"
+    },
+    {
+      "councilId": "cec:724",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:4724771302"
+    },
+    {
+      "councilId": "cec:725",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:4726029662"
+    },
+    {
+      "councilId": "cec:726",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:4726832081"
+    },
+    {
+      "councilId": "cec:727",
+      "distanceMeters": 0.08,
+      "osmId": "osm:node:4728929184"
+    },
+    {
+      "councilId": "cec:728",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:4729243788"
+    },
+    {
+      "councilId": "cec:729",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:4730695967"
+    },
+    {
+      "councilId": "cec:73",
+      "distanceMeters": 0.34,
+      "osmId": "osm:node:299443142"
+    },
+    {
+      "councilId": "cec:730",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:4730709856"
+    },
+    {
+      "councilId": "cec:731",
+      "distanceMeters": 0.34,
+      "osmId": "osm:node:4730922940"
+    },
+    {
+      "councilId": "cec:732",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:4730922941"
+    },
+    {
+      "councilId": "cec:733",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:4734159867"
+    },
+    {
+      "councilId": "cec:734",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:4735788491"
+    },
+    {
+      "councilId": "cec:735",
+      "distanceMeters": 9.49,
+      "osmId": "osm:node:4736535420"
+    },
+    {
+      "councilId": "cec:736",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:4743848021"
+    },
+    {
+      "councilId": "cec:737",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:4743888058"
+    },
+    {
+      "councilId": "cec:738",
+      "distanceMeters": 0.16,
+      "osmId": "osm:node:4752380734"
+    },
+    {
+      "councilId": "cec:739",
+      "distanceMeters": 0.79,
+      "osmId": "osm:node:4752606795"
+    },
+    {
+      "councilId": "cec:74",
+      "distanceMeters": 0.34,
+      "osmId": "osm:node:301090437"
+    },
+    {
+      "councilId": "cec:740",
+      "distanceMeters": 0.13,
+      "osmId": "osm:node:4756294562"
+    },
+    {
+      "councilId": "cec:741",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:4756836384"
+    },
+    {
+      "councilId": "cec:742",
+      "distanceMeters": 1.09,
+      "osmId": "osm:node:4760364090"
+    },
+    {
+      "councilId": "cec:743",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:4766315676"
+    },
+    {
+      "councilId": "cec:744",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:4773717630"
+    },
+    {
+      "councilId": "cec:745",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:4779742037"
+    },
+    {
+      "councilId": "cec:746",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:4783641829"
+    },
+    {
+      "councilId": "cec:747",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:4784946144"
+    },
+    {
+      "councilId": "cec:748",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:4792377329"
+    },
+    {
+      "councilId": "cec:749",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:4792377330"
+    },
+    {
+      "councilId": "cec:75",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:312682158"
+    },
+    {
+      "councilId": "cec:750",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:4796999263"
+    },
+    {
+      "councilId": "cec:751",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:4798233603"
+    },
+    {
+      "councilId": "cec:752",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:4801531516"
+    },
+    {
+      "councilId": "cec:753",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:4801960765"
+    },
+    {
+      "councilId": "cec:754",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:4801960767"
+    },
+    {
+      "councilId": "cec:755",
+      "distanceMeters": 0.82,
+      "osmId": "osm:node:4811423496"
+    },
+    {
+      "councilId": "cec:756",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:4811423498"
+    },
+    {
+      "councilId": "cec:757",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:4818602697"
+    },
+    {
+      "councilId": "cec:759",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:4833362126"
+    },
+    {
+      "councilId": "cec:76",
+      "distanceMeters": 0.26,
+      "osmId": "osm:node:368877712"
+    },
+    {
+      "councilId": "cec:760",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:4839864565"
+    },
+    {
+      "councilId": "cec:761",
+      "distanceMeters": 2.06,
+      "osmId": "osm:node:4840286517"
+    },
+    {
+      "councilId": "cec:762",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:4844073335"
+    },
+    {
+      "councilId": "cec:763",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:4850297092"
+    },
+    {
+      "councilId": "cec:764",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:4850297093"
+    },
+    {
+      "councilId": "cec:765",
+      "distanceMeters": 0.29,
+      "osmId": "osm:node:4850297094"
+    },
+    {
+      "councilId": "cec:766",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:4855431466"
+    },
+    {
+      "councilId": "cec:767",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:4867564746"
+    },
+    {
+      "councilId": "cec:768",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:4868426952"
+    },
+    {
+      "councilId": "cec:769",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:4868426976"
+    },
+    {
+      "councilId": "cec:77",
+      "distanceMeters": 5.44,
+      "osmId": "osm:node:370523157"
+    },
+    {
+      "councilId": "cec:770",
+      "distanceMeters": 2.86,
+      "osmId": "osm:node:4874693769"
+    },
+    {
+      "councilId": "cec:771",
+      "distanceMeters": 12.05,
+      "osmId": "osm:node:4874693770"
+    },
+    {
+      "councilId": "cec:772",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:4881554224"
+    },
+    {
+      "councilId": "cec:773",
+      "distanceMeters": 0.1,
+      "osmId": "osm:node:4883380487"
+    },
+    {
+      "councilId": "cec:774",
+      "distanceMeters": 1.06,
+      "osmId": "osm:node:4887762666"
+    },
+    {
+      "councilId": "cec:775",
+      "distanceMeters": 0.24,
+      "osmId": "osm:node:4889356814"
+    },
+    {
+      "councilId": "cec:776",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:4892244929"
+    },
+    {
+      "councilId": "cec:777",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:4893787374"
+    },
+    {
+      "councilId": "cec:778",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:4930925451"
+    },
+    {
+      "councilId": "cec:779",
+      "distanceMeters": 0.03,
+      "osmId": "osm:node:4935729556"
+    },
+    {
+      "councilId": "cec:78",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:446257911"
+    },
+    {
+      "councilId": "cec:780",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:4941178087"
+    },
+    {
+      "councilId": "cec:781",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:4988711108"
+    },
+    {
+      "councilId": "cec:782",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:5010343277"
+    },
+    {
+      "councilId": "cec:783",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:5012787155"
+    },
+    {
+      "councilId": "cec:784",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:5017120278"
+    },
+    {
+      "councilId": "cec:785",
+      "distanceMeters": 1.09,
+      "osmId": "osm:node:5030532411"
+    },
+    {
+      "councilId": "cec:786",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:5039705579"
+    },
+    {
+      "councilId": "cec:787",
+      "distanceMeters": 1.47,
+      "osmId": "osm:node:5060533721"
+    },
+    {
+      "councilId": "cec:788",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:5081292222"
+    },
+    {
+      "councilId": "cec:789",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:5091336374"
+    },
+    {
+      "councilId": "cec:79",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:446392409"
+    },
+    {
+      "councilId": "cec:790",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:5100928942"
+    },
+    {
+      "councilId": "cec:791",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:5100986670"
+    },
+    {
+      "councilId": "cec:792",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:5103625622"
+    },
+    {
+      "councilId": "cec:793",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:5111282806"
+    },
+    {
+      "councilId": "cec:794",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:5126236821"
+    },
+    {
+      "councilId": "cec:795",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:5127108171"
+    },
+    {
+      "councilId": "cec:796",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:5128673383"
+    },
+    {
+      "councilId": "cec:797",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:5128693569"
+    },
+    {
+      "councilId": "cec:798",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:5131641815"
+    },
+    {
+      "councilId": "cec:799",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:5137993831"
+    },
+    {
+      "councilId": "cec:8",
+      "distanceMeters": 0.28,
+      "osmId": "osm:node:250234762"
+    },
+    {
+      "councilId": "cec:80",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:446392410"
+    },
+    {
+      "councilId": "cec:800",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:5145117925"
+    },
+    {
+      "councilId": "cec:801",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:5162699422"
+    },
+    {
+      "councilId": "cec:802",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:5167182689"
+    },
+    {
+      "councilId": "cec:804",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:5231434185"
+    },
+    {
+      "councilId": "cec:805",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:5232874626"
+    },
+    {
+      "councilId": "cec:806",
+      "distanceMeters": 0.89,
+      "osmId": "osm:node:5232874627"
+    },
+    {
+      "councilId": "cec:807",
+      "distanceMeters": 0.62,
+      "osmId": "osm:node:5232874628"
+    },
+    {
+      "councilId": "cec:808",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:5232874629"
+    },
+    {
+      "councilId": "cec:809",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:5232874630"
+    },
+    {
+      "councilId": "cec:81",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:446424434"
+    },
+    {
+      "councilId": "cec:810",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:5232874631"
+    },
+    {
+      "councilId": "cec:811",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:5232874639"
+    },
+    {
+      "councilId": "cec:812",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:5232874640"
+    },
+    {
+      "councilId": "cec:813",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:5238301369"
+    },
+    {
+      "councilId": "cec:814",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:5262084240"
+    },
+    {
+      "councilId": "cec:815",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:5299482791"
+    },
+    {
+      "councilId": "cec:816",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:5302243622"
+    },
+    {
+      "councilId": "cec:817",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:5331191657"
+    },
+    {
+      "councilId": "cec:818",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:5332076698"
+    },
+    {
+      "councilId": "cec:819",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:5339115149"
+    },
+    {
+      "councilId": "cec:82",
+      "distanceMeters": 0.36,
+      "osmId": "osm:node:446424460"
+    },
+    {
+      "councilId": "cec:820",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:5339118948"
+    },
+    {
+      "councilId": "cec:821",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:5351056087"
+    },
+    {
+      "councilId": "cec:822",
+      "distanceMeters": 7.32,
+      "osmId": "osm:node:5351056088"
+    },
+    {
+      "councilId": "cec:823",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:5351056089"
+    },
+    {
+      "councilId": "cec:824",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:5390553275"
+    },
+    {
+      "councilId": "cec:825",
+      "distanceMeters": 0.07,
+      "osmId": "osm:node:5391082139"
+    },
+    {
+      "councilId": "cec:826",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:5392844196"
+    },
+    {
+      "councilId": "cec:827",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:5401691782"
+    },
+    {
+      "councilId": "cec:828",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:5412726048"
+    },
+    {
+      "councilId": "cec:829",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:5412743475"
+    },
+    {
+      "councilId": "cec:83",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:446754410"
+    },
+    {
+      "councilId": "cec:830",
+      "distanceMeters": 0.8,
+      "osmId": "osm:node:5416611532"
+    },
+    {
+      "councilId": "cec:831",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:5468030862"
+    },
+    {
+      "councilId": "cec:832",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:5482862324"
+    },
+    {
+      "councilId": "cec:833",
+      "distanceMeters": 0.96,
+      "osmId": "osm:node:5520843091"
+    },
+    {
+      "councilId": "cec:834",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:5554969341"
+    },
+    {
+      "councilId": "cec:835",
+      "distanceMeters": 0.57,
+      "osmId": "osm:node:5574583328"
+    },
+    {
+      "councilId": "cec:836",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:5574707240"
+    },
+    {
+      "councilId": "cec:837",
+      "distanceMeters": 0.34,
+      "osmId": "osm:node:5600452535"
+    },
+    {
+      "councilId": "cec:839",
+      "distanceMeters": 2.1,
+      "osmId": "osm:node:5620575325"
+    },
+    {
+      "councilId": "cec:84",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:446754411"
+    },
+    {
+      "councilId": "cec:840",
+      "distanceMeters": 2.49,
+      "osmId": "osm:node:5620575341"
+    },
+    {
+      "councilId": "cec:841",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:5665018509"
+    },
+    {
+      "councilId": "cec:842",
+      "distanceMeters": 1.08,
+      "osmId": "osm:node:5666399263"
+    },
+    {
+      "councilId": "cec:843",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:5667808142"
+    },
+    {
+      "councilId": "cec:844",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:5746720005"
+    },
+    {
+      "councilId": "cec:845",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:5746720006"
+    },
+    {
+      "councilId": "cec:846",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:5746723136"
+    },
+    {
+      "councilId": "cec:847",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:5746723137"
+    },
+    {
+      "councilId": "cec:848",
+      "distanceMeters": 0.53,
+      "osmId": "osm:node:5760222465"
+    },
+    {
+      "councilId": "cec:849",
+      "distanceMeters": 0.58,
+      "osmId": "osm:node:5783333303"
+    },
+    {
+      "councilId": "cec:85",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:446754422"
+    },
+    {
+      "councilId": "cec:850",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:5790748470"
+    },
+    {
+      "councilId": "cec:852",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:5832688441"
+    },
+    {
+      "councilId": "cec:853",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:5832688442"
+    },
+    {
+      "councilId": "cec:854",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:5832688443"
+    },
+    {
+      "councilId": "cec:855",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:5839075176"
+    },
+    {
+      "councilId": "cec:856",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:5839837043"
+    },
+    {
+      "councilId": "cec:857",
+      "distanceMeters": 0.2,
+      "osmId": "osm:node:5841565993"
+    },
+    {
+      "councilId": "cec:858",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:5853882562"
+    },
+    {
+      "councilId": "cec:859",
+      "distanceMeters": 3.36,
+      "osmId": "osm:node:5882852951"
+    },
+    {
+      "councilId": "cec:86",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:446754423"
+    },
+    {
+      "councilId": "cec:860",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:5885220837"
+    },
+    {
+      "councilId": "cec:861",
+      "distanceMeters": 0.18,
+      "osmId": "osm:node:5885220839"
+    },
+    {
+      "councilId": "cec:862",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:5890619949"
+    },
+    {
+      "councilId": "cec:863",
+      "distanceMeters": 0.27,
+      "osmId": "osm:node:5890624095"
+    },
+    {
+      "councilId": "cec:864",
+      "distanceMeters": 1.05,
+      "osmId": "osm:node:5892848362"
+    },
+    {
+      "councilId": "cec:865",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:5909679294"
+    },
+    {
+      "councilId": "cec:866",
+      "distanceMeters": 0.91,
+      "osmId": "osm:node:5910004116"
+    },
+    {
+      "councilId": "cec:867",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:5911839134"
+    },
+    {
+      "councilId": "cec:868",
+      "distanceMeters": 8.37,
+      "osmId": "osm:node:5922829868"
+    },
+    {
+      "councilId": "cec:869",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:5933820109"
+    },
+    {
+      "councilId": "cec:87",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:446754425"
+    },
+    {
+      "councilId": "cec:870",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:5963605434"
+    },
+    {
+      "councilId": "cec:871",
+      "distanceMeters": 0.83,
+      "osmId": "osm:node:5963605435"
+    },
+    {
+      "councilId": "cec:872",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:5964644215"
+    },
+    {
+      "councilId": "cec:873",
+      "distanceMeters": 0.41,
+      "osmId": "osm:node:5964644221"
+    },
+    {
+      "councilId": "cec:874",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:5983479756"
+    },
+    {
+      "councilId": "cec:876",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:6005679122"
+    },
+    {
+      "councilId": "cec:877",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:6016051261"
+    },
+    {
+      "councilId": "cec:878",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:6016051263"
+    },
+    {
+      "councilId": "cec:879",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:6016051269"
+    },
+    {
+      "councilId": "cec:88",
+      "distanceMeters": 1.01,
+      "osmId": "osm:node:446754426"
+    },
+    {
+      "councilId": "cec:880",
+      "distanceMeters": 0.35,
+      "osmId": "osm:node:6033031935"
+    },
+    {
+      "councilId": "cec:881",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:6033038624"
+    },
+    {
+      "councilId": "cec:882",
+      "distanceMeters": 0.37,
+      "osmId": "osm:node:6040227857"
+    },
+    {
+      "councilId": "cec:883",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:6040227858"
+    },
+    {
+      "councilId": "cec:884",
+      "distanceMeters": 0.6,
+      "osmId": "osm:node:6051219768"
+    },
+    {
+      "councilId": "cec:885",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:6115752662"
+    },
+    {
+      "councilId": "cec:886",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:6171168443"
+    },
+    {
+      "councilId": "cec:887",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:6171168444"
+    },
+    {
+      "councilId": "cec:888",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:6172896009"
+    },
+    {
+      "councilId": "cec:889",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:6172896019"
+    },
+    {
+      "councilId": "cec:89",
+      "distanceMeters": 0.46,
+      "osmId": "osm:node:446759694"
+    },
+    {
+      "councilId": "cec:890",
+      "distanceMeters": 0.69,
+      "osmId": "osm:node:6177003458"
+    },
+    {
+      "councilId": "cec:891",
+      "distanceMeters": 0.25,
+      "osmId": "osm:node:6177035188"
+    },
+    {
+      "councilId": "cec:892",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:6177201964"
+    },
+    {
+      "councilId": "cec:893",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:6177201965"
+    },
+    {
+      "councilId": "cec:894",
+      "distanceMeters": 0.31,
+      "osmId": "osm:node:6182105328"
+    },
+    {
+      "councilId": "cec:895",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:6203120319"
+    },
+    {
+      "councilId": "cec:896",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:6206167640"
+    },
+    {
+      "councilId": "cec:897",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:6209869467"
+    },
+    {
+      "councilId": "cec:899",
+      "distanceMeters": 1.13,
+      "osmId": "osm:node:6277480745"
+    },
+    {
+      "councilId": "cec:9",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:251878967"
+    },
+    {
+      "councilId": "cec:90",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:495441311"
+    },
+    {
+      "councilId": "cec:900",
+      "distanceMeters": 0.22,
+      "osmId": "osm:node:6277480855"
+    },
+    {
+      "councilId": "cec:901",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:6312598613"
+    },
+    {
+      "councilId": "cec:903",
+      "distanceMeters": 0.33,
+      "osmId": "osm:node:6318628406"
+    },
+    {
+      "councilId": "cec:904",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:6342904772"
+    },
+    {
+      "councilId": "cec:905",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:6343335884"
+    },
+    {
+      "councilId": "cec:906",
+      "distanceMeters": 0.98,
+      "osmId": "osm:node:6344686641"
+    },
+    {
+      "councilId": "cec:907",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:6349747518"
+    },
+    {
+      "councilId": "cec:908",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:6351926121"
+    },
+    {
+      "councilId": "cec:909",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:6356122607"
+    },
+    {
+      "councilId": "cec:91",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:495441455"
+    },
+    {
+      "councilId": "cec:910",
+      "distanceMeters": 0.56,
+      "osmId": "osm:node:6356122608"
+    },
+    {
+      "councilId": "cec:911",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:6380851145"
+    },
+    {
+      "councilId": "cec:912",
+      "distanceMeters": 0.72,
+      "osmId": "osm:node:6383750772"
+    },
+    {
+      "councilId": "cec:913",
+      "distanceMeters": 0.65,
+      "osmId": "osm:node:6387507013"
+    },
+    {
+      "councilId": "cec:914",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:6387507019"
+    },
+    {
+      "councilId": "cec:915",
+      "distanceMeters": 0.74,
+      "osmId": "osm:node:6387660667"
+    },
+    {
+      "councilId": "cec:916",
+      "distanceMeters": 0.5,
+      "osmId": "osm:node:6387660668"
+    },
+    {
+      "councilId": "cec:918",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:6433732297"
+    },
+    {
+      "councilId": "cec:919",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:6466444182"
+    },
+    {
+      "councilId": "cec:92",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:495442246"
+    },
+    {
+      "councilId": "cec:920",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:6467747813"
+    },
+    {
+      "councilId": "cec:921",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:6467747814"
+    },
+    {
+      "councilId": "cec:922",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:6467747825"
+    },
+    {
+      "councilId": "cec:923",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:6467747828"
+    },
+    {
+      "councilId": "cec:924",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:6467747829"
+    },
+    {
+      "councilId": "cec:925",
+      "distanceMeters": 0.54,
+      "osmId": "osm:node:6467747831"
+    },
+    {
+      "councilId": "cec:926",
+      "distanceMeters": 0.81,
+      "osmId": "osm:node:6467763174"
+    },
+    {
+      "councilId": "cec:927",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:6467763184"
+    },
+    {
+      "councilId": "cec:929",
+      "distanceMeters": 0.38,
+      "osmId": "osm:node:6483104507"
+    },
+    {
+      "councilId": "cec:93",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:505215107"
+    },
+    {
+      "councilId": "cec:930",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:6483694047"
+    },
+    {
+      "councilId": "cec:931",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:6486887453"
+    },
+    {
+      "councilId": "cec:933",
+      "distanceMeters": 0.92,
+      "osmId": "osm:node:6510283535"
+    },
+    {
+      "councilId": "cec:934",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:6514810219"
+    },
+    {
+      "councilId": "cec:935",
+      "distanceMeters": 0.45,
+      "osmId": "osm:node:6548998469"
+    },
+    {
+      "councilId": "cec:936",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:6556984591"
+    },
+    {
+      "councilId": "cec:937",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:6556984592"
+    },
+    {
+      "councilId": "cec:938",
+      "distanceMeters": 0.51,
+      "osmId": "osm:node:6556984593"
+    },
+    {
+      "councilId": "cec:939",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:6584351087"
+    },
+    {
+      "councilId": "cec:94",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:505539232"
+    },
+    {
+      "councilId": "cec:940",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:6584351088"
+    },
+    {
+      "councilId": "cec:942",
+      "distanceMeters": 1.02,
+      "osmId": "osm:node:6611450329"
+    },
+    {
+      "councilId": "cec:943",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:6611491747"
+    },
+    {
+      "councilId": "cec:944",
+      "distanceMeters": 0.39,
+      "osmId": "osm:node:6632139773"
+    },
+    {
+      "councilId": "cec:945",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:6647273121"
+    },
+    {
+      "councilId": "cec:946",
+      "distanceMeters": 0.85,
+      "osmId": "osm:node:6669737532"
+    },
+    {
+      "councilId": "cec:947",
+      "distanceMeters": 1.04,
+      "osmId": "osm:node:6907310993"
+    },
+    {
+      "councilId": "cec:948",
+      "distanceMeters": 0.75,
+      "osmId": "osm:node:6918061819"
+    },
+    {
+      "councilId": "cec:949",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:6937246350"
+    },
+    {
+      "councilId": "cec:95",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:507395801"
+    },
+    {
+      "councilId": "cec:950",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:6937789425"
+    },
+    {
+      "councilId": "cec:951",
+      "distanceMeters": 0.43,
+      "osmId": "osm:node:6937790992"
+    },
+    {
+      "councilId": "cec:952",
+      "distanceMeters": 0.23,
+      "osmId": "osm:node:6993243530"
+    },
+    {
+      "councilId": "cec:953",
+      "distanceMeters": 0.68,
+      "osmId": "osm:node:7041739548"
+    },
+    {
+      "councilId": "cec:954",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:7092961924"
+    },
+    {
+      "councilId": "cec:955",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:7092961944"
+    },
+    {
+      "councilId": "cec:956",
+      "distanceMeters": 0.63,
+      "osmId": "osm:node:7092961946"
+    },
+    {
+      "councilId": "cec:957",
+      "distanceMeters": 0.07,
+      "osmId": "osm:node:7093591471"
+    },
+    {
+      "councilId": "cec:958",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:7093847200"
+    },
+    {
+      "councilId": "cec:959",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:7098651857"
+    },
+    {
+      "councilId": "cec:96",
+      "distanceMeters": 0.49,
+      "osmId": "osm:node:507395802"
+    },
+    {
+      "councilId": "cec:960",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:7098651858"
+    },
+    {
+      "councilId": "cec:961",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:7105068368"
+    },
+    {
+      "councilId": "cec:962",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:7119901925"
+    },
+    {
+      "councilId": "cec:963",
+      "distanceMeters": 0.4,
+      "osmId": "osm:node:7119901941"
+    },
+    {
+      "councilId": "cec:964",
+      "distanceMeters": 0.67,
+      "osmId": "osm:node:7142788330"
+    },
+    {
+      "councilId": "cec:965",
+      "distanceMeters": 0.48,
+      "osmId": "osm:node:7172988172"
+    },
+    {
+      "councilId": "cec:966",
+      "distanceMeters": 0.55,
+      "osmId": "osm:node:7172988173"
+    },
+    {
+      "councilId": "cec:967",
+      "distanceMeters": 0.66,
+      "osmId": "osm:node:7172988174"
+    },
+    {
+      "councilId": "cec:968",
+      "distanceMeters": 0.44,
+      "osmId": "osm:node:7172988175"
+    },
+    {
+      "councilId": "cec:969",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:7179775199"
+    },
+    {
+      "councilId": "cec:97",
+      "distanceMeters": 0.47,
+      "osmId": "osm:node:518879066"
+    },
+    {
+      "councilId": "cec:970",
+      "distanceMeters": 0.73,
+      "osmId": "osm:node:7195055321"
+    },
+    {
+      "councilId": "cec:971",
+      "distanceMeters": 0.52,
+      "osmId": "osm:node:7216867384"
+    },
+    {
+      "councilId": "cec:972",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:7216993303"
+    },
+    {
+      "councilId": "cec:973",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:7235006963"
+    },
+    {
+      "councilId": "cec:974",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:7235081604"
+    },
+    {
+      "councilId": "cec:975",
+      "distanceMeters": 0.21,
+      "osmId": "osm:node:7252560434"
+    },
+    {
+      "councilId": "cec:976",
+      "distanceMeters": 0.93,
+      "osmId": "osm:node:7255131197"
+    },
+    {
+      "councilId": "cec:977",
+      "distanceMeters": 0.94,
+      "osmId": "osm:node:7258254363"
+    },
+    {
+      "councilId": "cec:978",
+      "distanceMeters": 0.64,
+      "osmId": "osm:node:7258295503"
+    },
+    {
+      "councilId": "cec:979",
+      "distanceMeters": 2.6,
+      "osmId": "osm:node:7287966739"
+    },
+    {
+      "councilId": "cec:98",
+      "distanceMeters": 0.61,
+      "osmId": "osm:node:546652437"
+    },
+    {
+      "councilId": "cec:980",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:7288879488"
+    },
+    {
+      "councilId": "cec:981",
+      "distanceMeters": 0.97,
+      "osmId": "osm:node:7289603716"
+    },
+    {
+      "councilId": "cec:982",
+      "distanceMeters": 0.77,
+      "osmId": "osm:node:7289620303"
+    },
+    {
+      "councilId": "cec:983",
+      "distanceMeters": 1.13,
+      "osmId": "osm:node:7289634476"
+    },
+    {
+      "councilId": "cec:984",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:7289634477"
+    },
+    {
+      "councilId": "cec:985",
+      "distanceMeters": 0.15,
+      "osmId": "osm:node:7291546679"
+    },
+    {
+      "councilId": "cec:986",
+      "distanceMeters": 1.07,
+      "osmId": "osm:node:7291546680"
+    },
+    {
+      "councilId": "cec:987",
+      "distanceMeters": 0.9,
+      "osmId": "osm:node:7294782075"
+    },
+    {
+      "councilId": "cec:988",
+      "distanceMeters": 0.42,
+      "osmId": "osm:node:7297595729"
+    },
+    {
+      "councilId": "cec:989",
+      "distanceMeters": 0.19,
+      "osmId": "osm:node:7319862730"
+    },
+    {
+      "councilId": "cec:99",
+      "distanceMeters": 0.86,
+      "osmId": "osm:node:548391904"
+    },
+    {
+      "councilId": "cec:990",
+      "distanceMeters": 0.7,
+      "osmId": "osm:node:7319862906"
+    },
+    {
+      "councilId": "cec:991",
+      "distanceMeters": 0.71,
+      "osmId": "osm:node:7319862911"
+    },
+    {
+      "councilId": "cec:992",
+      "distanceMeters": 0.95,
+      "osmId": "osm:node:7319862912"
+    },
+    {
+      "councilId": "cec:993",
+      "distanceMeters": 0.84,
+      "osmId": "osm:node:7319862923"
+    },
+    {
+      "councilId": "cec:994",
+      "distanceMeters": 0.99,
+      "osmId": "osm:node:7342598963"
+    },
+    {
+      "councilId": "cec:995",
+      "distanceMeters": 0.3,
+      "osmId": "osm:node:7342676199"
+    },
+    {
+      "councilId": "cec:996",
+      "distanceMeters": 0.88,
+      "osmId": "osm:node:7342676204"
+    },
+    {
+      "councilId": "cec:997",
+      "distanceMeters": 0.87,
+      "osmId": "osm:node:7342676205"
+    },
+    {
+      "councilId": "cec:998",
+      "distanceMeters": 1,
+      "osmId": "osm:node:7342835175"
+    },
+    {
+      "councilId": "cec:999",
+      "distanceMeters": 0.76,
+      "osmId": "osm:node:7347033811"
+    }
+  ],
+  "mergedRecordCount": 5573,
+  "naming": {
+    "contextCounts": {
+      "junctions": 25993,
+      "landmarks": 35786,
+      "nearbyNodes": 3582169,
+      "places": 21061,
+      "roadSamples": 308486
+    },
+    "counts": {
+      "generic": 0,
+      "junction": 3117,
+      "landmark": 1329,
+      "place": 129,
+      "source": 33,
+      "street": 965
+    },
+    "genericPercent": 0,
+    "samples": [
+      {
+        "id": "cec:1",
+        "name": "Gylemuir Road by Tesco Extra",
+        "nameSource": "landmark"
+      },
+      {
+        "id": "cec:10",
+        "name": "Ingliston Park and Ride cycle parking",
+        "nameSource": "landmark"
+      },
+      {
+        "id": "cec:100",
+        "name": "Belhaven Terrace near Cluny Gardens",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1000",
+        "name": "Telfer subway near Dundee Street",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1001",
+        "name": "Nicolson Street near Haddon's Court",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1002",
+        "name": "Crewe Road North cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1003",
+        "name": "Crewe Road North cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1004",
+        "name": "Old Dalkeith Road cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1005",
+        "name": "Oxgangs Path near Oxgangs Road North",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1006",
+        "name": "Pleasance near East Adam Street",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1007",
+        "name": "Caerketton Cottages cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1008",
+        "name": "Colinton Road near Woodhall Road",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1009",
+        "name": "Firrhill Drive near Firrhill Park",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:101",
+        "name": "Falcon Road West near Morningside Road",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1010",
+        "name": "Edinburgh Napier University - Craiglockhart Campus cycle parking",
+        "nameSource": "landmark"
+      },
+      {
+        "id": "cec:1011",
+        "name": "Corstorphine High Street cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1012",
+        "name": "Corstorphine High Street cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1013",
+        "name": "Colinton Mains Drive by Craiglockhart Surgery",
+        "nameSource": "landmark"
+      },
+      {
+        "id": "cec:1014",
+        "name": "Oxgangs Road North cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1015",
+        "name": "Oxgangs Road North cycle parking",
+        "nameSource": "street"
+      },
+      {
+        "id": "cec:1016",
+        "name": "Craiglockhart Terrace near The Wickets",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1017",
+        "name": "Marchfield Park by Davidson's Mains Primary School",
+        "nameSource": "landmark"
+      },
+      {
+        "id": "cec:1018",
+        "name": "Duddingston Road West near Peffer Bank",
+        "nameSource": "junction"
+      },
+      {
+        "id": "cec:1019",
+        "name": "Lawrie Reilly Place cycle parking",
+        "nameSource": "street"
+      }
+    ]
+  },
+  "osm": {
+    "completeness": {
+      "name": {
+        "count": 59,
+        "percent": 1.1
+      },
+      "capacity": {
+        "count": 4842,
+        "percent": 87.8
+      },
+      "covered": {
+        "count": 4472,
+        "percent": 81.1
+      },
+      "access": {
+        "count": 1356,
+        "percent": 24.6
+      },
+      "bicycle_pa": {
+        "count": 4836,
+        "percent": 87.7
+      }
+    },
+    "discarded": {
+      "relation": 0,
+      "way": 0
+    },
+    "geometryCounts": {
+      "node": 5206,
+      "relation": 2,
+      "way": 309
+    },
+    "pbfSha256": "7bf400d6012f6a1a01c0176fa7ecb6c8a294dbd72b6947c24b11b744ca168025",
+    "recordCount": 5517,
+    "sourceTimestamp": "2026-07-14T20:20:59.000Z"
+  },
+  "refreshedAt": "2026-07-15T21:21:27.298Z",
+  "schemaVersion": 1
+}

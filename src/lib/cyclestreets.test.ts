@@ -24,6 +24,7 @@ const destination: ParkingPoint = {
   latitude: 55.944,
   longitude: -3.205,
   properties: {},
+  sourceId: 'test',
 };
 
 const cycleStreetsFixture = {
@@ -333,6 +334,7 @@ describe('CycleStreets utilities', () => {
         latitude: 55.95332,
         longitude: -3.18833,
         properties: {},
+        sourceId: 'test',
       },
     );
 

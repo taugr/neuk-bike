@@ -9,7 +9,40 @@ export type ParkingPoint = {
   latitude: number;
   longitude: number;
   properties: Record<string, string | number | boolean | null>;
+  sourceId: string;
   distanceMeters?: number;
+};
+
+export type ParkingDataSource = {
+  attribution: string;
+  id: string;
+  label: string;
+  licenceName: string;
+  licenceUrl: string;
+  recordCount: number;
+  sourceTimestamp?: string | null;
+  sourceUrl: string;
+};
+
+export type ParkingDataManifest = {
+  chunkZoom: number;
+  chunks: Record<
+    string,
+    {
+      bounds: { east: number; north: number; south: number; west: number };
+      count: number;
+      path: string;
+    }
+  >;
+  coverage: {
+    bounds: { east: number; north: number; south: number; west: number };
+    label: string;
+  };
+  pointIndexPath: string;
+  recordCount: number;
+  refreshedAt: string;
+  schemaVersion: number;
+  sources: ParkingDataSource[];
 };
 
 export type CycleParkingDataset = {

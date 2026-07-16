@@ -48,6 +48,11 @@ import {
   getRenderableParkingPoints,
   type ParkingMapBounds,
 } from '@/lib/map-pins';
+import {
+  hasMapFocusTargetChanged,
+  shouldApplyMapFocus,
+  type MapFocusTarget,
+} from '@/lib/map-focus';
 
 type CycleParkingMapProps = {
   points: ParkingPoint[];
@@ -79,6 +84,7 @@ type CycleParkingMapProps = {
   onRequestDirections: (point: ParkingPoint) => void;
   onOpenStreetView: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
+  onViewportChange: (bounds: ParkingMapBounds) => void;
 };
 
 type VisibleMapArea = {
@@ -945,6 +951,7 @@ export default function CycleParkingMap({
   onRequestDirections,
   onOpenStreetView,
   onCopyParkingLink,
+  onViewportChange,
 }: CycleParkingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -952,7 +959,8 @@ export default function CycleParkingMap({
   const startMarkerRef = useRef<RenderedMarker | null>(null);
   const liveMarkerRef = useRef<RenderedMarker | null>(null);
   const instructionMarkerRef = useRef<RenderedMarker | null>(null);
-  const previousFocusRouteRef = useRef(route);
+  const previousFocusTargetRef = useRef<MapFocusTarget | null>(null);
+  const hasAppliedNearbyFocusRef = useRef(false);
   const mobileSheetStateRef = useRef(mobileSheetState);
   const previousMobileSheetStateRef = useRef(mobileSheetState);
   const previousRouteSheetStateRef = useRef(mobileSheetState);
@@ -973,6 +981,7 @@ export default function CycleParkingMap({
   });
   const handleViewportChange = useCallback(
     ({ bounds, zoom }: { bounds: ParkingMapBounds; zoom: number }) => {
+      onViewportChange(bounds);
       setViewport((current) => {
         if (
           current.zoom === zoom &&
@@ -987,7 +996,7 @@ export default function CycleParkingMap({
         return { bounds, zoom };
       });
     },
-    [],
+    [onViewportChange],
   );
   const updateViewport = useCallback(() => {
     if (!mapRef.current || frameRef.current !== null) {
@@ -1762,8 +1771,41 @@ export default function CycleParkingMap({
       return;
     }
 
-    const hadRoute = previousFocusRouteRef.current !== null;
-    previousFocusRouteRef.current = route;
+    const nextFocusTarget: MapFocusTarget = {
+      currentLocationFocusRequestId,
+      route,
+      selectedPointId: selectedPoint?.id ?? null,
+      userLatitude: userLocation.latitude,
+      userLongitude: userLocation.longitude,
+    };
+    const previousFocusTarget = previousFocusTargetRef.current;
+    const focusTargetChanged = hasMapFocusTargetChanged(
+      previousFocusTarget,
+      nextFocusTarget,
+    );
+    const focusPoints =
+      highlightedPoints.length > 0
+        ? highlightedPoints
+        : nearestPoint
+          ? [nearestPoint]
+          : [];
+    if (
+      !shouldApplyMapFocus({
+        hasAppliedNearbyFocus: hasAppliedNearbyFocusRef.current,
+        hasNearbyFocusPoints: focusPoints.length > 0,
+        next: nextFocusTarget,
+        previous: previousFocusTarget,
+      })
+    ) {
+      return;
+    }
+
+    previousFocusTargetRef.current = nextFocusTarget;
+    const hadRoute = previousFocusTarget?.route != null;
+
+    if (focusTargetChanged && !route && !selectedPoint) {
+      hasAppliedNearbyFocusRef.current = false;
+    }
 
     map.stop();
 
@@ -1773,10 +1815,12 @@ export default function CycleParkingMap({
       suppressNextSelectionClearFocusRef.current
     ) {
       suppressNextSelectionClearFocusRef.current = false;
+      hasAppliedNearbyFocusRef.current = true;
       return;
     }
 
     if (!route && hadRoute) {
+      hasAppliedNearbyFocusRef.current = true;
       return;
     }
 
@@ -1794,13 +1838,6 @@ export default function CycleParkingMap({
       });
       return;
     }
-
-    const focusPoints =
-      highlightedPoints.length > 0
-        ? highlightedPoints
-        : nearestPoint
-          ? [nearestPoint]
-          : [];
 
     if (selectedPoint) {
       if (mobileSheetState === 'collapsed') {
@@ -1839,6 +1876,7 @@ export default function CycleParkingMap({
     }
 
     if (focusPoints.length > 0) {
+      hasAppliedNearbyFocusRef.current = true;
       const bounds = createBounds([
         userLocationToPoint(userLocation),
         ...focusPoints.map(parkingPointToRoutePoint),

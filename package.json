@@ -2,12 +2,13 @@
   "name": "neuk-bike",
   "version": "0.1.0",
   "private": true,
-  "description": "Static mobile-friendly map for finding nearby Edinburgh cycle parking.",
+  "description": "Static mobile-friendly map for finding nearby cycle parking across Scotland.",
   "keywords": [
     "active-travel",
     "cycle-parking",
     "cycling",
     "edinburgh",
+    "scotland",
     "map",
     "nextjs"
   ],
@@ -24,7 +25,8 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/generate-parking-share-pages.mjs",
+    "build": "next build",
+    "deploy:cloudflare": "pnpm build && wrangler pages deploy out --project-name neuk-bike --branch main",
     "start": "next start",
     "update:data": "node scripts/update-cycle-parking-data.mjs",
     "test": "vitest run",
@@ -53,11 +55,13 @@
     "@types/react-dom": "^19.2.3",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
+    "osm-pbf-parser-node": "1.1.4",
     "oxfmt": "^0.58.0",
     "oxlint": "^1.72.0",
     "oxlint-tsgolint": "^0.24.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "wrangler": "4.110.0"
   },
   "lint-staged": {
     "*": "oxfmt --no-error-on-unmatched-pattern"

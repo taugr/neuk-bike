@@ -1,0 +1,13 @@
+/data/parking/manifest.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+/data/parking/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  Permissions-Policy: geolocation=(self)
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff

@@ -1,5 +1,5 @@
 import { isResolvedLocation } from '@/lib/geo';
-import type { ParkingPoint, UserLocation } from '@/lib/types';
+import type { UserLocation } from '@/lib/types';
 
 function getAppBasePath(pathname: string) {
   const parkingSegment = '/parking/';
@@ -29,16 +29,9 @@ export function parseUrlLocation(search: string): UserLocation | null {
   return isResolvedLocation(location) ? location : null;
 }
 
-export function findSharedParkingPoint(search: string, points: ParkingPoint[]) {
-  const parkingId = parseUrlParkingId(search);
-  return parkingId
-    ? (points.find((point) => point.id === parkingId) ?? null)
-    : null;
-}
-
-export function parseShareLinkState(search: string, points: ParkingPoint[]) {
+export function parseShareLinkState(search: string) {
   return {
-    selectedParkingId: findSharedParkingPoint(search, points)?.id ?? null,
+    selectedParkingId: parseUrlParkingId(search),
     referenceLocation: parseUrlLocation(search),
   };
 }
@@ -50,10 +43,8 @@ export function buildParkingShareUrl(
 ) {
   const appBasePath = getAppBasePath(pathname);
   const basePath = appBasePath === '/' ? '' : appBasePath;
-  const url = new URL(
-    `${basePath}/parking/${encodeURIComponent(parkingId)}/`,
-    origin,
-  );
+  const url = new URL(`${basePath}/`, origin);
+  url.searchParams.set('parking', parkingId);
 
   return url.toString();
 }

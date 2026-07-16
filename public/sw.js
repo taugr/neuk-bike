@@ -1,5 +1,5 @@
 const cachePrefix = 'neuk-bike-';
-const cacheName = `${cachePrefix}v3`;
+const cacheName = `${cachePrefix}v4`;
 const scopePath = new URL(self.registration.scope).pathname;
 const appBasePath = scopePath.endsWith('/')
   ? scopePath.slice(0, -1)
@@ -66,6 +66,13 @@ function isStaticAsset(request) {
   );
 }
 
+function isParkingData(request) {
+  return (
+    isSameOrigin(request) &&
+    new URL(request.url).pathname.startsWith(appPath('/data/parking/'))
+  );
+}
+
 async function cacheFirst(request) {
   const cachedResponse = await caches.match(request);
 
@@ -104,6 +111,23 @@ async function networkFirstNavigation(request) {
   }
 }
 
+async function networkFirstData(request) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(cacheName);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    throw new Error('Parking data is unavailable and has not been cached.');
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
@@ -113,6 +137,15 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(networkFirstNavigation(request));
+    return;
+  }
+
+  if (isParkingData(request)) {
+    event.respondWith(
+      new URL(request.url).pathname.endsWith('/manifest.json')
+        ? networkFirstData(request)
+        : cacheFirst(request),
+    );
     return;
   }
 

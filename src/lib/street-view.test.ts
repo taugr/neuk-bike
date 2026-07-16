@@ -11,6 +11,7 @@ const point: ParkingPoint = {
   latitude: 55.9533,
   longitude: -3.1883,
   properties: {},
+  sourceId: 'test',
 };
 
 describe('street view links', () => {

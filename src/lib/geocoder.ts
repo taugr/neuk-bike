@@ -3,7 +3,7 @@ import type { UserLocation } from '@/lib/types';
 
 export const NOMINATIM_SEARCH_URL =
   'https://nominatim.openstreetmap.org/search';
-export const EDINBURGH_VIEWBOX = '-3.45,56.04,-3.05,55.86';
+export const SCOTLAND_VIEWBOX = '-8.7,60.9,-0.5,54.55';
 
 export type PlaceSearchResult = {
   id: string;
@@ -25,7 +25,7 @@ export function buildPlaceSearchUrl(query: string) {
     format: 'jsonv2',
     limit: '5',
     countrycodes: 'gb',
-    viewbox: EDINBURGH_VIEWBOX,
+    viewbox: SCOTLAND_VIEWBOX,
     bounded: '1',
   });
 

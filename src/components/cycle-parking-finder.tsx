@@ -44,6 +44,7 @@ import {
 } from 'lucide-react';
 import {
   Fragment,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -52,7 +53,6 @@ import {
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
-import cycleParkingDataset from '@/data/cycle-parking.json';
 import {
   buildShortCycleRoute,
   buildCycleRouteCacheKey,
@@ -77,12 +77,15 @@ import {
   getCurrentPosition,
   watchPosition,
 } from '@/lib/geolocation';
-import type { ParkingPoint, UserLocation } from '@/lib/types';
+import type {
+  ParkingDataManifest,
+  ParkingPoint,
+  UserLocation,
+} from '@/lib/types';
 import {
-  EDINBURGH_FALLBACK_LOCATION,
+  SCOTLAND_FALLBACK_LOCATION,
   formatDistance,
   distanceMeters,
-  isFarFromNearestParking,
   isResolvedLocation,
   sortByDistance,
 } from '@/lib/geo';
@@ -100,6 +103,12 @@ import { buildGoogleStreetViewEmbedUrl } from '@/lib/street-view';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { captureAnalyticsEvent } from '@/lib/analytics';
 import { copyTextToClipboard } from '@/lib/clipboard';
+import {
+  getParkingDataBaseUrl,
+  isLocationInParkingCoverage,
+  ParkingDataClient,
+} from '@/lib/parking-data';
+import type { ParkingMapBounds } from '@/lib/map-pins';
 
 const CycleParkingMap = dynamic(
   () => import('@/components/cycle-parking-map'),
@@ -109,12 +118,6 @@ const CycleParkingMap = dynamic(
   },
 );
 
-const parkingPoints = (cycleParkingDataset.points as ParkingPoint[]).map(
-  (point) => ({
-    ...point,
-    name: getParkingDisplayName(point),
-  }),
-);
 const maxPlaceSearchCacheEntries = 12;
 const closestParkingResultCount = 8;
 const copiedMessageDurationMs = 1_800;
@@ -286,6 +289,7 @@ type ShareSource = 'list' | 'popup';
 type ThemeMode = 'system' | 'light' | 'dark';
 type ResolvedTheme = 'light' | 'dark';
 type MobileSheetState = 'expanded' | 'collapsed';
+type ParkingDataStatus = 'loading' | 'ready' | 'error';
 
 type CopiedShareButton = {
   parkingId: string;
@@ -314,12 +318,37 @@ function resolveTheme(mode: ThemeMode, prefersDark: boolean): ResolvedTheme {
   return mode;
 }
 
+function prepareParkingPoints(points: ParkingPoint[]) {
+  return points.map((point) => ({
+    ...point,
+    name: getParkingDisplayName(point),
+  }));
+}
+
+function keepParkingPointsWhenUnchanged(
+  current: ParkingPoint[],
+  next: ParkingPoint[],
+) {
+  return current.length === next.length &&
+    current.every((point, index) => point.id === next[index]?.id)
+    ? current
+    : next;
+}
+
 export default function CycleParkingFinder() {
   const shouldReduceMotion = useReducedMotion();
   const [locationState, setLocationState] = useState<LocationState>({
     status: 'fallback',
-    location: EDINBURGH_FALLBACK_LOCATION,
+    location: SCOTLAND_FALLBACK_LOCATION,
   });
+  const [parkingPoints, setParkingPoints] = useState<ParkingPoint[]>([]);
+  const [parkingManifest, setParkingManifest] =
+    useState<ParkingDataManifest | null>(null);
+  const [parkingDataStatus, setParkingDataStatus] =
+    useState<ParkingDataStatus>('loading');
+  const [parkingDataMessage, setParkingDataMessage] = useState<string | null>(
+    null,
+  );
   const [currentLocationFocusRequestId, setCurrentLocationFocusRequestId] =
     useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -380,6 +409,7 @@ export default function CycleParkingFinder() {
   );
   const { canInstall, installApp } = usePwaInstallPrompt();
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
+  const parkingDataClient = useRef<ParkingDataClient | null>(null);
   const directionsCache = useRef(new Map<string, CycleRoute>());
   const placeSearchInFlight = useRef(false);
   const directionsRequestId = useRef(0);
@@ -487,31 +517,197 @@ export default function CycleParkingFinder() {
       };
 
   useEffect(() => {
-    setIsClientReady(true);
-    setNumberLocale(navigator.language || defaultLocale);
+    let cancelled = false;
 
-    const { referenceLocation, selectedParkingId } = parseShareLinkState(
-      window.location.search,
-      parkingPoints,
-    );
-
-    if (referenceLocation) {
-      applyReferenceLocation(
-        referenceLocation,
-        'located',
-        undefined,
-        selectedParkingId ?? undefined,
+    async function initializeParkingData() {
+      setIsClientReady(true);
+      setNumberLocale(navigator.language || defaultLocale);
+      const client = new ParkingDataClient(
+        getParkingDataBaseUrl(window.location.href),
       );
-      return;
+      parkingDataClient.current = client;
+
+      try {
+        const manifest = await client.initialize();
+        const { referenceLocation, selectedParkingId } = parseShareLinkState(
+          window.location.search,
+        );
+        await client.loadLocation(
+          referenceLocation ?? SCOTLAND_FALLBACK_LOCATION,
+        );
+        const selectedPoint = selectedParkingId
+          ? await client.loadPoint(selectedParkingId)
+          : null;
+
+        if (cancelled) {
+          return;
+        }
+
+        setParkingManifest(manifest);
+        setParkingPoints((current) =>
+          keepParkingPointsWhenUnchanged(
+            current,
+            prepareParkingPoints(client.getLoadedPoints()),
+          ),
+        );
+        setParkingDataStatus('ready');
+        setParkingDataMessage(
+          selectedParkingId && !selectedPoint
+            ? 'That parking link is not in the current Scotland dataset.'
+            : null,
+        );
+
+        if (referenceLocation) {
+          if (isLocationInParkingCoverage(referenceLocation, manifest)) {
+            setSelectedId(selectedPoint?.id ?? null);
+            setLocationState({
+              status: 'located',
+              location: referenceLocation,
+            });
+          } else {
+            setSelectedId(null);
+            setLocationState({
+              status: 'too-far',
+              location: SCOTLAND_FALLBACK_LOCATION,
+            });
+          }
+          return;
+        }
+
+        if (selectedPoint) {
+          setSelectedId(selectedPoint.id);
+          setLocationState({
+            status: 'located',
+            location: {
+              latitude: selectedPoint.latitude,
+              longitude: selectedPoint.longitude,
+            },
+          });
+          requestCurrentLocationFocus();
+          return;
+        }
+
+        requestLocation();
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        setParkingDataStatus('error');
+        setParkingDataMessage(
+          error instanceof Error
+            ? error.message
+            : 'Cycle parking data is unavailable right now.',
+        );
+      }
     }
 
-    if (selectedParkingId) {
-      requestLocation(selectedParkingId);
-      return;
-    }
-
-    requestLocation();
+    void initializeParkingData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(() => {
+    const client = parkingDataClient.current;
+    const manifest = client?.getManifest();
+    if (!client || !manifest || parkingDataStatus === 'error') {
+      return;
+    }
+
+    let cancelled = false;
+    setParkingDataStatus('loading');
+    setParkingDataMessage('Loading nearby cycle parking...');
+    void client
+      .loadLocation(locationState.location)
+      .then(() => {
+        if (cancelled) {
+          return;
+        }
+        setParkingPoints((current) =>
+          keepParkingPointsWhenUnchanged(
+            current,
+            prepareParkingPoints(client.getLoadedPoints()),
+          ),
+        );
+        requestCurrentLocationFocus();
+        setParkingDataStatus('ready');
+        setParkingDataMessage(null);
+      })
+      .catch((error: unknown) => {
+        if (cancelled) {
+          return;
+        }
+        setParkingDataStatus('error');
+        setParkingDataMessage(
+          error instanceof Error
+            ? error.message
+            : 'Nearby cycle parking could not be loaded.',
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    locationState.location.latitude,
+    locationState.location.longitude,
+    parkingManifest?.refreshedAt,
+  ]);
+
+  const loadParkingForBounds = useCallback((bounds: ParkingMapBounds) => {
+    const client = parkingDataClient.current;
+    const manifest = client?.getManifest();
+    if (!client || !manifest) {
+      return;
+    }
+
+    void client
+      .loadBounds(bounds)
+      .then(() => {
+        setParkingPoints((current) =>
+          keepParkingPointsWhenUnchanged(
+            current,
+            prepareParkingPoints(client.getLoadedPoints()),
+          ),
+        );
+      })
+      .catch((error: unknown) => {
+        setParkingDataMessage(
+          error instanceof Error
+            ? error.message
+            : 'Some map-area parking could not be loaded.',
+        );
+      });
+  }, []);
+
+  async function retryParkingData() {
+    const client = parkingDataClient.current;
+    const manifest = client?.getManifest();
+    if (!client || !manifest) {
+      return;
+    }
+
+    setParkingDataStatus('loading');
+    setParkingDataMessage('Loading nearby cycle parking...');
+    try {
+      await client.loadLocation(locationState.location);
+      setParkingPoints((current) =>
+        keepParkingPointsWhenUnchanged(
+          current,
+          prepareParkingPoints(client.getLoadedPoints()),
+        ),
+      );
+      setParkingDataStatus('ready');
+      setParkingDataMessage(null);
+    } catch (error) {
+      setParkingDataStatus('error');
+      setParkingDataMessage(
+        error instanceof Error
+          ? error.message
+          : 'Nearby cycle parking could not be loaded.',
+      );
+    }
+  }
 
   useEffect(() => {
     const storedThemeMode = window.localStorage.getItem(themeStorageKey);
@@ -626,7 +822,7 @@ export default function CycleParkingFinder() {
 
   const nearbyPoints = useMemo(
     () => sortByDistance(parkingPoints, locationState.location),
-    [locationState.location],
+    [locationState.location, parkingPoints],
   );
 
   const closestPoints = useMemo(
@@ -634,8 +830,8 @@ export default function CycleParkingFinder() {
     [nearbyPoints],
   );
   const formattedParkingLocationCount = useMemo(
-    () => cycleParkingDataset.metadata.recordCount.toLocaleString(numberLocale),
-    [numberLocale],
+    () => (parkingManifest?.recordCount ?? 0).toLocaleString(numberLocale),
+    [numberLocale, parkingManifest?.recordCount],
   );
 
   const nearestPoint = nearbyPoints[0] ?? null;
@@ -941,7 +1137,8 @@ export default function CycleParkingFinder() {
           return;
         }
 
-        if (isFarFromNearestParking(parkingPoints, location)) {
+        const manifest = parkingDataClient.current?.getManifest();
+        if (manifest && !isLocationInParkingCoverage(location, manifest)) {
           clearLiveRouteWatch();
           previousLiveRouteMarkerPosition.current = null;
           setLiveRouteTracking({ status: 'too-far' });
@@ -1042,8 +1239,29 @@ export default function CycleParkingFinder() {
   ) {
     setLocationState({
       status,
-      location: EDINBURGH_FALLBACK_LOCATION,
+      location: SCOTLAND_FALLBACK_LOCATION,
     });
+    const client = parkingDataClient.current;
+    const manifest = client?.getManifest();
+    if (client && manifest) {
+      void client
+        .loadLocation(SCOTLAND_FALLBACK_LOCATION)
+        .then(() => {
+          setParkingPoints((current) =>
+            keepParkingPointsWhenUnchanged(
+              current,
+              prepareParkingPoints(client.getLoadedPoints()),
+            ),
+          );
+        })
+        .catch((error: unknown) => {
+          setParkingDataMessage(
+            error instanceof Error
+              ? error.message
+              : 'Nearby cycle parking could not be loaded.',
+          );
+        });
+    }
     requestCurrentLocationFocus();
   }
 
@@ -1056,10 +1274,8 @@ export default function CycleParkingFinder() {
     setSelectedId(selectedParkingId ?? null);
     clearDirections();
 
-    if (
-      status === 'located' &&
-      isFarFromNearestParking(parkingPoints, location)
-    ) {
+    const manifest = parkingDataClient.current?.getManifest();
+    if (manifest && !isLocationInParkingCoverage(location, manifest)) {
       applyFallbackLocation('too-far');
       return false;
     }
@@ -1149,7 +1365,7 @@ export default function CycleParkingFinder() {
       setPlaceResults(cachedResults);
       setPlaceSearchMessage(
         cachedResults.length === 0
-          ? 'No matching Edinburgh places found.'
+          ? 'No matching Scottish places found.'
           : null,
       );
       return;
@@ -1183,7 +1399,7 @@ export default function CycleParkingFinder() {
       });
       setPlaceResults(results);
       setPlaceSearchMessage(
-        results.length === 0 ? 'No matching Edinburgh places found.' : null,
+        results.length === 0 ? 'No matching Scottish places found.' : null,
       );
       setHasUsedPlaceSearch(true);
     } catch {
@@ -1645,6 +1861,7 @@ export default function CycleParkingFinder() {
             onCopyParkingLink={(point) => {
               void copyParkingLinkForPoint(point, 'popup');
             }}
+            onViewportChange={loadParkingForBounds}
           />
         </section>
 
@@ -1807,7 +2024,7 @@ export default function CycleParkingFinder() {
                         {liveRouteTracking.status === 'denied'
                           ? 'Enable location permissions to start route.'
                           : liveRouteTracking.status === 'too-far'
-                            ? 'Start route is only available near Edinburgh.'
+                            ? 'Start route is only available within Scotland.'
                             : 'Live location is unavailable.'}
                       </motion.p>
                     ) : null}
@@ -2035,7 +2252,7 @@ export default function CycleParkingFinder() {
                       <h1>Bike Neuks</h1>
                       <p>
                         {formattedParkingLocationCount} cycle parking spots in
-                        Edinburgh
+                        Scotland
                       </p>
                     </div>
                     {renderThemeSettings('settings-menu--desktop')}
@@ -2076,6 +2293,25 @@ export default function CycleParkingFinder() {
 
                     <div className="parking-list-scroll">
                       <AnimatePresence initial={false}>
+                        {parkingDataMessage ? (
+                          <motion.div
+                            {...risePresence}
+                            key={parkingDataMessage}
+                            className="parking-list-context"
+                            role="status"
+                          >
+                            {parkingDataMessage}
+                            {parkingDataStatus === 'error' ? (
+                              <button
+                                className="parking-retry-button"
+                                type="button"
+                                onClick={() => void retryParkingData()}
+                              >
+                                Retry
+                              </button>
+                            ) : null}
+                          </motion.div>
+                        ) : null}
                         {locationState.status === 'too-far' ? (
                           <motion.div
                             {...risePresence}
@@ -2083,8 +2319,8 @@ export default function CycleParkingFinder() {
                             className="parking-list-context"
                             role="status"
                           >
-                            You're too far from Edinburgh, showing bike parking
-                            in central Edinburgh.
+                            That location is outside the Scotland prototype,
+                            showing bike parking near Stirling.
                           </motion.div>
                         ) : null}
                       </AnimatePresence>
@@ -2216,10 +2452,12 @@ export default function CycleParkingFinder() {
                   <h2 id="attribution-modal-title">Attributions</h2>
                 </div>
                 <div className="attribution-details">
-                  <span>{cycleParkingDataset.metadata.attribution}</span>
-                  <a href={cycleParkingDataset.metadata.licenceUrl}>
-                    Open Government Licence v3.0
-                  </a>
+                  {parkingManifest?.sources.map((source) => (
+                    <Fragment key={source.id}>
+                      <span>{source.attribution}</span>
+                      <a href={source.licenceUrl}>{source.licenceName}</a>
+                    </Fragment>
+                  ))}
                   <span>
                     Map interface by{' '}
                     <a href="https://maplibre.org/">MapLibre GL JS</a>.

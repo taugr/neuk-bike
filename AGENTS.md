@@ -2,8 +2,13 @@
 
 ## Project Shape
 
-- This is a static, backend-free Next.js app for finding City of Edinburgh Council cycle parking.
-- Runtime data is bundled from `src/data/cycle-parking.json`; there is no database or server API.
+- This is a static, backend-free Next.js app for finding cycle parking across Scotland.
+- The generated release combines City of Edinburgh Council data with
+  OpenStreetMap coverage from the Geofabrik Scotland extract.
+- Runtime parking data is loaded from versioned zoom-12 chunks under
+  `public/data/parking/`; there is no database or server API.
+- `src/data/cycle-parking.json` is the generated council snapshot, while
+  `src/data/cycle-parking-report.json` is the generated quality report.
 - The main user experience lives in `src/components/cycle-parking-finder.tsx` and `src/components/cycle-parking-map.tsx`.
 - Shared behavior belongs in `src/lib/`, with focused tests near the changed code.
 
@@ -18,10 +23,18 @@
 ## Dataset
 
 - Refresh cycle parking data with `pnpm update:data`.
-- The data refresh script downloads public ArcGIS GeoJSON, normalizes it, and rewrites `src/data/cycle-parking.json`.
-- Treat `src/data/cycle-parking.json` as generated data. Do not hand-edit records unless the user explicitly asks for a local data correction.
-- When changing the normalizer in `scripts/update-cycle-parking-data.mjs`, check the generated metadata and record shape before committing the output.
-- Preserve source attribution and Open Government Licence details in README-facing documentation.
+- The refresh script downloads public council GeoJSON, downloads or reuses the
+  cached Scotland PBF, normalizes and merges both sources, derives contextual
+  names offline, and rewrites the generated snapshot, report, manifest, chunks,
+  and point index.
+- Treat `src/data/cycle-parking.json`, `src/data/cycle-parking-report.json`, and
+  `public/data/parking/` as generated data. Do not hand-edit generated records.
+- When changing the normalizer or merge/naming rules, inspect record counts,
+  geometry and completeness results, naming-tier counts and samples, source
+  timestamps, checksum, discarded features, and duplicate matches before
+  committing the regenerated output.
+- Preserve City of Edinburgh Council OGL and OpenStreetMap ODbL attribution in
+  README-facing and in-app documentation.
 
 ## Frontend Guidance
 
@@ -34,14 +47,21 @@
 ## Deployment
 
 - The app uses static export via `next.config.ts`.
-- GitHub Pages deployment sets `GITHUB_PAGES=true`, which enables the `/edinburgh-cycle-parking` base path and asset prefix.
-- Do not remove or bypass the GitHub Pages base-path behavior without verifying local static export and the intended deployment target.
+- Cloudflare Pages is the preferred production host and serves the generated
+  `out/` directory as static assets. `public/_headers` defines its caching and
+  security policy.
+- GitHub Pages remains the fallback until the Cloudflare `pages.dev` deployment,
+  custom domain, HTTPS, environment-dependent features, and PWA are verified.
+- Do not disable the GitHub Pages workflow or move `neuk.bike` without verifying
+  the Cloudflare deployment and preserving a rollback path.
 
 ## Verification
 
 - Start with the narrowest relevant check for the changed code.
 - Add or update focused tests for behavior changes in `src/lib/` and for logic that can be tested without a browser.
 - Run `pnpm build` for changes that affect Next.js config, static export, routing, dynamic imports, or browser/server boundaries.
+- Run `pnpm test:e2e` for Scotland data-loading, location, map, sharing, routing,
+  or responsive UI changes when the browser environment is available.
 - Treat local environment or dependency failures separately from code regressions and report them clearly.
 
 ## Dependencies

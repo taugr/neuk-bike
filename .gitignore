@@ -12,6 +12,7 @@ playwright-videos/
 node_modules/
 coverage/
 dist/
+.cache/
 *.tsbuildinfo
 .env.local
 posthog-setup-report.md

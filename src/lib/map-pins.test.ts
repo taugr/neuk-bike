@@ -25,6 +25,7 @@ function point(id: string, latitude: number, longitude: number): ParkingPoint {
     latitude,
     longitude,
     properties: {},
+    sourceId: 'test',
   };
 }
 

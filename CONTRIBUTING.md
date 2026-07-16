@@ -34,6 +34,9 @@ Useful variants:
 pnpm run lint:fix
 pnpm run format:fix
 pnpm run test:watch
+pnpm run test:e2e
+pnpm run update:data
+pnpm run deploy:cloudflare
 ```
 
 ## Workflow
@@ -42,6 +45,18 @@ pnpm run test:watch
 2. Run the narrowest relevant test first, then `pnpm run test`.
 3. Run `pnpm run lint`, `pnpm run format`, and `pnpm run build` before opening a PR.
 4. Update `README.md` when user-facing commands, installation, or workflows change.
+
+## Parking data
+
+`pnpm update:data` downloads the current council feed and downloads or reuses a
+roughly 320 MB cached Geofabrik Scotland PBF. It replaces the generated council
+snapshot, quality report, manifest, versioned chunks, and point index.
+
+Do not hand-edit files under `public/data/parking/` or generated JSON under
+`src/data/`. Change the normalizer or merge rules in `scripts/`, add focused
+tests, rerun the refresh, and review record counts, completeness, discarded
+features, source timestamps, checksum, duplicate matches, and naming-tier counts
+and samples before committing.
 
 ## Testing
 

@@ -15,7 +15,6 @@ export default defineConfig({
   webServer: {
     command: [
       'pnpm exec next build --webpack',
-      'node scripts/generate-parking-share-pages.mjs',
       `python3 -m http.server ${e2ePort} --directory out`,
     ].join(' && '),
     env: {

@@ -1,8 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 const parkingOne = {
-  id: '1',
-  name: 'Cycle parking 1',
+  id: 'cec:1',
   latitude: 55.9406042783081,
   longitude: -3.29451047885751,
 };
@@ -19,7 +18,9 @@ function parkingOneReferenceUrl(extraParams: Record<string, string> = {}) {
 }
 
 async function expectFinderReady(page: Page) {
-  await expect(page.getByRole('heading', { name: 'Bike Neuks' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Bike Neuks', exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole('region', { name: 'Cycle parking map' }),
   ).toBeVisible();
@@ -34,13 +35,18 @@ async function openShortRouteDirections(page: Page) {
     }),
   );
   await expectFinderReady(page);
+  const parkingName = (
+    await page
+      .getByTestId(`parking-row-${parkingOne.id}`)
+      .locator('strong')
+      .innerText()
+  ).trim();
   await page.getByTestId(`parking-directions-${parkingOne.id}`).click();
   await expect(
     page.getByRole('region', { name: 'Cycle directions' }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: parkingOne.name }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: parkingName })).toBeVisible();
+  return parkingName;
 }
 
 test('loads the map-first finder with nearby parking', async ({ page }) => {
@@ -48,8 +54,55 @@ test('loads the map-first finder with nearby parking', async ({ page }) => {
 
   await expectFinderReady(page);
   await expect(
-    page.getByRole('heading', { name: /Nearby cycle parking/ }),
+    page.getByRole('heading', { name: /Nearby bike neuks/ }),
   ).toBeVisible();
+});
+
+test('keeps manual zoom after background parking chunks load', async ({
+  page,
+}) => {
+  const loadedParkingChunks = new Set<string>();
+  page.on('response', (response) => {
+    const url = new URL(response.url());
+
+    if (
+      url.pathname.includes('/data/parking/') &&
+      !url.pathname.endsWith('/manifest.json') &&
+      !url.pathname.endsWith('/point-index.json')
+    ) {
+      loadedParkingChunks.add(url.pathname);
+    }
+  });
+
+  await page.goto('/?mockGps=55.8642,-4.2518,5');
+  await expectFinderReady(page);
+
+  const currentLocationMarker = page.getByRole('button', {
+    exact: true,
+    name: 'Current location',
+  });
+  const zoomOutButton = page.getByRole('button', { name: 'Zoom out' });
+  await expect(currentLocationMarker).toBeVisible();
+  loadedParkingChunks.clear();
+
+  for (let index = 0; index < 4; index += 1) {
+    await zoomOutButton.click();
+    await page.waitForTimeout(450);
+  }
+
+  const markerAfterZoom = await currentLocationMarker.boundingBox();
+  await page.waitForTimeout(1_500);
+  const markerAfterChunkLoading = await currentLocationMarker.boundingBox();
+
+  expect(loadedParkingChunks.size).toBeGreaterThan(0);
+  expect(markerAfterZoom).not.toBeNull();
+  expect(markerAfterChunkLoading).not.toBeNull();
+  expect(
+    Math.abs(markerAfterChunkLoading!.x - markerAfterZoom!.x),
+  ).toBeLessThan(2);
+  expect(
+    Math.abs(markerAfterChunkLoading!.y - markerAfterZoom!.y),
+  ).toBeLessThan(2);
 });
 
 test('searches from a place and selects a nearby parking row', async ({
@@ -75,8 +128,11 @@ test('searches from a place and selects a nearby parking row', async ({
   await page.goto('/?mockGps=55.94155,-3.29625,5');
   await expectFinderReady(page);
 
-  await page.getByPlaceholder('Place or postcode').fill('Test Place');
-  await page.getByRole('button', { name: 'Search' }).click();
+  const finderPanel = page.getByRole('complementary', {
+    name: 'Nearest cycle parking',
+  });
+  await finderPanel.getByRole('searchbox').fill('Test Place');
+  await finderPanel.getByRole('button', { name: 'Search' }).click();
   await page.getByRole('button', { name: /Test Place, Edinburgh/ }).click();
 
   const parkingRow = page.getByTestId(`parking-row-${parkingOne.id}`);
@@ -88,13 +144,13 @@ test('searches from a place and selects a nearby parking row', async ({
 test('opens short local directions from a mocked location', async ({
   page,
 }) => {
-  await openShortRouteDirections(page);
+  const parkingName = await openShortRouteDirections(page);
 
   await expect(page.getByLabel('Route summary')).toBeVisible();
   await expect(page.getByTestId('directions-list')).toBeVisible();
   await expect(page.locator('.directions-list-item')).toHaveCount(2);
   await expect(page.locator('.directions-list-item').last()).toContainText(
-    `Arrive at ${parkingOne.name}`,
+    `Arrive at ${parkingName}`,
   );
 });
 
@@ -145,16 +201,42 @@ for (const [mockGps, message] of [
   });
 }
 
-test('serves generated parking share metadata', async ({ request }) => {
-  const response = await request.get(`/parking/${parkingOne.id}/`);
-  const html = await response.text();
+test('resolves a source-qualified parking deep link from the point index', async ({
+  page,
+}) => {
+  await page.goto(`/?parking=${encodeURIComponent(parkingOne.id)}`);
+  await expectFinderReady(page);
 
-  expect(response.ok()).toBe(true);
-  expect(html).toContain(`<title>${parkingOne.name} | Bike Neuks</title>`);
-  expect(html).toContain(
-    `<meta http-equiv="refresh" content="0; url=/?parking=${parkingOne.id}">`,
+  const parkingRow = page.getByTestId(`parking-row-${parkingOne.id}`);
+  await expect(parkingRow).toBeVisible();
+  await expect(parkingRow).toHaveClass(/selected/);
+});
+
+test('keeps legacy Edinburgh parking links working', async ({ page }) => {
+  await page.goto('/?parking=1');
+  await expectFinderReady(page);
+  await expect(page.getByTestId(`parking-row-${parkingOne.id}`)).toHaveClass(
+    /selected/,
   );
-  expect(html).toContain(
-    `<meta property="og:title" content="${parkingOne.name} | Bike Neuks">`,
-  );
+});
+
+for (const [place, mockGps] of [
+  ['Glasgow', '55.8642,-4.2518,5'],
+  ['Dundee', '56.4620,-2.9707,5'],
+  ['Aberdeen', '57.1497,-2.0943,5'],
+  ['Inverness', '57.4778,-4.2247,5'],
+  ['Fort William', '56.8198,-5.1052,5'],
+] as const) {
+  test(`loads mapped cycle parking near ${place}`, async ({ page }) => {
+    await page.goto(`/?mockGps=${mockGps}`);
+    await expectFinderReady(page);
+  });
+}
+
+test('explains the Scotland boundary for an outside location', async ({
+  page,
+}) => {
+  await page.goto('/?mockGps=51.5072,-0.1276,5');
+  await expectFinderReady(page);
+  await expect(page.getByText(/outside the Scotland prototype/)).toBeVisible();
 });
