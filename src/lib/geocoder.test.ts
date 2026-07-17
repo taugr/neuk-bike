@@ -16,7 +16,7 @@ describe('place search', () => {
     expect(url.searchParams.get('limit')).toBe('5');
   });
 
-  it('requests localized place names and biases results to the current map area', () => {
+  it('uses supported Photon languages and biases results to the current map area', () => {
     const url = new URL(
       buildPlaceSearchUrl('Dùn Èideann', 'gd', {
         latitude: 55.9533,
@@ -24,12 +24,12 @@ describe('place search', () => {
       }),
     );
 
-    expect(url.searchParams.get('lang')).toBe('gd');
+    expect(url.searchParams.get('lang')).toBe('default');
     expect(url.searchParams.get('lat')).toBe('55.9533');
     expect(url.searchParams.get('lon')).toBe('-3.1883');
     expect(
       new URL(buildPlaceSearchUrl('Madrid', 'es')).searchParams.get('lang'),
-    ).toBe('es');
+    ).toBe('default');
   });
 
   it('parses valid Photon results and rejects malformed locations', () => {

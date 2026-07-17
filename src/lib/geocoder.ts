@@ -33,10 +33,6 @@ type PhotonResponse = {
   features?: unknown;
 };
 
-function firstLanguage(locale: AppLocale) {
-  return localeDetails[locale].placeSearchLanguages.split(',')[0] ?? locale;
-}
-
 export function buildPlaceSearchUrl(
   query: string,
   locale: AppLocale = 'en',
@@ -44,7 +40,7 @@ export function buildPlaceSearchUrl(
 ) {
   const params = new URLSearchParams({
     bbox: PARKING_COVERAGE_BBOX,
-    lang: firstLanguage(locale),
+    lang: localeDetails[locale].placeSearchLanguage,
     limit: '5',
     q: query,
   });

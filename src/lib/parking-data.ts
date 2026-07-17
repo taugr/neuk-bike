@@ -270,11 +270,14 @@ export class ParkingDataClient {
   }
 
   async loadPoint(id: string) {
-    const { points } = await this.loadPoints([id]);
+    const { points } = await this.loadPoints([id], { allowPartial: false });
     return points[0] ?? null;
   }
 
-  async loadPoints(ids: string[]) {
+  async loadPoints(
+    ids: string[],
+    { allowPartial = true }: { allowPartial?: boolean } = {},
+  ) {
     const manifest = await this.initialize();
     const pointIndex = await this.loadPointIndex(manifest);
     const resolvedIds = ids.map((id) =>
@@ -285,9 +288,16 @@ export class ParkingDataClient {
           : id,
     );
     const idsByKey = new Map<string, Set<string>>();
+    const originalIdsByResolvedId = new Map<string, Set<string>>();
     const missingIds = new Set<string>();
+    const failedIds = new Set<string>();
 
     resolvedIds.forEach((resolvedId, index) => {
+      const originalIds =
+        originalIdsByResolvedId.get(resolvedId) ?? new Set<string>();
+      originalIds.add(ids[index]);
+      originalIdsByResolvedId.set(resolvedId, originalIds);
+
       const key = pointIndex[resolvedId];
       if (!key || !manifest.chunks[key]) {
         missingIds.add(ids[index]);
@@ -304,12 +314,29 @@ export class ParkingDataClient {
     const batchSize = Math.max(1, this.maximumCachedChunks);
     for (let start = 0; start < keys.length; start += batchSize) {
       const batchKeys = keys.slice(start, start + batchSize);
-      await this.loadKeys(batchKeys);
+      const outcomes = await Promise.allSettled(
+        batchKeys.map((key) => this.loadKeys([key])),
+      );
 
-      for (const key of batchKeys) {
+      for (const [batchIndex, key] of batchKeys.entries()) {
         const expectedIds = idsByKey.get(key) ?? new Set<string>();
+        const outcome = outcomes[batchIndex];
+        if (outcome.status === 'rejected') {
+          if (!allowPartial) {
+            throw outcome.reason;
+          }
+          for (const expectedId of expectedIds) {
+            for (const originalId of originalIdsByResolvedId.get(
+              expectedId,
+            ) ?? [expectedId]) {
+              failedIds.add(originalId);
+            }
+          }
+          continue;
+        }
+
         const foundIds = new Set<string>();
-        for (const point of this.chunks.get(key) ?? []) {
+        for (const point of outcome.value) {
           if (expectedIds.has(point.id)) {
             pointsById.set(point.id, point);
             foundIds.add(point.id);
@@ -317,14 +344,18 @@ export class ParkingDataClient {
         }
         for (const expectedId of expectedIds) {
           if (!foundIds.has(expectedId)) {
-            const originalIndex = resolvedIds.indexOf(expectedId);
-            missingIds.add(ids[originalIndex] ?? expectedId);
+            for (const originalId of originalIdsByResolvedId.get(
+              expectedId,
+            ) ?? [expectedId]) {
+              missingIds.add(originalId);
+            }
           }
         }
       }
     }
 
     return {
+      failedIds: [...failedIds],
       missingIds: [...missingIds],
       points: resolvedIds.flatMap((id) => {
         const point = pointsById.get(id);

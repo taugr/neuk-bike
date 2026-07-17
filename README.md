@@ -111,7 +111,8 @@ first supported browser language, then falls back to English.
 The translated interface, parking-name templates, route instructions, and
 number formatting are bundled into the static app. Street and place names,
 brand names, source attribution, and licence text stay unchanged. Place search
-asks Photon for results in the selected language.
+uses English results for the English interface and local place names for Gaelic
+and Spanish, matching the languages supported by the public Photon service.
 
 ## Commands
 

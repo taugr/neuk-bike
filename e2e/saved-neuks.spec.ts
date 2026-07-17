@@ -368,6 +368,95 @@ test('loads a distant saved neuk and keeps My neuks behind Directions', async ({
   await expect(madridRow).toHaveClass(/selected/);
 });
 
+test('keeps available saved neuks when another saved data chunk fails', async ({
+  page,
+}) => {
+  await page.addInitScript(
+    ({ key, records }) => {
+      window.localStorage.setItem(
+        key,
+        JSON.stringify({ items: records, version: 1 }),
+      );
+    },
+    {
+      key: savedNeuksStorageKey,
+      records: [edinburghParking, madridParking].map((point, index) => ({
+        id: point.id,
+        savedAt: `2026-07-1${8 - index}T12:00:00.000Z`,
+        snapshot: {
+          latitude: point.latitude,
+          longitude: point.longitude,
+          name: point.name,
+        },
+      })),
+    },
+  );
+  await page.addInitScript(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (input, init) => {
+      const requestUrl =
+        typeof input === 'string'
+          ? input
+          : input instanceof Request
+            ? input.url
+            : input.href;
+      if (
+        /\/data\/parking\/chunks\/12\/2005\/1544\.[^/]+\.json$/.test(requestUrl)
+      ) {
+        return new Response(null, { status: 503 });
+      }
+      return originalFetch(input, init);
+    };
+  });
+
+  await page.goto(referenceUrl());
+  await expect(page.getByTestId('open-my-neuks')).toContainText('2');
+  await page.getByTestId('open-my-neuks').click();
+
+  await expect(
+    page.getByTestId(`parking-row-${edinburghParking.id}`),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Some saved neuks could not be loaded.'),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
+  await expect(page.getByText('No longer in the current data')).toHaveCount(0);
+});
+
+test('keeps session-only saved neuks when language changes', async ({
+  page,
+}) => {
+  await page.addInitScript((key) => {
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function setItem(storageKey, value) {
+      if (storageKey === key) {
+        throw new DOMException('Storage is unavailable.', 'QuotaExceededError');
+      }
+      return originalSetItem.call(this, storageKey, value);
+    };
+  }, savedNeuksStorageKey);
+
+  await page.goto(referenceUrl());
+  await page.locator('.parking-popup-save-button').click();
+  await expect(page.getByTestId('open-my-neuks')).toContainText('1');
+  await expect(
+    page.getByText('My neuks could not be saved on this device.'),
+  ).toBeVisible();
+
+  await page.locator('.settings-menu--desktop .settings-trigger').click();
+  await page
+    .locator('.settings-menu--desktop .language-select')
+    .selectOption('es');
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page.getByTestId('open-my-neuks')).toContainText('1');
+  await expect(
+    page.getByText('No se pudo guardar Mis neuks en este dispositivo.'),
+  ).toBeVisible();
+  await page.getByTestId('open-my-neuks').click();
+  await expect(page.locator('.saved-list-item')).toHaveCount(1);
+});
+
 test('explains and removes a saved ID missing from the dataset', async ({
   page,
 }) => {

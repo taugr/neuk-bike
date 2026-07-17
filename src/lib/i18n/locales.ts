@@ -9,23 +9,23 @@ export const localeDetails: Record<
   AppLocale,
   {
     formattingLocale: string;
-    placeSearchLanguages: string;
+    placeSearchLanguage: 'default' | 'en';
     selfName: string;
   }
 > = {
   en: {
     formattingLocale: 'en-GB',
-    placeSearchLanguages: 'en',
+    placeSearchLanguage: 'en',
     selfName: 'English',
   },
   gd: {
     formattingLocale: 'gd-GB',
-    placeSearchLanguages: 'gd,en',
+    placeSearchLanguage: 'default',
     selfName: 'Gàidhlig',
   },
   es: {
     formattingLocale: 'es-ES',
-    placeSearchLanguages: 'es,en',
+    placeSearchLanguage: 'default',
     selfName: 'Español',
   },
 };

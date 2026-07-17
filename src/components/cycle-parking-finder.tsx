@@ -393,7 +393,9 @@ export default function CycleParkingFinder() {
   const [savedNeuks, setSavedNeuks] = useState<SavedNeukRecord[]>([]);
   const [savedRawPoints, setSavedRawPoints] = useState<ParkingPoint[]>([]);
   const [missingSavedIds, setMissingSavedIds] = useState<string[]>([]);
+  const [failedSavedIds, setFailedSavedIds] = useState<string[]>([]);
   const [isSavedPointsLoading, setIsSavedPointsLoading] = useState(false);
+  const [savedPointsLoadRequestId, setSavedPointsLoadRequestId] = useState(0);
   const [savedNeuksMessage, setSavedNeuksMessage] = useState<string | null>(
     null,
   );
@@ -673,7 +675,7 @@ export default function CycleParkingFinder() {
     setSavedNeuks(stored.items);
     setSavedNeuksStatus(stored.ok ? 'ready' : 'storage-error');
     if (!stored.ok) {
-      setSavedNeuksMessage(t('savedStorageError'));
+      setSavedNeuksMessage(translate(localeRef.current, 'savedStorageError'));
     }
 
     return subscribeToSavedNeuks((items) => {
@@ -681,7 +683,13 @@ export default function CycleParkingFinder() {
       setSavedNeuksStatus('ready');
       setSavedNeuksMessage(null);
     });
-  }, [t]);
+  }, []);
+
+  useEffect(() => {
+    if (savedNeuksStatus === 'storage-error') {
+      setSavedNeuksMessage(t('savedStorageError'));
+    }
+  }, [savedNeuksStatus, t]);
 
   useEffect(() => {
     const client = parkingDataClient.current;
@@ -695,29 +703,48 @@ export default function CycleParkingFinder() {
       setIsSavedPointsLoading(false);
       setSavedRawPoints([]);
       setMissingSavedIds([]);
+      setFailedSavedIds([]);
       return;
     }
 
     setIsSavedPointsLoading(true);
     void client
       .loadPoints(savedNeuks.map(({ id }) => id))
-      .then(({ missingIds, points }) => {
+      .then(({ failedIds, missingIds, points }) => {
         if (savedResolutionRequestId.current !== requestId) {
           return;
         }
-        setSavedRawPoints(points);
+        const failedIdSet = new Set(failedIds);
+        setSavedRawPoints((current) => {
+          const nextPoints = new Map(
+            current
+              .filter(({ id }) => failedIdSet.has(id))
+              .map((point) => [point.id, point]),
+          );
+          for (const point of points) {
+            nextPoints.set(point.id, point);
+          }
+          return [...nextPoints.values()];
+        });
         setMissingSavedIds(missingIds);
+        setFailedSavedIds(failedIds);
         setIsSavedPointsLoading(false);
       })
       .catch(() => {
         if (savedResolutionRequestId.current !== requestId) {
           return;
         }
-        setSavedRawPoints([]);
-        setMissingSavedIds(savedNeuks.map(({ id }) => id));
+        const savedIdSet = new Set(savedNeuks.map(({ id }) => id));
+        setSavedRawPoints((current) =>
+          current.filter(({ id }) => savedIdSet.has(id)),
+        );
+        setMissingSavedIds((current) =>
+          current.filter((id) => savedIdSet.has(id)),
+        );
+        setFailedSavedIds(savedNeuks.map(({ id }) => id));
         setIsSavedPointsLoading(false);
       });
-  }, [parkingManifest, savedNeuks]);
+  }, [parkingManifest, savedNeuks, savedPointsLoadRequestId]);
 
   useEffect(() => {
     const client = parkingDataClient.current;
@@ -1847,10 +1874,12 @@ export default function CycleParkingFinder() {
     if (wasSaved) {
       setSavedRawPoints((points) => points.filter(({ id }) => id !== point.id));
       setMissingSavedIds((ids) => ids.filter((id) => id !== point.id));
+      setFailedSavedIds((ids) => ids.filter((id) => id !== point.id));
       if (parkingView === 'saved' && selectedId === point.id) {
         clearSelectedParkingPoint();
       }
     } else {
+      setFailedSavedIds((ids) => ids.filter((id) => id !== point.id));
       setSavedRawPoints((points) => [
         point,
         ...points.filter(({ id }) => id !== point.id),
@@ -1874,6 +1903,7 @@ export default function CycleParkingFinder() {
     const nextItems = removeSavedNeuk(savedNeuks, record.id);
     const wasWritten = commitSavedNeuks(nextItems);
     setMissingSavedIds((ids) => ids.filter((id) => id !== record.id));
+    setFailedSavedIds((ids) => ids.filter((id) => id !== record.id));
     if (wasWritten) {
       showSavedNeuksConfirmation(t('removedFromMyNeuks'));
     }
@@ -2974,6 +3004,23 @@ export default function CycleParkingFinder() {
                       {parkingView === 'saved' && isSavedPointsLoading ? (
                         <div className="parking-list-context" role="status">
                           {t('loadingSavedNeuks')}
+                        </div>
+                      ) : null}
+
+                      {parkingView === 'saved' &&
+                      !isSavedPointsLoading &&
+                      failedSavedIds.length > 0 ? (
+                        <div className="parking-list-context" role="status">
+                          {t('savedLoadError')}
+                          <button
+                            className="parking-retry-button"
+                            type="button"
+                            onClick={() =>
+                              setSavedPointsLoadRequestId((id) => id + 1)
+                            }
+                          >
+                            {t('retry')}
+                          </button>
                         </div>
                       ) : null}
 

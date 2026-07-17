@@ -23,10 +23,10 @@ describe('language support', () => {
   it('defines formatting and place-search preferences for every locale', () => {
     expect(localeDetails.en).toMatchObject({
       formattingLocale: 'en-GB',
-      placeSearchLanguages: 'en',
+      placeSearchLanguage: 'en',
     });
-    expect(localeDetails.gd.placeSearchLanguages).toBe('gd,en');
-    expect(localeDetails.es.placeSearchLanguages).toBe('es,en');
+    expect(localeDetails.gd.placeSearchLanguage).toBe('default');
+    expect(localeDetails.es.placeSearchLanguage).toBe('default');
   });
 
   it('keeps every catalogue complete with matching placeholders', () => {

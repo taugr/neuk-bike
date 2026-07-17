@@ -310,6 +310,7 @@ describe('ParkingDataClient', () => {
     await expect(
       client.loadPoints(['cec:1', 'cec:1', 'osm:node:2', 'missing']),
     ).resolves.toEqual({
+      failedIds: [],
       missingIds: ['missing'],
       points: [centerPoint, centerPoint, eastPoint],
     });
@@ -318,6 +319,42 @@ describe('ParkingDataClient', () => {
         new URL(input.toString()).pathname.endsWith('/point-index.json'),
       ),
     ).toHaveLength(1);
+  });
+
+  it('returns successful points separately from chunks that failed to load', async () => {
+    const fetcher = vi.fn(async (input: string | URL | Request) => {
+      const path = new URL(input.toString()).pathname;
+      if (path.endsWith('/manifest.json')) {
+        return Response.json(manifest);
+      }
+      if (path.endsWith('/point-index.json')) {
+        return Response.json({
+          'cec:1': centerKey,
+          'osm:node:2': eastKey,
+        });
+      }
+      if (path.endsWith(`/${centerKey}.json`)) {
+        return Response.json({
+          key: centerKey,
+          points: [centerPoint],
+          schemaVersion: 2,
+        });
+      }
+      if (path.endsWith(`/${eastKey}.json`)) {
+        return new Response(null, { status: 503 });
+      }
+      return new Response(null, { status: 404 });
+    });
+    const client = new ParkingDataClient(
+      new URL('https://example.test/data/parking/'),
+      fetcher,
+    );
+
+    await expect(client.loadPoints(['cec:1', 'osm:node:2'])).resolves.toEqual({
+      failedIds: ['osm:node:2'],
+      missingIds: [],
+      points: [centerPoint],
+    });
   });
 
   it('shares an in-flight point-index request between callers', async () => {

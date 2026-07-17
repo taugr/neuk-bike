@@ -132,6 +132,7 @@ const en = {
   saved: 'Saved',
   savedMarker: 'saved to My neuks',
   savedOnThisDevice: 'Saved on this device',
+  savedLoadError: 'Some saved neuks could not be loaded.',
   savedStorageError: 'My neuks could not be saved on this device.',
   savedToMyNeuks: 'Saved to My neuks',
   loadingSavedNeuks: 'Loading My neuks...',
@@ -302,6 +303,8 @@ const gd: MessageCatalogue = {
   saved: 'Air a shàbhaladh',
   savedMarker: 'air a shàbhaladh ann am My neuks',
   savedOnThisDevice: 'Air a shàbhaladh air an uidheam seo',
+  savedLoadError:
+    'Cha b’ urrainn dhuinn cuid de na neuks sàbhailte a luchdadh.',
   savedStorageError:
     'Cha b’ urrainn dhuinn My neuks a shàbhaladh air an uidheam seo.',
   savedToMyNeuks: 'Air a shàbhaladh ann am My neuks',
@@ -469,6 +472,7 @@ const es: MessageCatalogue = {
   saved: 'Guardado',
   savedMarker: 'guardado en Mis neuks',
   savedOnThisDevice: 'Guardado en este dispositivo',
+  savedLoadError: 'No se pudieron cargar algunos neuks guardados.',
   savedStorageError: 'No se pudo guardar Mis neuks en este dispositivo.',
   savedToMyNeuks: 'Guardado en Mis neuks',
   loadingSavedNeuks: 'Cargando Mis neuks...',
