@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getParkingMarkerVariant,
   getRenderableParkingPoints,
   type ParkingMapBounds,
 } from '@/lib/map-pins';
@@ -305,5 +306,39 @@ describe('map pin rendering', () => {
     });
 
     expect(secondRun).toEqual(firstRun);
+  });
+});
+
+describe('parking marker variants', () => {
+  const base = {
+    isDirectionsMode: false,
+    isSaved: false,
+    isSelected: false,
+    parkingView: 'nearby' as const,
+    rank: undefined,
+  };
+
+  it.each([
+    [{}, 'default'],
+    [{ rank: 2 }, 'ranked'],
+    [{ isSaved: true, rank: 2 }, 'ranked-saved'],
+    [{ isSaved: true }, 'saved'],
+    [{ isSelected: true }, 'selected'],
+    [{ isSelected: true, rank: 1 }, 'selected-ranked'],
+    [{ isSaved: true, isSelected: true, rank: 1 }, 'selected-ranked-saved'],
+    [{ isSaved: true, isSelected: true }, 'selected-saved'],
+    [{ isDirectionsMode: true, isSelected: true }, 'destination'],
+    [{ isSaved: true, parkingView: 'saved' as const }, 'saved'],
+    [
+      {
+        isSaved: true,
+        isSelected: true,
+        parkingView: 'saved' as const,
+        rank: 1,
+      },
+      'selected-saved',
+    ],
+  ] as const)('maps %j to %s', (input, expected) => {
+    expect(getParkingMarkerVariant({ ...base, ...input })).toBe(expected);
   });
 });

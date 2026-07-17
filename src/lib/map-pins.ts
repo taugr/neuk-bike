@@ -7,6 +7,55 @@ export type ParkingMapBounds = {
   west: number;
 };
 
+export type ParkingView = 'nearby' | 'saved';
+
+export type ParkingMarkerVariant =
+  | 'default'
+  | 'destination'
+  | 'ranked'
+  | 'ranked-saved'
+  | 'saved'
+  | 'selected'
+  | 'selected-ranked'
+  | 'selected-ranked-saved'
+  | 'selected-saved';
+
+export function getParkingMarkerVariant({
+  isDirectionsMode,
+  isSaved,
+  isSelected,
+  parkingView,
+  rank,
+}: {
+  isDirectionsMode: boolean;
+  isSaved: boolean;
+  isSelected: boolean;
+  parkingView: ParkingView;
+  rank: number | undefined;
+}): ParkingMarkerVariant {
+  if (isSelected && isDirectionsMode) {
+    return 'destination';
+  }
+
+  if (parkingView === 'saved') {
+    return isSelected ? 'selected-saved' : 'saved';
+  }
+
+  if (isSelected && rank !== undefined) {
+    return isSaved ? 'selected-ranked-saved' : 'selected-ranked';
+  }
+
+  if (isSelected) {
+    return isSaved ? 'selected-saved' : 'selected';
+  }
+
+  if (rank !== undefined) {
+    return isSaved ? 'ranked-saved' : 'ranked';
+  }
+
+  return isSaved ? 'saved' : 'default';
+}
+
 type RenderableParkingPointsOptions = {
   bounds: ParkingMapBounds | null;
   pinnedPoints?: ParkingPoint[];

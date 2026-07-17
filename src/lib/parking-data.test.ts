@@ -267,6 +267,91 @@ describe('ParkingDataClient', () => {
     expect(fetcher).toHaveBeenCalledTimes(4);
   });
 
+  it('bulk loads indexed points, deduplicates chunks, and reports missing IDs', async () => {
+    const eastPoint: ParkingPoint = {
+      ...centerPoint,
+      id: 'osm:node:2',
+      longitude: -2.9,
+      sourceId: 'osm',
+    };
+    const fetcher = vi.fn(async (input: string | URL | Request) => {
+      const path = new URL(input.toString()).pathname;
+      if (path.endsWith('/manifest.json')) {
+        return Response.json(manifest);
+      }
+      if (path.endsWith('/point-index.json')) {
+        return Response.json({
+          'cec:1': centerKey,
+          'osm:node:2': eastKey,
+        });
+      }
+      if (path.endsWith(`/${centerKey}.json`)) {
+        return Response.json({
+          key: centerKey,
+          points: [centerPoint],
+          schemaVersion: 2,
+        });
+      }
+      if (path.endsWith(`/${eastKey}.json`)) {
+        return Response.json({
+          key: eastKey,
+          points: [eastPoint],
+          schemaVersion: 2,
+        });
+      }
+      return new Response(null, { status: 404 });
+    });
+    const client = new ParkingDataClient(
+      new URL('https://example.test/data/parking/'),
+      fetcher,
+      1,
+    );
+
+    await expect(
+      client.loadPoints(['cec:1', 'cec:1', 'osm:node:2', 'missing']),
+    ).resolves.toEqual({
+      missingIds: ['missing'],
+      points: [centerPoint, centerPoint, eastPoint],
+    });
+    expect(
+      fetcher.mock.calls.filter(([input]) =>
+        new URL(input.toString()).pathname.endsWith('/point-index.json'),
+      ),
+    ).toHaveLength(1);
+  });
+
+  it('shares an in-flight point-index request between callers', async () => {
+    const fetcher = vi.fn(async (input: string | URL | Request) => {
+      const path = new URL(input.toString()).pathname;
+      if (path.endsWith('/manifest.json')) {
+        return Response.json(manifest);
+      }
+      if (path.endsWith('/point-index.json')) {
+        await Promise.resolve();
+        return Response.json({ 'cec:1': centerKey });
+      }
+      if (path.endsWith(`/${centerKey}.json`)) {
+        return Response.json({
+          key: centerKey,
+          points: [centerPoint],
+          schemaVersion: 2,
+        });
+      }
+      return new Response(null, { status: 404 });
+    });
+    const client = new ParkingDataClient(
+      new URL('https://example.test/data/parking/'),
+      fetcher,
+    );
+
+    await Promise.all([client.loadPoint('cec:1'), client.loadPoint('cec:1')]);
+    expect(
+      fetcher.mock.calls.filter(([input]) =>
+        new URL(input.toString()).pathname.endsWith('/point-index.json'),
+      ),
+    ).toHaveLength(1);
+  });
+
   it('retries failed chunks and evicts the least recently used chunk', async () => {
     const westKey = `10/${tile.x - 1}/${tile.y}`;
     const threeChunkManifest: ParkingDataManifest = {

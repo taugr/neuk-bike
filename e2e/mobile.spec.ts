@@ -122,3 +122,59 @@ test('keeps the nearby heading clear after collapsing and expanding', async ({
     })
     .toBeGreaterThanOrEqual(3);
 });
+
+test('keeps My neuks usable in the mobile sheet', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  const firstRow = page.locator('[data-testid^="parking-row-"]').first();
+  await expect(firstRow).toBeVisible();
+  const parkingId = (await firstRow.getAttribute('data-testid'))?.replace(
+    'parking-row-',
+    '',
+  );
+  expect(parkingId).toBeTruthy();
+
+  await firstRow.click();
+  await page.getByTestId(`parking-more-${parkingId}`).click();
+  await page.getByTestId(`parking-save-${parkingId}`).click();
+  const nearbyScroll = await page
+    .locator('.parking-list-scroll')
+    .evaluate((element) => {
+      element.scrollTop = 120;
+      return element.scrollTop;
+    });
+  expect(nearbyScroll).toBeGreaterThan(0);
+  await page.getByTestId('open-my-neuks').click();
+  await expect(page.getByRole('heading', { name: /My neuks/ })).toBeVisible();
+  await expect(page.locator('.saved-list-item')).toHaveCount(1);
+  await expect(page.locator('.saved-list-item .rank')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Collapse My neuks panel' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Expand My neuks panel' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Expand My neuks panel' }).click();
+  await expect
+    .poll(() =>
+      page
+        .locator('.mobile-sheet-body')
+        .evaluate((element) => element.scrollTop),
+    )
+    .toBe(0);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
+
+  await page.getByRole('button', { name: 'Show nearby' }).first().click();
+  await expect
+    .poll(() =>
+      page
+        .locator('.parking-list-scroll')
+        .evaluate((element) => element.scrollTop),
+    )
+    .toBe(nearbyScroll);
+});

@@ -14,6 +14,7 @@ import type {
 } from 'maplibre-gl';
 import {
   Bike,
+  Bookmark,
   Boxes,
   Building2,
   CircleHelp,
@@ -36,6 +37,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
+import { renderToStaticMarkup } from 'react-dom/server';
 import type { ParkingPoint, UserLocation } from '@/lib/types';
 import { getParkingPopupDetails } from '@/lib/parking';
 import type { ParkingPopupIcon } from '@/lib/parking';
@@ -45,8 +47,10 @@ import {
   type RouteInstructionManeuver,
 } from '@/lib/route-instructions';
 import {
+  getParkingMarkerVariant,
   getRenderableParkingPoints,
   type ParkingMapBounds,
+  type ParkingView,
 } from '@/lib/map-pins';
 import {
   hasMapFocusTargetChanged,
@@ -64,6 +68,8 @@ type CycleParkingMapProps = {
   selectedPoint: ParkingPoint | null;
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
+  parkingView: ParkingView;
+  savedPointIds: string[];
   route: CycleRoute | null;
   routeInstructionFocusRequest: {
     id: string;
@@ -87,6 +93,7 @@ type CycleParkingMapProps = {
   onRequestDirections: (point: ParkingPoint) => void;
   onOpenStreetView: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
+  onToggleSavedPoint: (point: ParkingPoint) => void;
   onViewportChange: (bounds: ParkingMapBounds) => void;
 };
 
@@ -579,23 +586,61 @@ function updateMarkerElement(
   );
   element.className = [className, ...mapLibreClasses].join(' ');
 
-  const labelElement = element.querySelector('span');
+  const labelElement = element.querySelector(':scope > span:first-child');
 
   if (labelElement) {
     labelElement.textContent = label;
   }
 }
 
+const bookmarkMarkerMarkup = renderToStaticMarkup(
+  <Bookmark
+    size={13}
+    strokeWidth={2.5}
+    fill="currentColor"
+    aria-hidden="true"
+  />,
+);
+
+function updateMarkerSavedBadge(element: HTMLElement, isSaved: boolean) {
+  const existingBadge = element.querySelector('.parking-marker-bookmark');
+  if (!isSaved) {
+    existingBadge?.remove();
+    return;
+  }
+
+  if (existingBadge) {
+    return;
+  }
+
+  const badge = document.createElement('span');
+  badge.className = 'parking-marker-bookmark';
+  badge.innerHTML = bookmarkMarkerMarkup;
+  element.append(badge);
+}
+
 function getParkingMarkerPresentation({
   isDirectionsMode,
+  isSaved,
   isSelected,
+  parkingView,
   rank,
 }: {
   isDirectionsMode: boolean;
+  isSaved: boolean;
   isSelected: boolean;
+  parkingView: ParkingView;
   rank: number | undefined;
 }): ParkingMarkerPresentation {
-  if (isSelected && isDirectionsMode) {
+  const variant = getParkingMarkerVariant({
+    isDirectionsMode,
+    isSaved,
+    isSelected,
+    parkingView,
+    rank,
+  });
+
+  if (variant === 'destination') {
     return {
       anchor: 'bottom',
       className: 'destination-marker',
@@ -606,10 +651,15 @@ function getParkingMarkerPresentation({
     };
   }
 
-  if (isSelected && rank !== undefined) {
+  if (variant === 'selected-ranked' || variant === 'selected-ranked-saved') {
     return {
       anchor: 'center',
-      className: 'parking-marker parking-marker-selected-ranked',
+      className: [
+        'parking-marker parking-marker-selected-ranked',
+        isSaved ? 'parking-marker-saved' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
       label: String(rank),
       offset: [0, -18],
       popupAnchor: 'bottom',
@@ -617,10 +667,15 @@ function getParkingMarkerPresentation({
     };
   }
 
-  if (isSelected) {
+  if (variant === 'selected' || variant === 'selected-saved') {
     return {
       anchor: 'center',
-      className: 'parking-marker parking-marker-selected',
+      className: [
+        'parking-marker parking-marker-selected',
+        isSaved ? 'parking-marker-saved' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
       label: '',
       offset: [0, -18],
       popupAnchor: 'bottom',
@@ -628,10 +683,15 @@ function getParkingMarkerPresentation({
     };
   }
 
-  if (rank !== undefined) {
+  if (variant === 'ranked' || variant === 'ranked-saved') {
     return {
       anchor: 'center',
-      className: `parking-marker parking-marker-ranked parking-marker-rank-${rank}`,
+      className: [
+        `parking-marker parking-marker-ranked parking-marker-rank-${rank}`,
+        isSaved ? 'parking-marker-saved' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
       label: String(rank),
       offset: [0, -18],
       popupAnchor: 'bottom',
@@ -639,14 +699,23 @@ function getParkingMarkerPresentation({
     };
   }
 
-  return {
-    anchor: 'center',
-    className: 'parking-marker parking-marker-default',
-    label: '',
-    offset: [0, -18],
-    popupAnchor: 'bottom',
-    zIndex: '',
-  };
+  return variant === 'saved'
+    ? {
+        anchor: 'center',
+        className: 'parking-marker parking-marker-saved',
+        label: '',
+        offset: [0, -18],
+        popupAnchor: 'bottom',
+        zIndex: '',
+      }
+    : {
+        anchor: 'center',
+        className: 'parking-marker parking-marker-default',
+        label: '',
+        offset: [0, -18],
+        popupAnchor: 'bottom',
+        zIndex: '',
+      };
 }
 
 function createParkingMarkerElement(
@@ -734,9 +803,11 @@ function ParkingPopupContent({
   canShowStreetView,
   copiedShareButton,
   isDirectionsMode,
+  isSaved,
   onCopyParkingLink,
   onOpenStreetView,
   onRequestDirections,
+  onToggleSavedPoint,
   point,
   locale,
 }: {
@@ -744,9 +815,11 @@ function ParkingPopupContent({
   canShowStreetView: boolean;
   copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
   isDirectionsMode: boolean;
+  isSaved: boolean;
   onCopyParkingLink: (point: ParkingPoint) => void;
   onOpenStreetView: (point: ParkingPoint) => void;
   onRequestDirections: (point: ParkingPoint) => void;
+  onToggleSavedPoint: (point: ParkingPoint) => void;
   point: ParkingPoint;
   locale: AppLocale;
 }) {
@@ -830,6 +903,27 @@ function ParkingPopupContent({
                 {translate(locale, 'copied')}
               </span>
             ) : null}
+          </button>
+          <button
+            aria-label={translate(
+              locale,
+              isSaved ? 'removeFromMyNeuks' : 'saveToMyNeuks',
+              { name: point.name },
+            )}
+            aria-pressed={isSaved}
+            className="parking-popup-save-button"
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggleSavedPoint(point);
+            }}
+          >
+            <Bookmark
+              size={16}
+              fill={isSaved ? 'currentColor' : 'none'}
+              aria-hidden="true"
+            />
+            {translate(locale, isSaved ? 'saved' : 'save')}
           </button>
         </div>
       )}
@@ -995,6 +1089,8 @@ export default function CycleParkingMap({
   selectedPoint,
   nearestPoint,
   rankedPoints,
+  parkingView,
+  savedPointIds,
   route,
   routeInstructionFocusRequest,
   liveRouteMarker,
@@ -1010,6 +1106,7 @@ export default function CycleParkingMap({
   onRequestDirections,
   onOpenStreetView,
   onCopyParkingLink,
+  onToggleSavedPoint,
   onViewportChange,
 }: CycleParkingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1020,6 +1117,12 @@ export default function CycleParkingMap({
   const liveMarkerRef = useRef<RenderedMarker | null>(null);
   const instructionMarkerRef = useRef<RenderedMarker | null>(null);
   const previousFocusTargetRef = useRef<MapFocusTarget | null>(null);
+  const previousParkingViewRef = useRef(parkingView);
+  const nearbyCameraRef = useRef<{
+    center: [number, number];
+    zoom: number;
+  } | null>(null);
+  const suppressParkingViewFocusRef = useRef(false);
   const hasAppliedNearbyFocusRef = useRef(false);
   const isAutomaticFocusAnimationRef = useRef(false);
   const mobileSheetStateRef = useRef(mobileSheetState);
@@ -1040,18 +1143,26 @@ export default function CycleParkingMap({
   const [styleRevision, setStyleRevision] = useState(0);
   const [viewport, setViewport] = useState<{
     bounds: ParkingMapBounds | null;
+    center: [number, number] | null;
     zoom: number;
   }>({
     bounds: null,
+    center: null,
     zoom: 13,
   });
   onViewportChangeRef.current = onViewportChange;
   const handleViewportChange = useCallback(
     ({ bounds, zoom }: { bounds: ParkingMapBounds; zoom: number }) => {
       onViewportChangeRef.current(bounds);
+      const mapCenter = mapRef.current?.getCenter();
+      const center = mapCenter
+        ? ([mapCenter.lng, mapCenter.lat] satisfies [number, number])
+        : null;
       setViewport((current) => {
         if (
           current.zoom === zoom &&
+          current.center?.[0] === center?.[0] &&
+          current.center?.[1] === center?.[1] &&
           current.bounds?.north === bounds.north &&
           current.bounds.south === bounds.south &&
           current.bounds.east === bounds.east &&
@@ -1060,7 +1171,7 @@ export default function CycleParkingMap({
           return current;
         }
 
-        return { bounds, zoom };
+        return { bounds, center, zoom };
       });
     },
     [],
@@ -1101,6 +1212,10 @@ export default function CycleParkingMap({
         .map((point, index) => [point.id, index + 1]),
     );
   }, [rankedPoints]);
+  const savedPointIdSet = useMemo(
+    () => new Set(savedPointIds),
+    [savedPointIds],
+  );
   const highlightedPoints = useMemo(
     () => rankedPoints.slice(0, highlightedRankCount),
     [rankedPoints],
@@ -1404,6 +1519,35 @@ export default function CycleParkingMap({
   }, [map, mobileSheetState, updateViewport]);
 
   useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const previousView = previousParkingViewRef.current;
+    previousParkingViewRef.current = parkingView;
+    if (previousView === parkingView) {
+      return;
+    }
+
+    suppressParkingViewFocusRef.current = true;
+    if (previousView === 'nearby' && parkingView === 'saved') {
+      const center = map.getCenter();
+      nearbyCameraRef.current = {
+        center: [center.lng, center.lat],
+        zoom: map.getZoom(),
+      };
+      return;
+    }
+
+    if (previousView === 'saved' && parkingView === 'nearby') {
+      const camera = nearbyCameraRef.current;
+      if (camera) {
+        map.jumpTo(camera);
+      }
+    }
+  }, [map, parkingView]);
+
+  useEffect(() => {
     if (!map || !isMapLoaded) {
       return;
     }
@@ -1608,10 +1752,13 @@ export default function CycleParkingMap({
 
     reconciledVisiblePoints.forEach((point) => {
       const rank = rankedPointRanks.get(point.id);
+      const isSaved = savedPointIdSet.has(point.id);
       const isSelected = point.id === selectedPoint?.id;
       const presentation = getParkingMarkerPresentation({
         isDirectionsMode,
+        isSaved,
         isSelected,
+        parkingView,
         rank,
       });
       const popupContent = (
@@ -1620,9 +1767,11 @@ export default function CycleParkingMap({
           canShowStreetView={canShowStreetView}
           copiedShareButton={copiedShareButton}
           isDirectionsMode={isDirectionsMode}
+          isSaved={isSaved}
           onCopyParkingLink={onCopyParkingLink}
           onOpenStreetView={onOpenStreetView}
           onRequestDirections={onRequestDirections}
+          onToggleSavedPoint={onToggleSavedPoint}
           point={point}
           locale={locale}
         />
@@ -1644,6 +1793,10 @@ export default function CycleParkingMap({
           presentation.className,
           presentation.label,
         );
+        updateMarkerSavedBadge(
+          renderedMarker.element,
+          isSaved && !isDirectionsMode,
+        );
         renderedMarker.element.style.zIndex = presentation.zIndex;
         renderedMarker.popupRoot.render(popupContent);
         renderedMarker.popup?.setOffset(presentation.offset);
@@ -1657,6 +1810,7 @@ export default function CycleParkingMap({
           presentation.className,
           presentation.label,
         );
+        updateMarkerSavedBadge(element, isSaved && !isDirectionsMode);
         const marker = new maplibregl.Marker({
           anchor: presentation.anchor,
           element,
@@ -1687,12 +1841,19 @@ export default function CycleParkingMap({
           ? translate(locale, 'rank', { count: rank })
           : translate(locale, 'genericParking'),
         isSelected ? translate(locale, 'selected') : null,
+        isSaved ? translate(locale, 'savedMarker') : null,
       ]
         .filter(Boolean)
         .join(', ');
       markerElement.setAttribute('aria-label', markerLabel);
       markerElement.setAttribute('role', 'button');
       markerElement.setAttribute('title', point.name);
+      markerElement.dataset.testid = `parking-marker-${point.id}`;
+      if (isSaved) {
+        markerElement.dataset.saved = 'true';
+      } else {
+        delete markerElement.dataset.saved;
+      }
       markerElement.tabIndex = isDirectionsMode ? -1 : 0;
 
       markerElement.onclick = isDirectionsMode
@@ -1769,10 +1930,13 @@ export default function CycleParkingMap({
     onCopyParkingLink,
     onOpenStreetView,
     onRequestDirections,
+    onToggleSavedPoint,
     onSelectPoint,
+    parkingView,
     rankedPointRanks,
     route,
     selectedPoint,
+    savedPointIdSet,
     visiblePoints,
   ]);
 
@@ -1923,6 +2087,11 @@ export default function CycleParkingMap({
           parkingPointToRoutePoint(point),
         ) <= nearbyFocusMaximumDistanceMeters,
     );
+    if (suppressParkingViewFocusRef.current) {
+      suppressParkingViewFocusRef.current = false;
+      previousFocusTargetRef.current = nextFocusTarget;
+      return;
+    }
     if (
       !shouldApplyMapFocus({
         hasAppliedNearbyFocus: hasAppliedNearbyFocusRef.current,
@@ -1956,6 +2125,10 @@ export default function CycleParkingMap({
 
     if (!route && hadRoute) {
       hasAppliedNearbyFocusRef.current = true;
+      return;
+    }
+
+    if (parkingView === 'saved' && !route && !selectedPoint) {
       return;
     }
 
@@ -2040,6 +2213,7 @@ export default function CycleParkingMap({
     map,
     mobileSheetState,
     nearestPoint,
+    parkingView,
     route,
     selectedPoint,
     userLocation,
@@ -2114,6 +2288,8 @@ export default function CycleParkingMap({
     <div
       className={`bike-map bike-map-${theme}`}
       data-map-east={viewport.bounds?.east}
+      data-map-center-latitude={viewport.center?.[1]}
+      data-map-center-longitude={viewport.center?.[0]}
       data-map-north={viewport.bounds?.north}
       data-map-south={viewport.bounds?.south}
       data-map-west={viewport.bounds?.west}

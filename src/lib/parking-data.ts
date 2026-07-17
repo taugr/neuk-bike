@@ -212,6 +212,7 @@ export class ParkingDataClient {
   private readonly chunks = new Map<string, ParkingPoint[]>();
   private readonly inFlightChunks = new Map<string, Promise<void>>();
   private pointIndex: Record<string, string> | null = null;
+  private pointIndexRequest: Promise<Record<string, string>> | null = null;
 
   constructor(
     baseUrl: URL,
@@ -269,36 +270,98 @@ export class ParkingDataClient {
   }
 
   async loadPoint(id: string) {
+    const { points } = await this.loadPoints([id]);
+    return points[0] ?? null;
+  }
+
+  async loadPoints(ids: string[]) {
     const manifest = await this.initialize();
-    if (!this.pointIndex) {
-      const response = await this.fetcher(
-        new URL(manifest.pointIndexPath, this.baseUrl),
-      );
-      if (!response.ok) {
-        throw new Error(
-          `Parking point index request failed (${response.status}).`,
-        );
+    const pointIndex = await this.loadPointIndex(manifest);
+    const resolvedIds = ids.map((id) =>
+      pointIndex[id]
+        ? id
+        : !id.includes(':') && pointIndex[`cec:${id}`]
+          ? `cec:${id}`
+          : id,
+    );
+    const idsByKey = new Map<string, Set<string>>();
+    const missingIds = new Set<string>();
+
+    resolvedIds.forEach((resolvedId, index) => {
+      const key = pointIndex[resolvedId];
+      if (!key || !manifest.chunks[key]) {
+        missingIds.add(ids[index]);
+        return;
       }
-      const pointIndex: unknown = await response.json();
-      if (!pointIndex || typeof pointIndex !== 'object') {
-        throw new Error('Parking point index has an unsupported shape.');
+
+      const keyIds = idsByKey.get(key) ?? new Set<string>();
+      keyIds.add(resolvedId);
+      idsByKey.set(key, keyIds);
+    });
+
+    const pointsById = new Map<string, ParkingPoint>();
+    const keys = [...idsByKey.keys()];
+    const batchSize = Math.max(1, this.maximumCachedChunks);
+    for (let start = 0; start < keys.length; start += batchSize) {
+      const batchKeys = keys.slice(start, start + batchSize);
+      await this.loadKeys(batchKeys);
+
+      for (const key of batchKeys) {
+        const expectedIds = idsByKey.get(key) ?? new Set<string>();
+        const foundIds = new Set<string>();
+        for (const point of this.chunks.get(key) ?? []) {
+          if (expectedIds.has(point.id)) {
+            pointsById.set(point.id, point);
+            foundIds.add(point.id);
+          }
+        }
+        for (const expectedId of expectedIds) {
+          if (!foundIds.has(expectedId)) {
+            const originalIndex = resolvedIds.indexOf(expectedId);
+            missingIds.add(ids[originalIndex] ?? expectedId);
+          }
+        }
       }
-      this.pointIndex = pointIndex as Record<string, string>;
     }
 
-    const resolvedId = this.pointIndex[id]
-      ? id
-      : !id.includes(':') && this.pointIndex[`cec:${id}`]
-        ? `cec:${id}`
-        : id;
-    const key = this.pointIndex[resolvedId];
-    if (!key || !manifest.chunks[key]) {
-      return null;
+    return {
+      missingIds: [...missingIds],
+      points: resolvedIds.flatMap((id) => {
+        const point = pointsById.get(id);
+        return point ? [point] : [];
+      }),
+    };
+  }
+
+  private async loadPointIndex(
+    manifest: ParkingDataManifest,
+  ): Promise<Record<string, string>> {
+    if (this.pointIndex) {
+      return this.pointIndex;
     }
-    await this.loadKeys([key]);
-    return (
-      this.getLoadedPoints().find((point) => point.id === resolvedId) ?? null
-    );
+
+    if (!this.pointIndexRequest) {
+      this.pointIndexRequest = (async () => {
+        const response = await this.fetcher(
+          new URL(manifest.pointIndexPath, this.baseUrl),
+        );
+        if (!response.ok) {
+          throw new Error(
+            `Parking point index request failed (${response.status}).`,
+          );
+        }
+        const pointIndex: unknown = await response.json();
+        if (!pointIndex || typeof pointIndex !== 'object') {
+          throw new Error('Parking point index has an unsupported shape.');
+        }
+        this.pointIndex = pointIndex as Record<string, string>;
+        return this.pointIndex;
+      })().finally(() => {
+        this.pointIndexRequest = null;
+      });
+    }
+
+    return this.pointIndexRequest;
   }
 
   private async loadKeys(keys: string[]) {

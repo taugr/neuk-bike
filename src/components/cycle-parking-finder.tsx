@@ -17,6 +17,7 @@ import {
 import {
   ArrowUp,
   Bike,
+  Bookmark,
   Boxes,
   Building2,
   CircleHelp,
@@ -25,6 +26,7 @@ import {
   CornerUpRight,
   Crosshair,
   Download,
+  EllipsisVertical,
   ExternalLink,
   LocateFixed,
   MapPin,
@@ -53,6 +55,7 @@ import {
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react';
+import { createPortal } from 'react-dom';
 import {
   buildShortCycleRoute,
   buildCycleRouteCacheKey,
@@ -110,6 +113,16 @@ import {
   ParkingDataClient,
 } from '@/lib/parking-data';
 import type { ParkingMapBounds } from '@/lib/map-pins';
+import type { ParkingView } from '@/lib/map-pins';
+import {
+  addSavedNeuk,
+  isNeukSaved,
+  readSavedNeuks,
+  removeSavedNeuk,
+  subscribeToSavedNeuks,
+  writeSavedNeuks,
+  type SavedNeukRecord,
+} from '@/lib/saved-neuks';
 import {
   localeDetails,
   supportedLocales,
@@ -302,6 +315,13 @@ type ThemeMode = 'system' | 'light' | 'dark';
 type ResolvedTheme = 'light' | 'dark';
 type MobileSheetState = 'expanded' | 'collapsed';
 type ParkingDataStatus = 'loading' | 'ready' | 'error';
+type SavedNeuksStatus = 'loading' | 'ready' | 'storage-error';
+
+type ParkingMoreMenuPosition = {
+  bottom?: number;
+  right: number;
+  top?: number;
+};
 
 type CopiedShareButton = {
   parkingId: string;
@@ -365,6 +385,16 @@ export default function CycleParkingFinder() {
   const [currentLocationFocusRequestId, setCurrentLocationFocusRequestId] =
     useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [parkingView, setParkingView] = useState<ParkingView>('nearby');
+  const [savedNeuksStatus, setSavedNeuksStatus] =
+    useState<SavedNeuksStatus>('loading');
+  const [savedNeuks, setSavedNeuks] = useState<SavedNeukRecord[]>([]);
+  const [savedRawPoints, setSavedRawPoints] = useState<ParkingPoint[]>([]);
+  const [missingSavedIds, setMissingSavedIds] = useState<string[]>([]);
+  const [isSavedPointsLoading, setIsSavedPointsLoading] = useState(false);
+  const [savedNeuksMessage, setSavedNeuksMessage] = useState<string | null>(
+    null,
+  );
   const [placeQuery, setPlaceQuery] = useState('');
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(
@@ -396,6 +426,11 @@ export default function CycleParkingFinder() {
     null,
   );
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
+  const [openParkingMoreMenuId, setOpenParkingMoreMenuId] = useState<
+    string | null
+  >(null);
+  const [parkingMoreMenuPosition, setParkingMoreMenuPosition] =
+    useState<ParkingMoreMenuPosition | null>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light');
   const [isClientReady, setIsClientReady] = useState(false);
@@ -431,10 +466,21 @@ export default function CycleParkingFinder() {
   const liveRouteWatchId = useRef<number | null>(null);
   const previousLiveRouteMarkerPosition = useRef<CycleRoutePoint | null>(null);
   const copiedMessageTimeout = useRef<number | null>(null);
+  const savedNeuksMessageTimeout = useRef<number | null>(null);
   const attributionDialog = useRef<HTMLDialogElement>(null);
   const streetViewDialog = useRef<HTMLDialogElement>(null);
   const parkingListScroll = useRef<HTMLDivElement>(null);
+  const savedHeadingRef = useRef<HTMLHeadingElement>(null);
+  const parkingMoreButtonRef = useRef<HTMLButtonElement>(null);
+  const parkingMoreMenuRef = useRef<HTMLDivElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
+  const savedResolutionRequestId = useRef(0);
+  const parkingViewState = useRef<
+    Record<ParkingView, { scrollTop: number; selectedId: string | null }>
+  >({
+    nearby: { scrollTop: 0, selectedId: null },
+    saved: { scrollTop: 0, selectedId: null },
+  });
   const mobileSheetDrag = useRef<{
     currentY: number;
     lastTimestamp: number;
@@ -619,6 +665,57 @@ export default function CycleParkingFinder() {
   }, []);
 
   useEffect(() => {
+    const stored = readSavedNeuks(window.localStorage);
+    setSavedNeuks(stored.items);
+    setSavedNeuksStatus(stored.ok ? 'ready' : 'storage-error');
+    if (!stored.ok) {
+      setSavedNeuksMessage(t('savedStorageError'));
+    }
+
+    return subscribeToSavedNeuks((items) => {
+      setSavedNeuks(items);
+      setSavedNeuksStatus('ready');
+      setSavedNeuksMessage(null);
+    });
+  }, [t]);
+
+  useEffect(() => {
+    const client = parkingDataClient.current;
+    if (!client || !parkingManifest) {
+      return;
+    }
+
+    const requestId = savedResolutionRequestId.current + 1;
+    savedResolutionRequestId.current = requestId;
+    if (savedNeuks.length === 0) {
+      setIsSavedPointsLoading(false);
+      setSavedRawPoints([]);
+      setMissingSavedIds([]);
+      return;
+    }
+
+    setIsSavedPointsLoading(true);
+    void client
+      .loadPoints(savedNeuks.map(({ id }) => id))
+      .then(({ missingIds, points }) => {
+        if (savedResolutionRequestId.current !== requestId) {
+          return;
+        }
+        setSavedRawPoints(points);
+        setMissingSavedIds(missingIds);
+        setIsSavedPointsLoading(false);
+      })
+      .catch(() => {
+        if (savedResolutionRequestId.current !== requestId) {
+          return;
+        }
+        setSavedRawPoints([]);
+        setMissingSavedIds(savedNeuks.map(({ id }) => id));
+        setIsSavedPointsLoading(false);
+      });
+  }, [parkingManifest, savedNeuks]);
+
+  useEffect(() => {
     const client = parkingDataClient.current;
     if (client) {
       setParkingPoints(prepareParkingPoints(client.getLoadedPoints(), locale));
@@ -762,6 +859,9 @@ export default function CycleParkingFinder() {
       if (copiedMessageTimeout.current !== null) {
         window.clearTimeout(copiedMessageTimeout.current);
       }
+      if (savedNeuksMessageTimeout.current !== null) {
+        window.clearTimeout(savedNeuksMessageTimeout.current);
+      }
     };
   }, []);
 
@@ -792,6 +892,73 @@ export default function CycleParkingFinder() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isSettingsMenuOpen]);
+
+  useEffect(() => {
+    if (!openParkingMoreMenuId) {
+      return;
+    }
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      parkingMoreMenuRef.current
+        ?.querySelector<HTMLButtonElement>('[role="menuitem"]')
+        ?.focus();
+    });
+
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+
+      if (
+        !(target instanceof Element) ||
+        (!target.closest('.parking-more-menu-shell') &&
+          !target.closest('.parking-more-menu'))
+      ) {
+        setOpenParkingMoreMenuId(null);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      setOpenParkingMoreMenuId(null);
+      window.requestAnimationFrame(() => parkingMoreButtonRef.current?.focus());
+    }
+
+    function closeForViewportChange() {
+      setOpenParkingMoreMenuId(null);
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', closeForViewportChange);
+    parkingListScroll.current?.addEventListener(
+      'scroll',
+      closeForViewportChange,
+      { passive: true },
+    );
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', closeForViewportChange);
+      parkingListScroll.current?.removeEventListener(
+        'scroll',
+        closeForViewportChange,
+      );
+    };
+  }, [openParkingMoreMenuId]);
+
+  useEffect(() => {
+    setOpenParkingMoreMenuId(null);
+  }, [parkingView, selectedId]);
+
+  useEffect(() => {
+    if (!openParkingMoreMenuId) {
+      setParkingMoreMenuPosition(null);
+    }
+  }, [openParkingMoreMenuId]);
 
   useEffect(() => {
     const dialog = attributionDialog.current;
@@ -842,20 +1009,65 @@ export default function CycleParkingFinder() {
     () => nearbyPoints.slice(0, closestParkingResultCount),
     [nearbyPoints],
   );
+  const savedIds = useMemo(
+    () => new Set(savedNeuks.map(({ id }) => id)),
+    [savedNeuks],
+  );
+  const savedPoints = useMemo(
+    () =>
+      sortByDistance(
+        prepareParkingPoints(savedRawPoints, locale),
+        locationState.location,
+      ).sort((left, right) => {
+        const distanceDifference =
+          (left.distanceMeters ?? 0) - (right.distanceMeters ?? 0);
+        if (distanceDifference !== 0) {
+          return distanceDifference;
+        }
+        const leftSavedAt = savedNeuks.find(
+          ({ id }) => id === left.id,
+        )?.savedAt;
+        const rightSavedAt = savedNeuks.find(
+          ({ id }) => id === right.id,
+        )?.savedAt;
+        const savedAtDifference =
+          Date.parse(rightSavedAt ?? '') - Date.parse(leftSavedAt ?? '');
+        return savedAtDifference || left.name.localeCompare(right.name, locale);
+      }),
+    [locale, locationState.location, savedNeuks, savedRawPoints],
+  );
+  const missingSavedRecords = useMemo(
+    () =>
+      savedNeuks
+        .filter(({ id }) => missingSavedIds.includes(id))
+        .sort((a, b) => b.savedAt.localeCompare(a.savedAt)),
+    [missingSavedIds, savedNeuks],
+  );
+  const availablePoints = useMemo(() => {
+    const points = new Map<string, ParkingPoint>();
+    for (const point of [...nearbyPoints, ...savedPoints]) {
+      points.set(point.id, point);
+    }
+    return [...points.values()];
+  }, [nearbyPoints, savedPoints]);
+  const mapPoints = parkingView === 'saved' ? savedPoints : availablePoints;
   const formattedParkingLocationCount = useMemo(
     () => (parkingManifest?.recordCount ?? 0).toLocaleString(formattingLocale),
     [formattingLocale, parkingManifest?.recordCount],
   );
 
   const nearestPoint = nearbyPoints[0] ?? null;
+  const activeListPoints =
+    parkingView === 'saved' ? savedPoints : closestPoints;
   const explicitSelectedPoint =
     selectedId !== null
-      ? (nearbyPoints.find((point) => point.id === selectedId) ?? null)
+      ? (availablePoints.find((point) => point.id === selectedId) ?? null)
       : null;
   const directionsParkingPoint =
     directionsState.status !== 'idle'
-      ? (nearbyPoints.find((point) => point.id === directionsState.parkingId) ??
-        null)
+      ? (availablePoints.find(
+          (point) => point.id === directionsState.parkingId,
+        ) ?? null)
       : null;
   const activeRoute =
     directionsState.status === 'loaded' ? directionsState.route : null;
@@ -917,7 +1129,21 @@ export default function CycleParkingFinder() {
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
       top: scrollContainer.scrollTop + scrollDelta,
     });
-  }, [selectedId, closestPoints]);
+  }, [activeListPoints, selectedId]);
+
+  useEffect(() => {
+    parkingViewState.current[parkingView].selectedId = selectedId;
+  }, [parkingView, selectedId]);
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      if (parkingListScroll.current) {
+        parkingListScroll.current.scrollTop =
+          parkingViewState.current[parkingView].scrollTop;
+      }
+    });
+    return () => window.cancelAnimationFrame(frameId);
+  }, [parkingView]);
 
   useEffect(() => {
     if (isDirectionsMode) {
@@ -1320,6 +1546,9 @@ export default function CycleParkingFinder() {
   }
 
   function requestLocation(selectedParkingId?: string) {
+    if (parkingView === 'saved') {
+      showNearby();
+    }
     setSelectedId(selectedParkingId ?? null);
     clearDirections();
 
@@ -1472,12 +1701,120 @@ export default function CycleParkingFinder() {
 
   function selectParkingPoint(id: string) {
     captureAnalyticsEvent('parking_selected', { parking_id: id });
+    setOpenParkingMoreMenuId(null);
+    parkingViewState.current[parkingView].selectedId = id;
     setSelectedId(id);
     clearDirections();
   }
 
   function clearSelectedParkingPoint() {
+    setOpenParkingMoreMenuId(null);
+    parkingViewState.current[parkingView].selectedId = null;
     setSelectedId(null);
+  }
+
+  function rememberCurrentParkingView() {
+    parkingViewState.current[parkingView] = {
+      scrollTop: parkingListScroll.current?.scrollTop ?? 0,
+      selectedId,
+    };
+  }
+
+  function openMyNeuks(event?: MouseEvent<HTMLButtonElement>) {
+    rememberCurrentParkingView();
+    const selectedSavedId =
+      selectedId && savedIds.has(selectedId)
+        ? selectedId
+        : parkingViewState.current.saved.selectedId;
+    parkingViewState.current.saved.selectedId = selectedSavedId;
+    setSelectedId(selectedSavedId);
+    setParkingView('saved');
+    if (event?.detail === 0) {
+      window.requestAnimationFrame(() => savedHeadingRef.current?.focus());
+    }
+    captureAnalyticsEvent('my_neuks_opened', {
+      saved_count: savedNeuks.length,
+    });
+  }
+
+  function showNearby() {
+    rememberCurrentParkingView();
+    const nearbySelectedId = parkingViewState.current.nearby.selectedId;
+    setSelectedId(nearbySelectedId);
+    setParkingView('nearby');
+  }
+
+  function showSavedNeuksConfirmation(message: string) {
+    if (savedNeuksMessageTimeout.current !== null) {
+      window.clearTimeout(savedNeuksMessageTimeout.current);
+    }
+    setSavedNeuksMessage(message);
+    savedNeuksMessageTimeout.current = window.setTimeout(() => {
+      setSavedNeuksMessage(null);
+      savedNeuksMessageTimeout.current = null;
+    }, copiedMessageDurationMs);
+  }
+
+  function commitSavedNeuks(items: SavedNeukRecord[]) {
+    setSavedNeuks(items);
+    const wasWritten = writeSavedNeuks(window.localStorage, items);
+    setSavedNeuksStatus(wasWritten ? 'ready' : 'storage-error');
+    if (!wasWritten) {
+      if (savedNeuksMessageTimeout.current !== null) {
+        window.clearTimeout(savedNeuksMessageTimeout.current);
+        savedNeuksMessageTimeout.current = null;
+      }
+      setSavedNeuksMessage(t('savedStorageError'));
+    }
+    return wasWritten;
+  }
+
+  function toggleSavedPoint(point: ParkingPoint, source: ShareSource) {
+    const wasSaved = isNeukSaved(savedNeuks, point.id);
+    const nextItems = wasSaved
+      ? removeSavedNeuk(savedNeuks, point.id)
+      : addSavedNeuk(savedNeuks, point);
+    const wasWritten = commitSavedNeuks(nextItems);
+
+    if (wasSaved) {
+      setSavedRawPoints((points) => points.filter(({ id }) => id !== point.id));
+      setMissingSavedIds((ids) => ids.filter((id) => id !== point.id));
+      if (parkingView === 'saved' && selectedId === point.id) {
+        clearSelectedParkingPoint();
+      }
+    } else {
+      setSavedRawPoints((points) => [
+        point,
+        ...points.filter(({ id }) => id !== point.id),
+      ]);
+    }
+
+    if (wasWritten) {
+      showSavedNeuksConfirmation(
+        t(wasSaved ? 'removedFromMyNeuks' : 'savedToMyNeuks'),
+      );
+    }
+    captureAnalyticsEvent(wasSaved ? 'neuk_removed' : 'neuk_saved', {
+      parking_id: point.id,
+      parking_name: point.name,
+      saved_count: nextItems.length,
+      source,
+    });
+  }
+
+  function removeMissingSavedNeuk(record: SavedNeukRecord) {
+    const nextItems = removeSavedNeuk(savedNeuks, record.id);
+    const wasWritten = commitSavedNeuks(nextItems);
+    setMissingSavedIds((ids) => ids.filter((id) => id !== record.id));
+    if (wasWritten) {
+      showSavedNeuksConfirmation(t('removedFromMyNeuks'));
+    }
+    captureAnalyticsEvent('neuk_removed', {
+      parking_id: record.id,
+      parking_name: record.snapshot.name,
+      saved_count: nextItems.length,
+      source: 'list',
+    });
   }
 
   async function requestDirectionsToPoint(point: ParkingPoint) {
@@ -1909,12 +2246,14 @@ export default function CycleParkingFinder() {
         <section className="map-pane" aria-label={t('map')}>
           <CycleParkingMap
             locale={locale}
-            points={nearbyPoints}
+            points={mapPoints}
             userLocation={locationState.location}
             currentLocationFocusRequestId={currentLocationFocusRequestId}
             selectedPoint={explicitSelectedPoint}
-            nearestPoint={nearestPoint}
-            rankedPoints={nearbyPoints}
+            nearestPoint={parkingView === 'nearby' ? nearestPoint : null}
+            rankedPoints={parkingView === 'nearby' ? nearbyPoints : []}
+            parkingView={parkingView}
+            savedPointIds={[...savedIds]}
             route={activeRoute}
             routeInstructionFocusRequest={routeInstructionFocusRequest}
             liveRouteMarker={
@@ -1949,6 +2288,9 @@ export default function CycleParkingFinder() {
             onCopyParkingLink={(point) => {
               void copyParkingLinkForPoint(point, 'popup');
             }}
+            onToggleSavedPoint={(point) => {
+              toggleSavedPoint(point, 'popup');
+            }}
             onViewportChange={loadParkingForBounds}
           />
         </section>
@@ -1979,12 +2321,20 @@ export default function CycleParkingFinder() {
               mobileSheetState === 'expanded'
                 ? t('collapsePanel', {
                     panel: t(
-                      isDirectionsMode ? 'panelDirections' : 'panelResults',
+                      isDirectionsMode
+                        ? 'panelDirections'
+                        : parkingView === 'saved'
+                          ? 'panelSaved'
+                          : 'panelResults',
                     ),
                   })
                 : t('expandPanel', {
                     panel: t(
-                      isDirectionsMode ? 'panelDirections' : 'panelResults',
+                      isDirectionsMode
+                        ? 'panelDirections'
+                        : parkingView === 'saved'
+                          ? 'panelSaved'
+                          : 'panelResults',
                     ),
                   })
             }
@@ -2360,37 +2710,105 @@ export default function CycleParkingFinder() {
 
                   <div className="mobile-sheet-summary" aria-hidden="true">
                     <span>
-                      <strong>{t('nearbyBikeNeuks')}</strong>
+                      <strong>
+                        {t(
+                          parkingView === 'saved'
+                            ? 'myNeuks'
+                            : 'nearbyBikeNeuks',
+                        )}
+                      </strong>
                       <small>
-                        {t('closestCount', { count: closestPoints.length })}
+                        {t(
+                          parkingView === 'saved'
+                            ? 'savedCount'
+                            : 'closestCount',
+                          {
+                            count:
+                              parkingView === 'saved'
+                                ? savedNeuks.length
+                                : closestPoints.length,
+                          },
+                        )}
                       </small>
                     </span>
                     <span className="mobile-sheet-summary-location">
-                      {nearestPoint?.name}
+                      {parkingView === 'saved'
+                        ? explicitSelectedPoint?.name
+                        : nearestPoint?.name}
                     </span>
                   </div>
 
                   <div className="mobile-sheet-body">
-                    {renderPlaceSearchPanel('desktop')}
+                    {parkingView === 'nearby'
+                      ? renderPlaceSearchPanel('desktop')
+                      : null}
 
-                    <div className="list-heading">
-                      <h2>
-                        {t('nearbyBikeNeuks')}{' '}
+                    <div className="list-heading list-heading-actions">
+                      <h2
+                        ref={savedHeadingRef}
+                        tabIndex={parkingView === 'saved' ? -1 : undefined}
+                      >
+                        {t(
+                          parkingView === 'saved'
+                            ? 'myNeuks'
+                            : 'nearbyBikeNeuks',
+                        )}{' '}
                         <span>
-                          · {t('closestCount', { count: closestPoints.length })}
+                          ·{' '}
+                          {t(
+                            parkingView === 'saved'
+                              ? 'savedCount'
+                              : 'closestCount',
+                            {
+                              count:
+                                parkingView === 'saved'
+                                  ? savedNeuks.length
+                                  : closestPoints.length,
+                            },
+                          )}
                         </span>
                       </h2>
+                      {parkingView === 'saved' ? (
+                        <motion.button
+                          className="parking-view-button"
+                          type="button"
+                          whileTap={subtleTap}
+                          onClick={showNearby}
+                        >
+                          {t('showNearby')}
+                        </motion.button>
+                      ) : (
+                        <motion.button
+                          className="parking-view-button"
+                          data-testid="open-my-neuks"
+                          disabled={savedNeuksStatus === 'loading'}
+                          type="button"
+                          whileTap={subtleTap}
+                          onClick={openMyNeuks}
+                        >
+                          <Bookmark
+                            size={15}
+                            fill={
+                              savedNeuks.length > 0 ? 'currentColor' : 'none'
+                            }
+                            aria-hidden="true"
+                          />
+                          <span>
+                            {t('myNeuks')} {savedNeuks.length}
+                          </span>
+                        </motion.button>
+                      )}
                     </div>
 
                     <AnimatePresence initial={false}>
-                      {shareError ? (
+                      {shareError || savedNeuksMessage ? (
                         <motion.div
                           {...risePresence}
-                          key={shareError}
+                          key={shareError ?? savedNeuksMessage}
                           className="parking-share-message"
                           role="status"
                         >
-                          {shareError}
+                          {shareError ?? savedNeuksMessage}
                         </motion.div>
                       ) : null}
                     </AnimatePresence>
@@ -2400,7 +2818,7 @@ export default function CycleParkingFinder() {
                       ref={parkingListScroll}
                     >
                       <AnimatePresence initial={false}>
-                        {parkingDataMessage ? (
+                        {parkingView === 'nearby' && parkingDataMessage ? (
                           <motion.div
                             {...risePresence}
                             key={parkingDataMessage}
@@ -2419,7 +2837,8 @@ export default function CycleParkingFinder() {
                             ) : null}
                           </motion.div>
                         ) : null}
-                        {locationState.status === 'too-far' ? (
+                        {parkingView === 'nearby' &&
+                        locationState.status === 'too-far' ? (
                           <motion.div
                             {...risePresence}
                             key="too-far"
@@ -2431,17 +2850,51 @@ export default function CycleParkingFinder() {
                         ) : null}
                       </AnimatePresence>
 
+                      {parkingView === 'saved' && isSavedPointsLoading ? (
+                        <div className="parking-list-context" role="status">
+                          {t('loadingSavedNeuks')}
+                        </div>
+                      ) : null}
+
+                      {parkingView === 'saved' &&
+                      !isSavedPointsLoading &&
+                      savedNeuks.length === 0 ? (
+                        <section className="saved-neuks-empty">
+                          <Bookmark size={24} aria-hidden="true" />
+                          <h3>{t('noSavedNeuks')}</h3>
+                          <p>{t('noSavedNeuksHint')}</p>
+                          <small>{t('savedOnThisDevice')}</small>
+                          <button type="button" onClick={showNearby}>
+                            {t('showNearby')}
+                          </button>
+                        </section>
+                      ) : null}
+
                       <motion.ol
                         layout="position"
                         className="parking-list"
                         data-testid="parking-list"
-                        aria-label={t('nearbyBikeNeuks')}
+                        aria-label={t(
+                          parkingView === 'saved'
+                            ? 'myNeuks'
+                            : 'nearbyBikeNeuks',
+                        )}
                       >
-                        {closestPoints.map((point, index) => {
+                        {activeListPoints.map((point, index) => {
+                          const isActive =
+                            point.id === explicitSelectedPoint?.id;
+                          const isSaved = savedIds.has(point.id);
                           return (
                             <motion.li
                               layout="position"
-                              className="parking-list-item"
+                              className={[
+                                'parking-list-item',
+                                parkingView === 'saved'
+                                  ? 'saved-list-item'
+                                  : null,
+                              ]
+                                .filter(Boolean)
+                                .join(' ')}
                               key={point.id}
                               transition={rowLayoutTransition}
                               ref={(item) => {
@@ -2458,7 +2911,10 @@ export default function CycleParkingFinder() {
                               <motion.button
                                 className={[
                                   'parking-row',
-                                  index === 0 && !explicitSelectedPoint
+                                  parkingView === 'saved'
+                                    ? 'saved-parking-row'
+                                    : null,
+                                  parkingView === 'nearby' && index === 0
                                     ? 'closest'
                                     : null,
                                   point.id === explicitSelectedPoint?.id
@@ -2472,9 +2928,11 @@ export default function CycleParkingFinder() {
                                 whileTap={subtleTap}
                                 onClick={() => selectParkingPoint(point.id)}
                               >
-                                <span className={`rank rank-${index + 1}`}>
-                                  {index + 1}
-                                </span>
+                                {parkingView === 'nearby' ? (
+                                  <span className={`rank rank-${index + 1}`}>
+                                    {index + 1}
+                                  </span>
+                                ) : null}
                                 <span className="parking-row-copy">
                                   <strong>{point.name}</strong>
                                   <ParkingDetailStrip
@@ -2482,52 +2940,210 @@ export default function CycleParkingFinder() {
                                     point={point}
                                   />
                                 </span>
+                                {parkingView === 'nearby' &&
+                                isSaved &&
+                                !isActive ? (
+                                  <span
+                                    className="parking-saved-indicator"
+                                    data-testid={`parking-saved-status-${point.id}`}
+                                  >
+                                    <Bookmark
+                                      size={16}
+                                      fill="currentColor"
+                                      aria-hidden="true"
+                                    />
+                                    <span className="sr-only">
+                                      {t('savedMarker')}
+                                    </span>
+                                  </span>
+                                ) : null}
                               </motion.button>
-                              <motion.button
-                                aria-label={t('showDirections', {
-                                  name: point.name,
-                                })}
-                                className="parking-directions-button"
-                                data-testid={`parking-directions-${point.id}`}
-                                disabled={!isClientReady}
-                                type="button"
-                                whileTap={subtleTap}
-                                onClick={(event) => {
-                                  void requestDirections(event, point);
-                                }}
-                              >
-                                <Navigation size={17} aria-hidden="true" />
-                                <span className="parking-action-label">
-                                  {t('directions')}
-                                </span>
-                              </motion.button>
-                              <motion.button
-                                aria-label={t('copyLink', { name: point.name })}
-                                className="parking-share-button"
-                                type="button"
-                                whileTap={subtleTap}
-                                onClick={(event) => {
-                                  void copyParkingLink(event, point);
-                                }}
-                              >
-                                <Share2 size={17} aria-hidden="true" />
-                                <AnimatePresence initial={false}>
-                                  {copiedShareButton?.source === 'list' &&
-                                  copiedShareButton.parkingId === point.id ? (
-                                    <motion.span
-                                      {...tooltipPresence}
-                                      key="copied"
-                                      className="parking-share-tooltip"
-                                      role="status"
+                              {isActive ? (
+                                <motion.div
+                                  className="parking-list-actions"
+                                  data-testid={`parking-actions-${point.id}`}
+                                  layout="position"
+                                >
+                                  <motion.button
+                                    aria-label={t('showDirections', {
+                                      name: point.name,
+                                    })}
+                                    className="parking-directions-button"
+                                    data-testid={`parking-directions-${point.id}`}
+                                    disabled={!isClientReady}
+                                    type="button"
+                                    whileTap={subtleTap}
+                                    onClick={(event) => {
+                                      void requestDirections(event, point);
+                                    }}
+                                  >
+                                    <Navigation size={17} aria-hidden="true" />
+                                  </motion.button>
+                                  <div className="parking-more-menu-shell">
+                                    <motion.button
+                                      ref={parkingMoreButtonRef}
+                                      aria-expanded={
+                                        openParkingMoreMenuId === point.id
+                                      }
+                                      aria-haspopup="menu"
+                                      aria-label={t('moreActions', {
+                                        name: point.name,
+                                      })}
+                                      className="parking-more-button"
+                                      data-testid={`parking-more-${point.id}`}
+                                      type="button"
+                                      whileTap={subtleTap}
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        if (
+                                          openParkingMoreMenuId === point.id
+                                        ) {
+                                          setOpenParkingMoreMenuId(null);
+                                          return;
+                                        }
+
+                                        const buttonBounds =
+                                          event.currentTarget.getBoundingClientRect();
+                                        const opensAbove =
+                                          buttonBounds.top >= 116;
+                                        setParkingMoreMenuPosition({
+                                          right: Math.max(
+                                            12,
+                                            window.innerWidth -
+                                              buttonBounds.right,
+                                          ),
+                                          ...(opensAbove
+                                            ? {
+                                                bottom:
+                                                  window.innerHeight -
+                                                  buttonBounds.top +
+                                                  6,
+                                              }
+                                            : {
+                                                top: buttonBounds.bottom + 6,
+                                              }),
+                                        });
+                                        setOpenParkingMoreMenuId(point.id);
+                                      }}
                                     >
-                                      {t('copied')}
-                                    </motion.span>
-                                  ) : null}
-                                </AnimatePresence>
-                              </motion.button>
+                                      <EllipsisVertical
+                                        size={20}
+                                        aria-hidden="true"
+                                      />
+                                    </motion.button>
+                                    {openParkingMoreMenuId === point.id &&
+                                    parkingMoreMenuPosition &&
+                                    typeof document !== 'undefined'
+                                      ? createPortal(
+                                          <motion.div
+                                            ref={parkingMoreMenuRef}
+                                            {...risePresence}
+                                            className="parking-more-menu"
+                                            data-testid={`parking-more-menu-${point.id}`}
+                                            role="menu"
+                                            style={parkingMoreMenuPosition}
+                                          >
+                                            <motion.button
+                                              aria-label={t(
+                                                isSaved
+                                                  ? 'removeFromMyNeuks'
+                                                  : 'saveToMyNeuks',
+                                                { name: point.name },
+                                              )}
+                                              className="parking-more-menu-item parking-save-button"
+                                              data-testid={`parking-save-${point.id}`}
+                                              role="menuitem"
+                                              type="button"
+                                              whileTap={subtleTap}
+                                              onClick={(event) => {
+                                                event.stopPropagation();
+                                                setOpenParkingMoreMenuId(null);
+                                                toggleSavedPoint(point, 'list');
+                                              }}
+                                            >
+                                              <Bookmark
+                                                size={17}
+                                                fill={
+                                                  isSaved
+                                                    ? 'currentColor'
+                                                    : 'none'
+                                                }
+                                                aria-hidden="true"
+                                              />
+                                              {t(
+                                                isSaved
+                                                  ? 'removeFromMyNeuksShort'
+                                                  : 'saveToMyNeuksShort',
+                                              )}
+                                            </motion.button>
+                                            <motion.button
+                                              aria-label={t('copyLink', {
+                                                name: point.name,
+                                              })}
+                                              className="parking-more-menu-item parking-share-button"
+                                              role="menuitem"
+                                              type="button"
+                                              whileTap={subtleTap}
+                                              onClick={(event) => {
+                                                void copyParkingLink(
+                                                  event,
+                                                  point,
+                                                );
+                                              }}
+                                            >
+                                              <Share2
+                                                size={17}
+                                                aria-hidden="true"
+                                              />
+                                              {copiedShareButton?.source ===
+                                                'list' &&
+                                              copiedShareButton.parkingId ===
+                                                point.id
+                                                ? t('copied')
+                                                : t('share')}
+                                            </motion.button>
+                                          </motion.div>,
+                                          document.body,
+                                        )
+                                      : null}
+                                  </div>
+                                </motion.div>
+                              ) : null}
                             </motion.li>
                           );
                         })}
+                        {parkingView === 'saved'
+                          ? missingSavedRecords.map((record) => (
+                              <motion.li
+                                className="parking-list-item saved-list-item saved-list-item-missing"
+                                key={record.id}
+                                layout="position"
+                              >
+                                <div className="parking-row saved-parking-row">
+                                  <span className="parking-row-copy">
+                                    <strong>{record.snapshot.name}</strong>
+                                    <span>{t('noLongerInData')}</span>
+                                  </span>
+                                </div>
+                                <motion.button
+                                  aria-label={t('removeFromMyNeuks', {
+                                    name: record.snapshot.name,
+                                  })}
+                                  aria-pressed="true"
+                                  className="parking-save-button"
+                                  type="button"
+                                  whileTap={subtleTap}
+                                  onClick={() => removeMissingSavedNeuk(record)}
+                                >
+                                  <Bookmark
+                                    size={18}
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                  />
+                                </motion.button>
+                              </motion.li>
+                            ))
+                          : null}
                       </motion.ol>
                     </div>
 
