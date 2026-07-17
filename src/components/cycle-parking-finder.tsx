@@ -1445,18 +1445,16 @@ export default function CycleParkingFinder() {
     }
   }
 
-  function clearPlaceSearch(surface: 'desktop' | 'mobile') {
+  function clearPlaceSearch(event: MouseEvent<HTMLButtonElement>) {
+    event.currentTarget.parentElement
+      ?.querySelector<HTMLInputElement>('input')
+      ?.focus();
     placeSearchRequestId.current += 1;
     placeSearchInFlight.current = false;
     setIsPlaceSearching(false);
     setPlaceQuery('');
     setPlaceResults([]);
     setPlaceSearchMessage(null);
-    window.requestAnimationFrame(() => {
-      document
-        .querySelector<HTMLInputElement>(`#place-search-${surface}`)
-        ?.focus();
-    });
   }
 
   function selectPlace(result: PlaceSearchResult) {
@@ -1779,7 +1777,7 @@ export default function CycleParkingFinder() {
                 aria-label={t('clearSearch')}
                 className="search-clear-button"
                 type="button"
-                onClick={() => clearPlaceSearch(surface)}
+                onClick={clearPlaceSearch}
               >
                 <X size={16} aria-hidden="true" />
               </button>
