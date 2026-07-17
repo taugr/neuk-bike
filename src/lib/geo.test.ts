@@ -418,28 +418,32 @@ describe('geo utilities', () => {
 
   it('parses valid place search results and rejects invalid coordinates', () => {
     expect(
-      parsePlaceSearchResults([
-        {
-          display_name: 'Meadows, Edinburgh, Scotland, United Kingdom',
-          lat: '55.941',
-          lon: '-3.191',
-          osm_id: 123,
-        },
-        {
-          display_name: 'Null Island',
-          lat: '0',
-          lon: '0',
-          osm_id: 456,
-        },
-        {
-          display_name: 'Invalid',
-          lat: 'not-a-number',
-          lon: '-3.191',
-        },
-      ]),
+      parsePlaceSearchResults({
+        features: [
+          {
+            geometry: { coordinates: [-3.191, 55.941] },
+            properties: {
+              city: 'Edinburgh',
+              country: 'United Kingdom',
+              name: 'Meadows',
+              osm_id: 123,
+              osm_type: 'W',
+              state: 'Scotland',
+            },
+          },
+          {
+            geometry: { coordinates: [0, 0] },
+            properties: { name: 'Null Island', osm_id: 456 },
+          },
+          {
+            geometry: { coordinates: [-3.191, 'not-a-number'] },
+            properties: { name: 'Invalid' },
+          },
+        ],
+      }),
     ).toEqual([
       {
-        id: '123',
+        id: 'W:123',
         name: 'Meadows, Edinburgh, Scotland, United Kingdom',
         location: {
           latitude: 55.941,

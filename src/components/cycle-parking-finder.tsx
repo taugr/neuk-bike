@@ -144,6 +144,8 @@ function LocalizedMapLoading() {
 }
 
 const maxPlaceSearchCacheEntries = 12;
+const placeSearchDebounceMs = 300;
+const placeSearchMinimumCharacters = 3;
 const closestParkingResultCount = 8;
 const copiedMessageDurationMs = 1_800;
 const themeStorageKey = 'cycle-parking-theme';
@@ -397,6 +399,7 @@ export default function CycleParkingFinder() {
   );
   const [placeQuery, setPlaceQuery] = useState('');
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
+  const [activePlaceResultIndex, setActivePlaceResultIndex] = useState(0);
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(
     null,
   );
@@ -460,7 +463,8 @@ export default function CycleParkingFinder() {
   localeRef.current = locale;
   const parkingDataClient = useRef<ParkingDataClient | null>(null);
   const directionsCache = useRef(new Map<string, CycleRoute>());
-  const placeSearchInFlight = useRef(false);
+  const placeSearchAbortController = useRef<AbortController | null>(null);
+  const placeSearchDebounceTimeout = useRef<number | null>(null);
   const placeSearchRequestId = useRef(0);
   const directionsRequestId = useRef(0);
   const liveRouteWatchId = useRef<number | null>(null);
@@ -720,7 +724,16 @@ export default function CycleParkingFinder() {
     if (client) {
       setParkingPoints(prepareParkingPoints(client.getLoadedPoints(), locale));
     }
+    if (placeSearchDebounceTimeout.current !== null) {
+      window.clearTimeout(placeSearchDebounceTimeout.current);
+      placeSearchDebounceTimeout.current = null;
+    }
+    placeSearchAbortController.current?.abort();
+    placeSearchAbortController.current = null;
+    placeSearchRequestId.current += 1;
     placeSearchCache.current.clear();
+    setIsPlaceSearching(false);
+    setActivePlaceResultIndex(0);
     setPlaceResults([]);
     setPlaceSearchMessage(null);
   }, [locale]);
@@ -862,6 +875,10 @@ export default function CycleParkingFinder() {
       if (savedNeuksMessageTimeout.current !== null) {
         window.clearTimeout(savedNeuksMessageTimeout.current);
       }
+      if (placeSearchDebounceTimeout.current !== null) {
+        window.clearTimeout(placeSearchDebounceTimeout.current);
+      }
+      placeSearchAbortController.current?.abort();
     };
   }, []);
 
@@ -1602,18 +1619,38 @@ export default function CycleParkingFinder() {
     );
   }
 
-  async function searchForPlace(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function cancelPlaceSearchWork() {
+    if (placeSearchDebounceTimeout.current !== null) {
+      window.clearTimeout(placeSearchDebounceTimeout.current);
+      placeSearchDebounceTimeout.current = null;
+    }
+    placeSearchAbortController.current?.abort();
+    placeSearchAbortController.current = null;
+    placeSearchRequestId.current += 1;
+    setIsPlaceSearching(false);
+  }
 
-    const trimmedQuery = placeQuery.trim();
-    if (trimmedQuery.length === 0 || placeSearchInFlight.current) {
+  async function runPlaceSearch(query: string) {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length === 0) {
       return;
     }
 
+    if (placeSearchDebounceTimeout.current !== null) {
+      window.clearTimeout(placeSearchDebounceTimeout.current);
+      placeSearchDebounceTimeout.current = null;
+    }
+    placeSearchAbortController.current?.abort();
+
     const cacheKey = `${locale}:${trimmedQuery.toLowerCase()}`;
     const cachedResults = placeSearchCache.current.get(cacheKey);
+    const requestId = placeSearchRequestId.current + 1;
+    placeSearchRequestId.current = requestId;
 
     if (cachedResults) {
+      placeSearchAbortController.current = null;
+      setIsPlaceSearching(false);
+      setActivePlaceResultIndex(0);
       setPlaceResults(cachedResults);
       setPlaceSearchMessage(
         cachedResults.length === 0 ? t('noPlaceResults') : null,
@@ -1621,18 +1658,21 @@ export default function CycleParkingFinder() {
       return;
     }
 
-    placeSearchInFlight.current = true;
-    const requestId = placeSearchRequestId.current + 1;
-    placeSearchRequestId.current = requestId;
+    const controller = new AbortController();
+    placeSearchAbortController.current = controller;
     setIsPlaceSearching(true);
     setPlaceSearchMessage(null);
 
     try {
-      const response = await fetch(buildPlaceSearchUrl(trimmedQuery, locale), {
-        headers: {
-          Accept: 'application/json',
+      const response = await fetch(
+        buildPlaceSearchUrl(trimmedQuery, locale, locationState.location),
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+          signal: controller.signal,
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Place search failed');
@@ -1656,38 +1696,66 @@ export default function CycleParkingFinder() {
       captureAnalyticsEvent('place_searched', {
         result_count: results.length,
       });
+      setActivePlaceResultIndex(0);
       setPlaceResults(results);
       setPlaceSearchMessage(results.length === 0 ? t('noPlaceResults') : null);
       setHasUsedPlaceSearch(true);
     } catch {
-      if (requestId !== placeSearchRequestId.current) {
+      if (
+        controller.signal.aborted ||
+        requestId !== placeSearchRequestId.current
+      ) {
         return;
       }
       captureAnalyticsEvent('place_searched', { error: true });
+      setActivePlaceResultIndex(0);
       setPlaceResults([]);
       setPlaceSearchMessage(t('placeSearchError'));
     } finally {
       if (requestId === placeSearchRequestId.current) {
-        placeSearchInFlight.current = false;
+        placeSearchAbortController.current = null;
         setIsPlaceSearching(false);
       }
     }
+  }
+
+  function searchForPlace(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void runPlaceSearch(placeQuery);
+  }
+
+  function updatePlaceQuery(query: string) {
+    cancelPlaceSearchWork();
+    setPlaceQuery(query);
+    setActivePlaceResultIndex(0);
+    setPlaceResults([]);
+    setPlaceSearchMessage(null);
+
+    if (query.trim().length < placeSearchMinimumCharacters) {
+      return;
+    }
+
+    placeSearchDebounceTimeout.current = window.setTimeout(() => {
+      placeSearchDebounceTimeout.current = null;
+      void runPlaceSearch(query);
+    }, placeSearchDebounceMs);
   }
 
   function clearPlaceSearch(event: MouseEvent<HTMLButtonElement>) {
     event.currentTarget.parentElement
       ?.querySelector<HTMLInputElement>('input')
       ?.focus();
-    placeSearchRequestId.current += 1;
-    placeSearchInFlight.current = false;
-    setIsPlaceSearching(false);
+    cancelPlaceSearchWork();
     setPlaceQuery('');
+    setActivePlaceResultIndex(0);
     setPlaceResults([]);
     setPlaceSearchMessage(null);
   }
 
   function selectPlace(result: PlaceSearchResult) {
+    cancelPlaceSearchWork();
     captureAnalyticsEvent('place_selected', { place_name: result.name });
+    setActivePlaceResultIndex(0);
     setPlaceResults([]);
     setPlaceSearchMessage(null);
     setPlaceQuery(result.name.split(',')[0] ?? result.name);
@@ -2085,6 +2153,12 @@ export default function CycleParkingFinder() {
   }
 
   function renderPlaceSearchPanel(surface: 'desktop' | 'mobile') {
+    const resultListId = `place-search-results-${surface}`;
+    const hasSearchFeedback =
+      isPlaceSearching ||
+      placeResults.length > 0 ||
+      placeSearchMessage !== null;
+
     return (
       <section
         className={`reference-panel reference-panel--${surface}`}
@@ -2102,12 +2176,49 @@ export default function CycleParkingFinder() {
               {t('placeSearchLabel')}
             </label>
             <input
+              aria-activedescendant={
+                placeResults.length > 0
+                  ? `place-search-result-${surface}-${activePlaceResultIndex}`
+                  : undefined
+              }
+              aria-autocomplete="list"
+              aria-controls={resultListId}
+              aria-expanded={hasSearchFeedback}
               id={`place-search-${surface}`}
               name="place-search"
               type="search"
               value={placeQuery}
               placeholder={t('placeOrPostcode')}
-              onChange={(event) => setPlaceQuery(event.target.value)}
+              onChange={(event) => updatePlaceQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  cancelPlaceSearchWork();
+                  setActivePlaceResultIndex(0);
+                  setPlaceResults([]);
+                  setPlaceSearchMessage(null);
+                  return;
+                }
+
+                if (placeResults.length === 0) {
+                  return;
+                }
+
+                if (event.key === 'ArrowDown') {
+                  event.preventDefault();
+                  setActivePlaceResultIndex((index) =>
+                    Math.min(index + 1, placeResults.length - 1),
+                  );
+                } else if (event.key === 'ArrowUp') {
+                  event.preventDefault();
+                  setActivePlaceResultIndex((index) => Math.max(index - 1, 0));
+                } else if (event.key === 'Enter') {
+                  event.preventDefault();
+                  const result = placeResults[activePlaceResultIndex];
+                  if (result) {
+                    selectPlace(result);
+                  }
+                }
+              }}
             />
             {placeQuery.length > 0 ? (
               <button
@@ -2180,18 +2291,28 @@ export default function CycleParkingFinder() {
             <motion.ol
               {...risePresence}
               layout
+              id={resultListId}
               className="place-results"
               aria-label={t('placeSearchResults')}
+              role="listbox"
             >
-              {placeResults.map((result) => (
+              {placeResults.map((result, index) => (
                 <motion.li
                   layout
                   key={result.id}
+                  role="none"
                   transition={rowLayoutTransition}
                 >
                   <motion.button
+                    aria-selected={index === activePlaceResultIndex}
+                    className={
+                      index === activePlaceResultIndex ? 'is-active' : undefined
+                    }
+                    id={`place-search-result-${surface}-${index}`}
+                    role="option"
                     type="button"
                     whileTap={subtleTap}
+                    onMouseDown={(event) => event.preventDefault()}
                     onClick={() => selectPlace(result)}
                   >
                     <MapPin size={16} aria-hidden="true" />
@@ -2204,14 +2325,14 @@ export default function CycleParkingFinder() {
         </AnimatePresence>
 
         <AnimatePresence initial={false}>
-          {placeSearchMessage ? (
+          {isPlaceSearching || placeSearchMessage ? (
             <motion.div
               {...risePresence}
-              key={placeSearchMessage}
+              key={isPlaceSearching ? 'searching' : placeSearchMessage}
               className="place-search-message"
               role="status"
             >
-              {placeSearchMessage}
+              {isPlaceSearching ? t('searching') : placeSearchMessage}
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -3189,10 +3310,8 @@ export default function CycleParkingFinder() {
                   {hasUsedPlaceSearch ? (
                     <span>
                       Place search by{' '}
-                      <a href="https://nominatim.openstreetmap.org/">
-                        Nominatim
-                      </a>{' '}
-                      using OpenStreetMap data.
+                      <a href="https://photon.komoot.io/">Photon</a> using
+                      OpenStreetMap data.
                     </span>
                   ) : null}
                   <span>

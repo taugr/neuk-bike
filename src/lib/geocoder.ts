@@ -2,9 +2,8 @@ import { isResolvedLocation } from '@/lib/geo';
 import { localeDetails, type AppLocale } from '@/lib/i18n/locales';
 import type { UserLocation } from '@/lib/types';
 
-export const NOMINATIM_SEARCH_URL =
-  'https://nominatim.openstreetmap.org/search';
-export const PARKING_COVERAGE_VIEWBOX = '-18.2,60.9,4.4,27.5';
+export const PHOTON_SEARCH_URL = 'https://photon.komoot.io/api/';
+export const PARKING_COVERAGE_BBOX = '-18.2,27.5,4.4,60.9';
 
 export type PlaceSearchResult = {
   id: string;
@@ -12,52 +11,129 @@ export type PlaceSearchResult = {
   location: UserLocation;
 };
 
-type NominatimResult = {
-  display_name?: unknown;
-  lat?: unknown;
-  lon?: unknown;
-  osm_id?: unknown;
-  place_id?: unknown;
+type PhotonFeature = {
+  geometry?: {
+    coordinates?: unknown;
+  };
+  properties?: {
+    city?: unknown;
+    country?: unknown;
+    county?: unknown;
+    district?: unknown;
+    name?: unknown;
+    osm_id?: unknown;
+    osm_type?: unknown;
+    postcode?: unknown;
+    state?: unknown;
+    street?: unknown;
+  };
 };
 
-export function buildPlaceSearchUrl(query: string, locale: AppLocale = 'en') {
-  const params = new URLSearchParams({
-    q: query,
-    format: 'jsonv2',
-    limit: '5',
-    countrycodes: 'gb,ie,es',
-    viewbox: PARKING_COVERAGE_VIEWBOX,
-    bounded: '1',
-    'accept-language': localeDetails[locale].nominatimLanguages,
-  });
+type PhotonResponse = {
+  features?: unknown;
+};
 
-  return `${NOMINATIM_SEARCH_URL}?${params.toString()}`;
+function firstLanguage(locale: AppLocale) {
+  return localeDetails[locale].placeSearchLanguages.split(',')[0] ?? locale;
 }
 
-export function parsePlaceSearchResults(results: unknown): PlaceSearchResult[] {
-  if (!Array.isArray(results)) {
+export function buildPlaceSearchUrl(
+  query: string,
+  locale: AppLocale = 'en',
+  focus?: UserLocation,
+) {
+  const params = new URLSearchParams({
+    bbox: PARKING_COVERAGE_BBOX,
+    lang: firstLanguage(locale),
+    limit: '5',
+    q: query,
+  });
+
+  for (const countryCode of ['GB', 'IE', 'ES']) {
+    params.append('countrycode', countryCode);
+  }
+
+  if (focus && isResolvedLocation(focus)) {
+    params.set('lat', String(focus.latitude));
+    params.set('lon', String(focus.longitude));
+  }
+
+  return `${PHOTON_SEARCH_URL}?${params.toString()}`;
+}
+
+function stringProperty(value: unknown) {
+  return typeof value === 'string' && value.trim().length > 0
+    ? value.trim()
+    : null;
+}
+
+function photonResultName(feature: PhotonFeature) {
+  const properties = feature.properties ?? {};
+  const parts = [
+    properties.name,
+    properties.postcode,
+    properties.street,
+    properties.city,
+    properties.district,
+    properties.county,
+    properties.state,
+    properties.country,
+  ]
+    .map(stringProperty)
+    .filter((part): part is string => part !== null)
+    .filter(
+      (part, index, values) =>
+        values.findIndex(
+          (candidate) =>
+            candidate.toLocaleLowerCase() === part.toLocaleLowerCase(),
+        ) === index,
+    );
+
+  return parts.length > 0 ? parts.join(', ') : null;
+}
+
+export function parsePlaceSearchResults(
+  response: unknown,
+): PlaceSearchResult[] {
+  const features = (response as PhotonResponse)?.features;
+  if (!Array.isArray(features)) {
     return [];
   }
 
-  return results.flatMap((result, index) => {
-    const candidate = result as NominatimResult;
-    const latitude = Number(candidate.lat);
-    const longitude = Number(candidate.lon);
-    const location = { latitude, longitude };
+  return features
+    .flatMap((value, index) => {
+      const feature = value as PhotonFeature;
+      const coordinates = feature.geometry?.coordinates;
+      if (!Array.isArray(coordinates) || coordinates.length < 2) {
+        return [];
+      }
 
-    if (
-      !isResolvedLocation(location) ||
-      typeof candidate.display_name !== 'string'
-    ) {
-      return [];
-    }
+      const location = {
+        latitude: Number(coordinates[1]),
+        longitude: Number(coordinates[0]),
+      };
+      const name = photonResultName(feature);
+      if (!isResolvedLocation(location) || !name) {
+        return [];
+      }
 
-    return [
-      {
-        id: String(candidate.osm_id ?? candidate.place_id ?? index),
-        name: candidate.display_name,
-        location,
-      },
-    ];
-  });
+      const osmId = feature.properties?.osm_id;
+      const osmType = stringProperty(feature.properties?.osm_type) ?? 'feature';
+
+      return [
+        {
+          id: `${osmType}:${String(osmId ?? index)}`,
+          name,
+          location,
+        },
+      ];
+    })
+    .filter(
+      (result, index, results) =>
+        results.findIndex(
+          (candidate) =>
+            candidate.name.toLocaleLowerCase() ===
+            result.name.toLocaleLowerCase(),
+        ) === index,
+    );
 }

@@ -817,7 +817,8 @@ a {
   width: 100%;
 }
 
-.place-results button:hover {
+.place-results button:hover,
+.place-results button.is-active {
   background: var(--surface-strong);
   border-color: var(--accent);
 }

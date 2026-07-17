@@ -77,9 +77,10 @@ dataset is not included in the JavaScript bundle.
 If geolocation is unavailable or the requested location is outside the UK,
 Ireland and Spain, the app falls back to central Edinburgh and explains what
 happened.
-Place search uses Nominatim and OpenStreetMap data, filters results through the
-same country-boundary polygons as the parking data, and does not use
-autocomplete.
+Place search uses Photon and OpenStreetMap data. After three characters it
+loads suggestions automatically, while Enter and the desktop Search button
+remain available as explicit fallbacks. Results are filtered through the same
+country-boundary polygons as the parking data.
 
 Directions use the CycleStreets v2 API from the browser. Add a public API key to
 `.env.local` for local development:
@@ -110,7 +111,7 @@ first supported browser language, then falls back to English.
 The translated interface, parking-name templates, route instructions, and
 number formatting are bundled into the static app. Street and place names,
 brand names, source attribution, and licence text stay unchanged. Place search
-asks Nominatim for results in the selected language with an English fallback.
+asks Photon for results in the selected language.
 
 ## Commands
 
@@ -283,7 +284,7 @@ OpenStreetMap-derived records and map/search data:
 
 - Data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright),
   available under the [Open Database Licence 1.0](https://opendatacommons.org/licenses/odbl/1-0/)
-- [Nominatim](https://nominatim.openstreetmap.org/)
+- [Photon](https://photon.komoot.io/)
 
 Cycle directions:
 

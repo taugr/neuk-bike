@@ -266,22 +266,28 @@ test('keeps manual zoom after background parking chunks load', async ({
 test('searches from a place and selects a nearby parking row', async ({
   page,
 }) => {
-  await page.route(
-    'https://nominatim.openstreetmap.org/search**',
-    async (route) => {
-      await route.fulfill({
-        contentType: 'application/json',
-        json: [
+  await page.route('https://photon.komoot.io/api/**', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      json: {
+        features: [
           {
-            display_name: 'Test Place, Edinburgh, Scotland',
-            lat: String(parkingOne.latitude),
-            lon: String(parkingOne.longitude),
-            osm_id: 1_234_567,
+            geometry: {
+              coordinates: [parkingOne.longitude, parkingOne.latitude],
+            },
+            properties: {
+              city: 'Edinburgh',
+              country: 'United Kingdom',
+              name: 'Test Place',
+              osm_id: 1_234_567,
+              osm_type: 'N',
+              state: 'Scotland',
+            },
           },
         ],
-      });
-    },
-  );
+      },
+    });
+  });
 
   await page.goto('/?mockGps=55.94155,-3.29625,5');
   await expectFinderReady(page);
@@ -289,11 +295,12 @@ test('searches from a place and selects a nearby parking row', async ({
   const finderPanel = page.getByRole('complementary', {
     name: 'Nearest cycle parking',
   });
-  await finderPanel.getByRole('searchbox').fill('Test Place');
-  await finderPanel
-    .getByRole('button', { name: 'Search', exact: true })
-    .click();
-  await page.getByRole('button', { name: /Test Place, Edinburgh/ }).click();
+  const searchbox = finderPanel.getByRole('searchbox');
+  await searchbox.fill('Test Place');
+  await expect(
+    page.getByRole('option', { name: /Test Place, Edinburgh/ }),
+  ).toBeVisible();
+  await searchbox.press('Enter');
 
   const parkingRow = page.getByTestId(`parking-row-${parkingOne.id}`);
   await expect(parkingRow).toBeVisible();
@@ -304,22 +311,25 @@ test('searches from a place and selects a nearby parking row', async ({
 test('searches for a Spanish place and loads Madrid parking', async ({
   page,
 }) => {
-  await page.route(
-    'https://nominatim.openstreetmap.org/search**',
-    async (route) => {
-      await route.fulfill({
-        contentType: 'application/json',
-        json: [
+  await page.route('https://photon.komoot.io/api/**', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      json: {
+        features: [
           {
-            display_name: 'Madrid, Comunidad de Madrid, España',
-            lat: '40.4168',
-            lon: '-3.7038',
-            osm_id: 5_329_560,
+            geometry: { coordinates: [-3.7038, 40.4168] },
+            properties: {
+              country: 'España',
+              name: 'Madrid',
+              osm_id: 5_329_560,
+              osm_type: 'R',
+              state: 'Comunidad de Madrid',
+            },
           },
         ],
-      });
-    },
-  );
+      },
+    });
+  });
 
   await page.goto('/?mockGps=55.94155,-3.29625,5');
   await expectFinderReady(page);
@@ -328,11 +338,8 @@ test('searches for a Spanish place and loads Madrid parking', async ({
     name: 'Nearest cycle parking',
   });
   await finderPanel.getByRole('searchbox').fill('Madrid');
-  await finderPanel
-    .getByRole('button', { name: 'Search', exact: true })
-    .click();
   await page
-    .getByRole('button', { name: /Madrid, Comunidad de Madrid/ })
+    .getByRole('option', { name: /Madrid, Comunidad de Madrid/ })
     .click();
 
   await expectMapFocusedAt(page, 40.4168, -3.7038);

@@ -20,13 +20,13 @@ describe('language support', () => {
     expect(localeFromLanguageTag('GD_gb')).toBe('gd');
   });
 
-  it('defines formatting and Nominatim preferences for every locale', () => {
+  it('defines formatting and place-search preferences for every locale', () => {
     expect(localeDetails.en).toMatchObject({
       formattingLocale: 'en-GB',
-      nominatimLanguages: 'en',
+      placeSearchLanguages: 'en',
     });
-    expect(localeDetails.gd.nominatimLanguages).toBe('gd,en');
-    expect(localeDetails.es.nominatimLanguages).toBe('es,en');
+    expect(localeDetails.gd.placeSearchLanguages).toBe('gd,en');
+    expect(localeDetails.es.placeSearchLanguages).toBe('es,en');
   });
 
   it('keeps every catalogue complete with matching placeholders', () => {

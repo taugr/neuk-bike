@@ -1,50 +1,96 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildPlaceSearchUrl,
-  PARKING_COVERAGE_VIEWBOX,
+  PARKING_COVERAGE_BBOX,
   parsePlaceSearchResults,
 } from '@/lib/geocoder';
 
 describe('place search', () => {
-  it('bounds Nominatim requests to the UK, Ireland and Spain', () => {
+  it('bounds Photon requests to the UK, Ireland and Spain', () => {
     const url = new URL(buildPlaceSearchUrl('Madrid'));
 
-    expect(url.searchParams.get('viewbox')).toBe(PARKING_COVERAGE_VIEWBOX);
-    expect(url.searchParams.get('bounded')).toBe('1');
-    expect(url.searchParams.get('countrycodes')).toBe('gb,ie,es');
+    expect(url.searchParams.get('bbox')).toBe(PARKING_COVERAGE_BBOX);
+    expect(url.searchParams.getAll('countrycode')).toEqual(['GB', 'IE', 'ES']);
     expect(url.searchParams.get('q')).toBe('Madrid');
-    expect(url.searchParams.get('accept-language')).toBe('en');
+    expect(url.searchParams.get('lang')).toBe('en');
+    expect(url.searchParams.get('limit')).toBe('5');
   });
 
-  it('requests localized place names with an English fallback', () => {
+  it('requests localized place names and biases results to the current map area', () => {
+    const url = new URL(
+      buildPlaceSearchUrl('Dùn Èideann', 'gd', {
+        latitude: 55.9533,
+        longitude: -3.1883,
+      }),
+    );
+
+    expect(url.searchParams.get('lang')).toBe('gd');
+    expect(url.searchParams.get('lat')).toBe('55.9533');
+    expect(url.searchParams.get('lon')).toBe('-3.1883');
     expect(
-      new URL(buildPlaceSearchUrl('Dùn Èideann', 'gd')).searchParams.get(
-        'accept-language',
-      ),
-    ).toBe('gd,en');
-    expect(
-      new URL(buildPlaceSearchUrl('Madrid', 'es')).searchParams.get(
-        'accept-language',
-      ),
-    ).toBe('es,en');
+      new URL(buildPlaceSearchUrl('Madrid', 'es')).searchParams.get('lang'),
+    ).toBe('es');
   });
 
-  it('parses valid Nominatim results and rejects malformed locations', () => {
+  it('parses valid Photon results and rejects malformed locations', () => {
     expect(
-      parsePlaceSearchResults([
-        {
-          display_name: 'Manchester, England, United Kingdom',
-          lat: '53.4808',
-          lon: '-2.2426',
-          osm_id: 1,
-        },
-        { display_name: 'Invalid', lat: 'not-a-number', lon: '-2' },
-      ]),
+      parsePlaceSearchResults({
+        features: [
+          {
+            geometry: { coordinates: [-2.2426, 53.4808] },
+            properties: {
+              country: 'United Kingdom',
+              name: 'Manchester',
+              osm_id: 1,
+              osm_type: 'R',
+              state: 'England',
+            },
+          },
+          {
+            geometry: { coordinates: [-2, 'not-a-number'] },
+            properties: { name: 'Invalid' },
+          },
+        ],
+      }),
     ).toEqual([
       {
-        id: '1',
+        id: 'R:1',
         location: { latitude: 53.4808, longitude: -2.2426 },
         name: 'Manchester, England, United Kingdom',
+      },
+    ]);
+  });
+
+  it('formats and deduplicates equivalent suggestions', () => {
+    expect(
+      parsePlaceSearchResults({
+        features: [
+          {
+            geometry: { coordinates: [-3.1883, 55.9533] },
+            properties: {
+              city: 'Edinburgh',
+              country: 'United Kingdom',
+              name: 'EH1 1BB',
+              postcode: 'EH1 1BB',
+            },
+          },
+          {
+            geometry: { coordinates: [-3.1882, 55.9534] },
+            properties: {
+              city: 'Edinburgh',
+              country: 'United Kingdom',
+              name: 'EH1 1BB',
+              osm_id: 2,
+              postcode: 'EH1 1BB',
+            },
+          },
+        ],
+      }),
+    ).toEqual([
+      {
+        id: 'feature:0',
+        location: { latitude: 55.9533, longitude: -3.1883 },
+        name: 'EH1 1BB, Edinburgh, United Kingdom',
       },
     ]);
   });
