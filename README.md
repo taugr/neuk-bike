@@ -10,13 +10,14 @@
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="license" />
   </a>
   <br />
-  Static, mobile-friendly map for finding nearby cycle parking across the UK and Ireland.
+  Static, mobile-friendly map for finding nearby cycle parking across the UK, Ireland and Spain.
 </p>
 
 ## Features
 
-- Find nearby cycle parking from your current location in the UK or Ireland
-- Search from a UK or Irish street, postcode, town, or place
+- Find nearby cycle parking from your current location in the UK, Ireland or
+  Spain
+- Search from a UK, Irish or Spanish street, postcode, town, or place
 - Browse a map-first interface without an app account or backend
 - Show cycle directions to a selected parking place with CycleStreets
 - See capacity, access, cover, and stand type when mapped
@@ -49,9 +50,9 @@ The generated parking release combines two free sources:
 
 - City of Edinburgh Council public cycle-parking GeoJSON, preferred within
   Edinburgh
-- OpenStreetMap `amenity=bicycle_parking` features from the Geofabrik Scotland,
-  Wales, and Ireland-and-Northern-Ireland extracts plus sequential England
-  county extracts for baseline coverage
+- OpenStreetMap `amenity=bicycle_parking` features from sequential Geofabrik
+  extracts for the UK, Ireland and Spain, including a separate Canary Islands
+  extract
 
 The refresh script normalizes both sources, suppresses likely Edinburgh
 duplicates in favour of council records, and writes source-qualified IDs such
@@ -69,11 +70,12 @@ src/data/cycle-parking-report.json
 The browser first loads the manifest and a 3×3 neighbourhood of zoom-12 chunks
 around the current location. Map movement loads additional bounded chunks. A
 24-chunk in-memory LRU cache prevents unbounded growth. The point index is only
-loaded when a `?parking=` deep link needs it. The full UK-and-Ireland
+loaded when a `?parking=` deep link needs it. The full UK-Ireland-Spain
 dataset is not included in the JavaScript bundle.
 
-If geolocation is unavailable or the requested location is outside the UK and
-Ireland, the app falls back to central Edinburgh and explains what happened.
+If geolocation is unavailable or the requested location is outside the UK,
+Ireland and Spain, the app falls back to central Edinburgh and explains what
+happened.
 Place search uses Nominatim and OpenStreetMap data, filters results through the
 same country-boundary polygons as the parking data, and does not use
 autocomplete.
@@ -120,21 +122,22 @@ pnpm exec playwright install chromium
 `pnpm update:data` performs the complete release pipeline:
 
 1. fetch the current City of Edinburgh Council public GeoJSON;
-2. download or reuse the Scotland, Wales, and Ireland-and-Northern-Ireland PBFs
-   plus 47 England county PBFs from Geofabrik;
+2. download or reuse the Scotland, Wales, Ireland-and-Northern-Ireland, and
+   Canary Islands PBFs plus 47 England county and 18 Spain regional PBFs from
+   Geofabrik;
 3. process each region sequentially so contextual naming stays memory-bounded;
 4. extract bicycle-parking nodes, ways, and relations;
 5. normalize fields, representative geometry, and descriptive names;
 6. deduplicate overlapping county extracts by source-qualified OSM ID;
 7. merge likely Edinburgh duplicates with deterministic council priority;
-8. download or reuse the England, Scotland, Wales, and
-   Ireland-and-Northern-Ireland Geofabrik coverage polygons;
+8. download or reuse the England, Scotland, Wales, Ireland-and-Northern-Ireland,
+   Spain, and Canary Islands Geofabrik coverage polygons;
 9. replace `public/data/parking/` with a schema-v2 manifest,
    content-addressed chunks, and point index;
 10. enforce file, asset, initial-payload, and total-data hard budgets;
 11. write the council snapshot and detailed quality report under `src/data/`.
 
-The cached inputs currently occupy about 2.4 GB and are ignored by Git. The
+The cached inputs currently occupy about 3.9 GB and are ignored by Git. The
 first refresh depends on Geofabrik download speed and bounded retry delays; a
 cached refresh avoids those downloads. The generated report records source
 timestamps, per-input SHA-256 checksums and elapsed time, geometry counts,
@@ -142,11 +145,11 @@ field completeness, naming-tier counts and samples, discarded features,
 cross-region duplicate IDs, council/OSM matches, peak memory, and output-size
 budgets.
 
-The current generated release contains 68,916 merged parking points in 3,213
-chunks. It includes 1,454 council points and 68,860 unique OSM records, with 207
+The current generated release contains 87,611 merged parking points in 4,342
+chunks. It includes 1,454 council points and 87,555 unique OSM records, with 216
 cross-region OSM duplicates removed and 1,398 likely Edinburgh duplicates
-suppressed in favour of council records. The parking release is about 20.6 MiB;
-the largest possible initial 3×3 payload is about 483 KiB compressed. Treat
+suppressed in favour of council records. The parking release is about 26.7 MiB;
+the largest possible initial 3×3 payload is about 491 KiB compressed. Treat
 these as a snapshot: `public/data/parking/manifest.json` and
 `src/data/cycle-parking-report.json` are the source of truth after a refresh.
 
@@ -161,13 +164,15 @@ Sources:
 - [Geofabrik Scotland extract](https://download.geofabrik.de/europe/united-kingdom/scotland.html)
 - [Geofabrik Wales extract](https://download.geofabrik.de/europe/united-kingdom/wales.html)
 - [Geofabrik Ireland and Northern Ireland extract](https://download.geofabrik.de/europe/ireland-and-northern-ireland.html)
+- [Geofabrik Spain regional extracts](https://download.geofabrik.de/europe/spain.html)
+- [Geofabrik Canary Islands extract](https://download.geofabrik.de/africa/canary-islands.html)
 
 ## Offline behaviour
 
 The service worker caches the app shell. The manifest uses network-first
 caching, while immutable versioned parking chunks and the point index use
 cache-first behaviour. Previously visited areas can therefore remain useful
-offline, but the app does not promise UK-and-Ireland-wide offline
+offline, but the app does not promise UK-Ireland-Spain-wide offline
 coverage.
 
 Live place search, CycleStreets directions, uncached map tiles, and uncached
@@ -192,6 +197,8 @@ On localhost or a loopback host, add mock GPS parameters for browser testing:
 /?parking=cec%3A1&mockGpsPath=55.94055,-3.29460,5;55.9406042783081,-3.29451047885751,5&mockGpsStepMs=1000
 /?parking=cec%3A1&mockGps=denied
 /?parking=cec%3A1&mockGps=unavailable
+/?mockGps=40.4168,-3.7038,5
+/?mockGps=28.1235,-15.4363,5
 /?mockGps=null-island
 ```
 

@@ -102,8 +102,49 @@ const manifest: ParkingDataManifest = {
           },
         ],
       },
+      {
+        bounds: { east: 4.4, north: 43.9, south: 35.1, west: -10 },
+        id: 'spain',
+        label: 'Spain',
+        rings: [
+          {
+            coordinates: [
+              [-10, 35.1],
+              [4.4, 35.1],
+              [4.4, 43.9],
+              [-10, 43.9],
+            ],
+            exclude: false,
+          },
+          {
+            coordinates: [
+              [-9.6, 36.8],
+              [-6, 36.8],
+              [-6, 42.2],
+              [-9.6, 42.2],
+            ],
+            exclude: true,
+          },
+        ],
+      },
+      {
+        bounds: { east: -13.2, north: 29.5, south: 27.5, west: -18.2 },
+        id: 'canary-islands',
+        label: 'Canary Islands',
+        rings: [
+          {
+            coordinates: [
+              [-18.2, 27.5],
+              [-13.2, 27.5],
+              [-13.2, 29.5],
+              [-18.2, 29.5],
+            ],
+            exclude: false,
+          },
+        ],
+      },
     ],
-    label: 'UK and Ireland',
+    label: 'UK, Ireland and Spain',
   },
   pointIndexPath: 'version/point-index.json',
   recordCount: 2,
@@ -154,6 +195,24 @@ describe('parking data tiling', () => {
         manifest,
       ),
     ).toBe(true);
+    expect(
+      isLocationInParkingCoverage(
+        { latitude: 40.4168, longitude: -3.7038 },
+        manifest,
+      ),
+    ).toBe(true);
+    expect(
+      isLocationInParkingCoverage(
+        { latitude: 28.1235, longitude: -15.4363 },
+        manifest,
+      ),
+    ).toBe(true);
+    expect(
+      isLocationInParkingCoverage(
+        { latitude: 38.7223, longitude: -9.1393 },
+        manifest,
+      ),
+    ).toBe(false);
     expect(
       isLocationInParkingCoverage(
         { latitude: 49.2144, longitude: -2.1313 },

@@ -119,15 +119,16 @@ async function main() {
   assert(manifest.schemaVersion === 2, 'Manifest schema must be version 2.');
   assert(report.schemaVersion === 2, 'Report schema must be version 2.');
   assert(
-    manifest.coverage.label === 'UK and Ireland',
-    'Coverage label must describe the UK and Ireland.',
+    manifest.coverage.label === 'UK, Ireland and Spain',
+    'Coverage label must describe the UK, Ireland and Spain.',
   );
   assert(
     manifest.coverage.areas
       .map((area) => area.id)
       .sort()
-      .join(',') === 'england,ireland-and-northern-ireland,scotland,wales',
-    'Coverage must contain England, Scotland, Wales, and Ireland areas.',
+      .join(',') ===
+      'canary-islands,england,ireland-and-northern-ireland,scotland,spain,wales',
+    'Coverage must contain UK, Ireland, mainland Spain, and Canary areas.',
   );
 
   const pointIndexContent = await readFile(
@@ -189,11 +190,22 @@ async function main() {
     Cardiff: { latitude: 51.4816, longitude: -3.1791 },
     Belfast: { latitude: 54.5973, longitude: -5.9301 },
     Dublin: { latitude: 53.3498, longitude: -6.2603 },
+    Madrid: { latitude: 40.4168, longitude: -3.7038 },
+    Barcelona: { latitude: 41.3874, longitude: 2.1686 },
+    Seville: { latitude: 37.3891, longitude: -5.9845 },
+    Palma: { latitude: 39.5696, longitude: 2.6502 },
+    LasPalmas: { latitude: 28.1235, longitude: -15.4363 },
+    Ceuta: { latitude: 35.8894, longitude: -5.3213 },
+    Melilla: { latitude: 35.2923, longitude: -2.9381 },
   };
   const representativeOutside = {
     Douglas: { latitude: 54.1523, longitude: -4.4861 },
     Jersey: { latitude: 49.2144, longitude: -2.1313 },
     Cherbourg: { latitude: 49.6337, longitude: -1.6221 },
+    Lisbon: { latitude: 38.7223, longitude: -9.1393 },
+    Paris: { latitude: 48.8566, longitude: 2.3522 },
+    AndorraLaVella: { latitude: 42.5063, longitude: 1.5218 },
+    Tangier: { latitude: 35.7595, longitude: -5.834 },
   };
   for (const [label, location] of Object.entries(representativeInside)) {
     assert(isCovered(location, manifest), `${label} must be inside coverage.`);

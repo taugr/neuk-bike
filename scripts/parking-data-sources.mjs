@@ -1,7 +1,10 @@
-const geofabrikEuropeRoot = 'https://download.geofabrik.de/europe';
+const geofabrikRoot = 'https://download.geofabrik.de';
+const geofabrikAfricaRoot = `${geofabrikRoot}/africa`;
+const geofabrikEuropeRoot = `${geofabrikRoot}/europe`;
+const geofabrikSpainRoot = `${geofabrikEuropeRoot}/spain`;
 const geofabrikUkRoot = `${geofabrikEuropeRoot}/united-kingdom`;
 
-export const coverageLabel = 'UK and Ireland';
+export const coverageLabel = 'UK, Ireland and Spain';
 
 const englandRegions = [
   ['bedfordshire', 'Bedfordshire'],
@@ -53,6 +56,27 @@ const englandRegions = [
   ['worcestershire', 'Worcestershire'],
 ];
 
+const spainRegions = [
+  ['andalucia', 'Andalucía'],
+  ['aragon', 'Aragón'],
+  ['asturias', 'Asturias'],
+  ['cantabria', 'Cantabria'],
+  ['castilla-la-mancha', 'Castilla-La Mancha'],
+  ['castilla-y-leon', 'Castilla y León'],
+  ['cataluna', 'Cataluña'],
+  ['ceuta', 'Ceuta'],
+  ['extremadura', 'Extremadura'],
+  ['galicia', 'Galicia'],
+  ['islas-baleares', 'Islas Baleares'],
+  ['la-rioja', 'La Rioja'],
+  ['madrid', 'Madrid'],
+  ['melilla', 'Melilla'],
+  ['murcia', 'Murcia'],
+  ['navarra', 'Navarra'],
+  ['pais-vasco', 'País Vasco'],
+  ['valencia', 'Valencia'],
+];
+
 export const osmInputs = [
   {
     countryId: 'scotland',
@@ -78,6 +102,18 @@ export const osmInputs = [
     label: 'Ireland and Northern Ireland',
     url: `${geofabrikEuropeRoot}/ireland-and-northern-ireland-latest.osm.pbf`,
   },
+  ...spainRegions.map(([id, label]) => ({
+    countryId: 'spain',
+    id: `spain-${id}`,
+    label,
+    url: `${geofabrikSpainRoot}/${id}-latest.osm.pbf`,
+  })),
+  {
+    countryId: 'spain',
+    id: 'canary-islands',
+    label: 'Canary Islands',
+    url: `${geofabrikAfricaRoot}/canary-islands-latest.osm.pbf`,
+  },
 ];
 
 export const coverageInputs = [
@@ -101,7 +137,17 @@ export const coverageInputs = [
     label: 'Ireland and Northern Ireland',
     url: `${geofabrikEuropeRoot}/ireland-and-northern-ireland.poly`,
   },
+  {
+    id: 'spain',
+    label: 'Spain',
+    url: `${geofabrikEuropeRoot}/spain.poly`,
+  },
+  {
+    id: 'canary-islands',
+    label: 'Canary Islands',
+    url: `${geofabrikAfricaRoot}/canary-islands.poly`,
+  },
 ];
 
-export const osmCatalogueUrl = `${geofabrikEuropeRoot}.html`;
+export const osmCatalogueUrl = geofabrikRoot;
 export const osmLicenceUrl = 'https://opendatacommons.org/licenses/odbl/1-0/';

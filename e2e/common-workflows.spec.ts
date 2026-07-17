@@ -6,6 +6,12 @@ const parkingOne = {
   longitude: -3.29451047885751,
 };
 
+const madridParking = {
+  id: 'osm:node:8017318200',
+  latitude: 40.4166001,
+  longitude: -3.703248,
+};
+
 function parkingOneReferenceUrl(extraParams: Record<string, string> = {}) {
   const params = new URLSearchParams({
     lat: String(parkingOne.latitude),
@@ -94,6 +100,10 @@ test('keeps manual zoom after background parking chunks load', async ({
 }) => {
   const loadedParkingChunks = new Set<string>();
   const selectedParkingChunkPath = '/chunks/12/1962/1255.';
+  let releaseBackgroundChunks: () => void = () => {};
+  const backgroundChunksReleased = new Promise<void>((resolve) => {
+    releaseBackgroundChunks = resolve;
+  });
 
   await page.route('**/data/parking/**/*.json', async (route) => {
     const pathname = new URL(route.request().url()).pathname;
@@ -104,7 +114,7 @@ test('keeps manual zoom after background parking chunks load', async ({
       chunkCoordinates !== null && Number(chunkCoordinates[1]) < 2_000;
 
     if (isSelectedAreaChunk && !pathname.includes(selectedParkingChunkPath)) {
-      await new Promise((resolve) => setTimeout(resolve, 3_500));
+      await backgroundChunksReleased;
     }
 
     await route.continue();
@@ -147,7 +157,10 @@ test('keeps manual zoom after background parking chunks load', async ({
   expect(zoomAfterManualZoom).toBeLessThan(initialZoom - 0.5);
   const westAfterManualZoom = Number(await map.getAttribute('data-map-west'));
   const northAfterManualZoom = Number(await map.getAttribute('data-map-north'));
-  await page.waitForTimeout(3_000);
+  releaseBackgroundChunks();
+  await expect
+    .poll(() => loadedParkingChunks.size, { timeout: 5_000 })
+    .toBeGreaterThan(0);
   const markerAfterChunkLoading = await selectedParkingMarker.boundingBox();
   const zoomAfterChunkLoading = Number(await map.getAttribute('data-map-zoom'));
   const westAfterChunkLoading = Number(await map.getAttribute('data-map-west'));
@@ -155,7 +168,6 @@ test('keeps manual zoom after background parking chunks load', async ({
     await map.getAttribute('data-map-north'),
   );
 
-  expect(loadedParkingChunks.size).toBeGreaterThan(0);
   expect(markerAfterZoom).not.toBeNull();
   expect(markerAfterChunkLoading).not.toBeNull();
   expect(
@@ -203,13 +215,75 @@ test('searches from a place and selects a nearby parking row', async ({
     name: 'Nearest cycle parking',
   });
   await finderPanel.getByRole('searchbox').fill('Test Place');
-  await finderPanel.getByRole('button', { name: 'Search' }).click();
+  await finderPanel
+    .getByRole('button', { name: 'Search', exact: true })
+    .click();
   await page.getByRole('button', { name: /Test Place, Edinburgh/ }).click();
 
   const parkingRow = page.getByTestId(`parking-row-${parkingOne.id}`);
   await expect(parkingRow).toBeVisible();
   await parkingRow.click();
   await expect(parkingRow).toHaveClass(/selected/);
+});
+
+test('searches for a Spanish place and loads Madrid parking', async ({
+  page,
+}) => {
+  await page.route(
+    'https://nominatim.openstreetmap.org/search**',
+    async (route) => {
+      await route.fulfill({
+        contentType: 'application/json',
+        json: [
+          {
+            display_name: 'Madrid, Comunidad de Madrid, España',
+            lat: '40.4168',
+            lon: '-3.7038',
+            osm_id: 5_329_560,
+          },
+        ],
+      });
+    },
+  );
+
+  await page.goto('/?mockGps=55.94155,-3.29625,5');
+  await expectFinderReady(page);
+
+  const finderPanel = page.getByRole('complementary', {
+    name: 'Nearest cycle parking',
+  });
+  await finderPanel.getByRole('searchbox').fill('Madrid');
+  await finderPanel
+    .getByRole('button', { name: 'Search', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: /Madrid, Comunidad de Madrid/ })
+    .click();
+
+  await expectMapFocusedAt(page, 40.4168, -3.7038);
+  await expect(
+    page.getByTestId(`parking-row-${madridParking.id}`),
+  ).toBeVisible();
+});
+
+test('opens short local directions to Spanish parking', async ({ page }) => {
+  const params = new URLSearchParams({
+    lat: String(madridParking.latitude),
+    lng: String(madridParking.longitude),
+    parking: madridParking.id,
+  });
+  await page.goto(`/?${params.toString()}`);
+  await expectFinderReady(page);
+
+  const parkingRow = page.getByTestId(`parking-row-${madridParking.id}`);
+  await expect(parkingRow).toBeVisible();
+  await page.getByTestId(`parking-directions-${madridParking.id}`).click();
+
+  await expect(
+    page.getByRole('region', { name: 'Cycle directions' }),
+  ).toBeVisible();
+  await expect(page.getByLabel('Route summary')).toBeVisible();
+  await expect(page.getByTestId('directions-list')).toBeVisible();
 });
 
 test('opens short local directions from a mocked location', async ({
@@ -307,6 +381,20 @@ for (const [place, mockGps] of [
 }
 
 for (const [place, mockGps] of [
+  ['Madrid', '40.4168,-3.7038,5'],
+  ['Barcelona', '41.3874,2.1686,5'],
+  ['Palma', '39.5696,2.6502,5'],
+  ['Las Palmas', '28.1235,-15.4363,5'],
+] as const) {
+  test(`loads mapped cycle parking near ${place}`, async ({ page }) => {
+    await page.goto(`/?mockGps=${mockGps}`);
+    await expectFinderReady(page);
+    const [latitude, longitude] = mockGps.split(',').map(Number);
+    await expectMapFocusedAt(page, latitude, longitude);
+  });
+}
+
+for (const [place, mockGps] of [
   ['Cardiff', '51.4816,-3.1791,5'],
   ['Swansea', '51.6214,-3.9436,5'],
   ['Aberystwyth', '52.4153,-4.0829,5'],
@@ -353,14 +441,14 @@ for (const mockGps of ['denied', 'unavailable'] as const) {
   });
 }
 
-test('explains the UK and Ireland boundary for an outside location', async ({
+test('explains the dataset boundary for an outside location', async ({
   page,
 }) => {
   await page.goto('/?mockGps=54.1523,-4.4861,5');
   await expectFinderReady(page);
   await expect(
     page.getByText(
-      'That location is outside the UK and Ireland, showing bike parking near Edinburgh.',
+      'That location is outside the UK, Ireland and Spain, showing bike parking near Edinburgh.',
     ),
   ).toBeVisible();
   await expect(page.getByTestId('parking-row-cec:178')).toBeVisible();

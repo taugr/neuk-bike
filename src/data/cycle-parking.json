@@ -3,7 +3,7 @@
     "attribution": "Copyright City of Edinburgh Council, contains Ordnance Survey data (c) Crown copyright and database right 2026.",
     "licenceUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
     "recordCount": 1454,
-    "refreshedAt": "2026-07-16T15:41:31.822Z",
+    "refreshedAt": "2026-07-17T06:24:41.972Z",
     "sourceUrl": "https://services-eu1.arcgis.com/FgpikkYuSUOuITxp/arcgis/rest/services/Public_Bike_Parking/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson"
   },
   "points": [

@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildPlaceSearchUrl,
-  UK_IRELAND_VIEWBOX,
+  PARKING_COVERAGE_VIEWBOX,
   parsePlaceSearchResults,
 } from '@/lib/geocoder';
 
 describe('place search', () => {
-  it('bounds Nominatim requests to the UK and Ireland', () => {
-    const url = new URL(buildPlaceSearchUrl('Manchester'));
+  it('bounds Nominatim requests to the UK, Ireland and Spain', () => {
+    const url = new URL(buildPlaceSearchUrl('Madrid'));
 
-    expect(url.searchParams.get('viewbox')).toBe(UK_IRELAND_VIEWBOX);
+    expect(url.searchParams.get('viewbox')).toBe(PARKING_COVERAGE_VIEWBOX);
     expect(url.searchParams.get('bounded')).toBe('1');
-    expect(url.searchParams.get('countrycodes')).toBe('gb,ie');
-    expect(url.searchParams.get('q')).toBe('Manchester');
+    expect(url.searchParams.get('countrycodes')).toBe('gb,ie,es');
+    expect(url.searchParams.get('q')).toBe('Madrid');
   });
 
   it('parses valid Nominatim results and rejects malformed locations', () => {

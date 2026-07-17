@@ -3,7 +3,7 @@ import type { UserLocation } from '@/lib/types';
 
 export const NOMINATIM_SEARCH_URL =
   'https://nominatim.openstreetmap.org/search';
-export const UK_IRELAND_VIEWBOX = '-10.8,60.9,1.8,49.8';
+export const PARKING_COVERAGE_VIEWBOX = '-18.2,60.9,4.4,27.5';
 
 export type PlaceSearchResult = {
   id: string;
@@ -24,8 +24,8 @@ export function buildPlaceSearchUrl(query: string) {
     q: query,
     format: 'jsonv2',
     limit: '5',
-    countrycodes: 'gb,ie',
-    viewbox: UK_IRELAND_VIEWBOX,
+    countrycodes: 'gb,ie,es',
+    viewbox: PARKING_COVERAGE_VIEWBOX,
     bounded: '1',
   });
 

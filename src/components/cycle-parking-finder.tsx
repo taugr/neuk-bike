@@ -555,7 +555,7 @@ export default function CycleParkingFinder() {
         setParkingDataStatus('ready');
         setParkingDataMessage(
           selectedParkingId && !selectedPoint
-            ? 'That parking link is not in the current UK and Ireland dataset.'
+            ? 'That parking link is not in the current UK, Ireland and Spain dataset.'
             : null,
         );
 
@@ -1380,7 +1380,7 @@ export default function CycleParkingFinder() {
       setPlaceResults(cachedResults);
       setPlaceSearchMessage(
         cachedResults.length === 0
-          ? 'No matching places in the UK or Ireland found.'
+          ? 'No matching places in the UK, Ireland or Spain found.'
           : null,
       );
       return;
@@ -1424,7 +1424,7 @@ export default function CycleParkingFinder() {
       setPlaceResults(results);
       setPlaceSearchMessage(
         results.length === 0
-          ? 'No matching places in the UK or Ireland found.'
+          ? 'No matching places in the UK, Ireland or Spain found.'
           : null,
       );
       setHasUsedPlaceSearch(true);
@@ -2085,7 +2085,7 @@ export default function CycleParkingFinder() {
                         {liveRouteTracking.status === 'denied'
                           ? 'Enable location permissions to start route.'
                           : liveRouteTracking.status === 'too-far'
-                            ? 'Start route is only available within the UK and Ireland.'
+                            ? 'Start route is only available within the UK, Ireland and Spain.'
                             : 'Live location is unavailable.'}
                       </motion.p>
                     ) : null}
@@ -2313,7 +2313,7 @@ export default function CycleParkingFinder() {
                       <h1>Bike Neuks</h1>
                       <p>
                         {formattedParkingLocationCount} cycle parking spots in
-                        the UK and Ireland
+                        the UK, Ireland and Spain
                       </p>
                     </div>
                     {renderThemeSettings('settings-menu--desktop')}
@@ -2383,8 +2383,8 @@ export default function CycleParkingFinder() {
                             className="parking-list-context"
                             role="status"
                           >
-                            That location is outside the UK and Ireland, showing
-                            bike parking near Edinburgh.
+                            That location is outside the UK, Ireland and Spain,
+                            showing bike parking near Edinburgh.
                           </motion.div>
                         ) : null}
                       </AnimatePresence>

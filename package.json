@@ -2,7 +2,7 @@
   "name": "neuk-bike",
   "version": "0.1.0",
   "private": true,
-  "description": "Static mobile-friendly map for finding nearby cycle parking across the UK and Ireland.",
+  "description": "Static mobile-friendly map for finding nearby cycle parking across the UK, Ireland and Spain.",
   "keywords": [
     "active-travel",
     "cycle-parking",
@@ -11,6 +11,7 @@
     "england",
     "ireland",
     "scotland",
+    "spain",
     "wales",
     "map",
     "nextjs"
