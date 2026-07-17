@@ -412,6 +412,7 @@ export default function CycleParkingFinder() {
   const parkingDataClient = useRef<ParkingDataClient | null>(null);
   const directionsCache = useRef(new Map<string, CycleRoute>());
   const placeSearchInFlight = useRef(false);
+  const placeSearchRequestId = useRef(0);
   const directionsRequestId = useRef(0);
   const liveRouteWatchId = useRef<number | null>(null);
   const previousLiveRouteMarkerPosition = useRef<CycleRoutePoint | null>(null);
@@ -1386,6 +1387,8 @@ export default function CycleParkingFinder() {
     }
 
     placeSearchInFlight.current = true;
+    const requestId = placeSearchRequestId.current + 1;
+    placeSearchRequestId.current = requestId;
     setIsPlaceSearching(true);
     setPlaceSearchMessage(null);
 
@@ -1412,6 +1415,9 @@ export default function CycleParkingFinder() {
           placeSearchCache.current.delete(oldestKey);
         }
       }
+      if (requestId !== placeSearchRequestId.current) {
+        return;
+      }
       captureAnalyticsEvent('place_searched', {
         result_count: results.length,
       });
@@ -1423,13 +1429,32 @@ export default function CycleParkingFinder() {
       );
       setHasUsedPlaceSearch(true);
     } catch {
+      if (requestId !== placeSearchRequestId.current) {
+        return;
+      }
       captureAnalyticsEvent('place_searched', { error: true });
       setPlaceResults([]);
       setPlaceSearchMessage('Place search is unavailable right now.');
     } finally {
-      placeSearchInFlight.current = false;
-      setIsPlaceSearching(false);
+      if (requestId === placeSearchRequestId.current) {
+        placeSearchInFlight.current = false;
+        setIsPlaceSearching(false);
+      }
     }
+  }
+
+  function clearPlaceSearch(surface: 'desktop' | 'mobile') {
+    placeSearchRequestId.current += 1;
+    placeSearchInFlight.current = false;
+    setIsPlaceSearching(false);
+    setPlaceQuery('');
+    setPlaceResults([]);
+    setPlaceSearchMessage(null);
+    window.requestAnimationFrame(() => {
+      document
+        .querySelector<HTMLInputElement>(`#place-search-${surface}`)
+        ?.focus();
+    });
   }
 
   function selectPlace(result: PlaceSearchResult) {
@@ -1710,9 +1735,11 @@ export default function CycleParkingFinder() {
             void searchForPlace(event);
           }}
         >
-          <label className="search-box">
-            <Search size={17} aria-hidden="true" />
-            <span className="sr-only">Search from a place</span>
+          <div className="search-box">
+            <Search className="search-box-icon" size={17} aria-hidden="true" />
+            <label className="sr-only" htmlFor={`place-search-${surface}`}>
+              Search from a place
+            </label>
             <input
               id={`place-search-${surface}`}
               name="place-search"
@@ -1721,7 +1748,17 @@ export default function CycleParkingFinder() {
               placeholder="Place or postcode"
               onChange={(event) => setPlaceQuery(event.target.value)}
             />
-          </label>
+            {placeQuery.length > 0 ? (
+              <button
+                aria-label="Clear search"
+                className="search-clear-button"
+                type="button"
+                onClick={() => clearPlaceSearch(surface)}
+              >
+                <X size={16} aria-hidden="true" />
+              </button>
+            ) : null}
+          </div>
           <motion.button
             aria-label={
               locationState.status === 'locating'
