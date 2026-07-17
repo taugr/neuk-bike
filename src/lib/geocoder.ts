@@ -1,4 +1,5 @@
 import { isResolvedLocation } from '@/lib/geo';
+import { localeDetails, type AppLocale } from '@/lib/i18n/locales';
 import type { UserLocation } from '@/lib/types';
 
 export const NOMINATIM_SEARCH_URL =
@@ -19,7 +20,7 @@ type NominatimResult = {
   place_id?: unknown;
 };
 
-export function buildPlaceSearchUrl(query: string) {
+export function buildPlaceSearchUrl(query: string, locale: AppLocale = 'en') {
   const params = new URLSearchParams({
     q: query,
     format: 'jsonv2',
@@ -27,6 +28,7 @@ export function buildPlaceSearchUrl(query: string) {
     countrycodes: 'gb,ie,es',
     viewbox: PARKING_COVERAGE_VIEWBOX,
     bounded: '1',
+    'accept-language': localeDetails[locale].nominatimLanguages,
   });
 
   return `${NOMINATIM_SEARCH_URL}?${params.toString()}`;

@@ -95,6 +95,69 @@ test('loads the map-first finder with nearby parking', async ({ page }) => {
   ).toBeVisible();
 });
 
+test('switches and persists the interface language without moving the map', async ({
+  page,
+}) => {
+  await page.goto('/?mockGps=55.94155,-3.29625,5');
+  await expectFinderReady(page);
+  await expectMapFocusedAt(page, 55.94155, -3.29625);
+
+  const map = page.getByTestId('parking-map');
+  const boundsBefore = await Promise.all(
+    ['data-map-west', 'data-map-east', 'data-map-south', 'data-map-north'].map(
+      (attribute) => map.getAttribute(attribute),
+    ),
+  );
+  const desktopSettings = page.locator(
+    '.settings-menu--desktop .settings-trigger',
+  );
+  await desktopSettings.click();
+  await page
+    .locator('.settings-menu--desktop .language-select')
+    .selectOption('es');
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page.locator('#place-search-desktop')).toHaveAttribute(
+    'placeholder',
+    'Lugar o código postal',
+  );
+  await expect(
+    page.getByRole('heading', { name: /Aparcabicis cercanos/ }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Alejar' })).toBeVisible();
+
+  const boundsAfter = await Promise.all(
+    ['data-map-west', 'data-map-east', 'data-map-south', 'data-map-north'].map(
+      (attribute) => map.getAttribute(attribute),
+    ),
+  );
+  boundsBefore.forEach((value, index) => {
+    expect(Math.abs(Number(boundsAfter[index]) - Number(value))).toBeLessThan(
+      0.03,
+    );
+  });
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page.locator('#place-search-desktop')).toHaveAttribute(
+    'placeholder',
+    'Lugar o código postal',
+  );
+
+  await page.locator('.settings-menu--desktop .settings-trigger').click();
+  await page
+    .locator('.settings-menu--desktop .language-select')
+    .selectOption('gd');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'gd');
+  await expect(page.locator('#place-search-desktop')).toHaveAttribute(
+    'placeholder',
+    'Àite no còd-puist',
+  );
+  await expect(
+    page.getByRole('heading', { name: /Bike neuks faisg ort/ }),
+  ).toBeVisible();
+});
+
 test('keeps manual zoom after background parking chunks load', async ({
   page,
 }) => {

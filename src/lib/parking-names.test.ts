@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { getParkingDisplayName } from '@/lib/parking-names';
+import {
+  formatParkingDisplayName,
+  getParkingDisplayName,
+} from '@/lib/parking-names';
 import type { ParkingPoint } from '@/lib/types';
 
 function parkingPoint(id: string, name: string): ParkingPoint {
@@ -35,5 +38,45 @@ describe('getParkingDisplayName', () => {
     expect(
       getParkingDisplayName(parkingPoint('cec:999', 'Cycle parking 999')),
     ).toBe('Cycle parking 999');
+  });
+});
+
+describe('formatParkingDisplayName', () => {
+  it('localizes generated connectors while preserving proper names', () => {
+    const point = parkingPoint('osm:1', 'Calle de Alcalá near Gran Vía');
+    point.properties.nameSource = 'junction';
+
+    expect(formatParkingDisplayName(point, 'es')).toBe(
+      'Calle de Alcalá cerca de Gran Vía',
+    );
+    expect(formatParkingDisplayName(point, 'gd')).toBe(
+      'Calle de Alcalá faisg air Gran Vía',
+    );
+  });
+
+  it('localizes generated suffixes and generic names', () => {
+    const street = parkingPoint('osm:2', 'Sràid na Banrighinn cycle parking');
+    street.properties.nameSource = 'street';
+    expect(formatParkingDisplayName(street, 'gd')).toBe(
+      'Pàirceadh bhaidhsagalan aig Sràid na Banrighinn',
+    );
+
+    const generic = parkingPoint('osm:3', 'Cycle parking 3');
+    generic.properties.nameSource = 'generic';
+    expect(formatParkingDisplayName(generic, 'es')).toBe('Aparcabicis');
+  });
+
+  it('never rewrites a source-authored or curated name', () => {
+    const source = parkingPoint('osm:4', 'Aparcabicis Plaza Mayor');
+    source.properties.nameSource = 'source';
+    expect(formatParkingDisplayName(source, 'gd')).toBe(
+      'Aparcabicis Plaza Mayor',
+    );
+    expect(
+      formatParkingDisplayName(
+        parkingPoint('cec:178', 'Cycle parking 178'),
+        'es',
+      ),
+    ).toBe('Princes Street by Waverley Steps');
   });
 });

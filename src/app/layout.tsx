@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import PwaInstallPrompt from '@/components/pwa-install-prompt';
+import { LanguageProvider } from '@/components/language-provider';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
 
@@ -67,7 +68,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href={assetPath('/site.webmanifest')} />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -103,9 +104,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <PwaInstallPrompt assetBasePath={assetBasePath}>
-          {children}
-        </PwaInstallPrompt>
+        <LanguageProvider>
+          <PwaInstallPrompt assetBasePath={assetBasePath}>
+            {children}
+          </PwaInstallPrompt>
+        </LanguageProvider>
       </body>
     </html>
   );

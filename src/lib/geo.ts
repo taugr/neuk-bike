@@ -1,4 +1,6 @@
 import type { ParkingPoint, UserLocation } from '@/lib/types';
+import type { AppLocale } from '@/lib/i18n/locales';
+import { formatLocalizedDistance } from '@/lib/i18n/format';
 
 export const EDINBURGH_FALLBACK_LOCATION: UserLocation = {
   latitude: 55.9533,
@@ -74,14 +76,9 @@ export function isFarFromNearestParking(
   );
 }
 
-export function formatDistance(distance: number | undefined) {
-  if (typeof distance !== 'number') {
-    return 'Unknown distance';
-  }
-
-  if (distance < 1_000) {
-    return `${Math.round(distance)} m`;
-  }
-
-  return `${(distance / 1_000).toFixed(1)} km`;
+export function formatDistance(
+  distance: number | undefined,
+  locale: AppLocale = 'en',
+) {
+  return formatLocalizedDistance(distance, locale);
 }

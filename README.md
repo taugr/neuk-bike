@@ -24,6 +24,7 @@
 - Share parking places with source-qualified `?parking=` links
 - Install the app as a Progressive Web App
 - Reuse previously visited parking chunks offline
+- Use the interface in English, Scottish Gaelic, or Spanish
 
 ## Live app
 
@@ -98,6 +99,18 @@ the Google key to the Maps Embed API and the app's allowed HTTP referrers.
 
 Production builds use PostHog only when `NEXT_PUBLIC_POSTHOG_KEY` is configured.
 Analytics are disabled on local and loopback hosts by default.
+
+## Language setting
+
+Open the settings menu to switch between English, Scottish Gaelic
+(`Gàidhlig`), and Spanish (`Español`). The choice is stored only in the
+browser and is reused on the next visit. On a first visit the app uses the
+first supported browser language, then falls back to English.
+
+The translated interface, parking-name templates, route instructions, and
+number formatting are bundled into the static app. Street and place names,
+brand names, source attribution, and licence text stay unchanged. Place search
+asks Nominatim for results in the selected language with an English fallback.
 
 ## Commands
 

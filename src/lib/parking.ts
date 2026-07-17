@@ -1,7 +1,10 @@
 import { formatDistance } from '@/lib/geo';
+import type { AppLocale } from '@/lib/i18n/locales';
+import { translate } from '@/lib/i18n/messages';
 import type { ParkingPoint } from '@/lib/types';
 
 type ParkingDetail = {
+  kind: 'access' | 'cover' | 'distance' | 'spaces' | 'type';
   label: string;
   value: string;
 };
@@ -31,6 +34,7 @@ export type ParkingPopupIcon =
 
 type ParkingPopupMetric = {
   icon: ParkingPopupIcon;
+  kind: 'distance';
   label: string;
   tone: ParkingPopupTone;
   value: string;
@@ -39,6 +43,7 @@ type ParkingPopupMetric = {
 type ParkingPopupDetail = {
   emphasis?: string;
   icon: ParkingPopupIcon;
+  kind: 'access' | 'cover' | 'spaces' | 'type';
   label: string;
   tone: ParkingPopupTone;
   value: string;
@@ -55,22 +60,28 @@ function normalizeText(value: string | number | boolean | null | undefined) {
     : null;
 }
 
-function formatCapacity(value: string | number | boolean | null | undefined) {
+function formatCapacity(
+  value: string | number | boolean | null | undefined,
+  locale: AppLocale,
+) {
   return typeof value === 'number' && value > 0
-    ? `${value} spaces`
-    : 'Not listed';
+    ? translate(locale, 'spacesCount', { count: value })
+    : translate(locale, 'notListed');
 }
 
-function formatCovered(value: string | number | boolean | null | undefined) {
+function formatCovered(
+  value: string | number | boolean | null | undefined,
+  locale: AppLocale,
+) {
   if (value === 'yes') {
-    return 'Covered';
+    return translate(locale, 'covered');
   }
 
   if (value === 'no') {
-    return 'Not covered';
+    return translate(locale, 'notCovered');
   }
 
-  return 'Not listed';
+  return translate(locale, 'notListed');
 }
 
 function getDistanceTone(distance: number | undefined): ParkingPopupTone {
@@ -109,6 +120,7 @@ function getCapacityTone(
 
 function formatCapacityDetail(
   value: string | number | boolean | null | undefined,
+  locale: AppLocale,
 ): ParkingPopupDetail | null {
   const hasCapacity = typeof value === 'number' && value > 0;
 
@@ -119,14 +131,16 @@ function formatCapacityDetail(
   return {
     emphasis: String(value),
     icon: 'parking',
-    label: 'Spaces',
+    kind: 'spaces',
+    label: translate(locale, 'spaces'),
     tone: getCapacityTone(value),
-    value: 'Spaces',
+    value: translate(locale, 'spaces'),
   };
 }
 
 function formatStandType(
   value: string | number | boolean | null | undefined,
+  locale: AppLocale,
 ): ParkingPopupDetail | null {
   const type = normalizeText(value);
 
@@ -137,27 +151,30 @@ function formatStandType(
   if (['stands', 'wide_stands', 'staple', 'hoop', 'post_hoop'].includes(type)) {
     return {
       icon: 'stand',
-      label: 'Type',
+      kind: 'type',
+      label: translate(locale, 'type'),
       tone: 'teal',
-      value: formatTypeLabel(type),
+      value: formatTypeLabel(type, locale),
     };
   }
 
   if (['rack', 'racks'].includes(type)) {
     return {
       icon: 'parking',
-      label: 'Type',
+      kind: 'type',
+      label: translate(locale, 'type'),
       tone: 'teal',
-      value: formatTypeLabel(type),
+      value: formatTypeLabel(type, locale),
     };
   }
 
   if (['shed', 'building', 'lockers', 'streetpod'].includes(type)) {
     return {
       icon: type === 'building' ? 'building' : 'storage',
-      label: 'Type',
+      kind: 'type',
+      label: translate(locale, 'type'),
       tone: 'green',
-      value: formatTypeLabel(type),
+      value: formatTypeLabel(type, locale),
     };
   }
 
@@ -172,21 +189,56 @@ function formatStandType(
   ) {
     return {
       icon: 'fixture',
-      label: 'Type',
+      kind: 'type',
+      label: translate(locale, 'type'),
       tone: 'amber',
-      value: formatTypeLabel(type),
+      value: formatTypeLabel(type, locale),
     };
   }
 
   return {
     icon: 'unknown',
-    label: 'Type',
+    kind: 'type',
+    label: translate(locale, 'type'),
     tone: 'neutral',
-    value: formatTypeLabel(type),
+    value: formatTypeLabel(type, locale),
   };
 }
 
-function formatTypeLabel(value: string) {
+const translatedTypeKeys = {
+  anchors: 'typeAnchors',
+  building: 'typeBuilding',
+  customers: 'accessCustomers',
+  destination: 'accessDestination',
+  employees: 'accessEmployees',
+  front_wheel: 'typeFrontWheel',
+  ground_slots: 'typeGroundSlots',
+  hoop: 'typeHoop',
+  lockers: 'typeLockers',
+  permissive: 'accessPermissive',
+  permit: 'accessPermit',
+  post_hoop: 'typePostHoop',
+  private: 'accessPrivate',
+  rack: 'typeRack',
+  racks: 'typeRacks',
+  residents: 'accessResidents',
+  shed: 'typeShed',
+  stands: 'typeStands',
+  staple: 'typeStaple',
+  streetpod: 'typeStreetpod',
+  university: 'accessUniversity',
+  vertical_stand: 'typeVerticalStand',
+  wall_loops: 'typeWallLoops',
+  wide_stands: 'typeWideStands',
+} as const;
+
+function formatTypeLabel(value: string, locale: AppLocale) {
+  const messageKey =
+    translatedTypeKeys[value as keyof typeof translatedTypeKeys];
+  if (messageKey) {
+    return translate(locale, messageKey);
+  }
+
   return value
     .replaceAll(/[-_]+/g, ' ')
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -194,22 +246,25 @@ function formatTypeLabel(value: string) {
 
 function formatCoverDetail(
   value: string | number | boolean | null | undefined,
+  locale: AppLocale,
 ): ParkingPopupDetail | null {
   if (value === 'yes') {
     return {
       icon: 'covered',
-      label: 'Cover',
+      kind: 'cover',
+      label: translate(locale, 'cover'),
       tone: 'green',
-      value: 'Covered',
+      value: translate(locale, 'covered'),
     };
   }
 
   if (value === 'no') {
     return {
       icon: 'not-covered',
-      label: 'Cover',
+      kind: 'cover',
+      label: translate(locale, 'cover'),
       tone: 'muted',
-      value: 'Not covered',
+      value: translate(locale, 'notCovered'),
     };
   }
 
@@ -218,6 +273,7 @@ function formatCoverDetail(
 
 function formatAccessDetail(
   value: string | number | boolean | null | undefined,
+  locale: AppLocale,
 ): ParkingPopupDetail | null {
   const access = normalizeText(value);
 
@@ -232,106 +288,137 @@ function formatAccessDetail(
   if (['yes', 'permissive', 'destination'].includes(access)) {
     return {
       icon: 'access-open',
-      label: 'Access',
+      kind: 'access',
+      label: translate(locale, 'access'),
       tone: 'green',
-      value: access === 'yes' ? 'Public access' : formatTypeLabel(access),
+      value:
+        access === 'yes'
+          ? translate(locale, 'accessPublic')
+          : formatTypeLabel(access, locale),
     };
   }
 
   if (['private', 'employees', 'permit', 'residents'].includes(access)) {
     return {
       icon: 'restricted',
-      label: 'Access',
+      kind: 'access',
+      label: translate(locale, 'access'),
       tone: 'restricted',
-      value: formatTypeLabel(access),
+      value: formatTypeLabel(access, locale),
     };
   }
 
   if (access === 'customers') {
     return {
       icon: 'customer',
-      label: 'Access',
+      kind: 'access',
+      label: translate(locale, 'access'),
       tone: 'amber',
-      value: 'Customers',
+      value: translate(locale, 'accessCustomers'),
     };
   }
 
   if (access === 'university') {
     return {
       icon: 'university',
-      label: 'Access',
+      kind: 'access',
+      label: translate(locale, 'access'),
       tone: 'teal',
-      value: 'University',
+      value: translate(locale, 'accessUniversity'),
     };
   }
 
   return {
     icon: 'unknown',
-    label: 'Access',
+    kind: 'access',
+    label: translate(locale, 'access'),
     tone: 'neutral',
-    value: formatTypeLabel(access),
+    value: formatTypeLabel(access, locale),
   };
 }
 
-export function getParkingDetails(point: ParkingPoint): ParkingDetail[] {
+export function getParkingDetails(
+  point: ParkingPoint,
+  locale: AppLocale = 'en',
+): ParkingDetail[] {
   return [
     {
-      label: 'Distance',
+      kind: 'distance',
+      label: translate(locale, 'distance'),
       value:
         typeof point.distanceMeters === 'number'
-          ? `${formatDistance(point.distanceMeters)} away`
-          : 'Not listed',
+          ? translate(locale, 'away', {
+              distance: formatDistance(point.distanceMeters, locale),
+            })
+          : translate(locale, 'notListed'),
     },
     {
-      label: 'Spaces',
-      value: formatCapacity(point.properties.capacity),
+      kind: 'spaces',
+      label: translate(locale, 'spaces'),
+      value: formatCapacity(point.properties.capacity, locale),
     },
     {
-      label: 'Type',
-      value: normalizeText(point.properties.bicycle_pa) ?? 'Not listed',
+      kind: 'type',
+      label: translate(locale, 'type'),
+      value:
+        normalizeText(point.properties.bicycle_pa) ??
+        translate(locale, 'notListed'),
     },
     {
-      label: 'Cover',
-      value: formatCovered(point.properties.covered),
+      kind: 'cover',
+      label: translate(locale, 'cover'),
+      value: formatCovered(point.properties.covered, locale),
     },
     {
-      label: 'Access',
-      value: normalizeText(point.properties.access) ?? 'Not listed',
+      kind: 'access',
+      label: translate(locale, 'access'),
+      value:
+        normalizeText(point.properties.access) ??
+        translate(locale, 'notListed'),
     },
   ];
 }
 
 export function getParkingPopupDetails(
   point: ParkingPoint,
+  locale: AppLocale = 'en',
 ): ParkingPopupDetails {
   return {
     metrics: [
       {
         icon: 'distance',
-        label: 'Distance',
+        kind: 'distance',
+        label: translate(locale, 'distance'),
         tone: getDistanceTone(point.distanceMeters),
         value:
           typeof point.distanceMeters === 'number'
-            ? `${formatDistance(point.distanceMeters)} away`
-            : 'Not listed',
+            ? translate(locale, 'away', {
+                distance: formatDistance(point.distanceMeters, locale),
+              })
+            : translate(locale, 'notListed'),
       },
     ],
     details: [
-      formatCapacityDetail(point.properties.capacity),
-      formatStandType(point.properties.bicycle_pa),
-      formatCoverDetail(point.properties.covered),
-      formatAccessDetail(point.properties.access),
+      formatCapacityDetail(point.properties.capacity, locale),
+      formatStandType(point.properties.bicycle_pa, locale),
+      formatCoverDetail(point.properties.covered, locale),
+      formatAccessDetail(point.properties.access, locale),
     ].filter((detail): detail is ParkingPopupDetail => detail !== null),
   };
 }
 
-export function describeParkingPoint(point: ParkingPoint) {
-  const capacity = formatCapacity(point.properties.capacity);
-  const kind = normalizeText(point.properties.bicycle_pa) ?? 'type not listed';
-  const covered = formatCovered(point.properties.covered);
+export function describeParkingPoint(
+  point: ParkingPoint,
+  locale: AppLocale = 'en',
+) {
+  const capacity = formatCapacity(point.properties.capacity, locale);
+  const kind =
+    normalizeText(point.properties.bicycle_pa) ??
+    translate(locale, 'typeNotListed');
+  const covered = formatCovered(point.properties.covered, locale);
   const details = [capacity, kind];
 
-  if (covered !== 'Not listed') {
+  if (covered !== translate(locale, 'notListed')) {
     details.push(covered.toLowerCase());
   }
 

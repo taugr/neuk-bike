@@ -53,8 +53,11 @@ import {
   shouldApplyMapFocus,
   type MapFocusTarget,
 } from '@/lib/map-focus';
+import type { AppLocale } from '@/lib/i18n/locales';
+import { translate } from '@/lib/i18n/messages';
 
 type CycleParkingMapProps = {
+  locale: AppLocale;
   points: ParkingPoint[];
   userLocation: UserLocation;
   currentLocationFocusRequestId: number;
@@ -161,6 +164,19 @@ const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
   university: GraduationCap,
   unknown: CircleHelp,
 };
+
+function getMapLibreLocale(locale: AppLocale) {
+  return {
+    'AttributionControl.ToggleAttribution': translate(
+      locale,
+      'toggleAttribution',
+    ),
+    'NavigationControl.ResetBearing': translate(locale, 'resetBearing'),
+    'NavigationControl.ZoomIn': translate(locale, 'zoomIn'),
+    'NavigationControl.ZoomOut': translate(locale, 'zoomOut'),
+    'Popup.Close': translate(locale, 'closePopup'),
+  };
+}
 
 function toLngLat(point: CycleRoutePoint): [number, number] {
   return [point[1], point[0]];
@@ -685,6 +701,7 @@ function ParkingPopupContent({
   onOpenStreetView,
   onRequestDirections,
   point,
+  locale,
 }: {
   canRequestDirections: boolean;
   canShowStreetView: boolean;
@@ -694,8 +711,9 @@ function ParkingPopupContent({
   onOpenStreetView: (point: ParkingPoint) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   point: ParkingPoint;
+  locale: AppLocale;
 }) {
-  const popupDetails = getParkingPopupDetails(point);
+  const popupDetails = getParkingPopupDetails(point, locale);
 
   return (
     <div className="parking-popup">
@@ -713,7 +731,7 @@ function ParkingPopupContent({
       </div>
       <div
         className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}
-        aria-label="Parking details"
+        aria-label={translate(locale, 'details')}
       >
         {popupDetails.details.map((detail) => (
           <div
@@ -740,11 +758,13 @@ function ParkingPopupContent({
             }}
           >
             <Navigation size={15} aria-hidden="true" />
-            Directions
+            {translate(locale, 'directions')}
           </button>
           {canShowStreetView ? (
             <button
-              aria-label={`Open Street View for ${point.name}`}
+              aria-label={translate(locale, 'openStreetView', {
+                name: point.name,
+              })}
               className="parking-popup-street-view-button"
               type="button"
               onClick={(event) => {
@@ -753,11 +773,11 @@ function ParkingPopupContent({
               }}
             >
               <ScanSearch size={15} aria-hidden="true" />
-              Street
+              {translate(locale, 'street')}
             </button>
           ) : null}
           <button
-            aria-label={`Copy link to ${point.name}`}
+            aria-label={translate(locale, 'copyLink', { name: point.name })}
             className="parking-popup-share-button"
             type="button"
             onClick={(event) => {
@@ -766,11 +786,11 @@ function ParkingPopupContent({
             }}
           >
             <Share2 size={15} aria-hidden="true" />
-            Share
+            {translate(locale, 'share')}
             {copiedShareButton?.source === 'popup' &&
             copiedShareButton.parkingId === point.id ? (
               <span className="parking-popup-share-feedback" role="status">
-                Copied
+                {translate(locale, 'copied')}
               </span>
             ) : null}
           </button>
@@ -780,11 +800,11 @@ function ParkingPopupContent({
   );
 }
 
-function StartPopupContent() {
+function StartPopupContent({ locale }: { locale: AppLocale }) {
   return (
     <div className="parking-popup">
-      <strong>Start position</strong>
-      <span>Current location</span>
+      <strong>{translate(locale, 'startPosition')}</strong>
+      <span>{translate(locale, 'currentLocation')}</span>
     </div>
   );
 }
@@ -931,6 +951,7 @@ function syncLineLayer({
 }
 
 export default function CycleParkingMap({
+  locale,
   points,
   userLocation,
   currentLocationFocusRequestId,
@@ -969,6 +990,10 @@ export default function CycleParkingMap({
   const centeredCollapsedPopupPointRef = useRef<string | null>(null);
   const suppressNextSelectionClearFocusRef = useRef(false);
   const frameRef = useRef<number | null>(null);
+  const savedCameraRef = useRef<{
+    center: [number, number];
+    zoom: number;
+  } | null>(null);
   const initialBasemapThemeRef = useRef(theme);
   const activeBasemapThemeRef = useRef(theme);
   const [map, setMap] = useState<MapLibreMap | null>(null);
@@ -1099,14 +1124,15 @@ export default function CycleParkingMap({
 
       nextMap = new maplibregl.Map({
         attributionControl: false,
-        center: toLngLat(defaultCenter),
+        center: savedCameraRef.current?.center ?? toLngLat(defaultCenter),
         container,
         dragRotate: false,
+        locale: getMapLibreLocale(locale),
         minZoom: 1,
         pitchWithRotate: false,
         style,
         touchPitch: false,
-        zoom: 13,
+        zoom: savedCameraRef.current?.zoom ?? 13,
       });
       nextMap.touchZoomRotate.disableRotation();
       container.addEventListener(
@@ -1223,12 +1249,19 @@ export default function CycleParkingMap({
       startMarkerRef.current = null;
       liveMarkerRef.current = null;
       instructionMarkerRef.current = null;
-      nextMap?.remove();
+      if (nextMap) {
+        const center = nextMap.getCenter();
+        savedCameraRef.current = {
+          center: [center.lng, center.lat],
+          zoom: nextMap.getZoom(),
+        };
+        nextMap.remove();
+      }
       mapRef.current = null;
       setMap(null);
       setIsMapLoaded(false);
     };
-  }, [handleViewportChange, updateViewport]);
+  }, [handleViewportChange, locale, updateViewport]);
 
   useEffect(() => {
     if (!map) {
@@ -1383,13 +1416,16 @@ export default function CycleParkingMap({
 
     cleanupRenderedMarker(startMarkerRef.current);
 
-    const { popup, root } = createRenderedPopup(<StartPopupContent />, {
-      closeButton: true,
-      closeOnClick: true,
-      offset: [0, -32],
-    });
+    const { popup, root } = createRenderedPopup(
+      <StartPopupContent locale={locale} />,
+      {
+        closeButton: true,
+        closeOnClick: true,
+        offset: [0, -32],
+      },
+    );
     const element = createPinMarkerElement('start-marker');
-    element.setAttribute('aria-label', 'Current location');
+    element.setAttribute('aria-label', translate(locale, 'currentLocation'));
     element.setAttribute('role', 'button');
     element.tabIndex = 0;
     const marker = new maplibregl.Marker({
@@ -1429,7 +1465,7 @@ export default function CycleParkingMap({
       cleanupRenderedMarker(startMarkerRef.current);
       startMarkerRef.current = null;
     };
-  }, [map, userLocation]);
+  }, [locale, map, userLocation]);
 
   useEffect(() => {
     if (!map) {
@@ -1540,6 +1576,7 @@ export default function CycleParkingMap({
           onOpenStreetView={onOpenStreetView}
           onRequestDirections={onRequestDirections}
           point={point}
+          locale={locale}
         />
       );
       const existingMarker = parkingMarkerRefs.current.get(point.id);
@@ -1598,8 +1635,10 @@ export default function CycleParkingMap({
 
       const markerLabel = [
         point.name,
-        rank ? `rank ${rank}` : 'cycle parking',
-        isSelected ? 'selected' : null,
+        rank
+          ? translate(locale, 'rank', { count: rank })
+          : translate(locale, 'genericParking'),
+        isSelected ? translate(locale, 'selected') : null,
       ]
         .filter(Boolean)
         .join(', ');
@@ -1677,6 +1716,7 @@ export default function CycleParkingMap({
     canShowStreetView,
     copiedShareButton,
     isDirectionsMode,
+    locale,
     map,
     onCopyParkingLink,
     onOpenStreetView,

@@ -1,5 +1,29 @@
 import { expect, test } from '@playwright/test';
 
+test('changes language from the mobile menu and keeps the choice', async ({
+  page,
+}) => {
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  await page.locator('.settings-menu--mobile .settings-trigger').click();
+  await page
+    .locator('.settings-menu--mobile .language-select')
+    .selectOption('gd');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'gd');
+  await expect(page.locator('#place-search-mobile')).toHaveAttribute(
+    'placeholder',
+    'Àite no còd-puist',
+  );
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'gd');
+  await expect(page.locator('#place-search-mobile')).toHaveAttribute(
+    'placeholder',
+    'Àite no còd-puist',
+  );
+});
+
 test('keeps the mobile directions panel usable', async ({ page }) => {
   const parkingId = 'cec:1';
   const latitude = 55.9406042783081;

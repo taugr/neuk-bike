@@ -1,5 +1,11 @@
 import type { ParkingPoint, UserLocation } from '@/lib/types';
 import { distanceMeters } from '@/lib/geo';
+import type { AppLocale } from '@/lib/i18n/locales';
+import {
+  formatLocalizedDistance,
+  formatLocalizedDuration,
+} from '@/lib/i18n/format';
+import { translate } from '@/lib/i18n/messages';
 
 export const CYCLESTREETS_DIRECTIONS_ENDPOINT =
   'https://api.cyclestreets.net/v2/journey.plan';
@@ -183,13 +189,11 @@ export function buildCycleRouteCacheKey(
   ].join(':');
 }
 
-export function formatCycleRouteDuration(seconds: number) {
-  if (!Number.isFinite(seconds) || seconds <= 0) {
-    return 'less than 1 min';
-  }
-
-  const minutes = Math.max(1, Math.round(seconds / 60));
-  return minutes === 1 ? '1 min' : `${minutes} min`;
+export function formatCycleRouteDuration(
+  seconds: number,
+  locale: AppLocale = 'en',
+) {
+  return formatLocalizedDuration(seconds, locale);
 }
 
 function capitalizeFirstLetter(value: string) {
@@ -212,20 +216,46 @@ function buildArrivalInstruction(
 
 export function describeCycleRouteInstruction(
   instruction: CycleRouteInstruction,
+  locale: AppLocale = 'en',
 ) {
   const name = instruction.streetName.trim();
   const turn = instruction.turn.trim();
 
   if (turn === 'start') {
-    return name ? `Start on ${name}` : 'Start';
+    return name
+      ? translate(locale, 'startOn', { name })
+      : translate(locale, 'start');
   }
 
   if (turn === 'arrive') {
-    return name ? `Arrive at ${name}` : 'Arrive';
+    return name
+      ? translate(locale, 'arriveAt', { name })
+      : translate(locale, 'arrive');
   }
 
   if (turn === 'straight' && !name) {
-    return `Straight ${Math.round(instruction.distanceMeters)} m`;
+    return translate(locale, 'straightDistance', {
+      distance: formatLocalizedDistance(instruction.distanceMeters, locale),
+    });
+  }
+
+  const normalizedTurn = turn.toLowerCase();
+  if (normalizedTurn.includes('left')) {
+    return name
+      ? translate(locale, 'turnLeftOnto', { name })
+      : translate(locale, 'turnLeft');
+  }
+
+  if (normalizedTurn.includes('right')) {
+    return name
+      ? translate(locale, 'turnRightOnto', { name })
+      : translate(locale, 'turnRight');
+  }
+
+  if (normalizedTurn === 'straight') {
+    return name
+      ? translate(locale, 'continueStraightOn', { name })
+      : translate(locale, 'continueStraight');
   }
 
   if (!name) {

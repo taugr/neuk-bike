@@ -153,6 +153,7 @@ describe('geo utilities', () => {
     expect(near.metrics).toEqual([
       {
         icon: 'distance',
+        kind: 'distance',
         label: 'Distance',
         tone: 'green',
         value: '249 m away',
@@ -161,6 +162,7 @@ describe('geo utilities', () => {
     expect(near.details[0]).toEqual({
       emphasis: '4',
       icon: 'parking',
+      kind: 'spaces',
       label: 'Spaces',
       tone: 'amber',
       value: 'Spaces',
@@ -170,6 +172,7 @@ describe('geo utilities', () => {
     expect(medium.metrics).toEqual([
       {
         icon: 'distance',
+        kind: 'distance',
         label: 'Distance',
         tone: 'amber',
         value: '250 m away',
@@ -178,6 +181,7 @@ describe('geo utilities', () => {
     expect(medium.details[0]).toEqual({
       emphasis: '10',
       icon: 'parking',
+      kind: 'spaces',
       label: 'Spaces',
       tone: 'teal',
       value: 'Spaces',
@@ -187,6 +191,7 @@ describe('geo utilities', () => {
     expect(far.metrics).toEqual([
       {
         icon: 'distance',
+        kind: 'distance',
         label: 'Distance',
         tone: 'muted',
         value: '1.0 km away',
@@ -195,6 +200,7 @@ describe('geo utilities', () => {
     expect(far.details[0]).toEqual({
       emphasis: '11',
       icon: 'parking',
+      kind: 'spaces',
       label: 'Spaces',
       tone: 'green',
       value: 'Spaces',
@@ -204,6 +210,7 @@ describe('geo utilities', () => {
     expect(unknown.metrics).toEqual([
       {
         icon: 'distance',
+        kind: 'distance',
         label: 'Distance',
         tone: 'neutral',
         value: 'Not listed',
@@ -218,6 +225,7 @@ describe('geo utilities', () => {
         .details[0],
     ).toEqual({
       icon: 'stand',
+      kind: 'type',
       label: 'Type',
       tone: 'teal',
       value: 'Wide Stands',
@@ -226,6 +234,7 @@ describe('geo utilities', () => {
       getParkingPopupDetails(parkingPoint({ bicycle_pa: 'rack' })).details[0],
     ).toEqual({
       icon: 'parking',
+      kind: 'type',
       label: 'Type',
       tone: 'teal',
       value: 'Rack',
@@ -234,6 +243,7 @@ describe('geo utilities', () => {
       getParkingPopupDetails(parkingPoint({ bicycle_pa: 'shed' })).details[0],
     ).toEqual({
       icon: 'storage',
+      kind: 'type',
       label: 'Type',
       tone: 'green',
       value: 'Shed',
@@ -243,6 +253,7 @@ describe('geo utilities', () => {
         .details[0],
     ).toEqual({
       icon: 'fixture',
+      kind: 'type',
       label: 'Type',
       tone: 'amber',
       value: 'Wall Loops',
@@ -252,6 +263,7 @@ describe('geo utilities', () => {
         .details[0],
     ).toEqual({
       icon: 'unknown',
+      kind: 'type',
       label: 'Type',
       tone: 'neutral',
       value: 'Artistic',
@@ -265,12 +277,14 @@ describe('geo utilities', () => {
     ).toEqual([
       {
         icon: 'covered',
+        kind: 'cover',
         label: 'Cover',
         tone: 'green',
         value: 'Covered',
       },
       {
         icon: 'access-open',
+        kind: 'access',
         label: 'Access',
         tone: 'green',
         value: 'Public access',
@@ -283,12 +297,14 @@ describe('geo utilities', () => {
     ).toEqual([
       {
         icon: 'not-covered',
+        kind: 'cover',
         label: 'Cover',
         tone: 'muted',
         value: 'Not covered',
       },
       {
         icon: 'restricted',
+        kind: 'access',
         label: 'Access',
         tone: 'restricted',
         value: 'Private',
@@ -299,6 +315,7 @@ describe('geo utilities', () => {
       getParkingPopupDetails(parkingPoint({ access: 'customers' })).details[0],
     ).toEqual({
       icon: 'customer',
+      kind: 'access',
       label: 'Access',
       tone: 'amber',
       value: 'Customers',
@@ -307,6 +324,7 @@ describe('geo utilities', () => {
       getParkingPopupDetails(parkingPoint({ access: 'university' })).details[0],
     ).toEqual({
       icon: 'university',
+      kind: 'access',
       label: 'Access',
       tone: 'teal',
       value: 'University',
@@ -315,6 +333,7 @@ describe('geo utilities', () => {
       getParkingPopupDetails(parkingPoint({ access: 'permissive' })).details[0],
     ).toEqual({
       icon: 'access-open',
+      kind: 'access',
       label: 'Access',
       tone: 'green',
       value: 'Permissive',
@@ -325,6 +344,22 @@ describe('geo utilities', () => {
     expect(
       getParkingPopupDetails(parkingPoint({ access: 'unknown' })).details,
     ).toHaveLength(0);
+  });
+
+  it('localizes parking detail labels and values', () => {
+    expect(
+      getParkingPopupDetails(
+        parkingPoint({ capacity: 8, covered: 'no', access: 'customers' }, 450),
+        'es',
+      ),
+    ).toMatchObject({
+      metrics: [{ kind: 'distance', label: 'Distancia', value: 'a 450 m' }],
+      details: [
+        { kind: 'spaces', label: 'Plazas', value: 'Plazas' },
+        { kind: 'cover', label: 'Cubierta', value: 'Sin cubierta' },
+        { kind: 'access', label: 'Acceso', value: 'Clientes' },
+      ],
+    });
   });
 
   it('keeps dataset provenance out of popup details', () => {
@@ -339,6 +374,7 @@ describe('geo utilities', () => {
       {
         emphasis: '12',
         icon: 'parking',
+        kind: 'spaces',
         label: 'Spaces',
         tone: 'green',
         value: 'Spaces',

@@ -90,7 +90,7 @@ import {
   sortByDistance,
 } from '@/lib/geo';
 import { getParkingPopupDetails, type ParkingPopupIcon } from '@/lib/parking';
-import { getParkingDisplayName } from '@/lib/parking-names';
+import { formatParkingDisplayName } from '@/lib/parking-names';
 import {
   getBearingDegrees,
   getLiveRouteProgress,
@@ -101,6 +101,7 @@ import { getRouteInstructionManeuver } from '@/lib/route-instructions';
 import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
 import { buildGoogleStreetViewEmbedUrl } from '@/lib/street-view';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
+import { useLanguage } from '@/components/language-provider';
 import { captureAnalyticsEvent } from '@/lib/analytics';
 import { copyTextToClipboard } from '@/lib/clipboard';
 import {
@@ -109,19 +110,29 @@ import {
   ParkingDataClient,
 } from '@/lib/parking-data';
 import type { ParkingMapBounds } from '@/lib/map-pins';
+import {
+  localeDetails,
+  supportedLocales,
+  type AppLocale,
+} from '@/lib/i18n/locales';
+import { translate, type MessageKey } from '@/lib/i18n/messages';
 
 const CycleParkingMap = dynamic(
   () => import('@/components/cycle-parking-map'),
   {
     ssr: false,
-    loading: () => <div className="map-loading">Loading map...</div>,
+    loading: () => <LocalizedMapLoading />,
   },
 );
+
+function LocalizedMapLoading() {
+  const { t } = useLanguage();
+  return <div className="map-loading">{t('loadingMap')}</div>;
+}
 
 const maxPlaceSearchCacheEntries = 12;
 const closestParkingResultCount = 8;
 const copiedMessageDurationMs = 1_800;
-const defaultLocale = 'en-GB';
 const themeStorageKey = 'cycle-parking-theme';
 const mobileSheetCollapsedHeightRem = 5.4;
 const mobileSheetDragIntentThresholdPx = 6;
@@ -206,7 +217,7 @@ function ParkingListDetailIcon({ icon }: { icon: ParkingPopupIcon }) {
   return <Icon size={13} aria-hidden="true" />;
 }
 
-const parkingDetailLabels = new Set(['Spaces', 'Type', 'Cover']);
+const parkingDetailKinds = new Set(['spaces', 'type', 'cover']);
 
 function ParkingDetailStrip({
   className,
@@ -217,9 +228,10 @@ function ParkingDetailStrip({
   includeDistance?: boolean;
   point: ParkingPoint;
 }) {
-  const parkingDetails = getParkingPopupDetails(point);
+  const { locale, t } = useLanguage();
+  const parkingDetails = getParkingPopupDetails(point, locale);
   const visibleDetails = parkingDetails.details.filter((detail) =>
-    parkingDetailLabels.has(detail.label),
+    parkingDetailKinds.has(detail.kind),
   );
 
   if (!includeDistance && visibleDetails.length === 0) {
@@ -228,7 +240,7 @@ function ParkingDetailStrip({
 
   return (
     <span
-      aria-label="Parking details"
+      aria-label={t('details')}
       className={['parking-row-details', className].filter(Boolean).join(' ')}
     >
       {includeDistance
@@ -245,7 +257,7 @@ function ParkingDetailStrip({
             {detail.emphasis ?? <ParkingListDetailIcon icon={detail.icon} />}
           </span>
           <span>
-            {detail.label === 'Spaces'
+            {detail.kind === 'spaces'
               ? detail.value.toLowerCase()
               : detail.value}
           </span>
@@ -298,12 +310,12 @@ type CopiedShareButton = {
 
 const themeOptions: {
   icon: typeof Monitor;
-  label: string;
+  labelKey: MessageKey;
   mode: ThemeMode;
 }[] = [
-  { icon: Monitor, label: 'System', mode: 'system' },
-  { icon: Sun, label: 'Light', mode: 'light' },
-  { icon: Moon, label: 'Dark', mode: 'dark' },
+  { icon: Monitor, labelKey: 'system', mode: 'system' },
+  { icon: Sun, labelKey: 'light', mode: 'light' },
+  { icon: Moon, labelKey: 'dark', mode: 'dark' },
 ];
 
 function isThemeMode(value: string | null): value is ThemeMode {
@@ -318,10 +330,10 @@ function resolveTheme(mode: ThemeMode, prefersDark: boolean): ResolvedTheme {
   return mode;
 }
 
-function prepareParkingPoints(points: ParkingPoint[]) {
+function prepareParkingPoints(points: ParkingPoint[], locale: AppLocale) {
   return points.map((point) => ({
     ...point,
-    name: getParkingDisplayName(point),
+    name: formatParkingDisplayName(point, locale),
   }));
 }
 
@@ -336,6 +348,7 @@ function keepParkingPointsWhenUnchanged(
 }
 
 export default function CycleParkingFinder() {
+  const { formattingLocale, locale, setLocale, t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
   const [locationState, setLocationState] = useState<LocationState>({
     status: 'fallback',
@@ -383,7 +396,6 @@ export default function CycleParkingFinder() {
     null,
   );
   const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
-  const [numberLocale, setNumberLocale] = useState(defaultLocale);
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light');
   const [isClientReady, setIsClientReady] = useState(false);
@@ -409,6 +421,8 @@ export default function CycleParkingFinder() {
   );
   const { canInstall, installApp } = usePwaInstallPrompt();
   const placeSearchCache = useRef(new Map<string, PlaceSearchResult[]>());
+  const localeRef = useRef(locale);
+  localeRef.current = locale;
   const parkingDataClient = useRef<ParkingDataClient | null>(null);
   const directionsCache = useRef(new Map<string, CycleRoute>());
   const placeSearchInFlight = useRef(false);
@@ -523,7 +537,6 @@ export default function CycleParkingFinder() {
 
     async function initializeParkingData() {
       setIsClientReady(true);
-      setNumberLocale(navigator.language || defaultLocale);
       const client = new ParkingDataClient(
         getParkingDataBaseUrl(window.location.href),
       );
@@ -549,13 +562,13 @@ export default function CycleParkingFinder() {
         setParkingPoints((current) =>
           keepParkingPointsWhenUnchanged(
             current,
-            prepareParkingPoints(client.getLoadedPoints()),
+            prepareParkingPoints(client.getLoadedPoints(), localeRef.current),
           ),
         );
         setParkingDataStatus('ready');
         setParkingDataMessage(
           selectedParkingId && !selectedPoint
-            ? 'That parking link is not in the current UK, Ireland and Spain dataset.'
+            ? translate(localeRef.current, 'parkingLinkMissing')
             : null,
         );
 
@@ -590,16 +603,12 @@ export default function CycleParkingFinder() {
         }
 
         requestLocation();
-      } catch (error) {
+      } catch {
         if (cancelled) {
           return;
         }
         setParkingDataStatus('error');
-        setParkingDataMessage(
-          error instanceof Error
-            ? error.message
-            : 'Cycle parking data is unavailable right now.',
-        );
+        setParkingDataMessage(translate(localeRef.current, 'dataUnavailable'));
       }
     }
 
@@ -611,6 +620,16 @@ export default function CycleParkingFinder() {
 
   useEffect(() => {
     const client = parkingDataClient.current;
+    if (client) {
+      setParkingPoints(prepareParkingPoints(client.getLoadedPoints(), locale));
+    }
+    placeSearchCache.current.clear();
+    setPlaceResults([]);
+    setPlaceSearchMessage(null);
+  }, [locale]);
+
+  useEffect(() => {
+    const client = parkingDataClient.current;
     const manifest = client?.getManifest();
     if (!client || !manifest || parkingDataStatus === 'error') {
       return;
@@ -618,7 +637,7 @@ export default function CycleParkingFinder() {
 
     let cancelled = false;
     setParkingDataStatus('loading');
-    setParkingDataMessage('Loading nearby cycle parking...');
+    setParkingDataMessage(t('loadingNearby'));
     void client
       .loadLocation(locationState.location)
       .then(() => {
@@ -628,22 +647,18 @@ export default function CycleParkingFinder() {
         setParkingPoints((current) =>
           keepParkingPointsWhenUnchanged(
             current,
-            prepareParkingPoints(client.getLoadedPoints()),
+            prepareParkingPoints(client.getLoadedPoints(), locale),
           ),
         );
         setParkingDataStatus('ready');
         setParkingDataMessage(null);
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (cancelled) {
           return;
         }
         setParkingDataStatus('error');
-        setParkingDataMessage(
-          error instanceof Error
-            ? error.message
-            : 'Nearby cycle parking could not be loaded.',
-        );
+        setParkingDataMessage(t('nearbyLoadError'));
       });
 
     return () => {
@@ -653,33 +668,34 @@ export default function CycleParkingFinder() {
     locationState.location.latitude,
     locationState.location.longitude,
     parkingManifest?.refreshedAt,
+    locale,
+    t,
   ]);
 
-  const loadParkingForBounds = useCallback((bounds: ParkingMapBounds) => {
-    const client = parkingDataClient.current;
-    const manifest = client?.getManifest();
-    if (!client || !manifest) {
-      return;
-    }
+  const loadParkingForBounds = useCallback(
+    (bounds: ParkingMapBounds) => {
+      const client = parkingDataClient.current;
+      const manifest = client?.getManifest();
+      if (!client || !manifest) {
+        return;
+      }
 
-    void client
-      .loadBounds(bounds)
-      .then(() => {
-        setParkingPoints((current) =>
-          keepParkingPointsWhenUnchanged(
-            current,
-            prepareParkingPoints(client.getLoadedPoints()),
-          ),
-        );
-      })
-      .catch((error: unknown) => {
-        setParkingDataMessage(
-          error instanceof Error
-            ? error.message
-            : 'Some map-area parking could not be loaded.',
-        );
-      });
-  }, []);
+      void client
+        .loadBounds(bounds)
+        .then(() => {
+          setParkingPoints((current) =>
+            keepParkingPointsWhenUnchanged(
+              current,
+              prepareParkingPoints(client.getLoadedPoints(), locale),
+            ),
+          );
+        })
+        .catch(() => {
+          setParkingDataMessage(t('loadAreaError'));
+        });
+    },
+    [locale, t],
+  );
 
   async function retryParkingData() {
     const client = parkingDataClient.current;
@@ -689,24 +705,20 @@ export default function CycleParkingFinder() {
     }
 
     setParkingDataStatus('loading');
-    setParkingDataMessage('Loading nearby cycle parking...');
+    setParkingDataMessage(t('loadingNearby'));
     try {
       await client.loadLocation(locationState.location);
       setParkingPoints((current) =>
         keepParkingPointsWhenUnchanged(
           current,
-          prepareParkingPoints(client.getLoadedPoints()),
+          prepareParkingPoints(client.getLoadedPoints(), locale),
         ),
       );
       setParkingDataStatus('ready');
       setParkingDataMessage(null);
-    } catch (error) {
+    } catch {
       setParkingDataStatus('error');
-      setParkingDataMessage(
-        error instanceof Error
-          ? error.message
-          : 'Nearby cycle parking could not be loaded.',
-      );
+      setParkingDataMessage(t('nearbyLoadError'));
     }
   }
 
@@ -831,8 +843,8 @@ export default function CycleParkingFinder() {
     [nearbyPoints],
   );
   const formattedParkingLocationCount = useMemo(
-    () => (parkingManifest?.recordCount ?? 0).toLocaleString(numberLocale),
-    [numberLocale, parkingManifest?.recordCount],
+    () => (parkingManifest?.recordCount ?? 0).toLocaleString(formattingLocale),
+    [formattingLocale, parkingManifest?.recordCount],
   );
 
   const nearestPoint = nearbyPoints[0] ?? null;
@@ -1265,16 +1277,12 @@ export default function CycleParkingFinder() {
           setParkingPoints((current) =>
             keepParkingPointsWhenUnchanged(
               current,
-              prepareParkingPoints(client.getLoadedPoints()),
+              prepareParkingPoints(client.getLoadedPoints(), locale),
             ),
           );
         })
-        .catch((error: unknown) => {
-          setParkingDataMessage(
-            error instanceof Error
-              ? error.message
-              : 'Nearby cycle parking could not be loaded.',
-          );
+        .catch(() => {
+          setParkingDataMessage(t('nearbyLoadError'));
         });
     }
     requestCurrentLocationFocus();
@@ -1300,7 +1308,7 @@ export default function CycleParkingFinder() {
         ? {
             status,
             location,
-            label: label ?? 'selected place',
+            label: label ?? t('selectedPlace'),
           }
         : {
             status,
@@ -1373,15 +1381,13 @@ export default function CycleParkingFinder() {
       return;
     }
 
-    const cacheKey = trimmedQuery.toLowerCase();
+    const cacheKey = `${locale}:${trimmedQuery.toLowerCase()}`;
     const cachedResults = placeSearchCache.current.get(cacheKey);
 
     if (cachedResults) {
       setPlaceResults(cachedResults);
       setPlaceSearchMessage(
-        cachedResults.length === 0
-          ? 'No matching places in the UK, Ireland or Spain found.'
-          : null,
+        cachedResults.length === 0 ? t('noPlaceResults') : null,
       );
       return;
     }
@@ -1393,7 +1399,7 @@ export default function CycleParkingFinder() {
     setPlaceSearchMessage(null);
 
     try {
-      const response = await fetch(buildPlaceSearchUrl(trimmedQuery), {
+      const response = await fetch(buildPlaceSearchUrl(trimmedQuery, locale), {
         headers: {
           Accept: 'application/json',
         },
@@ -1422,11 +1428,7 @@ export default function CycleParkingFinder() {
         result_count: results.length,
       });
       setPlaceResults(results);
-      setPlaceSearchMessage(
-        results.length === 0
-          ? 'No matching places in the UK, Ireland or Spain found.'
-          : null,
-      );
+      setPlaceSearchMessage(results.length === 0 ? t('noPlaceResults') : null);
       setHasUsedPlaceSearch(true);
     } catch {
       if (requestId !== placeSearchRequestId.current) {
@@ -1434,7 +1436,7 @@ export default function CycleParkingFinder() {
       }
       captureAnalyticsEvent('place_searched', { error: true });
       setPlaceResults([]);
-      setPlaceSearchMessage('Place search is unavailable right now.');
+      setPlaceSearchMessage(t('placeSearchError'));
     } finally {
       if (requestId === placeSearchRequestId.current) {
         placeSearchInFlight.current = false;
@@ -1549,15 +1551,12 @@ export default function CycleParkingFinder() {
         route_source: route.source,
       });
       setDirectionsState({ status: 'loaded', parkingId: point.id, route });
-    } catch (error) {
+    } catch {
       if (directionsRequestId.current !== requestId) {
         return;
       }
 
-      const message =
-        error instanceof Error && error.message
-          ? error.message
-          : 'Directions are unavailable right now.';
+      const message = t('directionsError');
       captureAnalyticsEvent('directions_error', {
         parking_id: point.id,
         parking_name: point.name,
@@ -1608,7 +1607,7 @@ export default function CycleParkingFinder() {
     }
 
     setCopiedShareButton(null);
-    setShareError('Could not copy link.');
+    setShareError(t('copyLinkError'));
   }
 
   async function copyParkingLink(
@@ -1622,6 +1621,12 @@ export default function CycleParkingFinder() {
   function chooseThemeMode(mode: ThemeMode) {
     captureAnalyticsEvent('theme_changed', { theme: mode });
     setThemeMode(mode);
+    setIsSettingsMenuOpen(false);
+  }
+
+  function chooseLanguage(nextLocale: AppLocale) {
+    captureAnalyticsEvent('language_changed', { language: nextLocale });
+    setLocale(nextLocale);
     setIsSettingsMenuOpen(false);
   }
 
@@ -1646,7 +1651,7 @@ export default function CycleParkingFinder() {
       <div className={['settings-menu', className].filter(Boolean).join(' ')}>
         <motion.button
           aria-expanded={isSettingsMenuOpen}
-          aria-label={isBrandTrigger ? 'Bike Neuks menu' : 'Theme settings'}
+          aria-label={isBrandTrigger ? t('bikeNeuksMenu') : t('themeSettings')}
           className={[
             'settings-trigger',
             isBrandTrigger ? 'settings-trigger--brand' : '',
@@ -1669,11 +1674,15 @@ export default function CycleParkingFinder() {
               {...popoverPresence}
               className="settings-popover"
               role="menu"
-              aria-label={isBrandTrigger ? 'Bike Neuks menu' : 'Settings'}
+              aria-label={isBrandTrigger ? t('bikeNeuksMenu') : t('settings')}
             >
-              <span className="settings-label">Theme</span>
-              <div className="theme-options" role="group" aria-label="Theme">
-                {themeOptions.map(({ icon: Icon, label, mode }) => (
+              <span className="settings-label">{t('theme')}</span>
+              <div
+                className="theme-options"
+                role="group"
+                aria-label={t('theme')}
+              >
+                {themeOptions.map(({ icon: Icon, labelKey, mode }) => (
                   <motion.button
                     aria-pressed={themeMode === mode}
                     className={themeMode === mode ? 'selected' : undefined}
@@ -1683,13 +1692,30 @@ export default function CycleParkingFinder() {
                     onClick={() => chooseThemeMode(mode)}
                   >
                     <Icon size={15} aria-hidden="true" />
-                    {label}
+                    {t(labelKey)}
                   </motion.button>
                 ))}
               </div>
+              <label className="settings-label" htmlFor="language-setting">
+                {t('language')}
+              </label>
+              <select
+                className="language-select"
+                id="language-setting"
+                value={locale}
+                onChange={(event) =>
+                  chooseLanguage(event.target.value as AppLocale)
+                }
+              >
+                {supportedLocales.map((optionLocale) => (
+                  <option key={optionLocale} value={optionLocale}>
+                    {localeDetails[optionLocale].selfName}
+                  </option>
+                ))}
+              </select>
               {canInstall ? (
                 <Fragment key="install-app-action">
-                  <span className="settings-label">App</span>
+                  <span className="settings-label">{t('app')}</span>
                   <motion.button
                     className="settings-action-button"
                     type="button"
@@ -1697,11 +1723,11 @@ export default function CycleParkingFinder() {
                     onClick={installPwa}
                   >
                     <Download size={15} aria-hidden="true" />
-                    Install app
+                    {t('installApp')}
                   </motion.button>
                 </Fragment>
               ) : null}
-              <span className="settings-label">About</span>
+              <span className="settings-label">{t('about')}</span>
               <motion.button
                 className="settings-action-button"
                 type="button"
@@ -1709,11 +1735,11 @@ export default function CycleParkingFinder() {
                 onClick={openAttributionsFromSettings}
               >
                 <CircleHelp size={15} aria-hidden="true" />
-                Attributions
+                {t('attributions')}
               </motion.button>
               {isBrandTrigger ? (
                 <p className="settings-credit">
-                  Built by <a href="https://tau.gr">taugr</a>
+                  {t('builtBy')} <a href="https://tau.gr">taugr</a>
                 </p>
               ) : null}
             </motion.div>
@@ -1727,7 +1753,7 @@ export default function CycleParkingFinder() {
     return (
       <section
         className={`reference-panel reference-panel--${surface}`}
-        aria-label="Search from"
+        aria-label={t('placeSearch')}
       >
         <form
           className="place-search-form"
@@ -1738,19 +1764,19 @@ export default function CycleParkingFinder() {
           <div className="search-box">
             <Search className="search-box-icon" size={17} aria-hidden="true" />
             <label className="sr-only" htmlFor={`place-search-${surface}`}>
-              Search from a place
+              {t('placeSearchLabel')}
             </label>
             <input
               id={`place-search-${surface}`}
               name="place-search"
               type="search"
               value={placeQuery}
-              placeholder="Place or postcode"
+              placeholder={t('placeOrPostcode')}
               onChange={(event) => setPlaceQuery(event.target.value)}
             />
             {placeQuery.length > 0 ? (
               <button
-                aria-label="Clear search"
+                aria-label={t('clearSearch')}
                 className="search-clear-button"
                 type="button"
                 onClick={() => clearPlaceSearch(surface)}
@@ -1762,14 +1788,14 @@ export default function CycleParkingFinder() {
           <motion.button
             aria-label={
               locationState.status === 'locating'
-                ? 'Locating'
-                : 'Use current location'
+                ? t('locating')
+                : t('useCurrentLocation')
             }
             className="secondary-location-button"
             title={
               locationState.status === 'locating'
-                ? 'Locating'
-                : 'Use current location'
+                ? t('locating')
+                : t('useCurrentLocation')
             }
             type="button"
             onClick={() => {
@@ -1787,7 +1813,9 @@ export default function CycleParkingFinder() {
               <LocateFixed size={18} aria-hidden="true" />
             )}
             <span className="sr-only">
-              {locationState.status === 'locating' ? 'Locating' : 'Near me'}
+              {locationState.status === 'locating'
+                ? t('locating')
+                : t('nearMe')}
             </span>
           </motion.button>
           <motion.button
@@ -1807,7 +1835,7 @@ export default function CycleParkingFinder() {
           >
             <Search size={18} aria-hidden="true" />
             <span className="mobile-action-label">
-              {isPlaceSearching ? 'Searching' : 'Search'}
+              {isPlaceSearching ? t('searching') : t('search')}
             </span>
           </motion.button>
         </form>
@@ -1818,7 +1846,7 @@ export default function CycleParkingFinder() {
               {...risePresence}
               layout
               className="place-results"
-              aria-label="Place search results"
+              aria-label={t('placeSearchResults')}
             >
               {placeResults.map((result) => (
                 <motion.li
@@ -1864,10 +1892,10 @@ export default function CycleParkingFinder() {
           type="button"
           onClick={() => setIsAttributionModalOpen(true)}
         >
-          Attributions
+          {t('attributions')}
         </button>
         <span className="built-by-credit">
-          Built by <a href="https://tau.gr">taugr</a>
+          {t('builtBy')} <a href="https://tau.gr">taugr</a>
         </span>
       </footer>
     );
@@ -1880,8 +1908,9 @@ export default function CycleParkingFinder() {
         data-directions-mode={isDirectionsMode ? 'true' : undefined}
         data-theme={resolvedTheme}
       >
-        <section className="map-pane" aria-label="Cycle parking map">
+        <section className="map-pane" aria-label={t('map')}>
           <CycleParkingMap
+            locale={locale}
             points={nearbyPoints}
             userLocation={locationState.location}
             currentLocationFocusRequestId={currentLocationFocusRequestId}
@@ -1927,10 +1956,7 @@ export default function CycleParkingFinder() {
         </section>
 
         {!isDirectionsMode ? (
-          <section
-            className="mobile-map-toolbar"
-            aria-label="Find nearby cycle parking"
-          >
+          <section className="mobile-map-toolbar" aria-label={t('findNearby')}>
             <header className="app-header app-header--mobile">
               {renderThemeSettings('settings-menu--mobile', 'brand')}
               <h1 className="sr-only">Bike Neuks</h1>
@@ -1941,7 +1967,7 @@ export default function CycleParkingFinder() {
 
         <motion.aside
           className="control-pane"
-          aria-label="Nearest cycle parking"
+          aria-label={t('nearestParking')}
           data-mobile-sheet-dragging={
             isMobileSheetDragging ? 'true' : undefined
           }
@@ -1953,8 +1979,16 @@ export default function CycleParkingFinder() {
             aria-expanded={mobileSheetState === 'expanded'}
             aria-label={
               mobileSheetState === 'expanded'
-                ? `Collapse ${isDirectionsMode ? 'directions' : 'results'} panel`
-                : `Expand ${isDirectionsMode ? 'directions' : 'results'} panel`
+                ? t('collapsePanel', {
+                    panel: t(
+                      isDirectionsMode ? 'panelDirections' : 'panelResults',
+                    ),
+                  })
+                : t('expandPanel', {
+                    panel: t(
+                      isDirectionsMode ? 'panelDirections' : 'panelResults',
+                    ),
+                  })
             }
             className="mobile-sheet-grip"
             type="button"
@@ -1981,7 +2015,7 @@ export default function CycleParkingFinder() {
                   initial="enter"
                   key="directions"
                   className="directions-mode panel-view"
-                  aria-label="Cycle directions"
+                  aria-label={t('cycleDirections')}
                   transition={panelSlideTransition}
                   variants={panelSlideVariants}
                 >
@@ -2010,7 +2044,7 @@ export default function CycleParkingFinder() {
                         </motion.div>
                         <motion.div layout transition={rowLayoutTransition}>
                           <h1>
-                            {directionsParkingPoint?.name ?? 'Directions'}
+                            {directionsParkingPoint?.name ?? t('directions')}
                           </h1>
                           <AnimatePresence initial={false} mode="wait">
                             {directionsParkingPoint ? (
@@ -2025,7 +2059,7 @@ export default function CycleParkingFinder() {
                               </motion.div>
                             ) : (
                               <motion.p {...risePresence} key="directions-copy">
-                                Cycle route
+                                {t('cycleRoute')}
                               </motion.p>
                             )}
                           </AnimatePresence>
@@ -2047,11 +2081,11 @@ export default function CycleParkingFinder() {
                             <Bike size={16} aria-hidden="true" />
                             {liveRouteTracking.status === 'tracking'
                               ? liveRouteProgress?.hasArrived
-                                ? 'Done'
-                                : 'Stop'
+                                ? t('done')
+                                : t('stop')
                               : liveRouteTracking.status === 'starting'
-                                ? 'Starting...'
-                                : 'Start route'}
+                                ? t('starting')
+                                : t('startRoute')}
                           </motion.button>
                         ) : null}
                         <motion.button
@@ -2061,7 +2095,7 @@ export default function CycleParkingFinder() {
                           onClick={clearDirections}
                         >
                           <X size={16} aria-hidden="true" />
-                          Exit directions
+                          {t('exitDirections')}
                         </motion.button>
                       </motion.div>
                     </motion.div>
@@ -2071,7 +2105,7 @@ export default function CycleParkingFinder() {
                         className="directions-live-status directions-live-status-arrived"
                         role="status"
                       >
-                        Arrived at bike parking.
+                        {t('arrivedParking')}
                       </motion.p>
                     ) : null}
                     {liveRouteTracking.status === 'denied' ||
@@ -2083,10 +2117,10 @@ export default function CycleParkingFinder() {
                         role="status"
                       >
                         {liveRouteTracking.status === 'denied'
-                          ? 'Enable location permissions to start route.'
+                          ? t('routeLocationPermission')
                           : liveRouteTracking.status === 'too-far'
-                            ? 'Start route is only available within the UK, Ireland and Spain.'
-                            : 'Live location is unavailable.'}
+                            ? t('routeOutsideCoverage')
+                            : t('liveLocationUnavailable')}
                       </motion.p>
                     ) : null}
                     {liveRouteTracking.status === 'tracking' &&
@@ -2110,11 +2144,13 @@ export default function CycleParkingFinder() {
                         <span className="directions-current-step-text">
                           {describeCycleRouteInstruction(
                             activeRouteInstruction,
+                            locale,
                           )}
                         </span>
                         <small className="directions-step-distance directions-current-step-distance">
                           {formatDistance(
                             activeRouteInstruction.distanceMeters,
+                            locale,
                           )}
                         </small>
                       </motion.div>
@@ -2128,18 +2164,20 @@ export default function CycleParkingFinder() {
                         >
                           <div
                             className="directions-metrics"
-                            aria-label="Route summary"
+                            aria-label={t('routeSummary')}
                           >
                             <span>
                               <Navigation size={16} aria-hidden="true" />
                               {formatDistance(
                                 directionsState.route.distanceMeters,
+                                locale,
                               )}
                             </span>
                             <span>
                               <Bike size={16} aria-hidden="true" />
                               {formatCycleRouteDuration(
                                 directionsState.route.durationSeconds,
+                                locale,
                               )}
                             </span>
                           </div>
@@ -2156,7 +2194,7 @@ export default function CycleParkingFinder() {
                           key="directions-loading"
                           className="directions-message"
                         >
-                          Finding a cycle route...
+                          {t('findingRoute')}
                         </motion.p>
                       ) : null}
 
@@ -2166,7 +2204,7 @@ export default function CycleParkingFinder() {
                           key="directions-missing-key"
                           className="directions-message"
                         >
-                          Directions need a CycleStreets API key.
+                          {t('directionsNeedKey')}
                         </motion.p>
                       ) : null}
 
@@ -2247,11 +2285,13 @@ export default function CycleParkingFinder() {
                                     <span className="directions-step-text">
                                       {describeCycleRouteInstruction(
                                         instruction,
+                                        locale,
                                       )}
                                     </span>
                                     <small className="directions-step-distance">
                                       {formatDistance(
                                         instruction.distanceMeters,
+                                        locale,
                                       )}
                                     </small>
                                   </motion.li>
@@ -2272,7 +2312,7 @@ export default function CycleParkingFinder() {
                               aria-hidden="true"
                             />
                             <span key="directions-attribution-label">
-                              Route by
+                              {t('routeBy')}
                             </span>
                             <a
                               key="directions-attribution-link"
@@ -2312,8 +2352,9 @@ export default function CycleParkingFinder() {
                     <div>
                       <h1>Bike Neuks</h1>
                       <p>
-                        {formattedParkingLocationCount} cycle parking spots in
-                        the UK, Ireland and Spain
+                        {t('spotsAcrossCoverage', {
+                          count: formattedParkingLocationCount,
+                        })}
                       </p>
                     </div>
                     {renderThemeSettings('settings-menu--desktop')}
@@ -2321,8 +2362,10 @@ export default function CycleParkingFinder() {
 
                   <div className="mobile-sheet-summary" aria-hidden="true">
                     <span>
-                      <strong>Nearby bike neuks</strong>
-                      <small>{closestPoints.length} closest</small>
+                      <strong>{t('nearbyBikeNeuks')}</strong>
+                      <small>
+                        {t('closestCount', { count: closestPoints.length })}
+                      </small>
                     </span>
                     <span className="mobile-sheet-summary-location">
                       {nearestPoint?.name}
@@ -2334,8 +2377,10 @@ export default function CycleParkingFinder() {
 
                     <div className="list-heading">
                       <h2>
-                        Nearby bike neuks{' '}
-                        <span>· {closestPoints.length} closest</span>
+                        {t('nearbyBikeNeuks')}{' '}
+                        <span>
+                          · {t('closestCount', { count: closestPoints.length })}
+                        </span>
                       </h2>
                     </div>
 
@@ -2371,7 +2416,7 @@ export default function CycleParkingFinder() {
                                 type="button"
                                 onClick={() => void retryParkingData()}
                               >
-                                Retry
+                                {t('retry')}
                               </button>
                             ) : null}
                           </motion.div>
@@ -2383,8 +2428,7 @@ export default function CycleParkingFinder() {
                             className="parking-list-context"
                             role="status"
                           >
-                            That location is outside the UK, Ireland and Spain,
-                            showing bike parking near Edinburgh.
+                            {t('outsideCoverage')}
                           </motion.div>
                         ) : null}
                       </AnimatePresence>
@@ -2393,7 +2437,7 @@ export default function CycleParkingFinder() {
                         layout="position"
                         className="parking-list"
                         data-testid="parking-list"
-                        aria-label="Nearby bike neuks"
+                        aria-label={t('nearbyBikeNeuks')}
                       >
                         {closestPoints.map((point, index) => {
                           return (
@@ -2442,7 +2486,9 @@ export default function CycleParkingFinder() {
                                 </span>
                               </motion.button>
                               <motion.button
-                                aria-label={`Show cycle directions to ${point.name}`}
+                                aria-label={t('showDirections', {
+                                  name: point.name,
+                                })}
                                 className="parking-directions-button"
                                 data-testid={`parking-directions-${point.id}`}
                                 disabled={!isClientReady}
@@ -2454,11 +2500,11 @@ export default function CycleParkingFinder() {
                               >
                                 <Navigation size={17} aria-hidden="true" />
                                 <span className="parking-action-label">
-                                  Directions
+                                  {t('directions')}
                                 </span>
                               </motion.button>
                               <motion.button
-                                aria-label={`Copy link to ${point.name}`}
+                                aria-label={t('copyLink', { name: point.name })}
                                 className="parking-share-button"
                                 type="button"
                                 whileTap={subtleTap}
@@ -2476,7 +2522,7 @@ export default function CycleParkingFinder() {
                                       className="parking-share-tooltip"
                                       role="status"
                                     >
-                                      Copied
+                                      {t('copied')}
                                     </motion.span>
                                   ) : null}
                                 </AnimatePresence>
@@ -2513,7 +2559,7 @@ export default function CycleParkingFinder() {
                 className="attribution-modal-content"
               >
                 <div className="attribution-modal-header">
-                  <h2 id="attribution-modal-title">Attributions</h2>
+                  <h2 id="attribution-modal-title">{t('attributions')}</h2>
                 </div>
                 <div className="attribution-details">
                   {parkingManifest?.sources.map((source) => (
@@ -2548,7 +2594,7 @@ export default function CycleParkingFinder() {
                     whileTap={subtleTap}
                     onClick={closeAttributionDialog}
                   >
-                    Close
+                    {t('close')}
                   </motion.button>
                 </div>
               </motion.div>
@@ -2579,7 +2625,7 @@ export default function CycleParkingFinder() {
                 <div className="street-view-modal-header">
                   <h2 id="street-view-modal-title">{streetViewPoint.name}</h2>
                   <motion.button
-                    aria-label="Close Street View"
+                    aria-label={t('closeStreetView')}
                     className="street-view-modal-close"
                     type="button"
                     whileTap={subtleTap}
@@ -2597,7 +2643,7 @@ export default function CycleParkingFinder() {
                     streetViewPoint,
                     googleStreetViewApiKey,
                   )}
-                  title={`Street View for ${streetViewPoint.name}`}
+                  title={t('streetViewFor', { name: streetViewPoint.name })}
                 />
               </motion.div>
             ) : null}

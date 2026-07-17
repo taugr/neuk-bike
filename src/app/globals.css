@@ -638,6 +638,25 @@ a {
   box-shadow: 0 2px 8px rgb(16 32 28 / 10%);
 }
 
+.language-select {
+  appearance: auto;
+  background: var(--surface-strong);
+  border: 1px solid var(--subtle);
+  border-radius: 10px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  min-height: 2.2rem;
+  padding: 0 0.6rem;
+  width: 100%;
+}
+
+.language-select:hover,
+.language-select:focus-visible {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
 .settings-action-button {
   align-items: center;
   background: var(--surface-strong);

@@ -13,6 +13,20 @@ describe('place search', () => {
     expect(url.searchParams.get('bounded')).toBe('1');
     expect(url.searchParams.get('countrycodes')).toBe('gb,ie,es');
     expect(url.searchParams.get('q')).toBe('Madrid');
+    expect(url.searchParams.get('accept-language')).toBe('en');
+  });
+
+  it('requests localized place names with an English fallback', () => {
+    expect(
+      new URL(buildPlaceSearchUrl('Dùn Èideann', 'gd')).searchParams.get(
+        'accept-language',
+      ),
+    ).toBe('gd,en');
+    expect(
+      new URL(buildPlaceSearchUrl('Madrid', 'es')).searchParams.get(
+        'accept-language',
+      ),
+    ).toBe('es,en');
   });
 
   it('parses valid Nominatim results and rejects malformed locations', () => {

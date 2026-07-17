@@ -325,6 +325,26 @@ describe('CycleStreets utilities', () => {
     expect(formatCycleRouteDuration(15)).toBe('1 min');
   });
 
+  it('localizes route instructions while preserving road names', () => {
+    const instruction = {
+      id: 'left',
+      anchor: [40.4168, -3.7038] as [number, number],
+      streetName: 'Calle de Alcalá',
+      turn: 'turn left',
+      distanceMeters: 120,
+      durationSeconds: 30,
+      travelMode: 'cycling',
+    };
+
+    expect(describeCycleRouteInstruction(instruction, 'es')).toBe(
+      'Gira a la izquierda por Calle de Alcalá',
+    );
+    expect(describeCycleRouteInstruction(instruction, 'gd')).toBe(
+      'Tionndaidh gu clì gu Calle de Alcalá',
+    );
+    expect(formatCycleRouteDuration(811, 'gd')).toBe('14 mion');
+  });
+
   it('builds local short routes for nearby parking', () => {
     const route = buildShortCycleRoute(
       { latitude: 55.9533, longitude: -3.1883 },
