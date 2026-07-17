@@ -103,6 +103,10 @@ test('switches and persists the interface language without moving the map', asyn
   await expectMapFocusedAt(page, 55.94155, -3.29625);
 
   const map = page.getByTestId('parking-map');
+  const mapCanvas = page.locator('.maplibregl-canvas');
+  await mapCanvas.evaluate((canvas) => {
+    canvas.setAttribute('data-language-switch-canvas', 'stable');
+  });
   const boundsBefore = await Promise.all(
     ['data-map-west', 'data-map-east', 'data-map-south', 'data-map-north'].map(
       (attribute) => map.getAttribute(attribute),
@@ -125,6 +129,14 @@ test('switches and persists the interface language without moving the map', asyn
     page.getByRole('heading', { name: /Aparcabicis cercanos/ }),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Alejar' })).toBeVisible();
+  await expect(mapCanvas).toHaveAttribute(
+    'data-language-switch-canvas',
+    'stable',
+  );
+  await expect(page.locator('.parking-list-scroll')).toHaveCSS(
+    'background-color',
+    'rgb(255, 255, 255)',
+  );
 
   const boundsAfter = await Promise.all(
     ['data-map-west', 'data-map-east', 'data-map-south', 'data-map-north'].map(

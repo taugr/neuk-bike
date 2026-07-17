@@ -472,6 +472,7 @@ a {
   flex-direction: column;
   gap: 0.8rem;
   min-width: 0;
+  isolation: isolate;
   overflow: auto;
   padding: 1.25rem 1.25rem 0.45rem;
   position: relative;
@@ -488,6 +489,7 @@ a {
 }
 
 .finder-panel-content {
+  background: var(--surface);
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -911,6 +913,7 @@ a {
 }
 
 .parking-list-scroll {
+  background: var(--surface);
   flex: none;
 }
 

@@ -178,6 +178,43 @@ function getMapLibreLocale(locale: AppLocale) {
   };
 }
 
+function applyMapLibreLocale(map: MapLibreMap, locale: AppLocale) {
+  const localizedLabels = getMapLibreLocale(locale);
+
+  Object.assign(map._locale, localizedLabels);
+
+  const updateControlLabel = (selector: string, label: string) => {
+    const control = map.getContainer().querySelector<HTMLElement>(selector);
+
+    if (!control) {
+      return;
+    }
+
+    control.setAttribute('aria-label', label);
+    control.setAttribute('title', label);
+  };
+
+  updateControlLabel(
+    '.maplibregl-ctrl-zoom-in',
+    localizedLabels['NavigationControl.ZoomIn'],
+  );
+  updateControlLabel(
+    '.maplibregl-ctrl-zoom-out',
+    localizedLabels['NavigationControl.ZoomOut'],
+  );
+  updateControlLabel(
+    '.maplibregl-ctrl-attrib-button',
+    localizedLabels['AttributionControl.ToggleAttribution'],
+  );
+
+  map
+    .getContainer()
+    .querySelectorAll<HTMLElement>('.maplibregl-popup-close-button')
+    .forEach((button) => {
+      button.setAttribute('aria-label', localizedLabels['Popup.Close']);
+    });
+}
+
 function toLngLat(point: CycleRoutePoint): [number, number] {
   return [point[1], point[0]];
 }
@@ -977,6 +1014,7 @@ export default function CycleParkingMap({
 }: CycleParkingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const onViewportChangeRef = useRef(onViewportChange);
   const parkingMarkerRefs = useRef(new Map<string, RenderedMarker>());
   const startMarkerRef = useRef<RenderedMarker | null>(null);
   const liveMarkerRef = useRef<RenderedMarker | null>(null);
@@ -995,6 +1033,7 @@ export default function CycleParkingMap({
     zoom: number;
   } | null>(null);
   const initialBasemapThemeRef = useRef(theme);
+  const initialLocaleRef = useRef(locale);
   const activeBasemapThemeRef = useRef(theme);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -1006,9 +1045,10 @@ export default function CycleParkingMap({
     bounds: null,
     zoom: 13,
   });
+  onViewportChangeRef.current = onViewportChange;
   const handleViewportChange = useCallback(
     ({ bounds, zoom }: { bounds: ParkingMapBounds; zoom: number }) => {
-      onViewportChange(bounds);
+      onViewportChangeRef.current(bounds);
       setViewport((current) => {
         if (
           current.zoom === zoom &&
@@ -1023,7 +1063,7 @@ export default function CycleParkingMap({
         return { bounds, zoom };
       });
     },
-    [onViewportChange],
+    [],
   );
   const updateViewport = useCallback(() => {
     if (!mapRef.current || frameRef.current !== null) {
@@ -1127,7 +1167,7 @@ export default function CycleParkingMap({
         center: savedCameraRef.current?.center ?? toLngLat(defaultCenter),
         container,
         dragRotate: false,
-        locale: getMapLibreLocale(locale),
+        locale: getMapLibreLocale(initialLocaleRef.current),
         minZoom: 1,
         pitchWithRotate: false,
         style,
@@ -1261,7 +1301,15 @@ export default function CycleParkingMap({
       setMap(null);
       setIsMapLoaded(false);
     };
-  }, [handleViewportChange, locale, updateViewport]);
+  }, [handleViewportChange, updateViewport]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    applyMapLibreLocale(map, locale);
+  }, [locale, map]);
 
   useEffect(() => {
     if (!map) {
