@@ -23,9 +23,9 @@ import {
   LockOpen,
   MapPin,
   Navigation,
-  ScanSearch,
   ParkingCircle,
   Route,
+  ScanSearch,
   Share2,
   ShoppingBag,
   Umbrella,
@@ -39,7 +39,10 @@ import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { ParkingPoint, UserLocation } from '@/lib/types';
-import { getParkingPopupDetails } from '@/lib/parking';
+import {
+  getParkingEssentialDetails,
+  getParkingPopupDetails,
+} from '@/lib/parking';
 import type { ParkingPopupIcon } from '@/lib/parking';
 import type { CycleRoute, CycleRoutePoint } from '@/lib/cyclestreets';
 import {
@@ -84,7 +87,10 @@ type CycleParkingMapProps = {
   shouldFollowLiveRoute: boolean;
   isDirectionsMode: boolean;
   mobileSheetState: 'collapsed' | 'expanded';
-  copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
+  copiedShareButton: {
+    parkingId: string;
+    source: 'details' | 'list' | 'popup';
+  } | null;
   theme: 'light' | 'dark';
   canRequestDirections: boolean;
   canShowStreetView: boolean;
@@ -94,6 +100,7 @@ type CycleParkingMapProps = {
   onOpenStreetView: (point: ParkingPoint) => void;
   onCopyParkingLink: (point: ParkingPoint) => void;
   onToggleSavedPoint: (point: ParkingPoint) => void;
+  onOpenDetails: (point: ParkingPoint) => void;
   onViewportChange: (bounds: ParkingMapBounds) => void;
 };
 
@@ -813,7 +820,10 @@ function ParkingPopupContent({
 }: {
   canRequestDirections: boolean;
   canShowStreetView: boolean;
-  copiedShareButton: { parkingId: string; source: 'list' | 'popup' } | null;
+  copiedShareButton: {
+    parkingId: string;
+    source: 'details' | 'list' | 'popup';
+  } | null;
   isDirectionsMode: boolean;
   isSaved: boolean;
   onCopyParkingLink: (point: ParkingPoint) => void;
@@ -823,110 +833,142 @@ function ParkingPopupContent({
   point: ParkingPoint;
   locale: AppLocale;
 }) {
+  const essentialDetails = getParkingEssentialDetails(point, locale);
   const popupDetails = getParkingPopupDetails(point, locale);
 
   return (
     <div className="parking-popup">
-      <div className="parking-popup-title-row">
-        <strong>{point.name}</strong>
-        {popupDetails.metrics.map((metric) => (
-          <span
-            className="parking-popup-distance"
-            key={metric.label}
-            title={metric.label}
-          >
-            {metric.value}
-          </span>
-        ))}
-      </div>
       <div
-        className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}
-        aria-label={translate(locale, 'details')}
+        className="parking-popup-preview"
+        data-testid={`parking-popup-details-${point.id}`}
       >
-        {popupDetails.details.map((detail) => (
-          <div
-            aria-label={`${detail.label}: ${detail.value}`}
-            className={`parking-popup-detail parking-popup-tone-${detail.tone}`}
-            key={detail.label}
+        <span className="parking-popup-title-row">
+          <strong>{point.name}</strong>
+        </span>
+        {essentialDetails.length > 0 ? (
+          <span
+            className={`parking-popup-details parking-popup-details-count-${essentialDetails.length}`}
+            aria-label={translate(locale, 'details')}
           >
-            <span className="parking-popup-detail-icon">
-              {detail.emphasis ?? <ParkingPopupIcon icon={detail.icon} />}
-            </span>
-            <span className="parking-popup-detail-value">{detail.value}</span>
-          </div>
-        ))}
+            {essentialDetails.map((detail) => (
+              <span
+                aria-label={`${detail.label}: ${detail.value}`}
+                className={`parking-popup-detail parking-popup-tone-${detail.tone}`}
+                key={detail.label}
+              >
+                <span className="parking-popup-detail-icon">
+                  {detail.emphasis ?? <ParkingPopupIcon icon={detail.icon} />}
+                </span>
+                <span className="parking-popup-detail-value">
+                  {detail.value}
+                </span>
+              </span>
+            ))}
+          </span>
+        ) : null}
       </div>
-      {isDirectionsMode ? null : (
-        <div className="parking-popup-actions">
-          <button
-            className="parking-popup-directions-button"
-            disabled={!canRequestDirections}
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onRequestDirections(point);
-            }}
-          >
-            <Navigation size={15} aria-hidden="true" />
-            {translate(locale, 'directions')}
-          </button>
-          {canShowStreetView ? (
+      <div className="parking-popup-desktop">
+        <div className="parking-popup-title-row">
+          <strong>{point.name}</strong>
+          {popupDetails.metrics.map((metric) => (
+            <span
+              className="parking-popup-distance"
+              key={metric.label}
+              title={metric.label}
+            >
+              {metric.value}
+            </span>
+          ))}
+        </div>
+        <div
+          className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}
+          aria-label={translate(locale, 'details')}
+        >
+          {popupDetails.details.map((detail) => (
+            <div
+              aria-label={`${detail.label}: ${detail.value}`}
+              className={`parking-popup-detail parking-popup-tone-${detail.tone}`}
+              key={detail.label}
+            >
+              <span className="parking-popup-detail-icon">
+                {detail.emphasis ?? <ParkingPopupIcon icon={detail.icon} />}
+              </span>
+              <span className="parking-popup-detail-value">{detail.value}</span>
+            </div>
+          ))}
+        </div>
+        {isDirectionsMode ? null : (
+          <div className="parking-popup-actions">
             <button
-              aria-label={translate(locale, 'openStreetView', {
-                name: point.name,
-              })}
-              className="parking-popup-street-view-button"
+              className="parking-popup-directions-button"
+              disabled={!canRequestDirections}
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
-                onOpenStreetView(point);
+                onRequestDirections(point);
               }}
             >
-              <ScanSearch size={15} aria-hidden="true" />
-              {translate(locale, 'street')}
+              <Navigation size={15} aria-hidden="true" />
+              {translate(locale, 'directions')}
             </button>
-          ) : null}
-          <button
-            aria-label={translate(locale, 'copyLink', { name: point.name })}
-            className="parking-popup-share-button"
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onCopyParkingLink(point);
-            }}
-          >
-            <Share2 size={15} aria-hidden="true" />
-            {translate(locale, 'share')}
-            {copiedShareButton?.source === 'popup' &&
-            copiedShareButton.parkingId === point.id ? (
-              <span className="parking-popup-share-feedback" role="status">
-                {translate(locale, 'copied')}
-              </span>
+            {canShowStreetView ? (
+              <button
+                aria-label={translate(locale, 'openStreetView', {
+                  name: point.name,
+                })}
+                className="parking-popup-street-view-button"
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onOpenStreetView(point);
+                }}
+              >
+                <ScanSearch size={15} aria-hidden="true" />
+                {translate(locale, 'street')}
+              </button>
             ) : null}
-          </button>
-          <button
-            aria-label={translate(
-              locale,
-              isSaved ? 'removeFromMyNeuks' : 'saveToMyNeuks',
-              { name: point.name },
-            )}
-            aria-pressed={isSaved}
-            className="parking-popup-save-button"
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onToggleSavedPoint(point);
-            }}
-          >
-            <Bookmark
-              size={16}
-              fill={isSaved ? 'currentColor' : 'none'}
-              aria-hidden="true"
-            />
-            {translate(locale, isSaved ? 'saved' : 'save')}
-          </button>
-        </div>
-      )}
+            <button
+              aria-label={translate(locale, 'copyLink', { name: point.name })}
+              className="parking-popup-share-button"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onCopyParkingLink(point);
+              }}
+            >
+              <Share2 size={15} aria-hidden="true" />
+              {translate(locale, 'share')}
+              {copiedShareButton?.source === 'popup' &&
+              copiedShareButton.parkingId === point.id ? (
+                <span className="parking-popup-share-feedback" role="status">
+                  {translate(locale, 'copied')}
+                </span>
+              ) : null}
+            </button>
+            <button
+              aria-label={translate(
+                locale,
+                isSaved ? 'removeFromMyNeuks' : 'saveToMyNeuks',
+                { name: point.name },
+              )}
+              aria-pressed={isSaved}
+              className="parking-popup-save-button"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleSavedPoint(point);
+              }}
+            >
+              <Bookmark
+                size={16}
+                fill={isSaved ? 'currentColor' : 'none'}
+                aria-hidden="true"
+              />
+              {translate(locale, isSaved ? 'saved' : 'save')}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1107,6 +1149,7 @@ export default function CycleParkingMap({
   onOpenStreetView,
   onCopyParkingLink,
   onToggleSavedPoint,
+  onOpenDetails,
   onViewportChange,
 }: CycleParkingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1129,6 +1172,7 @@ export default function CycleParkingMap({
   const previousMobileSheetStateRef = useRef(mobileSheetState);
   const previousRouteSheetStateRef = useRef(mobileSheetState);
   const centeredCollapsedPopupPointRef = useRef<string | null>(null);
+  const deferredExpandedSelectionFocusRef = useRef<string | null>(null);
   const suppressNextSelectionClearFocusRef = useRef(false);
   const frameRef = useRef<number | null>(null);
   const savedCameraRef = useRef<{
@@ -1863,7 +1907,11 @@ export default function CycleParkingMap({
             renderedMarker.popup
               ?.setLngLat([point.longitude, point.latitude])
               .addTo(map);
-            onSelectPoint(point.id);
+            if (window.matchMedia('(max-width: 820px)').matches) {
+              onOpenDetails(point);
+            } else {
+              onSelectPoint(point.id);
+            }
           };
       markerElement.onkeydown = isDirectionsMode
         ? null
@@ -1877,7 +1925,11 @@ export default function CycleParkingMap({
             renderedMarker.popup
               ?.setLngLat([point.longitude, point.latitude])
               .addTo(map);
-            onSelectPoint(point.id);
+            if (window.matchMedia('(max-width: 820px)').matches) {
+              onOpenDetails(point);
+            } else {
+              onSelectPoint(point.id);
+            }
           };
 
       if (isSelected) {
@@ -1904,14 +1956,27 @@ export default function CycleParkingMap({
         ])
         .addTo(map);
 
-      if (centeredCollapsedPopupPointRef.current !== currentSelectedPoint.id) {
+      const shouldCenterPopup =
+        !window.matchMedia('(max-width: 820px)').matches ||
+        mobileSheetStateRef.current === 'collapsed';
+
+      if (
+        shouldCenterPopup &&
+        centeredCollapsedPopupPointRef.current !== currentSelectedPoint.id
+      ) {
         centeredCollapsedPopupPointRef.current = currentSelectedPoint.id;
-        centerTimeoutId = window.setTimeout(
-          () =>
-            selectedEntry.popup &&
-            centerPopupInVisibleMapArea(map, selectedEntry.popup),
-          100,
-        );
+        centerTimeoutId = window.setTimeout(() => {
+          if (
+            window.matchMedia('(max-width: 820px)').matches &&
+            mobileSheetStateRef.current !== 'collapsed'
+          ) {
+            return;
+          }
+
+          if (selectedEntry.popup) {
+            centerPopupInVisibleMapArea(map, selectedEntry.popup);
+          }
+        }, 100);
       }
     }
 
@@ -1928,10 +1993,11 @@ export default function CycleParkingMap({
     locale,
     map,
     onCopyParkingLink,
+    onOpenDetails,
     onOpenStreetView,
     onRequestDirections,
-    onToggleSavedPoint,
     onSelectPoint,
+    onToggleSavedPoint,
     parkingView,
     rankedPointRanks,
     route,
@@ -1993,6 +2059,15 @@ export default function CycleParkingMap({
       return;
     }
 
+    const shouldDeferSelectionFocus =
+      previousMobileSheetState === 'collapsed' &&
+      mobileSheetState === 'expanded' &&
+      previousFocusTargetRef.current?.selectedPointId !== selectedPoint.id;
+
+    if (shouldDeferSelectionFocus) {
+      deferredExpandedSelectionFocusRef.current = selectedPoint.id;
+    }
+
     const timeoutId = window.setTimeout(() => {
       const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
 
@@ -2007,7 +2082,11 @@ export default function CycleParkingMap({
       }
 
       const zoom = map.getZoom();
+      if (deferredExpandedSelectionFocusRef.current === selectedPoint.id) {
+        deferredExpandedSelectionFocusRef.current = null;
+      }
       isAutomaticFocusAnimationRef.current = true;
+      map.stop();
       map.panTo(
         getMapPointFocusCenter(
           map,
@@ -2022,7 +2101,12 @@ export default function CycleParkingMap({
       );
     }, 380);
 
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (deferredExpandedSelectionFocusRef.current === selectedPoint.id) {
+        deferredExpandedSelectionFocusRef.current = null;
+      }
+    };
   }, [map, mobileSheetState, route, selectedPoint]);
 
   useEffect(() => {
@@ -2108,6 +2192,14 @@ export default function CycleParkingMap({
 
     if (focusTargetChanged && !route && !selectedPoint) {
       hasAppliedNearbyFocusRef.current = false;
+    }
+
+    if (
+      selectedPoint &&
+      mobileSheetState === 'expanded' &&
+      deferredExpandedSelectionFocusRef.current === selectedPoint.id
+    ) {
+      return;
     }
 
     isAutomaticFocusAnimationRef.current = false;

@@ -9,6 +9,7 @@ import {
 import { parsePlaceSearchResults } from '@/lib/geocoder';
 import {
   describeParkingPoint,
+  getParkingEssentialDetails,
   getParkingDetails,
   getParkingPopupDetails,
 } from '@/lib/parking';
@@ -217,6 +218,24 @@ describe('geo utilities', () => {
       },
     ]);
     expect(unknown.details).toEqual([]);
+  });
+
+  it('limits compact popup details to capacity, type and cover', () => {
+    const details = getParkingEssentialDetails(
+      parkingPoint({
+        access: 'private',
+        bicycle_pa: 'stands',
+        capacity: 12,
+        covered: 'yes',
+      }),
+    );
+
+    expect(details.map((detail) => detail.kind)).toEqual([
+      'spaces',
+      'type',
+      'cover',
+    ]);
+    expect(details.some((detail) => detail.kind === 'access')).toBe(false);
   });
 
   it('groups popup stand types into icon categories', () => {

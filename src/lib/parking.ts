@@ -40,7 +40,7 @@ type ParkingPopupMetric = {
   value: string;
 };
 
-type ParkingPopupDetail = {
+export type ParkingPopupDetail = {
   emphasis?: string;
   icon: ParkingPopupIcon;
   kind: 'access' | 'cover' | 'spaces' | 'type';
@@ -405,6 +405,17 @@ export function getParkingPopupDetails(
       formatAccessDetail(point.properties.access, locale),
     ].filter((detail): detail is ParkingPopupDetail => detail !== null),
   };
+}
+
+const essentialParkingDetailKinds = new Set(['cover', 'spaces', 'type']);
+
+export function getParkingEssentialDetails(
+  point: ParkingPoint,
+  locale: AppLocale = 'en',
+): ParkingPopupDetail[] {
+  return getParkingPopupDetails(point, locale).details.filter((detail) =>
+    essentialParkingDetailKinds.has(detail.kind),
+  );
 }
 
 export function describeParkingPoint(
