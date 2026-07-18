@@ -63,8 +63,6 @@ const en = {
   nearestParking: 'Nearest cycle parking',
   noPlaceResults: 'No matching places in the UK, Ireland or Spain found.',
   noSavedNeuks: 'No neuks saved yet',
-  noSavedNeuksHint:
-    'Select a bike neuk, then tap the bookmark to keep it here.',
   noLongerInData: 'No longer in the current data',
   notCovered: 'Not covered',
   notListed: 'Not listed',
@@ -131,7 +129,6 @@ const en = {
   savedCount: '{count} saved',
   saved: 'Saved',
   savedMarker: 'saved to My neuks',
-  savedOnThisDevice: 'Saved on this device',
   savedLoadError: 'Some saved neuks could not be loaded.',
   savedStorageError: 'My neuks could not be saved on this device.',
   savedToMyNeuks: 'Saved to My neuks',
@@ -234,8 +231,6 @@ const gd: MessageCatalogue = {
   noPlaceResults:
     'Cha deach àite freagarrach a lorg san RA, ann an Èirinn no san Spàinn.',
   noSavedNeuks: 'Cha deach neuk a shàbhaladh fhathast',
-  noSavedNeuksHint:
-    'Tagh bike neuk, agus an uair sin brùth air a’ chomharra-leabhair gus a chumail an-seo.',
   noLongerInData: 'Chan eil e san dàta làithreach tuilleadh',
   notCovered: 'Gun chòmhdach',
   notListed: 'Gun fhiosrachadh',
@@ -302,7 +297,6 @@ const gd: MessageCatalogue = {
   savedCount: '{count} air an sàbhaladh',
   saved: 'Air a shàbhaladh',
   savedMarker: 'air a shàbhaladh ann am My neuks',
-  savedOnThisDevice: 'Air a shàbhaladh air an uidheam seo',
   savedLoadError:
     'Cha b’ urrainn dhuinn cuid de na neuks sàbhailte a luchdadh.',
   savedStorageError:
@@ -403,8 +397,6 @@ const es: MessageCatalogue = {
   nearestParking: 'Aparcabicis más cercanos',
   noPlaceResults: 'No se encontraron lugares en Reino Unido, Irlanda o España.',
   noSavedNeuks: 'Aún no hay neuks guardados',
-  noSavedNeuksHint:
-    'Selecciona un bike neuk y toca el marcador para guardarlo aquí.',
   noLongerInData: 'Ya no está en los datos actuales',
   notCovered: 'Sin cubierta',
   notListed: 'Sin datos',
@@ -471,7 +463,6 @@ const es: MessageCatalogue = {
   savedCount: '{count} guardados',
   saved: 'Guardado',
   savedMarker: 'guardado en Mis neuks',
-  savedOnThisDevice: 'Guardado en este dispositivo',
   savedLoadError: 'No se pudieron cargar algunos neuks guardados.',
   savedStorageError: 'No se pudo guardar Mis neuks en este dispositivo.',
   savedToMyNeuks: 'Guardado en Mis neuks',

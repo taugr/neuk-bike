@@ -20,6 +20,8 @@ import {
   Bookmark,
   Boxes,
   Building2,
+  ChevronLeft,
+  ChevronRight,
   CircleHelp,
   CircleParking,
   CornerUpLeft,
@@ -2926,6 +2928,7 @@ export default function CycleParkingFinder() {
                           whileTap={subtleTap}
                           onClick={showNearby}
                         >
+                          <ChevronLeft size={14} aria-hidden="true" />
                           {t('showNearby')}
                         </motion.button>
                       ) : (
@@ -2938,7 +2941,7 @@ export default function CycleParkingFinder() {
                           onClick={openMyNeuks}
                         >
                           <Bookmark
-                            size={15}
+                            size={14}
                             fill={
                               savedNeuks.length > 0 ? 'currentColor' : 'none'
                             }
@@ -2947,6 +2950,7 @@ export default function CycleParkingFinder() {
                           <span>
                             {t('myNeuks')} {savedNeuks.length}
                           </span>
+                          <ChevronRight size={14} aria-hidden="true" />
                         </motion.button>
                       )}
                     </div>
@@ -3030,8 +3034,6 @@ export default function CycleParkingFinder() {
                         <section className="saved-neuks-empty">
                           <Bookmark size={24} aria-hidden="true" />
                           <h3>{t('noSavedNeuks')}</h3>
-                          <p>{t('noSavedNeuksHint')}</p>
-                          <small>{t('savedOnThisDevice')}</small>
                           <button type="button" onClick={showNearby}>
                             {t('showNearby')}
                           </button>

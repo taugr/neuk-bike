@@ -860,9 +860,9 @@ a {
   flex: 0 0 auto;
   font-size: 0.78rem;
   font-weight: 760;
-  gap: 0.35rem;
+  gap: 0.2rem;
   min-height: 36px;
-  padding: 0 0.45rem;
+  padding: 0 0.25rem;
 }
 
 .parking-view-button:hover,
@@ -876,7 +876,7 @@ a {
   margin: 0;
 }
 
-.list-heading span {
+.list-heading h2 span {
   color: var(--muted);
   font-size: 0.8rem;
   font-weight: 520;
@@ -1291,24 +1291,13 @@ a {
   text-align: center;
 }
 
-.saved-neuks-empty h3,
-.saved-neuks-empty p {
+.saved-neuks-empty h3 {
   margin: 0;
 }
 
 .saved-neuks-empty h3 {
   color: var(--text);
   font-size: 1rem;
-}
-
-.saved-neuks-empty p {
-  font-size: 0.84rem;
-  line-height: 1.4;
-  max-width: 22rem;
-}
-
-.saved-neuks-empty small {
-  font-size: 0.74rem;
 }
 
 .saved-neuks-empty button {
@@ -2775,6 +2764,14 @@ a {
 }
 
 @media (max-width: 460px) {
+  .list-heading-actions {
+    gap: 0.5rem;
+  }
+
+  .list-heading h2 {
+    font-size: 1.1rem;
+  }
+
   .place-search-form {
     grid-template-columns: minmax(0, 1fr) 40px 40px;
   }
