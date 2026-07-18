@@ -173,7 +173,10 @@ test('reveals list actions only for the explicitly selected neuk', async ({
   await expect(firstActions.getByRole('button').nth(0)).toHaveAccessibleName(
     /^Show cycle directions to /,
   );
-  await expect(firstActions.getByRole('button').nth(0)).toHaveText('');
+  await expect(firstActions.locator('.parking-directions-label')).toHaveCSS(
+    'display',
+    'none',
+  );
   const firstMoreButton = page.getByTestId(`parking-more-${firstParkingId}`);
   await expect(firstMoreButton).toHaveAttribute('aria-expanded', 'false');
 
@@ -244,7 +247,10 @@ test('reveals list actions only for the explicitly selected neuk', async ({
   await expect(savedActions.getByRole('button').first()).toHaveAccessibleName(
     /^Show cycle directions to /,
   );
-  await expect(savedActions.getByRole('button').first()).toHaveText('');
+  await expect(savedActions.locator('.parking-directions-label')).toHaveCSS(
+    'display',
+    'none',
+  );
   await page.getByTestId(`parking-more-${firstParkingId}`).click();
   const savedMenu = page.getByTestId(`parking-more-menu-${firstParkingId}`);
   await expect(savedMenu.getByRole('menuitem').first()).toContainText(
@@ -316,10 +322,18 @@ test('saves a neuk, persists it, and restores Nearby state', async ({
   await expect.poll(() => mapCamera(page)).toEqual(nearbyCamera);
 
   await page.getByRole('button', { name: 'Show nearby' }).first().click();
+  const nearbyView = page.locator(
+    '.parking-view-content[data-parking-view="nearby"]',
+  );
   await expect(
-    page.getByRole('heading', { name: /Nearby bike neuks/ }),
+    nearbyView.getByRole('heading', { name: /Nearby bike neuks/ }),
   ).toBeVisible();
-  await expect(row).toHaveClass(/selected/);
+  await expect(
+    page.locator('.parking-view-content[data-parking-view="saved"]'),
+  ).toHaveCount(0);
+  await expect(
+    nearbyView.getByTestId(`parking-row-${edinburghParking.id}`),
+  ).toHaveClass(/selected/);
   await expect.poll(() => mapCamera(page)).toEqual(nearbyCamera);
 });
 

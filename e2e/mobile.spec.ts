@@ -678,3 +678,95 @@ test('keeps the list open for comparison before opening details', async ({
     page.getByRole('region', { name: 'Parking details' }),
   ).toBeVisible();
 });
+
+test('returns directions to the mobile view that launched them', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+
+  const firstRow = page.locator('[data-testid^="parking-row-"]').first();
+  await expect(firstRow).toBeVisible();
+  const parkingId = (await firstRow.getAttribute('data-testid'))?.replace(
+    'parking-row-',
+    '',
+  );
+  expect(parkingId).toBeTruthy();
+
+  await firstRow.click();
+  await page.getByTestId(`parking-directions-${parkingId}`).click();
+  await expect(
+    page.getByRole('region', { name: 'Cycle directions' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Exit directions' }).click();
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await expect(firstRow).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    page.getByRole('region', { name: 'Parking details' }),
+  ).toHaveCount(0);
+
+  await page.getByTestId(`parking-details-${parkingId}`).click();
+  const details = page.getByRole('region', { name: 'Parking details' });
+  await expect(details).toBeVisible();
+  await details.getByRole('button', { name: 'Directions' }).click();
+  await expect(
+    page.getByRole('region', { name: 'Cycle directions' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Exit directions' }).click();
+  await expect(details).toBeVisible();
+  await expect(page.locator('.control-pane')).toHaveAttribute(
+    'data-panel-transition',
+    'navigate',
+  );
+});
+
+test('keeps content-sized details compact on a tall mobile viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 1_000 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+
+  const firstRow = page.locator('[data-testid^="parking-row-"]').first();
+  const parkingId = (await firstRow.getAttribute('data-testid'))?.replace(
+    'parking-row-',
+    '',
+  );
+  expect(parkingId).toBeTruthy();
+  await firstRow.click();
+  await page.getByTestId(`parking-details-${parkingId}`).click();
+
+  const controlPane = page.locator('.control-pane');
+  const detailsBody = page.locator('.parking-detail-body');
+  await expect(detailsBody).toBeVisible();
+  await expect
+    .poll(async () => (await controlPane.boundingBox())?.height ?? 1_000)
+    .toBeLessThan(500);
+  await expect
+    .poll(() =>
+      detailsBody.evaluate((body) => body.scrollHeight <= body.clientHeight),
+    )
+    .toBe(true);
+});
+
+test('keeps the mobile interaction contract usable with reduced motion', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+
+  const firstRow = page.locator('[data-testid^="parking-row-"]').first();
+  const parkingId = (await firstRow.getAttribute('data-testid'))?.replace(
+    'parking-row-',
+    '',
+  );
+  expect(parkingId).toBeTruthy();
+  await firstRow.click();
+  await expect(firstRow).toHaveAttribute('aria-pressed', 'true');
+  await page.getByTestId(`parking-details-${parkingId}`).click();
+  await expect(
+    page.getByRole('region', { name: 'Parking details' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Back to nearby neuks' }).click();
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+});

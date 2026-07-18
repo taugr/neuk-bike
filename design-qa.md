@@ -17,7 +17,8 @@
 ## States checked
 
 - Nearby list with no selection.
-- Nearby list with a selected pin and compact popup.
+- Nearby list with an explicitly selected row, compact popup, and contextual
+  View details and Directions actions.
 - Full parking detail sheet with the selected popup retained on the map.
 - Back from full details to the same nearby list context.
 - My Neuks list, full saved-neuk details, and Back to My Neuks.
@@ -31,7 +32,9 @@
 - P0: none.
 - P1: none.
 - P2: none after the final spacing and detail-strip pass.
-- The mobile implementation deliberately removes inline row actions from the browse list because the final product decision was to avoid a combined selected-and-nearby state.
+- The mobile browse list keeps unselected rows compact. Selecting a row reveals
+  only View details and Directions so several neuks can be compared without
+  immediately replacing the list.
 - Desktop deliberately retains the previous inline row actions and full popup because the wider layout has enough space for both.
 - The implementation deliberately retains the compact popup in the detail state because that was the final requested change after the detail mockup.
 - Actual parking names and values replace the mock data while preserving the reference hierarchy, spacing, icon treatment, borders, and action layout.
@@ -40,7 +43,8 @@
 
 - On mobile, a marker selects the pin and opens the dedicated detail sheet immediately.
 - The compact popup exposes capacity, type, and cover only.
-- A list row also opens the dedicated detail sheet.
+- A list row selects and previews the neuk while keeping the list visible; its
+  contextual View details action opens the dedicated detail sheet.
 - The detail sheet contains Directions, Street, Share, and Save controls.
 - Full details include access when known and distribute partial fact sets evenly.
 - Circular action controls are visually distinct from the static fact strip.
@@ -60,5 +64,10 @@
 6. Scoped the compact popup and dedicated detail sheet to mobile, restoring the previous desktop popup and selected-row actions.
 7. Made mobile pin selection direct, removed the redundant popup chevron, added full access details, and tightened the sheet and action hierarchy.
 8. Centred compact popup facts and made the detail sheet content-sized with a short-screen cap.
+9. Changed mobile list-row taps into an explicit preview state with View details
+   and Directions, while retaining direct pin-to-details behaviour.
+10. Gave list navigation and direct pin replacement distinct transitions,
+    stabilised list restoration, and coordinated collapsed-sheet pin selection
+    into one camera movement.
 
 final result: passed

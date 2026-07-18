@@ -53,6 +53,7 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type FormEvent,
@@ -122,6 +123,10 @@ import {
 } from '@/lib/parking-data';
 import type { ParkingMapBounds } from '@/lib/map-pins';
 import type { ParkingView } from '@/lib/map-pins';
+import {
+  initialParkingPanelState,
+  reduceParkingPanel,
+} from '@/lib/parking-panel';
 import {
   addSavedNeuk,
   isNeukSaved,
@@ -346,7 +351,6 @@ type ParkingActionSource = 'details' | 'list' | 'popup';
 type ThemeMode = 'system' | 'light' | 'dark';
 type ResolvedTheme = 'light' | 'dark';
 type MobileSheetState = 'expanded' | 'collapsed';
-type ParkingPanelMode = 'details' | 'list';
 type ParkingDataStatus = 'loading' | 'ready' | 'error';
 type SavedNeuksStatus = 'loading' | 'ready' | 'storage-error';
 
@@ -417,10 +421,12 @@ export default function CycleParkingFinder() {
   );
   const [currentLocationFocusRequestId, setCurrentLocationFocusRequestId] =
     useState(0);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [parkingView, setParkingView] = useState<ParkingView>('nearby');
-  const [parkingPanelMode, setParkingPanelMode] =
-    useState<ParkingPanelMode>('list');
+  const [parkingPanelState, dispatchParkingPanel] = useReducer(
+    reduceParkingPanel,
+    initialParkingPanelState,
+  );
+  const parkingView = parkingPanelState.listContext;
+  const selectedId = parkingPanelState.selectedId;
   const [savedNeuksStatus, setSavedNeuksStatus] =
     useState<SavedNeuksStatus>('loading');
   const [savedNeuks, setSavedNeuks] = useState<SavedNeukRecord[]>([]);
@@ -518,8 +524,6 @@ export default function CycleParkingFinder() {
   const parkingMoreButtonRef = useRef<HTMLButtonElement>(null);
   const parkingMoreMenuRef = useRef<HTMLDivElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
-  const parkingDetailsOriginRef = useRef<'list' | 'map'>('map');
-  const panelTransitionRef = useRef<'navigate' | 'replace'>('navigate');
   const savedResolutionRequestId = useRef(0);
   const parkingViewState = useRef<
     Record<ParkingView, { scrollTop: number; selectedId: string | null }>
@@ -698,13 +702,19 @@ export default function CycleParkingFinder() {
 
         if (referenceLocation) {
           if (isLocationInParkingCoverage(referenceLocation, manifest)) {
-            setSelectedId(selectedPoint?.id ?? null);
+            dispatchParkingPanel({
+              selectedId: selectedPoint?.id ?? null,
+              type: 'INITIALIZE_SELECTION',
+            });
             setLocationState({
               status: 'located',
               location: referenceLocation,
             });
           } else {
-            setSelectedId(null);
+            dispatchParkingPanel({
+              selectedId: null,
+              type: 'INITIALIZE_SELECTION',
+            });
             setLocationState({
               status: 'too-far',
               location: EDINBURGH_FALLBACK_LOCATION,
@@ -714,7 +724,10 @@ export default function CycleParkingFinder() {
         }
 
         if (selectedPoint) {
-          setSelectedId(selectedPoint.id);
+          dispatchParkingPanel({
+            selectedId: selectedPoint.id,
+            type: 'INITIALIZE_SELECTION',
+          });
           setLocationState({
             status: 'located',
             location: {
@@ -1203,13 +1216,17 @@ export default function CycleParkingFinder() {
         ) ?? null)
       : null;
   const isDirectionsMode =
-    directionsState.status !== 'idle' && directionsParkingPoint !== null;
+    parkingPanelState.view === 'directions' &&
+    directionsState.status !== 'idle' &&
+    directionsParkingPoint !== null;
   const isParkingDetailsMode =
-    parkingPanelMode === 'details' &&
+    parkingPanelState.view === 'details' &&
     explicitSelectedPoint !== null &&
     !isDirectionsMode;
   const isSavedListMode =
-    parkingPanelMode === 'list' && parkingView === 'saved' && !isDirectionsMode;
+    parkingPanelState.view === 'list' &&
+    parkingView === 'saved' &&
+    !isDirectionsMode;
   const isContentSizedMobileSheet = isParkingDetailsMode || isSavedListMode;
   const activeMobileSheetExpandedHeight =
     isContentSizedMobileSheet && mobileContentSheetExpandedHeightPx !== null
@@ -1227,11 +1244,11 @@ export default function CycleParkingFinder() {
       route: activeRoute,
     });
   }, [activeRoute, liveRouteTracking]);
-  const panelDirection = isDirectionsMode || isParkingDetailsMode ? 1 : -1;
+  const panelDirection = parkingPanelState.direction;
   const parkingViewDirection = parkingView === 'saved' ? 1 : -1;
   const panelMotionContext: PanelMotionContext = {
     direction: panelDirection,
-    kind: panelTransitionRef.current,
+    kind: parkingPanelState.transition,
   };
 
   useEffect(() => {
@@ -1294,10 +1311,13 @@ export default function CycleParkingFinder() {
   }, [isDirectionsMode]);
 
   useEffect(() => {
-    if (parkingPanelMode === 'details' && explicitSelectedPoint === null) {
-      setParkingPanelMode('list');
+    if (
+      parkingPanelState.view === 'details' &&
+      explicitSelectedPoint === null
+    ) {
+      dispatchParkingPanel({ type: 'CLEAR_SELECTION' });
     }
-  }, [explicitSelectedPoint, parkingPanelMode]);
+  }, [explicitSelectedPoint, parkingPanelState.view]);
 
   useEffect(() => {
     if (!isParkingDetailsMode) {
@@ -1309,14 +1329,14 @@ export default function CycleParkingFinder() {
   }, [isParkingDetailsMode]);
 
   useEffect(() => {
-    if (parkingPanelMode !== 'details') {
+    if (parkingPanelState.view !== 'details') {
       return;
     }
 
     const mobileViewport = window.matchMedia('(max-width: 820px)');
     function restoreDesktopList(event?: MediaQueryListEvent) {
       if (!(event?.matches ?? mobileViewport.matches)) {
-        setParkingPanelMode('list');
+        dispatchParkingPanel({ type: 'RESTORE_DESKTOP_LIST' });
       }
     }
 
@@ -1324,7 +1344,7 @@ export default function CycleParkingFinder() {
     mobileViewport.addEventListener('change', restoreDesktopList);
     return () =>
       mobileViewport.removeEventListener('change', restoreDesktopList);
-  }, [parkingPanelMode]);
+  }, [parkingPanelState.view]);
 
   useLayoutEffect(() => {
     if (!isContentSizedMobileSheet) {
@@ -1477,17 +1497,7 @@ export default function CycleParkingFinder() {
         return;
       }
 
-      setParkingPanelMode('list');
-      window.requestAnimationFrame(() => {
-        if (!selectedId) {
-          return;
-        }
-        document
-          .querySelector<HTMLElement>(
-            `[data-testid="parking-marker-${selectedId}"]`,
-          )
-          ?.focus({ preventScroll: true });
-      });
+      closeParkingDetails();
     }
 
     document.addEventListener('keydown', handleKeyDown);
@@ -1805,12 +1815,17 @@ export default function CycleParkingFinder() {
     startLiveRouteTracking();
   }
 
-  function clearDirections() {
+  function clearDirectionsData() {
     directionsRequestId.current += 1;
     stopLiveRouteTracking();
     setDirectionsState({ status: 'idle' });
     setActiveInstruction(null);
     setRouteInstructionFocusRequest(null);
+  }
+
+  function exitDirections() {
+    clearDirectionsData();
+    dispatchParkingPanel({ type: 'EXIT_DIRECTIONS' });
   }
 
   function selectRouteInstruction(id: string) {
@@ -1864,9 +1879,11 @@ export default function CycleParkingFinder() {
     label?: string,
     selectedParkingId?: string,
   ) {
-    setParkingPanelMode('list');
-    setSelectedId(selectedParkingId ?? null);
-    clearDirections();
+    dispatchParkingPanel({
+      selectedId: selectedParkingId ?? null,
+      type: 'RESET_LIST',
+    });
+    clearDirectionsData();
 
     const manifest = parkingDataClient.current?.getManifest();
     if (manifest && !isLocationInParkingCoverage(location, manifest)) {
@@ -1894,9 +1911,11 @@ export default function CycleParkingFinder() {
     if (parkingView === 'saved') {
       showNearby();
     }
-    setParkingPanelMode('list');
-    setSelectedId(selectedParkingId ?? null);
-    clearDirections();
+    dispatchParkingPanel({
+      selectedId: selectedParkingId ?? null,
+      type: 'RESET_LIST',
+    });
+    clearDirectionsData();
 
     if (!canUseGeolocation()) {
       applyFallbackLocation('unavailable');
@@ -2100,8 +2119,8 @@ export default function CycleParkingFinder() {
     captureAnalyticsEvent('parking_selected', { parking_id: id });
     setOpenParkingMoreMenuId(null);
     parkingViewState.current[parkingView].selectedId = id;
-    setSelectedId(id);
-    clearDirections();
+    clearDirectionsData();
+    dispatchParkingPanel({ selectedId: id, type: 'SELECT_LIST_POINT' });
   }
 
   function openParkingDetails(
@@ -2113,10 +2132,14 @@ export default function CycleParkingFinder() {
       return;
     }
 
-    parkingDetailsOriginRef.current = origin;
-    selectParkingPoint(point.id);
-    panelTransitionRef.current = origin === 'map' ? 'replace' : 'navigate';
-    setParkingPanelMode('details');
+    setOpenParkingMoreMenuId(null);
+    parkingViewState.current[parkingView].selectedId = point.id;
+    clearDirectionsData();
+    dispatchParkingPanel({
+      origin,
+      selectedId: point.id,
+      type: 'OPEN_DETAILS',
+    });
     setMobileSheetState('expanded');
     animateMobileSheetTo('expanded');
     captureAnalyticsEvent('parking_details_opened', {
@@ -2127,8 +2150,8 @@ export default function CycleParkingFinder() {
 
   function closeParkingDetails(event?: MouseEvent<HTMLButtonElement>) {
     const parkingId = selectedId;
-    panelTransitionRef.current = 'navigate';
-    setParkingPanelMode('list');
+    const detailsOrigin = parkingPanelState.detailsOrigin;
+    dispatchParkingPanel({ type: 'CLOSE_DETAILS' });
     captureAnalyticsEvent('parking_details_closed', {
       parking_id: parkingId,
     });
@@ -2151,7 +2174,7 @@ export default function CycleParkingFinder() {
       const listButton =
         listItem?.querySelector<HTMLButtonElement>('.parking-row');
       const focusTarget =
-        parkingDetailsOriginRef.current === 'list'
+        detailsOrigin === 'list'
           ? (listDetailsButton ?? listButton ?? markerButton)
           : (markerButton ?? listButton);
       focusTarget?.focus({ preventScroll: true });
@@ -2160,9 +2183,9 @@ export default function CycleParkingFinder() {
 
   function clearSelectedParkingPoint() {
     setOpenParkingMoreMenuId(null);
-    setParkingPanelMode('list');
     parkingViewState.current[parkingView].selectedId = null;
-    setSelectedId(null);
+    clearDirectionsData();
+    dispatchParkingPanel({ type: 'CLEAR_SELECTION' });
   }
 
   function rememberCurrentParkingView() {
@@ -2174,14 +2197,16 @@ export default function CycleParkingFinder() {
 
   function openMyNeuks(event?: MouseEvent<HTMLButtonElement>) {
     rememberCurrentParkingView();
-    setParkingPanelMode('list');
     const selectedSavedId =
       selectedId && savedIds.has(selectedId)
         ? selectedId
         : parkingViewState.current.saved.selectedId;
     parkingViewState.current.saved.selectedId = selectedSavedId;
-    setSelectedId(selectedSavedId);
-    setParkingView('saved');
+    clearDirectionsData();
+    dispatchParkingPanel({
+      selectedId: selectedSavedId,
+      type: 'SHOW_SAVED',
+    });
     if (event?.detail === 0) {
       window.requestAnimationFrame(() => savedHeadingRef.current?.focus());
     }
@@ -2192,10 +2217,12 @@ export default function CycleParkingFinder() {
 
   function showNearby() {
     rememberCurrentParkingView();
-    setParkingPanelMode('list');
     const nearbySelectedId = parkingViewState.current.nearby.selectedId;
-    setSelectedId(nearbySelectedId);
-    setParkingView('nearby');
+    clearDirectionsData();
+    dispatchParkingPanel({
+      selectedId: nearbySelectedId,
+      type: 'SHOW_NEARBY',
+    });
   }
 
   function showSavedNeuksConfirmation(message: string) {
@@ -2280,12 +2307,15 @@ export default function CycleParkingFinder() {
     }
 
     stopLiveRouteTracking();
-    panelTransitionRef.current = 'navigate';
     captureAnalyticsEvent('directions_requested', {
       parking_id: point.id,
       parking_name: point.name,
     });
-    setSelectedId(point.id);
+    parkingViewState.current[parkingView].selectedId = point.id;
+    dispatchParkingPanel({
+      selectedId: point.id,
+      type: 'OPEN_DIRECTIONS',
+    });
     setActiveInstruction(null);
     setRouteInstructionFocusRequest(null);
 
@@ -2833,7 +2863,7 @@ export default function CycleParkingFinder() {
                 : 'list'
           }
           data-parking-view={parkingView}
-          data-panel-transition={panelTransitionRef.current}
+          data-panel-transition={parkingPanelState.transition}
           initial={false}
           style={controlPaneStyle}
         >
@@ -2965,7 +2995,7 @@ export default function CycleParkingFinder() {
                           className="directions-exit-button"
                           type="button"
                           whileTap={subtleTap}
-                          onClick={clearDirections}
+                          onClick={exitDirections}
                         >
                           <X size={16} aria-hidden="true" />
                           {t('exitDirections')}
