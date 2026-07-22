@@ -377,7 +377,7 @@ test('loads a distant saved neuk and keeps My neuks behind Directions', async ({
   await expect(
     page.getByRole('region', { name: 'Cycle directions' }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Exit directions' }).click();
+  await page.getByRole('button', { exact: true, name: 'Back' }).click();
   await expect(page.getByRole('heading', { name: /My neuks/ })).toBeVisible();
   await expect(madridRow).toHaveClass(/selected/);
 });

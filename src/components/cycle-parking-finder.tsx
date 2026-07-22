@@ -98,8 +98,10 @@ import {
   sortByDistance,
 } from '@/lib/geo';
 import {
+  getDirectionsParkingDetails,
   getParkingEssentialDetails,
   getParkingPopupDetails,
+  type ParkingPopupDetail,
   type ParkingPopupIcon,
 } from '@/lib/parking';
 import { formatParkingDisplayName } from '@/lib/parking-names';
@@ -264,20 +266,26 @@ function ParkingListDetailIcon({ icon }: { icon: ParkingPopupIcon }) {
 
 function ParkingDetailStrip({
   className,
+  compact,
+  details,
   includeDistance,
   point,
   showAllDetails,
 }: {
   className?: string;
+  compact?: boolean;
+  details?: ParkingPopupDetail[];
   includeDistance?: boolean;
   point: ParkingPoint;
   showAllDetails?: boolean;
 }) {
   const { locale, t } = useLanguage();
   const parkingDetails = getParkingPopupDetails(point, locale);
-  const visibleDetails = showAllDetails
-    ? parkingDetails.details
-    : getParkingEssentialDetails(point, locale);
+  const visibleDetails =
+    details ??
+    (showAllDetails
+      ? parkingDetails.details
+      : getParkingEssentialDetails(point, locale));
 
   if (!includeDistance && visibleDetails.length === 0) {
     return null;
@@ -289,6 +297,7 @@ function ParkingDetailStrip({
       className={[
         'parking-row-details',
         `parking-row-details-count-${visibleDetails.length + (includeDistance ? parkingDetails.metrics.length : 0)}`,
+        compact ? 'parking-row-details-compact' : '',
         className,
       ]
         .filter(Boolean)
@@ -302,20 +311,39 @@ function ParkingDetailStrip({
             </span>
           ))
         : null}
-      {visibleDetails.map((detail) => (
-        <span
-          className={`parking-row-detail parking-row-detail-${detail.kind}`}
-          key={detail.label}
-        >
-          <span className="parking-row-detail-icon">
-            {detail.emphasis ?? <ParkingListDetailIcon icon={detail.icon} />}
+      {visibleDetails.map((detail, index) => (
+        <Fragment key={detail.label}>
+          {compact && index > 0 ? (
+            <span aria-hidden="true" className="parking-row-detail-separator">
+              ·
+            </span>
+          ) : null}
+          <span
+            className={`parking-row-detail parking-row-detail-${detail.kind}`}
+          >
+            {compact ? (
+              <span>
+                {detail.emphasis ? `${detail.emphasis} ` : ''}
+                {detail.kind === 'spaces'
+                  ? detail.value.toLowerCase()
+                  : detail.value}
+              </span>
+            ) : (
+              <>
+                <span className="parking-row-detail-icon">
+                  {detail.emphasis ?? (
+                    <ParkingListDetailIcon icon={detail.icon} />
+                  )}
+                </span>
+                <span>
+                  {detail.kind === 'spaces'
+                    ? detail.value.toLowerCase()
+                    : detail.value}
+                </span>
+              </>
+            )}
           </span>
-          <span>
-            {detail.kind === 'spaces'
-              ? detail.value.toLowerCase()
-              : detail.value}
-          </span>
-        </span>
+        </Fragment>
       ))}
     </span>
   );
@@ -2980,6 +3008,11 @@ export default function CycleParkingFinder() {
                               >
                                 <ParkingDetailStrip
                                   className="directions-parking-details"
+                                  compact
+                                  details={getDirectionsParkingDetails(
+                                    directionsParkingPoint,
+                                    locale,
+                                  )}
                                   point={directionsParkingPoint}
                                 />
                               </motion.div>
@@ -3015,13 +3048,13 @@ export default function CycleParkingFinder() {
                           </motion.button>
                         ) : null}
                         <motion.button
-                          className="directions-exit-button"
+                          className="directions-back-button"
                           type="button"
                           whileTap={subtleTap}
                           onClick={exitDirections}
                         >
-                          <X size={16} aria-hidden="true" />
-                          {t('exitDirections')}
+                          <ChevronLeft size={17} aria-hidden="true" />
+                          {t('back')}
                         </motion.button>
                       </motion.div>
                     </motion.div>

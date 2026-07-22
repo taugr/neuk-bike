@@ -418,6 +418,27 @@ export function getParkingEssentialDetails(
   );
 }
 
+const genericDirectionsParkingTypes = new Set(['rack', 'racks', 'stands']);
+
+export function getDirectionsParkingDetails(
+  point: ParkingPoint,
+  locale: AppLocale = 'en',
+): ParkingPopupDetail[] {
+  const details = getParkingPopupDetails(point, locale).details;
+  const capacity = details.find((detail) => detail.kind === 'spaces');
+  const covered = details.find(
+    (detail) => detail.kind === 'cover' && detail.icon === 'covered',
+  );
+  const type = details.find((detail) => detail.kind === 'type');
+  const rawType = normalizeText(point.properties.bicycle_pa);
+  const distinctiveType =
+    rawType && !genericDirectionsParkingTypes.has(rawType) ? type : undefined;
+
+  return [capacity, covered ?? distinctiveType].filter(
+    (detail): detail is ParkingPopupDetail => detail !== undefined,
+  );
+}
+
 export function describeParkingPoint(
   point: ParkingPoint,
   locale: AppLocale = 'en',

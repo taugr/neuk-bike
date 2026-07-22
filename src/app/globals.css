@@ -3152,15 +3152,107 @@ a {
     display: none;
   }
 
+  .directions-mode {
+    gap: 0.65rem;
+  }
+
+  .directions-mode-header {
+    gap: 0.65rem;
+  }
+
+  .directions-header-main {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .directions-title {
+    gap: 0;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .directions-mark {
+    display: none;
+  }
+
+  .directions-title > div:last-child {
+    gap: 0.1rem;
+  }
+
   .directions-header-actions {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 0.55rem;
-    min-width: 9.75rem;
+    display: contents;
   }
 
   .directions-mode-header button {
-    width: 100%;
+    min-height: 44px;
+    white-space: nowrap;
+    width: auto;
+  }
+
+  .directions-mode-header .directions-back-button {
+    align-self: center;
+    background: transparent;
+    border-color: transparent;
+    font-size: 0.8rem;
+    gap: 0.1rem;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    padding: 0;
+  }
+
+  .directions-mode-header .directions-back-button:hover,
+  .directions-mode-header .directions-back-button:focus-visible {
+    background: var(--hover-soft);
+    border-color: transparent;
+  }
+
+  .directions-mode-header .directions-route-start-button {
+    align-self: center;
+    font-size: 0.75rem;
+    gap: 0.25rem;
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    padding: 0 0.25rem;
+  }
+
+  .directions-parking-details {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0;
+    margin-top: 0.2rem;
+  }
+
+  .directions-parking-details .parking-row-detail {
+    display: inline-flex;
+    font-size: 0.74rem;
+    font-weight: 680;
+    grid-template-columns: none;
+  }
+
+  .directions-parking-details .parking-row-detail-separator {
+    color: var(--muted);
+    margin: 0 0.4rem;
+  }
+
+  .directions-list li {
+    gap: 0.65rem;
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    min-height: 3.65rem;
+    padding: 0.55rem 0.6rem;
+  }
+
+  .directions-list li::before,
+  .directions-list li::after {
+    left: 1.725rem;
+  }
+
+  .directions-step-icon {
+    height: 2.25rem;
+    width: 2.25rem;
   }
 
   .control-pane[data-mobile-sheet-state='expanded']:has(.directions-mode) {
@@ -3189,20 +3281,7 @@ a {
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
     .directions-title {
     flex: 1 1 auto;
-    gap: 0.7rem;
-  }
-
-  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
-    .directions-mark {
-    height: 30px;
-    width: 30px;
-  }
-
-  .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
-    .directions-mark
-    svg {
-    height: 16px;
-    width: 16px;
+    gap: 0;
   }
 
   .control-pane[data-mobile-sheet-state='collapsed']:has(.directions-mode)
@@ -3278,7 +3357,7 @@ a {
   }
 
   .directions-mode-header h1 {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
   .app-header p {

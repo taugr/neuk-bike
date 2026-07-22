@@ -102,9 +102,37 @@ test('keeps the mobile directions panel usable', async ({ page }) => {
     directions.getByRole('heading', { name: parkingName }),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Start route' })).toBeVisible();
+  const directionsParkingDetails = page.locator('.directions-parking-details');
+  await expect(
+    directionsParkingDetails.locator('.parking-row-detail'),
+  ).toHaveCount(1);
+  await expect(directionsParkingDetails).not.toContainText('Stands');
+  await expect(directionsParkingDetails).not.toContainText('Not covered');
+  await expect(
+    page.getByRole('button', { exact: true, name: 'Back' }),
+  ).toBeVisible();
   await expect(
     page.getByRole('button', { name: 'Exit directions' }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.locator('.directions-mark')).toBeHidden();
+
+  const directionsMain = page.locator('.directions-header-main');
+  const directionsMainBounds = await directionsMain.boundingBox();
+  const backBounds = await page
+    .getByRole('button', { exact: true, name: 'Back' })
+    .boundingBox();
+  const startBounds = await page
+    .getByRole('button', { name: 'Start route' })
+    .boundingBox();
+  expect(
+    directionsMainBounds?.height ?? Number.POSITIVE_INFINITY,
+  ).toBeLessThanOrEqual(72);
+  expect(backBounds?.x ?? Number.POSITIVE_INFINITY).toBeLessThan(
+    startBounds?.x ?? Number.NEGATIVE_INFINITY,
+  );
+  expect(
+    Math.abs((backBounds?.y ?? 0) - (startBounds?.y ?? 0)),
+  ).toBeLessThanOrEqual(8);
   await expect(page.locator('.mobile-map-toolbar')).toHaveCount(0);
 
   const directionsAttributionTop = await mapAttribution.evaluate((element) =>
@@ -899,7 +927,7 @@ test('returns directions to the mobile view that launched them', async ({
   await expect(
     page.getByRole('region', { name: 'Cycle directions' }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Exit directions' }).click();
+  await page.getByRole('button', { exact: true, name: 'Back' }).click();
   await expect(page.getByTestId('parking-list')).toBeVisible();
   await expect(firstRow).toHaveAttribute('aria-pressed', 'true');
   await expect(
@@ -913,7 +941,7 @@ test('returns directions to the mobile view that launched them', async ({
   await expect(
     page.getByRole('region', { name: 'Cycle directions' }),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Exit directions' }).click();
+  await page.getByRole('button', { exact: true, name: 'Back' }).click();
   await expect(details).toBeVisible();
   await expect(page.locator('.control-pane')).toHaveAttribute(
     'data-panel-transition',

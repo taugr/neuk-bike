@@ -245,3 +245,145 @@ Previous result: passed
   imagery cannot be compared locally, although its frame and interaction work.
 
 final result: blocked
+
+## Compact directions toolbar QA
+
+### Comparison setup
+
+- Reference source: `/Users/tomauger/.codex/generated_images/019f8983-28c0-7e80-9421-97587b58aca7/exec-6a705299-548d-4522-8fe7-5fc46f6080ed.png`
+- Normalized reference: `/Users/tomauger/projects/neuk-bike/playwright-videos/design-qa/directions-option-1-normalized.png`
+- Implementation capture: `/Users/tomauger/projects/neuk-bike/playwright-videos/directions-compact-toolbar-handoff.png`
+- Full comparison: `/Users/tomauger/projects/neuk-bike/playwright-videos/design-qa/directions-option-1-final-comparison.png`
+- Focused header comparison: `/Users/tomauger/projects/neuk-bike/playwright-videos/design-qa/directions-option-1-header-final-comparison.png`
+- Viewport: 390 x 844 CSS pixels
+- Reference density: 853 x 1844 pixels, normalized to 390 x 844 for the comparison
+- State: expanded mobile directions for Corstorphine High Street cycle parking
+
+### Visible comparison evidence
+
+- The large Exit directions button is replaced by a quiet left-aligned Back
+  chevron, with the destination title and compact Start route action sharing
+  one toolbar row.
+- Capacity and cover are reduced to a one-line metadata strip beneath the title.
+- The production sheet retains its existing 52dvh height, meeting the request
+  for more route space without enlarging the view.
+- The tighter header, route summary, and instruction spacing expose five full
+  route steps at 390 x 844 while preserving 44-pixel Back and Start targets.
+- The route instruction area remains independently scrollable and the document
+  has no horizontal or vertical body overflow.
+
+### Fidelity surfaces
+
+- Typography: the app's existing family and weights are retained; the real
+  destination remains a readable two-line heading.
+- Spacing and layout: the toolbar uses a compact three-column grid, the metadata
+  stays on one line, and the route list gains usable height without increasing
+  the panel.
+- Colors and tokens: existing surface, accent, border, and muted-text tokens are
+  reused throughout.
+- Image quality and assets: the live production map and existing Lucide route
+  icons are retained; no generated visual assets were added to the product.
+- Copy and content: Back, Start route, the parking facts, route summary, and all
+  route steps reflect the live application state.
+
+### Interaction and runtime checks
+
+- Opening Directions shows the compact toolbar with Back on the left and Start
+  route on the right.
+- The route list scrolls independently; a manual gesture moved it through the
+  later instructions while keeping the toolbar and summary fixed.
+- Collapse and expand both retain the route state. The collapsed accessibility
+  tree exposes only the intended summary and Back action.
+- Back restores the results view with the same Corstorphine parking selection;
+  reopening Directions returns to the verified handoff state.
+- Start route is visible, enabled, and meets the 44-pixel touch-target minimum.
+- The browser reported no console errors in the checked flow.
+- The focused Playwright set passes the saved-neuk directions flow, compact
+  mobile directions usability, and return-to-launching-view behavior.
+
+### Findings and iteration history
+
+1. P2: the first compact Start action was too wide and forced the real title to
+   three lines. Its label spacing and padding were tightened.
+2. P2: the title still wrapped earlier than the reference. The Start action was
+   reduced to the reference footprint, restoring a two-line heading.
+3. P2: the Back control and heading hierarchy remained oversized. Both were
+   compacted while preserving 44-pixel hit areas and readable labels.
+4. P2 accessibility: a pseudo-element metadata separator appeared as stray text
+   in the collapsed accessibility snapshot. It was replaced with an explicitly
+   hidden separator element.
+5. P3 accepted: the live map crop differs slightly from the static design image,
+   and the real heading breaks after `High` rather than after `Street`. Neither
+   difference affects hierarchy, available route space, or interaction.
+
+- P0: none.
+- P1: none.
+- P2: none after the final pass.
+
+final result: passed
+
+## Directions metadata simplification QA
+
+### Comparison setup
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/019f8983-28c0-7e80-9421-97587b58aca7/exec-6a705299-548d-4522-8fe7-5fc46f6080ed.png`, with the user's later decision to replace the three-fact metadata treatment with capacity plus at most one useful exception.
+- Normalized source: `/Users/tomauger/projects/neuk-bike/playwright-videos/design-qa/directions-option-1-normalized.png`
+- Implementation screenshot: `/Users/tomauger/projects/neuk-bike/playwright-videos/directions-one-line-details-handoff.png`
+- Full-view comparison: `/Users/tomauger/projects/neuk-bike/playwright-videos/design-qa/directions-one-line-details-comparison.png`
+- Focused header comparison: `/Users/tomauger/projects/neuk-bike/playwright-videos/design-qa/directions-one-line-details-header-comparison.png`
+- Source pixels: 853 x 1844, normalized to 390 x 844
+- Implementation pixels and CSS viewport: 390 x 844 at device-pixel ratio 1
+- State: expanded mobile directions for Corstorphine High Street cycle parking, with a loaded 605 m route
+
+### Findings
+
+- P0: none.
+- P1: none.
+- P2: none.
+- The implementation intentionally omits the mock's `Not covered` value because
+  the user's approved follow-up makes default negative and generic values
+  subordinate to keeping the directions header on one line.
+- The resulting live value is `6 spaces`; it measures one 14.21-pixel line,
+  contains one detail item, and has equal 189-pixel client and scroll widths.
+- The earlier accepted P3 remains: the real title wraps after `High` rather than
+  after `Street`. The simplified metadata does not worsen that title wrapping.
+
+### Fidelity surfaces
+
+- Fonts and typography: existing family, weight, size, line height, and title
+  hierarchy are unchanged; the metadata is now a stable single line.
+- Spacing and layout rhythm: the 54.19-pixel header and existing 52dvh panel are
+  unchanged, preserving the additional route-list space from the selected design.
+- Colors and visual tokens: existing teal, surface, muted-text, and summary-strip
+  tokens are unchanged.
+- Image quality and assets: the live map, map markers, and Lucide controls remain
+  unchanged; no replacement or generated assets were introduced.
+- Copy and content: the directions header shows capacity first, adds Covered when
+  applicable, otherwise permits one distinctive facility type, and suppresses
+  generic Stands, Rack, Racks, and Not covered values.
+
+### Interaction and runtime evidence
+
+- Opened directions first for a covered facility with no listed capacity; the
+  header correctly showed only `Covered`.
+- Returned with Back, selected Corstorphine High Street, and reopened Directions;
+  the loaded route correctly showed only `6 spaces`.
+- The route list remains independently scrollable with a 303-pixel client height
+  and 497-pixel scroll height.
+- The document has no horizontal or vertical body overflow.
+- The in-app browser reported no console errors.
+- The focused mobile Playwright regression passes, and unit coverage verifies
+  generic uncovered stands, covered stands, uncovered lockers, and the priority
+  of Covered over a distinctive type.
+
+### Comparison history
+
+- The first focused browser assertion assumed the selected test fixture had a
+  listed capacity. The rendered fixture correctly exposed only `Covered`; the
+  assertion was changed to verify one detail item and the absence of generic
+  `Stands` and `Not covered` copy. This was test-fixture drift, not a visual defect.
+- Post-fix evidence: the 780 x 844 full comparison and 780 x 150 focused header
+  comparison show the approved single-line treatment without changing the panel,
+  toolbar, metrics, or visible route-step density.
+
+final result: passed

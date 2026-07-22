@@ -9,6 +9,7 @@ import {
 import { parsePlaceSearchResults } from '@/lib/geocoder';
 import {
   describeParkingPoint,
+  getDirectionsParkingDetails,
   getParkingEssentialDetails,
   getParkingDetails,
   getParkingPopupDetails,
@@ -236,6 +237,56 @@ describe('geo utilities', () => {
       'cover',
     ]);
     expect(details.some((detail) => detail.kind === 'access')).toBe(false);
+  });
+
+  it('keeps directions details to capacity and one useful exception', () => {
+    expect(
+      getDirectionsParkingDetails(
+        parkingPoint({
+          bicycle_pa: 'stands',
+          capacity: 6,
+          covered: 'no',
+        }),
+      ).map((detail) => detail.kind),
+    ).toEqual(['spaces']);
+
+    expect(
+      getDirectionsParkingDetails(
+        parkingPoint({
+          bicycle_pa: 'stands',
+          capacity: 6,
+          covered: 'yes',
+        }),
+      ).map((detail) => [detail.kind, detail.value]),
+    ).toEqual([
+      ['spaces', 'Spaces'],
+      ['cover', 'Covered'],
+    ]);
+
+    expect(
+      getDirectionsParkingDetails(
+        parkingPoint({
+          bicycle_pa: 'lockers',
+          capacity: 6,
+          covered: 'no',
+        }),
+      ).map((detail) => [detail.kind, detail.value]),
+    ).toEqual([
+      ['spaces', 'Spaces'],
+      ['type', 'Lockers'],
+    ]);
+  });
+
+  it('prioritises covered status over a distinctive directions type', () => {
+    expect(
+      getDirectionsParkingDetails(
+        parkingPoint({
+          bicycle_pa: 'lockers',
+          capacity: 6,
+          covered: 'yes',
+        }),
+      ).map((detail) => detail.kind),
+    ).toEqual(['spaces', 'cover']);
   });
 
   it('groups popup stand types into icon categories', () => {
