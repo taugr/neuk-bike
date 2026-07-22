@@ -10,25 +10,25 @@ importers:
     dependencies:
       lucide-react:
         specifier: ^1.24.0
-        version: 1.24.0(react@19.2.7)
+        version: 1.24.0(react@19.2.8)
       maplibre-gl:
         specifier: ^5.24.0
         version: 5.24.0
       motion:
         specifier: ^12.42.2
-        version: 12.42.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 12.42.2(react-dom@19.2.7(react@19.2.8))(react@19.2.8)
       next:
         specifier: ^16.2.10
-        version: 16.2.10(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.10(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.8))(react@19.2.8)
       posthog-js:
         specifier: ^1.402.2
         version: 1.402.2
       react:
         specifier: ^19.2.7
-        version: 19.2.7
+        version: 19.2.8
       react-dom:
         specifier: ^19.2.7
-        version: 19.2.7(react@19.2.7)
+        version: 19.2.7(react@19.2.8)
     devDependencies:
       '@playwright/test':
         specifier: ^1.61.1
@@ -1443,8 +1443,8 @@ packages:
     peerDependencies:
       react: ^19.2.7
 
-  react@19.2.7:
-    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
+  react@19.2.8:
+    resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
     engines: {node: '>=0.10.0'}
 
   resolve-protobuf-schema@2.1.0:
@@ -2402,14 +2402,14 @@ snapshots:
 
   fflate@0.4.8: {}
 
-  framer-motion@12.42.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  framer-motion@12.42.2(react-dom@19.2.7(react@19.2.8))(react@19.2.8):
     dependencies:
       motion-dom: 12.42.2
       motion-utils: 12.39.0
       tslib: 2.8.1
     optionalDependencies:
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
+      react: 19.2.8
+      react-dom: 19.2.7(react@19.2.8)
 
   fsevents@2.3.2:
     optional: true
@@ -2509,9 +2509,9 @@ snapshots:
       strip-ansi: 7.2.0
       wrap-ansi: 9.0.2
 
-  lucide-react@1.24.0(react@19.2.7):
+  lucide-react@1.24.0(react@19.2.8):
     dependencies:
-      react: 19.2.7
+      react: 19.2.8
 
   magic-string@0.30.21:
     dependencies:
@@ -2561,28 +2561,28 @@ snapshots:
 
   motion-utils@12.39.0: {}
 
-  motion@12.42.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  motion@12.42.2(react-dom@19.2.7(react@19.2.8))(react@19.2.8):
     dependencies:
-      framer-motion: 12.42.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      framer-motion: 12.42.2(react-dom@19.2.7(react@19.2.8))(react@19.2.8)
       tslib: 2.8.1
     optionalDependencies:
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
+      react: 19.2.8
+      react-dom: 19.2.7(react@19.2.8)
 
   murmurhash-js@1.0.0: {}
 
   nanoid@3.3.16: {}
 
-  next@16.2.10(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next@16.2.10(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.8))(react@19.2.8):
     dependencies:
       '@next/env': 16.2.10
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.10.43
       caniuse-lite: 1.0.30001805
       postcss: 8.4.31
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      styled-jsx: 5.1.6(react@19.2.7)
+      react: 19.2.8
+      react-dom: 19.2.7(react@19.2.8)
+      styled-jsx: 5.1.6(react@19.2.8)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.2.10
       '@next/swc-darwin-x64': 16.2.10
@@ -2728,12 +2728,12 @@ snapshots:
 
   quickselect@3.0.0: {}
 
-  react-dom@19.2.7(react@19.2.7):
+  react-dom@19.2.7(react@19.2.8):
     dependencies:
-      react: 19.2.7
+      react: 19.2.8
       scheduler: 0.27.0
 
-  react@19.2.7: {}
+  react@19.2.8: {}
 
   resolve-protobuf-schema@2.1.0:
     dependencies:
@@ -2839,10 +2839,10 @@ snapshots:
     dependencies:
       ansi-regex: 6.2.2
 
-  styled-jsx@5.1.6(react@19.2.7):
+  styled-jsx@5.1.6(react@19.2.8):
     dependencies:
       client-only: 0.0.1
-      react: 19.2.7
+      react: 19.2.8
 
   supports-color@10.2.2: {}
 
