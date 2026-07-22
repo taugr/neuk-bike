@@ -95,6 +95,97 @@ test('loads the map-first finder with nearby parking', async ({ page }) => {
   ).toBeVisible();
 });
 
+test('shares a parking link through the native browser chooser', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: async (data: ShareData) => {
+        Object.defineProperty(window, '__sharedParkingData', {
+          configurable: true,
+          value: data,
+        });
+      },
+    });
+  });
+  await page.goto(
+    parkingOneReferenceUrl({
+      mockGps: `${parkingOne.latitude},${parkingOne.longitude},5`,
+    }),
+  );
+  await expectFinderReady(page);
+
+  const parkingName = (
+    await page
+      .getByTestId(`parking-row-${parkingOne.id}`)
+      .locator('strong')
+      .innerText()
+  ).trim();
+  await page.getByTestId(`parking-more-${parkingOne.id}`).click();
+  await page
+    .getByTestId(`parking-more-menu-${parkingOne.id}`)
+    .getByRole('menuitem', { name: `Share ${parkingName}` })
+    .click();
+
+  const sharedData = await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __sharedParkingData?: ShareData;
+            }
+          ).__sharedParkingData,
+      ),
+    )
+    .not.toBeUndefined()
+    .then(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __sharedParkingData?: ShareData;
+            }
+          ).__sharedParkingData!,
+      ),
+    );
+
+  expect(sharedData.title).toBe(parkingName);
+  const sharedUrl = new URL(sharedData.url ?? '');
+  expect(sharedUrl.pathname).toBe('/');
+  expect(sharedUrl.searchParams.get('parking')).toBe(parkingOne.id);
+  expect(sharedUrl.searchParams.has('mockGps')).toBe(false);
+});
+
+test('shows copied feedback when native sharing is unavailable', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: undefined,
+    });
+    document.execCommand = () => true;
+  });
+  await page.goto(
+    parkingOneReferenceUrl({
+      mockGps: `${parkingOne.latitude},${parkingOne.longitude},5`,
+    }),
+  );
+  await expectFinderReady(page);
+
+  await page.getByTestId(`parking-more-${parkingOne.id}`).click();
+  const shareButton = page
+    .getByTestId(`parking-more-menu-${parkingOne.id}`)
+    .getByRole('menuitem', { name: /^Share / });
+  await shareButton.click();
+
+  await expect(shareButton.locator('.parking-share-tooltip')).toHaveText(
+    'Copied',
+  );
+});
+
 test('switches and persists the interface language without moving the map', async ({
   page,
 }) => {

@@ -98,7 +98,7 @@ type CycleParkingMapProps = {
   onSelectPoint: (id: string) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   onOpenStreetView: (point: ParkingPoint) => void;
-  onCopyParkingLink: (point: ParkingPoint) => void;
+  onShareParkingLink: (point: ParkingPoint) => void;
   onToggleSavedPoint: (point: ParkingPoint) => void;
   onOpenDetails: (point: ParkingPoint) => void;
   onViewportChange: (bounds: ParkingMapBounds) => void;
@@ -811,7 +811,7 @@ function ParkingPopupContent({
   copiedShareButton,
   isDirectionsMode,
   isSaved,
-  onCopyParkingLink,
+  onShareParkingLink,
   onOpenStreetView,
   onRequestDirections,
   onToggleSavedPoint,
@@ -826,7 +826,7 @@ function ParkingPopupContent({
   } | null;
   isDirectionsMode: boolean;
   isSaved: boolean;
-  onCopyParkingLink: (point: ParkingPoint) => void;
+  onShareParkingLink: (point: ParkingPoint) => void;
   onOpenStreetView: (point: ParkingPoint) => void;
   onRequestDirections: (point: ParkingPoint) => void;
   onToggleSavedPoint: (point: ParkingPoint) => void;
@@ -928,12 +928,12 @@ function ParkingPopupContent({
               </button>
             ) : null}
             <button
-              aria-label={translate(locale, 'copyLink', { name: point.name })}
+              aria-label={translate(locale, 'shareLink', { name: point.name })}
               className="parking-popup-share-button"
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
-                onCopyParkingLink(point);
+                onShareParkingLink(point);
               }}
             >
               <Share2 size={15} aria-hidden="true" />
@@ -1147,7 +1147,7 @@ export default function CycleParkingMap({
   onSelectPoint,
   onRequestDirections,
   onOpenStreetView,
-  onCopyParkingLink,
+  onShareParkingLink,
   onToggleSavedPoint,
   onOpenDetails,
   onViewportChange,
@@ -1812,7 +1812,7 @@ export default function CycleParkingMap({
           copiedShareButton={copiedShareButton}
           isDirectionsMode={isDirectionsMode}
           isSaved={isSaved}
-          onCopyParkingLink={onCopyParkingLink}
+          onShareParkingLink={onShareParkingLink}
           onOpenStreetView={onOpenStreetView}
           onRequestDirections={onRequestDirections}
           onToggleSavedPoint={onToggleSavedPoint}
@@ -1992,7 +1992,7 @@ export default function CycleParkingMap({
     isDirectionsMode,
     locale,
     map,
-    onCopyParkingLink,
+    onShareParkingLink,
     onOpenDetails,
     onOpenStreetView,
     onRequestDirections,

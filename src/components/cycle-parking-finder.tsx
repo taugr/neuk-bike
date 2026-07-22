@@ -120,7 +120,7 @@ import {
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { useLanguage } from '@/components/language-provider';
 import { captureAnalyticsEvent } from '@/lib/analytics';
-import { copyTextToClipboard } from '@/lib/clipboard';
+import { shareParkingLink } from '@/lib/share';
 import {
   getParkingDataBaseUrl,
   isLocationInParkingCoverage,
@@ -2439,7 +2439,7 @@ export default function CycleParkingFinder() {
     }
   }
 
-  async function copyParkingLinkForPoint(
+  async function shareParkingLinkForPoint(
     point: ParkingPoint,
     source: ParkingActionSource,
   ) {
@@ -2449,7 +2449,28 @@ export default function CycleParkingFinder() {
       point.id,
     );
 
-    if (await copyTextToClipboard(link)) {
+    if (copiedMessageTimeout.current !== null) {
+      window.clearTimeout(copiedMessageTimeout.current);
+      copiedMessageTimeout.current = null;
+    }
+    setCopiedShareButton(null);
+
+    const result = await shareParkingLink({
+      title: point.name,
+      url: link,
+    });
+
+    if (result === 'shared') {
+      captureAnalyticsEvent('parking_link_shared', {
+        parking_id: point.id,
+        parking_name: point.name,
+        source,
+      });
+      setShareError(null);
+      return;
+    }
+
+    if (result === 'copied') {
       captureAnalyticsEvent('parking_link_copied', {
         parking_id: point.id,
         parking_name: point.name,
@@ -2457,9 +2478,6 @@ export default function CycleParkingFinder() {
       });
       setShareError(null);
       setCopiedShareButton({ parkingId: point.id, source });
-      if (copiedMessageTimeout.current !== null) {
-        window.clearTimeout(copiedMessageTimeout.current);
-      }
       copiedMessageTimeout.current = window.setTimeout(() => {
         setCopiedShareButton(null);
         copiedMessageTimeout.current = null;
@@ -2467,8 +2485,12 @@ export default function CycleParkingFinder() {
       return;
     }
 
-    setCopiedShareButton(null);
-    setShareError(t('copyLinkError'));
+    if (result === 'cancelled') {
+      setShareError(null);
+      return;
+    }
+
+    setShareError(t('shareLinkError'));
   }
 
   async function requestDirections(
@@ -2479,12 +2501,12 @@ export default function CycleParkingFinder() {
     await requestDirectionsToPoint(point);
   }
 
-  async function copyParkingLink(
+  async function shareParkingLinkFromList(
     event: MouseEvent<HTMLButtonElement>,
     point: ParkingPoint,
   ) {
     event.stopPropagation();
-    await copyParkingLinkForPoint(point, 'list');
+    await shareParkingLinkForPoint(point, 'list');
   }
 
   function chooseThemeMode(mode: ThemeMode) {
@@ -2872,8 +2894,8 @@ export default function CycleParkingFinder() {
                 parking_name: point.name,
               });
             }}
-            onCopyParkingLink={(point) => {
-              void copyParkingLinkForPoint(point, 'popup');
+            onShareParkingLink={(point) => {
+              void shareParkingLinkForPoint(point, 'popup');
             }}
             onToggleSavedPoint={(point) => {
               toggleSavedPoint(point, 'popup');
@@ -3366,7 +3388,7 @@ export default function CycleParkingFinder() {
                           />
                         </motion.button>
                         <motion.button
-                          aria-label={t('copyLink', {
+                          aria-label={t('shareLink', {
                             name: explicitSelectedPoint.name,
                           })}
                           className="parking-detail-utility"
@@ -3374,13 +3396,23 @@ export default function CycleParkingFinder() {
                           type="button"
                           whileTap={subtleTap}
                           onClick={() => {
-                            void copyParkingLinkForPoint(
+                            void shareParkingLinkForPoint(
                               explicitSelectedPoint,
                               'details',
                             );
                           }}
                         >
                           <Share2 size={21} aria-hidden="true" />
+                          {copiedShareButton?.source === 'details' &&
+                          copiedShareButton.parkingId ===
+                            explicitSelectedPoint.id ? (
+                            <span
+                              className="parking-share-tooltip"
+                              role="status"
+                            >
+                              {t('copied')}
+                            </span>
+                          ) : null}
                         </motion.button>
                       </div>
                     </div>
@@ -4000,7 +4032,7 @@ export default function CycleParkingFinder() {
                                                     )}
                                                   </motion.button>
                                                   <motion.button
-                                                    aria-label={t('copyLink', {
+                                                    aria-label={t('shareLink', {
                                                       name: point.name,
                                                     })}
                                                     className="parking-more-menu-item parking-share-button"
@@ -4008,7 +4040,7 @@ export default function CycleParkingFinder() {
                                                     type="button"
                                                     whileTap={subtleTap}
                                                     onClick={(event) => {
-                                                      void copyParkingLink(
+                                                      void shareParkingLinkFromList(
                                                         event,
                                                         point,
                                                       );
@@ -4018,12 +4050,18 @@ export default function CycleParkingFinder() {
                                                       size={17}
                                                       aria-hidden="true"
                                                     />
+                                                    {t('share')}
                                                     {copiedShareButton?.source ===
                                                       'list' &&
                                                     copiedShareButton.parkingId ===
-                                                      point.id
-                                                      ? t('copied')
-                                                      : t('share')}
+                                                      point.id ? (
+                                                      <span
+                                                        className="parking-share-tooltip"
+                                                        role="status"
+                                                      >
+                                                        {t('copied')}
+                                                      </span>
+                                                    ) : null}
                                                   </motion.button>
                                                 </motion.div>,
                                                 document.body,
