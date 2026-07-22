@@ -32,11 +32,11 @@ import {
   ExternalLink,
   LocateFixed,
   MapPin,
+  Maximize2,
   Monitor,
   Moon,
   Navigation,
   Route,
-  ScanSearch,
   Search,
   Settings,
   Share2,
@@ -111,7 +111,10 @@ import {
 } from '@/lib/route-progress';
 import { getRouteInstructionManeuver } from '@/lib/route-instructions';
 import { buildParkingShareUrl, parseShareLinkState } from '@/lib/share-links';
-import { buildGoogleStreetViewEmbedUrl } from '@/lib/street-view';
+import {
+  buildGoogleMapsLocationUrl,
+  buildGoogleStreetViewEmbedUrl,
+} from '@/lib/street-view';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { useLanguage } from '@/components/language-provider';
 import { captureAnalyticsEvent } from '@/lib/analytics';
@@ -165,6 +168,7 @@ const themeStorageKey = 'cycle-parking-theme';
 const mobileSheetCollapsedHeightRem = 5.4;
 const mobileSheetDragIntentThresholdPx = 6;
 const mobileSheetExpandedViewportRatio = 0.52;
+const mobileDetailsSheetExpandedViewportRatio = 0.68;
 const mobileSheetFlickVelocityPxPerMs = 0.45;
 const googleStreetViewApiKey =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY?.trim() ?? '';
@@ -485,6 +489,8 @@ export default function CycleParkingFinder() {
     mobileContentSheetExpandedHeightPx,
     setMobileContentSheetExpandedHeightPx,
   ] = useState<number | null>(null);
+  const [isMobileContentSheetOverflowing, setIsMobileContentSheetOverflowing] =
+    useState(false);
   const mobileSheetProgressValue = useMotionValue(1);
   const mobileSheetBodyOffset = useTransform(
     mobileSheetProgressValue,
@@ -1228,10 +1234,13 @@ export default function CycleParkingFinder() {
     parkingView === 'saved' &&
     !isDirectionsMode;
   const isContentSizedMobileSheet = isParkingDetailsMode || isSavedListMode;
+  const activeMobileSheetExpandedViewportRatio = isParkingDetailsMode
+    ? mobileDetailsSheetExpandedViewportRatio
+    : mobileSheetExpandedViewportRatio;
   const activeMobileSheetExpandedHeight =
     isContentSizedMobileSheet && mobileContentSheetExpandedHeightPx !== null
       ? `${mobileContentSheetExpandedHeightPx}px`
-      : `${mobileSheetExpandedViewportRatio * 100}dvh`;
+      : `${activeMobileSheetExpandedViewportRatio * 100}dvh`;
   const liveRouteProgress: LiveRouteProgress | null = useMemo(() => {
     if (liveRouteTracking.status !== 'tracking' || !activeRoute) {
       return null;
@@ -1349,6 +1358,7 @@ export default function CycleParkingFinder() {
   useLayoutEffect(() => {
     if (!isContentSizedMobileSheet) {
       setMobileContentSheetExpandedHeightPx(null);
+      setIsMobileContentSheetOverflowing(false);
       return;
     }
 
@@ -1419,16 +1429,19 @@ export default function CycleParkingFinder() {
       const collapsedHeight =
         (Number.isFinite(rootFontSize) ? rootFontSize : 16) *
         mobileSheetCollapsedHeightRem;
-      const contentHeight = Math.ceil(
-        contentBottom +
-          lastContent.offsetHeight +
-          (Number.isFinite(paddingBottom) ? paddingBottom : 0) +
-          (Number.isFinite(borderTopWidth) ? borderTopWidth : 0) +
-          (Number.isFinite(borderBottomWidth) ? borderBottomWidth : 0),
-      );
+      const contentHeight =
+        Math.ceil(
+          contentBottom +
+            lastContent.offsetHeight +
+            (Number.isFinite(paddingBottom) ? paddingBottom : 0) +
+            (Number.isFinite(borderTopWidth) ? borderTopWidth : 0) +
+            (Number.isFinite(borderBottomWidth) ? borderBottomWidth : 0),
+        ) + 1;
+      const maximumExpandedHeight =
+        viewportHeight * activeMobileSheetExpandedViewportRatio;
       const nextHeight = Math.round(
         Math.min(
-          viewportHeight * mobileSheetExpandedViewportRatio,
+          maximumExpandedHeight,
           Math.max(collapsedHeight + 1, contentHeight),
         ),
       );
@@ -1436,6 +1449,10 @@ export default function CycleParkingFinder() {
       setMobileContentSheetExpandedHeightPx((currentHeight) =>
         currentHeight === nextHeight ? currentHeight : nextHeight,
       );
+      setIsMobileContentSheetOverflowing((currentValue) => {
+        const nextValue = contentHeight > maximumExpandedHeight;
+        return currentValue === nextValue ? currentValue : nextValue;
+      });
     }
 
     let measurementFrame = 0;
@@ -1475,6 +1492,7 @@ export default function CycleParkingFinder() {
       );
     };
   }, [
+    activeMobileSheetExpandedViewportRatio,
     explicitSelectedPoint?.id,
     failedSavedIds.length,
     isContentSizedMobileSheet,
@@ -1608,7 +1626,7 @@ export default function CycleParkingFinder() {
     const expandedHeight =
       isContentSizedMobileSheet && mobileContentSheetExpandedHeightPx !== null
         ? mobileContentSheetExpandedHeightPx
-        : viewportHeight * mobileSheetExpandedViewportRatio;
+        : viewportHeight * activeMobileSheetExpandedViewportRatio;
     const rangePx = Math.max(expandedHeight - collapsedHeight, 1);
     const startProgress = mobileSheetState === 'expanded' ? 1 : 0;
 
@@ -2855,6 +2873,11 @@ export default function CycleParkingFinder() {
             isMobileSheetDragging ? 'true' : undefined
           }
           data-mobile-sheet-state={mobileSheetState}
+          data-content-overflow={
+            isParkingDetailsMode && isMobileContentSheetOverflowing
+              ? 'true'
+              : undefined
+          }
           data-panel-view={
             isDirectionsMode
               ? 'directions'
@@ -3263,19 +3286,71 @@ export default function CycleParkingFinder() {
                     className="mobile-sheet-body parking-detail-body"
                     data-parking-detail-id={explicitSelectedPoint.id}
                   >
-                    <motion.button
-                      className="parking-details-back"
-                      type="button"
-                      whileTap={subtleTap}
-                      onClick={closeParkingDetails}
-                    >
-                      <ChevronLeft size={17} aria-hidden="true" />
-                      {t(
-                        parkingView === 'saved'
-                          ? 'backToMyNeuks'
-                          : 'backToNearbyNeuks',
-                      )}
-                    </motion.button>
+                    <div className="parking-details-toolbar">
+                      <motion.button
+                        className="parking-details-back"
+                        type="button"
+                        whileTap={subtleTap}
+                        onClick={closeParkingDetails}
+                      >
+                        <ChevronLeft size={17} aria-hidden="true" />
+                        {t(
+                          parkingView === 'saved'
+                            ? 'backToMyNeuks'
+                            : 'backToNearbyNeuks',
+                        )}
+                      </motion.button>
+                      <div
+                        className="parking-details-utilities"
+                        aria-label={t('moreActions', {
+                          name: explicitSelectedPoint.name,
+                        })}
+                      >
+                        <motion.button
+                          aria-label={t(
+                            savedIds.has(explicitSelectedPoint.id)
+                              ? 'removeFromMyNeuks'
+                              : 'saveToMyNeuks',
+                            { name: explicitSelectedPoint.name },
+                          )}
+                          aria-pressed={savedIds.has(explicitSelectedPoint.id)}
+                          className="parking-detail-utility"
+                          data-testid="parking-detail-save"
+                          type="button"
+                          whileTap={subtleTap}
+                          onClick={() =>
+                            toggleSavedPoint(explicitSelectedPoint, 'details')
+                          }
+                        >
+                          <Bookmark
+                            fill={
+                              savedIds.has(explicitSelectedPoint.id)
+                                ? 'currentColor'
+                                : 'none'
+                            }
+                            size={21}
+                            aria-hidden="true"
+                          />
+                        </motion.button>
+                        <motion.button
+                          aria-label={t('copyLink', {
+                            name: explicitSelectedPoint.name,
+                          })}
+                          className="parking-detail-utility"
+                          data-testid="parking-detail-share"
+                          type="button"
+                          whileTap={subtleTap}
+                          onClick={() => {
+                            void copyParkingLinkForPoint(
+                              explicitSelectedPoint,
+                              'details',
+                            );
+                          }}
+                        >
+                          <Share2 size={21} aria-hidden="true" />
+                        </motion.button>
+                      </div>
+                    </div>
 
                     <header className="parking-details-header">
                       <h1>{explicitSelectedPoint.name}</h1>
@@ -3286,11 +3361,65 @@ export default function CycleParkingFinder() {
                       ) : null}
                     </header>
 
-                    <ParkingDetailStrip
-                      className="parking-detail-facts"
-                      point={explicitSelectedPoint}
-                      showAllDetails
-                    />
+                    <div
+                      className={[
+                        'parking-detail-overview',
+                        googleStreetViewApiKey.length === 0
+                          ? 'parking-detail-overview--facts-only'
+                          : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                    >
+                      <ParkingDetailStrip
+                        className="parking-detail-facts"
+                        point={explicitSelectedPoint}
+                        showAllDetails
+                      />
+                      {googleStreetViewApiKey.length > 0 ? (
+                        <div className="parking-detail-street-view">
+                          <iframe
+                            aria-hidden="true"
+                            className="parking-detail-street-view-frame"
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            src={buildGoogleStreetViewEmbedUrl(
+                              explicitSelectedPoint,
+                              googleStreetViewApiKey,
+                            )}
+                            tabIndex={-1}
+                            title={t('streetViewFor', {
+                              name: explicitSelectedPoint.name,
+                            })}
+                          />
+                          <motion.button
+                            aria-label={t('openStreetView', {
+                              name: explicitSelectedPoint.name,
+                            })}
+                            className="parking-detail-street-view-trigger"
+                            data-testid="parking-detail-street-view"
+                            type="button"
+                            whileTap={subtleTap}
+                            onClick={() => {
+                              setStreetViewPoint(explicitSelectedPoint);
+                              captureAnalyticsEvent('street_view_opened', {
+                                parking_id: explicitSelectedPoint.id,
+                                parking_name: explicitSelectedPoint.name,
+                                source: 'details_preview',
+                              });
+                            }}
+                          >
+                            <span className="parking-detail-street-view-expand">
+                              <Maximize2
+                                aria-hidden="true"
+                                data-testid="parking-detail-street-view-expand-icon"
+                                size={17}
+                              />
+                            </span>
+                          </motion.button>
+                        </div>
+                      ) : null}
+                    </div>
 
                     <AnimatePresence initial={false}>
                       {parkingDetailMessage ? (
@@ -3317,8 +3446,34 @@ export default function CycleParkingFinder() {
                         name: explicitSelectedPoint.name,
                       })}
                     >
+                      <motion.a
+                        aria-label={t('openInGoogleMaps', {
+                          name: explicitSelectedPoint.name,
+                        })}
+                        className="parking-detail-action parking-detail-action--external"
+                        data-testid="parking-detail-google-maps"
+                        href={buildGoogleMapsLocationUrl(explicitSelectedPoint)}
+                        rel="noreferrer"
+                        target="_blank"
+                        whileTap={subtleTap}
+                        onClick={() => {
+                          captureAnalyticsEvent('google_maps_opened', {
+                            parking_id: explicitSelectedPoint.id,
+                            parking_name: explicitSelectedPoint.name,
+                            source: 'details',
+                          });
+                        }}
+                      >
+                        <span className="parking-detail-action-icon">
+                          <ExternalLink size={19} aria-hidden="true" />
+                        </span>
+                        <span className="parking-detail-action-label">
+                          {t('googleMaps')}
+                        </span>
+                      </motion.a>
                       <motion.button
                         className="parking-detail-action parking-detail-action--primary"
+                        data-testid="parking-detail-directions"
                         disabled={!isClientReady}
                         type="button"
                         whileTap={subtleTap}
@@ -3331,89 +3486,6 @@ export default function CycleParkingFinder() {
                         </span>
                         <span className="parking-detail-action-label">
                           {t('directions')}
-                        </span>
-                      </motion.button>
-                      {googleStreetViewApiKey.length > 0 ? (
-                        <motion.button
-                          aria-label={t('openStreetView', {
-                            name: explicitSelectedPoint.name,
-                          })}
-                          className="parking-detail-action"
-                          type="button"
-                          whileTap={subtleTap}
-                          onClick={() => {
-                            setStreetViewPoint(explicitSelectedPoint);
-                            captureAnalyticsEvent('street_view_opened', {
-                              parking_id: explicitSelectedPoint.id,
-                              parking_name: explicitSelectedPoint.name,
-                            });
-                          }}
-                        >
-                          <span className="parking-detail-action-icon">
-                            <ScanSearch size={19} aria-hidden="true" />
-                          </span>
-                          <span className="parking-detail-action-label">
-                            {t('street')}
-                          </span>
-                        </motion.button>
-                      ) : null}
-                      <motion.button
-                        aria-label={t('copyLink', {
-                          name: explicitSelectedPoint.name,
-                        })}
-                        className="parking-detail-action"
-                        type="button"
-                        whileTap={subtleTap}
-                        onClick={() => {
-                          void copyParkingLinkForPoint(
-                            explicitSelectedPoint,
-                            'details',
-                          );
-                        }}
-                      >
-                        <span className="parking-detail-action-icon">
-                          <Share2 size={19} aria-hidden="true" />
-                        </span>
-                        <span className="parking-detail-action-label">
-                          {copiedShareButton?.source === 'details' &&
-                          copiedShareButton.parkingId ===
-                            explicitSelectedPoint.id
-                            ? t('copied')
-                            : t('share')}
-                        </span>
-                      </motion.button>
-                      <motion.button
-                        aria-label={t(
-                          savedIds.has(explicitSelectedPoint.id)
-                            ? 'removeFromMyNeuks'
-                            : 'saveToMyNeuks',
-                          { name: explicitSelectedPoint.name },
-                        )}
-                        aria-pressed={savedIds.has(explicitSelectedPoint.id)}
-                        className="parking-detail-action"
-                        type="button"
-                        whileTap={subtleTap}
-                        onClick={() =>
-                          toggleSavedPoint(explicitSelectedPoint, 'details')
-                        }
-                      >
-                        <span className="parking-detail-action-icon">
-                          <Bookmark
-                            fill={
-                              savedIds.has(explicitSelectedPoint.id)
-                                ? 'currentColor'
-                                : 'none'
-                            }
-                            size={19}
-                            aria-hidden="true"
-                          />
-                        </span>
-                        <span className="parking-detail-action-label">
-                          {t(
-                            savedIds.has(explicitSelectedPoint.id)
-                              ? 'saved'
-                              : 'save',
-                          )}
                         </span>
                       </motion.button>
                     </div>

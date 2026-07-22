@@ -41,8 +41,9 @@ interface:
   pin itself already communicates which neuk was chosen.
 - The compact mobile popup remains visible for the selected pin and shows only
   capacity, parking type, and cover status.
-- The full details view contains the complete available facts and the
-  Directions, Street, Share, and Save actions.
+- The full details view keeps Save and Share in its top toolbar, places the
+  complete available facts beside a tappable Street View preview, and ends with
+  Google Maps followed by the primary Directions action.
 - Back returns to the originating Nearby or My neuks list while preserving the
   selection and map context.
 - Desktop retains its existing list, full popup, and inline actions. The
@@ -129,6 +130,7 @@ truths independently.
 | Tap `Show nearby`                | Restore the previous Nearby list, selection, scroll position, and camera           | Reverse directional list transition                |
 | Collapse or expand the sheet     | Change only its position                                                           | Sheet spring; no panel-view change                 |
 | Save, share, or open Street View | Keep the details layout and scroll position stable                                 | Control feedback only                              |
+| Open Google Maps                 | Open the neuk coordinates in Google Maps without changing the current app state    | External navigation in a new tab                   |
 
 All motion must respect `prefers-reduced-motion` and must not be required to
 understand the resulting state.

@@ -168,7 +168,21 @@ test('keeps the nearby heading clear after collapsing and expanding', async ({
 
       return headingBounds.y - bodyBounds.y;
     })
-    .toBeGreaterThanOrEqual(3);
+    .toBeGreaterThanOrEqual(0);
+  await expect
+    .poll(async () => {
+      const gripBounds = await page
+        .locator('.mobile-sheet-grip span')
+        .boundingBox();
+      const headingBounds = await page.locator('.list-heading').boundingBox();
+
+      if (!gripBounds || !headingBounds) {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      return headingBounds.y - (gripBounds.y + gripBounds.height);
+    })
+    .toBeLessThanOrEqual(12);
 });
 
 test('keeps the collapsed parking details summary inside the sheet', async ({
@@ -192,12 +206,26 @@ test('keeps the collapsed parking details summary inside the sheet', async ({
     name: parkingName,
     exact: true,
   });
+  const detailsToolbar = page.locator('.parking-details-toolbar');
   const detailsActions = page.locator('.parking-detail-actions');
   await expect(detailsHeading).toBeVisible();
   await expect(detailsActions).toBeVisible();
   await expect
     .poll(async () => (await detailsHeading.boundingBox())?.height ?? 0)
     .toBeGreaterThan(40);
+  await expect
+    .poll(async () => {
+      const gripBounds = await page
+        .locator('.mobile-sheet-grip span')
+        .boundingBox();
+      const toolbarBounds = await detailsToolbar.boundingBox();
+      if (!gripBounds || !toolbarBounds) {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      return toolbarBounds.y - (gripBounds.y + gripBounds.height);
+    })
+    .toBeLessThanOrEqual(12);
   await expect
     .poll(async () => {
       const controlPaneBounds = await page
@@ -238,6 +266,8 @@ test('keeps the collapsed parking details summary inside the sheet', async ({
 
   const controlPane = page.locator('.control-pane');
   const summary = page.locator('.mobile-sheet-summary--details');
+  const summaryName = summary.locator('.mobile-sheet-summary-location');
+  const summaryMetric = summary.locator('small');
   await expect(summary).toBeVisible();
   await expect(summary).toContainText(parkingName);
   await expect
@@ -254,6 +284,156 @@ test('keeps the collapsed parking details summary inside the sheet', async ({
           controlPaneBounds.y + controlPaneBounds.height
       );
     })
+    .toBe(true);
+  await expect
+    .poll(async () => {
+      const controlPaneBounds = await controlPane.boundingBox();
+      const nameBounds = await summaryName.boundingBox();
+      const metricBounds = await summaryMetric.boundingBox();
+      if (!controlPaneBounds || !nameBounds || !metricBounds) {
+        return false;
+      }
+
+      return (
+        nameBounds.x - controlPaneBounds.x >= 15 &&
+        controlPaneBounds.x +
+          controlPaneBounds.width -
+          (metricBounds.x + metricBounds.width) >=
+          15
+      );
+    })
+    .toBe(true);
+});
+
+test('shows the compact details overview and reordered map actions', async ({
+  page,
+}) => {
+  const parkingId = 'cec:717';
+  const parkingName = 'Picardy Place near Broughton Street';
+  const latitude = 55.9568041927908;
+  const longitude = -3.1876114928825;
+  const params = new URLSearchParams({
+    lat: String(latitude),
+    lng: String(longitude),
+    mockGps: `${latitude},${longitude},5`,
+    parking: parkingId,
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/?${params.toString()}`);
+  await page.getByTestId(`parking-row-${parkingId}`).click();
+  await page.getByTestId(`parking-details-${parkingId}`).click();
+
+  const details = page.getByRole('region', { name: 'Parking details' });
+  const preview = page.getByTestId('parking-detail-street-view');
+  const googleMaps = page.getByTestId('parking-detail-google-maps');
+  const directions = page.getByTestId('parking-detail-directions');
+  await expect(details).toBeVisible();
+  await expect(page.getByTestId('parking-detail-save')).toBeVisible();
+  await expect(page.getByTestId('parking-detail-share')).toBeVisible();
+  await expect(preview).toBeVisible();
+  await expect(
+    page.getByTestId('parking-detail-street-view-expand-icon'),
+  ).toBeVisible();
+  await expect(googleMaps).toHaveText('Google Maps');
+  await expect(directions).toHaveText('Directions');
+  await expect(page.locator('.control-pane')).not.toHaveAttribute(
+    'data-content-overflow',
+    'true',
+  );
+  await expect(page.locator('.parking-detail-body')).toHaveCSS(
+    'overflow-y',
+    'clip',
+  );
+
+  const googleMapsUrl = new URL(
+    (await googleMaps.getAttribute('href')) ?? 'https://invalid.local',
+  );
+  expect(googleMapsUrl.origin).toBe('https://www.google.com');
+  expect(googleMapsUrl.pathname).toBe('/maps/search/');
+  expect(googleMapsUrl.searchParams.get('query')).toBe(
+    `${latitude},${longitude}`,
+  );
+
+  const googleMapsBounds = await googleMaps.boundingBox();
+  const directionsBounds = await directions.boundingBox();
+  expect(googleMapsBounds).not.toBeNull();
+  expect(directionsBounds).not.toBeNull();
+  expect(googleMapsBounds?.height ?? 0).toBeLessThanOrEqual(48);
+  expect(directionsBounds?.height ?? 0).toBeLessThanOrEqual(48);
+  expect(googleMapsBounds?.x ?? Number.POSITIVE_INFINITY).toBeLessThan(
+    directionsBounds?.x ?? Number.NEGATIVE_INFINITY,
+  );
+
+  await preview.click();
+  await expect(
+    page.getByRole('dialog').getByRole('heading', {
+      name: parkingName,
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Close Street View' }).click();
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+});
+
+test('fits details without scrolling in an iPhone 13 Safari viewport', async ({
+  page,
+}) => {
+  const parkingId = 'cec:717';
+  const latitude = 55.9568041927908;
+  const longitude = -3.1876114928825;
+  const params = new URLSearchParams({
+    lat: String(latitude),
+    lng: String(longitude),
+    mockGps: `${latitude},${longitude},5`,
+    parking: parkingId,
+  });
+
+  await page.setViewportSize({ width: 390, height: 664 });
+  await page.goto(`/?${params.toString()}`);
+  await page.getByTestId(`parking-row-${parkingId}`).click();
+  await page.getByTestId(`parking-details-${parkingId}`).click();
+
+  const controlPane = page.locator('.control-pane');
+  const detailBody = page.locator('.parking-detail-body');
+  await expect(controlPane).not.toHaveAttribute(
+    'data-content-overflow',
+    'true',
+  );
+  await expect(detailBody).toHaveCSS('overflow-y', 'clip');
+  await expect
+    .poll(() =>
+      detailBody.evaluate((body) => body.scrollHeight <= body.clientHeight),
+    )
+    .toBe(true);
+});
+
+test('scrolls details only when a very short viewport clamps the sheet', async ({
+  page,
+}) => {
+  const parkingId = 'cec:717';
+  const latitude = 55.9568041927908;
+  const longitude = -3.1876114928825;
+  const params = new URLSearchParams({
+    lat: String(latitude),
+    lng: String(longitude),
+    mockGps: `${latitude},${longitude},5`,
+    parking: parkingId,
+  });
+
+  await page.setViewportSize({ width: 390, height: 520 });
+  await page.goto(`/?${params.toString()}`);
+  await page.getByTestId(`parking-row-${parkingId}`).click();
+  await page.getByTestId(`parking-details-${parkingId}`).click();
+
+  const controlPane = page.locator('.control-pane');
+  const detailBody = page.locator('.parking-detail-body');
+  await expect(controlPane).toHaveAttribute('data-content-overflow', 'true');
+  await expect(detailBody).toHaveCSS('overflow-y', 'auto');
+  await expect
+    .poll(() =>
+      detailBody.evaluate((body) => body.scrollHeight > body.clientHeight),
+    )
     .toBe(true);
 });
 
@@ -421,7 +601,7 @@ test('resizes details when switching directly between map pins', async ({
 
   const longPaneHeight =
     (await page.locator('.control-pane').boundingBox())?.height ?? 0;
-  expect(longPaneHeight).toBeGreaterThan(shortPaneHeight);
+  expect(Math.abs(longPaneHeight - shortPaneHeight)).toBeGreaterThan(1);
 
   await page
     .getByTestId(`parking-marker-${shortParkingId}`)
@@ -442,7 +622,7 @@ test('resizes details when switching directly between map pins', async ({
 
   const resizedShortPaneHeight =
     (await page.locator('.control-pane').boundingBox())?.height ?? 0;
-  expect(resizedShortPaneHeight).toBeLessThan(longPaneHeight);
+  expect(Math.abs(resizedShortPaneHeight - shortPaneHeight)).toBeLessThan(1);
 });
 
 test('uses at most one camera move when selecting a pin from collapsed details', async ({

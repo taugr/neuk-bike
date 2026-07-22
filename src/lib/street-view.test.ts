@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildGoogleMapsLocationUrl,
   buildGoogleStreetViewEmbedUrl,
-  buildGoogleStreetViewMapsUrl,
 } from '@/lib/street-view';
 import type { ParkingPoint } from '@/lib/types';
 
@@ -26,13 +26,12 @@ describe('street view links', () => {
     expect(url.searchParams.get('pitch')).toBe('0');
   });
 
-  it('builds a normal Google Maps Street View URL', () => {
-    const url = new URL(buildGoogleStreetViewMapsUrl(point));
+  it('builds a keyless Google Maps location URL', () => {
+    const url = new URL(buildGoogleMapsLocationUrl(point));
 
     expect(url.origin).toBe('https://www.google.com');
-    expect(url.pathname).toBe('/maps/@');
+    expect(url.pathname).toBe('/maps/search/');
     expect(url.searchParams.get('api')).toBe('1');
-    expect(url.searchParams.get('map_action')).toBe('pano');
-    expect(url.searchParams.get('viewpoint')).toBe('55.9533,-3.1883');
+    expect(url.searchParams.get('query')).toBe('55.9533,-3.1883');
   });
 });

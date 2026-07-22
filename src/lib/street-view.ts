@@ -2,7 +2,7 @@ import type { ParkingPoint } from '@/lib/types';
 
 const googleStreetViewEmbedBaseUrl =
   'https://www.google.com/maps/embed/v1/streetview';
-const googleMapsStreetViewBaseUrl = 'https://www.google.com/maps/@';
+const googleMapsSearchBaseUrl = 'https://www.google.com/maps/search/';
 
 export function buildGoogleStreetViewEmbedUrl(
   point: ParkingPoint,
@@ -18,12 +18,11 @@ export function buildGoogleStreetViewEmbedUrl(
   return `${googleStreetViewEmbedBaseUrl}?${params.toString()}`;
 }
 
-export function buildGoogleStreetViewMapsUrl(point: ParkingPoint): string {
+export function buildGoogleMapsLocationUrl(point: ParkingPoint): string {
   const params = new URLSearchParams({
     api: '1',
-    map_action: 'pano',
-    viewpoint: `${point.latitude},${point.longitude}`,
+    query: `${point.latitude},${point.longitude}`,
   });
 
-  return `${googleMapsStreetViewBaseUrl}?${params.toString()}`;
+  return `${googleMapsSearchBaseUrl}?${params.toString()}`;
 }

@@ -19,6 +19,7 @@ export default defineConfig({
     ].join(' && '),
     env: {
       NEXT_PUBLIC_CYCLESTREETS_API_KEY: 'playwright-local-route-key',
+      NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY: 'playwright-google-maps-embed-key',
     },
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

@@ -48,6 +48,7 @@ const en = {
   panelSaved: 'My neuks',
   findNearby: 'Find nearby cycle parking',
   findingRoute: 'Finding a cycle route...',
+  googleMaps: 'Google Maps',
   installApp: 'Install app',
   language: 'Language',
   light: 'Light',
@@ -70,6 +71,7 @@ const en = {
   notCovered: 'Not covered',
   notListed: 'Not listed',
   openStreetView: 'Open Street View for {name}',
+  openInGoogleMaps: 'Open {name} in Google Maps',
   parkingLinkMissing:
     'That parking link is not in the current UK, Ireland and Spain dataset.',
   placeOrPostcode: 'Place or postcode',
@@ -219,6 +221,7 @@ const gd: MessageCatalogue = {
   panelSaved: 'My neuks',
   findNearby: 'Lorg pàirceadh bhaidhsagalan faisg ort',
   findingRoute: 'A’ lorg slighe baidhsagal...',
+  googleMaps: 'Google Maps',
   installApp: 'Stàlaich an aplacaid',
   language: 'Cànan',
   light: 'Soilleir',
@@ -243,6 +246,7 @@ const gd: MessageCatalogue = {
   notCovered: 'Gun chòmhdach',
   notListed: 'Gun fhiosrachadh',
   openStreetView: 'Fosgail Street View airson {name}',
+  openInGoogleMaps: 'Fosgail {name} ann an Google Maps',
   parkingLinkMissing:
     'Chan eil an ceangal pàircidh sin san dàta làithreach airson na RA, Èirinn agus na Spàinne.',
   placeOrPostcode: 'Àite no còd-puist',
@@ -392,6 +396,7 @@ const es: MessageCatalogue = {
   panelSaved: 'Mis neuks',
   findNearby: 'Buscar aparcabicis cercanos',
   findingRoute: 'Buscando una ruta en bicicleta...',
+  googleMaps: 'Google Maps',
   installApp: 'Instalar aplicación',
   language: 'Idioma',
   light: 'Claro',
@@ -414,6 +419,7 @@ const es: MessageCatalogue = {
   notCovered: 'Sin cubierta',
   notListed: 'Sin datos',
   openStreetView: 'Abrir Street View para {name}',
+  openInGoogleMaps: 'Abrir {name} en Google Maps',
   parkingLinkMissing:
     'Ese enlace no está en los datos actuales de Reino Unido, Irlanda y España.',
   placeOrPostcode: 'Lugar o código postal',
