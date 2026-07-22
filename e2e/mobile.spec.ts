@@ -335,6 +335,27 @@ test('shows the compact details overview and reordered map actions', async ({
   await expect(
     page.getByTestId('parking-detail-street-view-expand-icon'),
   ).toBeVisible();
+  const previewFrameSizing = await page
+    .locator('.parking-detail-street-view-frame')
+    .evaluate((frame) => {
+      const frameElement = frame as HTMLElement;
+      const previewContainer = frame.parentElement;
+      const frameBounds = frame.getBoundingClientRect();
+      if (!previewContainer || frameElement.offsetWidth === 0) {
+        return null;
+      }
+
+      return {
+        layoutWidth: frameElement.offsetWidth,
+        previewWidth: previewContainer.clientWidth,
+        renderedScale: frameBounds.width / frameElement.offsetWidth,
+      };
+    });
+  expect(previewFrameSizing).not.toBeNull();
+  expect(previewFrameSizing?.layoutWidth ?? 0).toBeGreaterThan(
+    previewFrameSizing?.previewWidth ?? Number.POSITIVE_INFINITY,
+  );
+  expect(previewFrameSizing?.renderedScale ?? 1).toBeLessThan(1);
   await expect(googleMaps).toHaveText('Google Maps');
   await expect(directions).toHaveText('Directions');
   await expect(page.locator('.control-pane')).not.toHaveAttribute(
