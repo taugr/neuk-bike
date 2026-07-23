@@ -322,6 +322,185 @@ final result: blocked
 
 final result: passed
 
+## Cycling-place opening-hours metadata QA
+
+### Comparison setup
+
+- Selected source visual:
+  `/Users/tomauger/.codex/generated_images/019f8b44-965d-7220-8482-5d0715ddc952/exec-bd7ecfb3-55df-4652-8682-7eea0b9d1e0e.png`
+- Normalized source:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/metadata-hours-reference-390.png`
+- Implementation screenshot:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/metadata-hours-implementation-390-en.png`
+- Side-by-side comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/metadata-hours-comparison.png`
+- Long-schedule check:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/metadata-hours-long-hire-390-en.png`
+- Desktop check:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/metadata-hours-implementation-1280-en.png`
+- Source pixels: 853 x 1844, normalized to 390 x 844.
+- Implementation viewports: 390 x 844 mobile and 1280 x 800 desktop at
+  device-pixel ratio 1.
+- State: mock Edinburgh location, Shops selected, Wee Spoke Hub selected, and
+  its existing Directions action visible.
+
+### Fidelity surfaces
+
+- Existing map, search controls, bottom sheet, localized heading, icon-bearing
+  chips, result cards, numbering, and selected-card treatment remain unchanged.
+- POI metadata now contains the distance in every row and adds a clock icon plus
+  opening hours only when the OSM record provides them.
+- The redundant `Bicycle shop`, repair, and hire category text is absent from
+  result rows; the selected category chip continues to provide that context.
+- Cycle Scotland and Bike Central demonstrate the intended distance-only state.
+  Wee Spoke Hub and The Cycle Service demonstrate compact single-range hours.
+- The selected Wee Spoke Hub row retains the existing full-width mobile
+  Directions action. The desktop row retains its existing trailing Directions
+  affordance and map-popup action.
+- The live implementation intentionally retains the established production card
+  height and spacing rather than adopting the generated mock's denser cards; this
+  follows the user's explicit direction to keep the current list and Directions
+  styling.
+
+### Interaction and responsive evidence
+
+- Shops, Repair, and Hire were each selected in the in-app browser. Every
+  category showed distance-only rows when hours were missing and localized hours
+  when present.
+- A Hire result with a multi-clause weekly schedule wraps inside its row without
+  document overflow; `24/7` remains unchanged.
+- English, Gaelic, and Spanish were checked at 390 pixels. Weekday abbreviations
+  render as `Wed–Sat`, `DiC–DiS`, and `mié–sáb` respectively.
+- All three mobile locale checks measured equal 390-pixel document scroll and
+  client widths. The Hire check also measured zero horizontal overflow.
+- The OSM formatter improves common weekday and time-range typography but does
+  not infer or display live `Open now` or `Closed` status.
+- Unit coverage verifies English, Gaelic, Spanish, 24/7, unknown syntax, weekday
+  lists, closures, and range formatting.
+
+### Findings and resolution
+
+- P1 resolved: relying on browser `Intl` data caused Gaelic weekday labels to
+  fall back to English in the controlled browser. Stable locale-specific labels
+  now make the UI independent of optional browser ICU coverage.
+- P2 resolved: compact OSM weekday lists such as `Sa,Su` now render with a space
+  after the comma for readability.
+- P0: none. P1: none. P2: none after the final pass.
+
+final result: passed
+
+## Icon-preserving mobile category-chip QA
+
+### Current-run evidence
+
+- Previous icon-free Spanish row at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-icons-before-390-es.png`
+- Icon-preserving Spanish row at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-icons-after-390-es.png`
+- Spanish fallback scrolled fully to the final chip at 360 x 800:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-icons-scroll-360-es.png`
+
+### Findings and resolution
+
+- The earlier icon-free mobile treatment is superseded by the user's preference
+  to retain the category icons. The Lucide icons now stay inline at every
+  viewport, using a compact 13-pixel mobile size and tighter chip spacing.
+- Spanish uses concise filter actions, `Aparcar` and `Reparar`, while contextual
+  place metadata keeps the noun `Reparación`. No non-filter copy was shortened.
+- At 390 pixels, English, Gaelic, and Spanish each measure zero horizontal
+  overflow, and all four icons remain visible.
+- At 375 pixels, English, Gaelic, and Spanish again measure zero horizontal
+  overflow. The row stays on one line with no clipping or text truncation.
+- Below 370 pixels, the existing single-row horizontal snap fallback remains.
+  At 360 pixels the Spanish row has 53 pixels of overflow; a horizontal scroll
+  reaches the 53-pixel maximum and places the complete `Alquiler` chip inside
+  the 326-pixel row viewport.
+- Semantic buttons, the labelled filter group, `aria-pressed`, focus treatment,
+  active color state, and desktop layout are unchanged.
+- P0: none. P1: none. P2: none after the final pass.
+
+final result: passed
+
+## Bike neuk category chips prototype QA
+
+### Comparison setup
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/019f8b44-965d-7220-8482-5d0715ddc952/exec-254a70c6-3f1c-423a-aa7a-7d2f8876b1b5.png`
+- Mobile implementation: `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/bike-neuks-shops-prototype-final.png`
+- Desktop implementation: `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/bike-neuks-shops-desktop.png`
+- Mobile viewport: 390 x 844 CSS pixels at device-pixel ratio 1
+- Desktop viewport: 1280 x 800 CSS pixels
+- Compared state: expanded nearby sheet, Shops selected, real Edinburgh OSM
+  results, ranked list and ranked map pins
+
+### Visible comparison evidence
+
+- The implementation retains the reference's map-first composition, top search
+  controls, bottom-sheet grip, umbrella `Nearby bike neuks` heading, one active
+  category, ranked markers, and ranked results.
+- The category control follows the later product decision to use compact chips
+  rather than the reference's larger tile-like treatment. All four labels fit
+  on one 390-pixel row with practical 38-pixel controls and additional spacing
+  between the group and results.
+- The live sheet uses the existing product's compact row density, radii,
+  typography, green ranking scale, and selected teal token instead of importing
+  an unrelated card system from the mock.
+- Real OSM content replaces the mock names and distances. The first visible
+  Edinburgh shop is Cycle Scotland at 421 m; the next rows remain legible with
+  longer names such as Edinburgh Bicycle Co-operative.
+- My neuks is intentionally absent outside Parking, matching the approved
+  parking-only saving scope and reclaiming space for the filter row.
+
+### Fidelity and accessibility surfaces
+
+- Typography: the current app family, weights, scale, and hierarchy remain
+  consistent. No label truncates or wraps in the checked mobile and desktop
+  views.
+- Layout and responsiveness: the chip row, results, and map do not overlap at
+  390 x 844 or 1280 x 800. The desktop control pane preserves its existing
+  width and scroll behavior.
+- Colors and surfaces: the active teal, muted inactive chips, white sheet,
+  subtle borders, and green ranks maintain the existing design tokens and the
+  reference's category emphasis.
+- Icons: all category controls use the existing Lucide icon family with matched
+  size and stroke treatment. No custom SVG, CSS illustration, or placeholder
+  visual was introduced.
+- Accessibility: the filter is a labelled group of semantic buttons with
+  `aria-pressed`; active state is not conveyed by color alone. Keyboard focus
+  remains visible and non-parking selection exposes only the relevant
+  Directions action.
+
+### Interaction and runtime evidence
+
+- Parking is selected on reload and My neuks remains available there.
+- Shops, Repair, and Hire each load eight nearest real results in the Edinburgh
+  test location and update ranked map pins together with the list.
+- Repair selection exposes Directions without parking-only Details, Save,
+  Share, Street View, or More controls.
+- Returning to Parking restores My neuks and clears the non-parking selection.
+- The Scotland release verifier passes for 614 unique POIs across 242 chunks,
+  including content hashes, IDs, coordinates, category values, per-category
+  counts, coverage, and report parity.
+- The static export loads successfully at the mock-GPS URL and remains open for
+  handoff.
+
+### Findings and iteration history
+
+1. P2: the first Shops pass updated the list and markers but retained the
+   parking camera crop, leaving the nearest shop pins outside the visible map.
+   The category load now issues the existing current-location focus request,
+   fitting the user and ranked POIs into the visible map area.
+2. P2: the initial marker category colors were declared before the base marker
+   rules and could be overridden. The selectors now include the base marker
+   class so shop, repair, and hire state colors are stable.
+3. P2: generated compact JSON failed the repository-wide formatting check.
+   Generated POI assets and their report now follow the same formatter-ignore
+   policy as the existing generated parking release; the standalone verifier
+   provides the appropriate integrity gate.
+4. P0: none. P1: none. P2: none after the final pass.
+
+final result: passed
+
 ## Directions metadata simplification QA
 
 ### Comparison setup
@@ -385,5 +564,175 @@ final result: passed
 - Post-fix evidence: the 780 x 844 full comparison and 780 x 150 focused header
   comparison show the approved single-line treatment without changing the panel,
   toolbar, metrics, or visible route-step density.
+
+final result: passed
+
+## Current prototype status
+
+The latest QA is the stacked multi-clause opening-hours section below. The
+category-chip mobile and desktop comparisons, interaction checks, data
+verification, and earlier opening-hours findings also remain current after this
+presentation-only refinement.
+
+final result: passed
+
+## Mobile category-chip localization and reflow QA
+
+Historical note: this no-icon iteration is retained as comparison evidence but
+is superseded by the icon-preserving mobile category-chip QA above.
+
+### Current-run evidence
+
+- English overflow before the fix at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-before-mobile-390-en.png`
+- Spanish overflow before the fix at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-before-mobile-390-es.png`
+- Spanish fitted row after the fix at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-after-mobile-390-es.png`
+- Spanish small-screen fallback before scrolling at 360 x 800:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-after-mobile-360-es-scroll.png`
+- Spanish small-screen fallback after scrolling to Hire:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-after-mobile-360-es-scrolled.png`
+
+### Findings and resolution
+
+- P1 resolved: `flex: 1 0 auto` prevented every chip from shrinking. At 390
+  pixels, the row overflowed by 9 pixels in English, 58 pixels in Gaelic, and
+  113 pixels in Spanish, leaving Hire partly or wholly outside the pane.
+- Mobile chips now use their full translated text without icons, distribute the
+  available width according to label length, and remain on one row. At 390
+  pixels the measured overflow is zero in English, Gaelic, and Spanish.
+- At 375 pixels the full Spanish labels also fit with zero overflow.
+- Below 370 pixels, the row deliberately changes to a horizontal snap scroller
+  instead of compressing, truncating, or wrapping labels. At 360 pixels the
+  measured 48-pixel overflow scrolls fully, placing the complete Hire chip
+  inside the pane.
+- The semantic labelled group, button roles, `aria-pressed` state, focus
+  treatment, 38-pixel control height, translated copy, and desktop icon
+  treatment are unchanged.
+- P0: none. P1: none after the fix. P2: none.
+
+final result: passed
+
+## Compact category-chip vertical spacing QA
+
+### Current-run evidence
+
+- Previous spacing at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-vertical-spacing-before-390-es.png`
+- Compact spacing at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-vertical-spacing-after-390-es.png`
+- Final tightened spacing at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/chips-final-tight-spacing-390-es.png`
+
+### Findings and resolution
+
+- The filter row's vertical margin changed from `0.65rem 0 0.75rem` to
+  `0 0 0.25rem`, and its decorative vertical padding was removed.
+- The first result moved from 564.12 to 542.53 CSS pixels, recovering 21.59
+  pixels for the visible results without changing the sheet size.
+- The final heading-to-filter gap is 12 pixels and the filter-to-result gap is
+  16 pixels, preserving a readable grouping while removing surplus whitespace.
+- Every chip remains 38 pixels high, every Lucide icon remains visible, and the
+  Spanish row retains zero horizontal overflow at 390 pixels.
+- The document has no horizontal or vertical body overflow, and the in-app
+  browser reported no warnings or errors.
+- Screenshot evidence confirms more of the fourth result is visible while the
+  filter group remains visually distinct from both the heading and list.
+- Accessibility note: the change only removes surrounding whitespace; semantic
+  buttons, labels, focus treatment, and control height are unchanged. This is
+  not a full keyboard or assistive-technology audit.
+- P0: none. P1: none. P2: none after the final pass.
+
+final result: passed
+
+## Mobile localized heading reflow QA
+
+### Current-run evidence
+
+- Spanish stacked heading at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/stacked-heading-390-es.png`
+- Gaelic stacked heading at 390 x 844:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/stacked-heading-390-gd.png`
+
+### Findings and resolution
+
+- At 460 pixels and below, the localized nearest-result count now renders as a
+  complete supporting line below the primary `Nearby bike neuks` heading.
+- The inline separator is hidden in the stacked layout and marked
+  `aria-hidden`, so the mobile heading's accessible name contains no stray dot.
+- English `8 closest`, Gaelic `An 8 as fhaisge`, and Spanish
+  `Los 8 más cercanos` each measure one 16.22-pixel line at 390 pixels.
+- The document retains zero horizontal overflow in all three checked locales.
+- At 1280 x 800, the count and separator remain inline and the heading stays on
+  one 18.24-pixel line, preserving the established desktop treatment.
+- The in-app browser reported no warnings or errors.
+- Accessibility note: heading semantics and reading order are unchanged, but
+  this is not a full screen-reader, keyboard, or zoom audit.
+- P0: none. P1: none. P2: none after the final pass.
+
+final result: passed
+
+## Stacked multi-clause opening-hours QA
+
+### Comparison setup
+
+- Source visual truth (previous long-schedule treatment):
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/metadata-hours-long-hire-390-en.png`
+- Implementation screenshot:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/opening-hours-stacked-long-hire-390-en.png`
+- Full side-by-side comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/opening-hours-stacked-comparison.png`
+- Additional selected-shop evidence:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/opening-hours-stacked-390-en.png`
+- Desktop evidence:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/opening-hours-stacked-1280-en.png`
+- Source and mobile implementation pixels: 390 x 844 at a 390 x 844 CSS
+  viewport and device-pixel ratio 1; no density normalization was needed.
+- Desktop implementation pixels and viewport: 1280 x 800 at device-pixel ratio 1.
+- Compared state: Edinburgh mock location, Hire selected, Soul Cycles selected,
+  three opening-hours clauses, and the existing Directions action visible.
+- A separate focused crop was not needed because the selected row and its small
+  metadata are readable at 1:1 in the full 780 x 844 comparison.
+
+### Fidelity surfaces
+
+- Fonts and typography: the existing family, sizes, weights, line heights, and
+  hierarchy are unchanged. Each semicolon-delimited schedule clause now occupies
+  its own complete line without displaying punctuation between clauses.
+- Spacing and layout rhythm: a multi-clause schedule begins below the distance.
+  The distance pin and schedule clock share the exact same x-coordinate; schedule
+  text aligns consistently after the single clock icon. Single-clause hours keep
+  the compact horizontal treatment.
+- Colors and tokens: existing muted metadata, teal selected state, white cards,
+  borders, ranks, and Directions styling are unchanged.
+- Image and icon fidelity: the live map and Lucide pin/clock/directions icons are
+  preserved. No new image or approximate asset was introduced.
+- Copy and content: all OSM clauses remain visible and localized; only the
+  semicolon presentation changes. No hours are truncated and no open/closed state
+  is inferred.
+
+### Interaction and responsive evidence
+
+- Soul Cycles renders three distinct lines and Leith Cycle Co renders four. Voi
+  `24/7` and Pedal Forth's single schedule remain inline with the distance.
+- At 390 pixels, the selected Soul Cycles metadata block is 68.38 pixels high;
+  the document client and scroll widths both measure 390 pixels.
+- The three checked stacked shop rows each place the pin and clock at the same
+  77.20-pixel x-coordinate and render exactly two schedule lines.
+- Spanish multi-clause schedules render as separate localized lines with zero
+  document overflow. English formatter coverage also verifies one- and
+  two-clause results explicitly.
+- At 1280 pixels the same hierarchy is preserved in the side panel, including
+  the established compact trailing Directions affordance for the selected row.
+- The in-app browser reported no warnings or errors.
+
+### Findings and comparison history
+
+- P2 resolved: the previous semicolon-delimited text wrapped according to line
+  length, separating clauses unpredictably and leaving the clock after a center
+  dot on the distance line. Multi-clause schedules now use an intentional vertical
+  block below distance, with aligned icons and one clause per line.
+- P0: none. P1: none. P2: none after the final pass.
 
 final result: passed

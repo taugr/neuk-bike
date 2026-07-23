@@ -217,7 +217,7 @@ test('switches and persists the interface language without moving the map', asyn
     'Lugar o código postal',
   );
   await expect(
-    page.getByRole('heading', { name: /Aparcabicis cercanos/ }),
+    page.getByRole('heading', { name: /Bike neuks cercanos/ }),
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Alejar' })).toBeVisible();
   await expect(mapCanvas).toHaveAttribute(
@@ -601,6 +601,63 @@ for (const [place, mockGps] of [
     await expectFinderReady(page);
     const [latitude, longitude] = mockGps.split(',').map(Number);
     await expectMapFocusedAt(page, latitude, longitude);
+  });
+}
+
+for (const [place, mockGps, category, pointId, pointName] of [
+  [
+    'London',
+    '51.5072,-0.1276,5',
+    'hire',
+    'osm:node:865288929',
+    'Craven Street',
+  ],
+  [
+    'Cardiff',
+    '51.4816,-3.1791,5',
+    'shop',
+    'osm:node:1050444880',
+    'Cycles Direct',
+  ],
+  [
+    'Belfast',
+    '54.5973,-5.9301,5',
+    'hire',
+    'osm:node:3664516151',
+    'Belfast Bikes',
+  ],
+  [
+    'Dublin',
+    '53.3498,-6.2603,5',
+    'hire',
+    'osm:node:480606960',
+    "Princes Street / O'Connell Street",
+  ],
+  [
+    'Madrid',
+    '40.4168,-3.7038,5',
+    'hire',
+    'osm:node:3158274665',
+    'Empresa Municipal de Transportes de Madrid',
+  ],
+  [
+    'Las Palmas',
+    '28.1235,-15.4363,5',
+    'hire',
+    'osm:node:11048294943',
+    'Sitycleta Paseo de Chil - Av. Escaleritas',
+  ],
+] as const) {
+  test(`loads nearby cycling places in ${place}`, async ({ page }) => {
+    await page.goto(`/?mockGps=${mockGps}`);
+    await expectFinderReady(page);
+    await page.getByTestId(`category-chip-${category}`).click();
+    const row = page.getByTestId(`parking-row-${pointId}`);
+    await expect(row).toBeVisible();
+    await expect(row.locator('strong')).toHaveText(pointName);
+    await expect(
+      page.getByText('Nearby cycling places could not be loaded.'),
+    ).toHaveCount(0);
   });
 }
 

@@ -53,7 +53,10 @@ export function distanceMeters(from: UserLocation, to: UserLocation) {
   );
 }
 
-export function sortByDistance(points: ParkingPoint[], location: UserLocation) {
+export function sortByDistance<T extends ParkingPoint>(
+  points: T[],
+  location: UserLocation,
+) {
   return points
     .map((point) => ({
       ...point,

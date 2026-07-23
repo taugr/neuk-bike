@@ -1,26 +1,56 @@
-import type { ParkingPoint } from '@/lib/types';
+import {
+  isCyclingPoiPoint,
+  type CyclingPoiCategory,
+  type ParkingPoint,
+} from '@/lib/types';
 
 export const savedNeuksStorageKey = 'cycle-parking-saved-neuks';
 
+export type SavedNeukKind = 'cycling-place' | 'parking';
+
 export type SavedNeukRecord = {
   id: string;
+  key: string;
+  kind: SavedNeukKind;
   savedAt: string;
   snapshot: {
+    categories?: CyclingPoiCategory[];
     latitude: number;
     longitude: number;
     name: string;
+    openingHours?: string;
   };
 };
 
 type SavedNeuksStorage = {
   items: SavedNeukRecord[];
+  version: 2;
+};
+
+type LegacySavedNeukRecord = Omit<SavedNeukRecord, 'key' | 'kind'>;
+
+type LegacySavedNeuksStorage = {
+  items: LegacySavedNeukRecord[];
   version: 1;
 };
 
 type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
 
-function isSavedNeukRecord(value: unknown): value is SavedNeukRecord {
-  const candidate = value as Partial<SavedNeukRecord> | null;
+export function getSavedNeukKey(kind: SavedNeukKind, id: string) {
+  return `${kind}:${id}`;
+}
+
+export function getPointSavedNeukKind(point: ParkingPoint): SavedNeukKind {
+  return isCyclingPoiPoint(point) ? 'cycling-place' : 'parking';
+}
+
+export function getPointSavedNeukKey(point: ParkingPoint) {
+  return getSavedNeukKey(getPointSavedNeukKind(point), point.id);
+}
+
+function hasValidSnapshot(
+  candidate: Partial<SavedNeukRecord> | Partial<LegacySavedNeukRecord> | null,
+) {
   const snapshot = candidate?.snapshot;
 
   return Boolean(
@@ -43,6 +73,21 @@ function isSavedNeukRecord(value: unknown): value is SavedNeukRecord {
   );
 }
 
+function isSavedNeukRecord(value: unknown): value is SavedNeukRecord {
+  const candidate = value as Partial<SavedNeukRecord> | null;
+  return Boolean(
+    hasValidSnapshot(candidate) &&
+    (candidate?.kind === 'parking' || candidate?.kind === 'cycling-place') &&
+    candidate.key === getSavedNeukKey(candidate.kind, candidate.id!),
+  );
+}
+
+function isLegacySavedNeukRecord(
+  value: unknown,
+): value is LegacySavedNeukRecord {
+  return hasValidSnapshot(value as Partial<LegacySavedNeukRecord> | null);
+}
+
 export function parseSavedNeuks(value: string | null) {
   if (!value) {
     return [];
@@ -55,15 +100,32 @@ export function parseSavedNeuks(value: string | null) {
     return [];
   }
 
-  const storage = parsed as Partial<SavedNeuksStorage> | null;
-  if (!storage || storage.version !== 1 || !Array.isArray(storage.items)) {
+  const storage = parsed as
+    | Partial<SavedNeuksStorage>
+    | Partial<LegacySavedNeuksStorage>
+    | null;
+  if (
+    !storage ||
+    (storage.version !== 1 && storage.version !== 2) ||
+    !Array.isArray(storage.items)
+  ) {
     return [];
   }
 
   const records = new Map<string, SavedNeukRecord>();
   for (const item of storage.items) {
-    if (isSavedNeukRecord(item) && !records.has(item.id)) {
-      records.set(item.id, item);
+    const record =
+      storage.version === 1 && isLegacySavedNeukRecord(item)
+        ? {
+            ...item,
+            key: getSavedNeukKey('parking', item.id),
+            kind: 'parking' as const,
+          }
+        : isSavedNeukRecord(item)
+          ? item
+          : null;
+    if (record && !records.has(record.key)) {
+      records.set(record.key, record);
     }
   }
 
@@ -88,7 +150,7 @@ export function writeSavedNeuks(
   try {
     storage.setItem(
       savedNeuksStorageKey,
-      JSON.stringify({ items, version: 1 } satisfies SavedNeuksStorage),
+      JSON.stringify({ items, version: 2 } satisfies SavedNeuksStorage),
     );
     return true;
   } catch {
@@ -101,34 +163,45 @@ export function addSavedNeuk(
   point: ParkingPoint,
   savedAt = new Date().toISOString(),
 ) {
-  if (items.some((item) => item.id === point.id)) {
+  const kind = getPointSavedNeukKind(point);
+  const key = getSavedNeukKey(kind, point.id);
+  if (items.some((item) => item.key === key)) {
     return items;
   }
 
   return [
     {
       id: point.id,
+      key,
+      kind,
       savedAt,
       snapshot: {
+        ...(isCyclingPoiPoint(point)
+          ? { categories: [...point.categories] }
+          : {}),
         latitude: point.latitude,
         longitude: point.longitude,
         name: point.name,
+        ...(typeof point.properties.openingHours === 'string'
+          ? { openingHours: point.properties.openingHours }
+          : {}),
       },
     },
     ...items,
   ];
 }
 
-export function removeSavedNeuk(items: SavedNeukRecord[], id: string) {
-  if (!items.some((item) => item.id === id)) {
+export function removeSavedNeuk(items: SavedNeukRecord[], key: string) {
+  if (!items.some((item) => item.key === key)) {
     return items;
   }
 
-  return items.filter((item) => item.id !== id);
+  return items.filter((item) => item.key !== key);
 }
 
-export function isNeukSaved(items: SavedNeukRecord[], id: string) {
-  return items.some((item) => item.id === id);
+export function isNeukSaved(items: SavedNeukRecord[], point: ParkingPoint) {
+  const key = getPointSavedNeukKey(point);
+  return items.some((item) => item.key === key);
 }
 
 export function subscribeToSavedNeuks(

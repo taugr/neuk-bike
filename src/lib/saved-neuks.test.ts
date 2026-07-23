@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { ParkingPoint } from '@/lib/types';
+import type { CyclingPoiPoint, ParkingPoint } from '@/lib/types';
 import {
   addSavedNeuk,
+  getPointSavedNeukKey,
+  getSavedNeukKey,
   isNeukSaved,
   parseSavedNeuks,
   readSavedNeuks,
@@ -19,13 +21,19 @@ const point: ParkingPoint = {
   sourceId: 'osm',
 };
 const savedAt = '2026-07-18T12:00:00.000Z';
+const shop: CyclingPoiPoint = {
+  ...point,
+  categories: ['shop'],
+  name: 'Waverley Cycles',
+  properties: { openingHours: 'Mo-Fr 09:00-17:00' },
+};
 
 describe('saved neuks', () => {
   it('parses valid records and discards malformed or duplicate items', () => {
     expect(
       parseSavedNeuks(
         JSON.stringify({
-          version: 1,
+          version: 2,
           items: [
             addSavedNeuk([], point, savedAt)[0],
             { id: 'broken' },
@@ -36,7 +44,29 @@ describe('saved neuks', () => {
     ).toEqual(addSavedNeuk([], point, savedAt));
   });
 
-  it.each([null, '', '{', '{"version":2,"items":[]}'])(
+  it('migrates version-1 parking records to compound keys', () => {
+    const legacy = {
+      id: point.id,
+      savedAt,
+      snapshot: {
+        latitude: point.latitude,
+        longitude: point.longitude,
+        name: point.name,
+      },
+    };
+
+    expect(
+      parseSavedNeuks(JSON.stringify({ items: [legacy], version: 1 })),
+    ).toEqual([
+      {
+        ...legacy,
+        key: getSavedNeukKey('parking', point.id),
+        kind: 'parking',
+      },
+    ]);
+  });
+
+  it.each([null, '', '{', '{"version":3,"items":[]}'])(
     'treats unsupported input %j as empty',
     (value) => {
       expect(parseSavedNeuks(value)).toEqual([]);
@@ -50,10 +80,24 @@ describe('saved neuks', () => {
     expect(original).toEqual([]);
     expect(added).toHaveLength(1);
     expect(addSavedNeuk(added, point, savedAt)).toBe(added);
-    expect(isNeukSaved(added, point.id)).toBe(true);
+    expect(isNeukSaved(added, point)).toBe(true);
     expect(removeSavedNeuk(added, 'missing')).toBe(added);
-    expect(removeSavedNeuk(added, point.id)).toEqual([]);
+    expect(removeSavedNeuk(added, getPointSavedNeukKey(point))).toEqual([]);
     expect(added).toHaveLength(1);
+  });
+
+  it('keeps parking and cycling places distinct when their raw IDs match', () => {
+    const items = addSavedNeuk(addSavedNeuk([], point, savedAt), shop, savedAt);
+
+    expect(items).toHaveLength(2);
+    expect(items.map(({ key }) => key)).toEqual([
+      getSavedNeukKey('cycling-place', point.id),
+      getSavedNeukKey('parking', point.id),
+    ]);
+    expect(items[0].snapshot).toMatchObject({
+      categories: ['shop'],
+      openingHours: 'Mo-Fr 09:00-17:00',
+    });
   });
 
   it('reads and writes the versioned payload', () => {
@@ -66,10 +110,10 @@ describe('saved neuks', () => {
     expect(writeSavedNeuks(storage, items)).toBe(true);
     expect(storage.setItem).toHaveBeenCalledWith(
       savedNeuksStorageKey,
-      JSON.stringify({ items, version: 1 }),
+      JSON.stringify({ items, version: 2 }),
     );
 
-    storage.getItem.mockReturnValue(JSON.stringify({ items, version: 1 }));
+    storage.getItem.mockReturnValue(JSON.stringify({ items, version: 2 }));
     expect(readSavedNeuks(storage)).toEqual({ items, ok: true });
   });
 

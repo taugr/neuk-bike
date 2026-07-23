@@ -38,7 +38,12 @@ import type { ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
-import type { ParkingPoint, UserLocation } from '@/lib/types';
+import type {
+  CyclingPoiCategory,
+  ParkingPoint,
+  UserLocation,
+} from '@/lib/types';
+import { isCyclingPoiPoint } from '@/lib/types';
 import {
   getParkingEssentialDetails,
   getParkingPopupDetails,
@@ -62,6 +67,7 @@ import {
 } from '@/lib/map-focus';
 import type { AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
+import { getPointSavedNeukKey } from '@/lib/saved-neuks';
 
 type CycleParkingMapProps = {
   locale: AppLocale;
@@ -72,7 +78,7 @@ type CycleParkingMapProps = {
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
   parkingView: ParkingView;
-  savedPointIds: string[];
+  savedPointKeys: string[];
   route: CycleRoute | null;
   routeInstructionFocusRequest: {
     id: string;
@@ -833,11 +839,20 @@ function ParkingPopupContent({
   point: ParkingPoint;
   locale: AppLocale;
 }) {
-  const essentialDetails = getParkingEssentialDetails(point, locale);
+  const isParking = !isCyclingPoiPoint(point);
+  const essentialDetails = isParking
+    ? getParkingEssentialDetails(point, locale)
+    : [];
   const popupDetails = getParkingPopupDetails(point, locale);
 
   return (
-    <div className="parking-popup">
+    <div
+      className={
+        isParking
+          ? 'parking-popup'
+          : 'parking-popup parking-popup-cycling-place'
+      }
+    >
       <div
         className="parking-popup-preview"
         data-testid={`parking-popup-details-${point.id}`}
@@ -880,23 +895,27 @@ function ParkingPopupContent({
             </span>
           ))}
         </div>
-        <div
-          className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}
-          aria-label={translate(locale, 'details')}
-        >
-          {popupDetails.details.map((detail) => (
-            <div
-              aria-label={`${detail.label}: ${detail.value}`}
-              className={`parking-popup-detail parking-popup-tone-${detail.tone}`}
-              key={detail.label}
-            >
-              <span className="parking-popup-detail-icon">
-                {detail.emphasis ?? <ParkingPopupIcon icon={detail.icon} />}
-              </span>
-              <span className="parking-popup-detail-value">{detail.value}</span>
-            </div>
-          ))}
-        </div>
+        {isParking ? (
+          <div
+            className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}
+            aria-label={translate(locale, 'details')}
+          >
+            {popupDetails.details.map((detail) => (
+              <div
+                aria-label={`${detail.label}: ${detail.value}`}
+                className={`parking-popup-detail parking-popup-tone-${detail.tone}`}
+                key={detail.label}
+              >
+                <span className="parking-popup-detail-icon">
+                  {detail.emphasis ?? <ParkingPopupIcon icon={detail.icon} />}
+                </span>
+                <span className="parking-popup-detail-value">
+                  {detail.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : null}
         {isDirectionsMode ? null : (
           <div className="parking-popup-actions">
             <button
@@ -911,7 +930,7 @@ function ParkingPopupContent({
               <Navigation size={15} aria-hidden="true" />
               {translate(locale, 'directions')}
             </button>
-            {canShowStreetView ? (
+            {isParking && canShowStreetView ? (
               <button
                 aria-label={translate(locale, 'openStreetView', {
                   name: point.name,
@@ -927,24 +946,28 @@ function ParkingPopupContent({
                 {translate(locale, 'street')}
               </button>
             ) : null}
-            <button
-              aria-label={translate(locale, 'shareLink', { name: point.name })}
-              className="parking-popup-share-button"
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                onShareParkingLink(point);
-              }}
-            >
-              <Share2 size={15} aria-hidden="true" />
-              {translate(locale, 'share')}
-              {copiedShareButton?.source === 'popup' &&
-              copiedShareButton.parkingId === point.id ? (
-                <span className="parking-popup-share-feedback" role="status">
-                  {translate(locale, 'copied')}
-                </span>
-              ) : null}
-            </button>
+            {isParking ? (
+              <button
+                aria-label={translate(locale, 'shareLink', {
+                  name: point.name,
+                })}
+                className="parking-popup-share-button"
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onShareParkingLink(point);
+                }}
+              >
+                <Share2 size={15} aria-hidden="true" />
+                {translate(locale, 'share')}
+                {copiedShareButton?.source === 'popup' &&
+                copiedShareButton.parkingId === point.id ? (
+                  <span className="parking-popup-share-feedback" role="status">
+                    {translate(locale, 'copied')}
+                  </span>
+                ) : null}
+              </button>
+            ) : null}
             <button
               aria-label={translate(
                 locale,
@@ -1132,7 +1155,7 @@ export default function CycleParkingMap({
   nearestPoint,
   rankedPoints,
   parkingView,
-  savedPointIds,
+  savedPointKeys,
   route,
   routeInstructionFocusRequest,
   liveRouteMarker,
@@ -1256,9 +1279,9 @@ export default function CycleParkingMap({
         .map((point, index) => [point.id, index + 1]),
     );
   }, [rankedPoints]);
-  const savedPointIdSet = useMemo(
-    () => new Set(savedPointIds),
-    [savedPointIds],
+  const savedPointKeySet = useMemo(
+    () => new Set(savedPointKeys),
+    [savedPointKeys],
   );
   const highlightedPoints = useMemo(
     () => rankedPoints.slice(0, highlightedRankCount),
@@ -1795,8 +1818,17 @@ export default function CycleParkingMap({
     });
 
     reconciledVisiblePoints.forEach((point) => {
+      const pointCategory: 'parking' | CyclingPoiCategory = isCyclingPoiPoint(
+        point,
+      )
+        ? point.categories.includes('shop')
+          ? 'shop'
+          : point.categories.includes('repair')
+            ? 'repair'
+            : 'hire'
+        : 'parking';
       const rank = rankedPointRanks.get(point.id);
-      const isSaved = savedPointIdSet.has(point.id);
+      const isSaved = savedPointKeySet.has(getPointSavedNeukKey(point));
       const isSelected = point.id === selectedPoint?.id;
       const presentation = getParkingMarkerPresentation({
         isDirectionsMode,
@@ -1805,6 +1837,9 @@ export default function CycleParkingMap({
         parkingView,
         rank,
       });
+      if (pointCategory !== 'parking') {
+        presentation.className = `${presentation.className} cycling-poi-marker cycling-poi-marker-${pointCategory}`;
+      }
       const popupContent = (
         <ParkingPopupContent
           canRequestDirections={canRequestDirections}
@@ -1883,7 +1918,16 @@ export default function CycleParkingMap({
         point.name,
         rank
           ? translate(locale, 'rank', { count: rank })
-          : translate(locale, 'genericParking'),
+          : translate(
+              locale,
+              pointCategory === 'parking'
+                ? 'genericParking'
+                : pointCategory === 'shop'
+                  ? 'categoryShop'
+                  : pointCategory === 'repair'
+                    ? 'categoryRepairPlace'
+                    : 'categoryHirePlace',
+            ),
         isSelected ? translate(locale, 'selected') : null,
         isSaved ? translate(locale, 'savedMarker') : null,
       ]
@@ -1907,7 +1951,10 @@ export default function CycleParkingMap({
             renderedMarker.popup
               ?.setLngLat([point.longitude, point.latitude])
               .addTo(map);
-            if (window.matchMedia('(max-width: 820px)').matches) {
+            if (
+              pointCategory === 'parking' &&
+              window.matchMedia('(max-width: 820px)').matches
+            ) {
               onOpenDetails(point);
             } else {
               onSelectPoint(point.id);
@@ -1925,7 +1972,10 @@ export default function CycleParkingMap({
             renderedMarker.popup
               ?.setLngLat([point.longitude, point.latitude])
               .addTo(map);
-            if (window.matchMedia('(max-width: 820px)').matches) {
+            if (
+              pointCategory === 'parking' &&
+              window.matchMedia('(max-width: 820px)').matches
+            ) {
               onOpenDetails(point);
             } else {
               onSelectPoint(point.id);
@@ -2002,7 +2052,7 @@ export default function CycleParkingMap({
     rankedPointRanks,
     route,
     selectedPoint,
-    savedPointIdSet,
+    savedPointKeySet,
     visiblePoints,
   ]);
 

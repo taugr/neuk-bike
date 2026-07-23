@@ -13,6 +13,28 @@ export type ParkingPoint = {
   distanceMeters?: number;
 };
 
+export const cyclingPoiCategories = ['shop', 'repair', 'hire'] as const;
+
+export type CyclingPoiCategory = (typeof cyclingPoiCategories)[number];
+
+export type CyclingPoiPoint = ParkingPoint & {
+  categories: CyclingPoiCategory[];
+};
+
+export type CyclingPoiDataManifest = ParkingDataManifest & {
+  categoryCounts: Record<CyclingPoiCategory, number>;
+  schemaVersion: 2;
+};
+
+export function isCyclingPoiPoint(
+  point: ParkingPoint,
+): point is CyclingPoiPoint {
+  return (
+    Array.isArray((point as Partial<CyclingPoiPoint>).categories) &&
+    (point as Partial<CyclingPoiPoint>).categories!.length > 0
+  );
+}
+
 export type ParkingDataSource = {
   attribution: string;
   id: string;

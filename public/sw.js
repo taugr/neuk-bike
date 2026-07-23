@@ -1,5 +1,5 @@
 const cachePrefix = 'neuk-bike-';
-const cacheName = `${cachePrefix}v8`;
+const cacheName = `${cachePrefix}v9`;
 const scopePath = new URL(self.registration.scope).pathname;
 const appBasePath = scopePath.endsWith('/')
   ? scopePath.slice(0, -1)
@@ -66,10 +66,15 @@ function isStaticAsset(request) {
   );
 }
 
-function isParkingData(request) {
+function isAppData(request) {
+  if (!isSameOrigin(request)) {
+    return false;
+  }
+
+  const pathname = new URL(request.url).pathname;
   return (
-    isSameOrigin(request) &&
-    new URL(request.url).pathname.startsWith(appPath('/data/parking/'))
+    pathname.startsWith(appPath('/data/parking/')) ||
+    pathname.startsWith(appPath('/data/cycling-pois/'))
   );
 }
 
@@ -124,7 +129,7 @@ async function networkFirstData(request) {
     if (cachedResponse) {
       return cachedResponse;
     }
-    throw new Error('Parking data is unavailable and has not been cached.');
+    throw new Error('App data is unavailable and has not been cached.');
   }
 }
 
@@ -140,7 +145,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (isParkingData(request)) {
+  if (isAppData(request)) {
     event.respondWith(
       new URL(request.url).pathname.endsWith('/manifest.json')
         ? networkFirstData(request)

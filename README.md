@@ -124,6 +124,8 @@ pnpm format
 pnpm build         # writes the static site to out/
 pnpm deploy:cloudflare # builds and deploys out/ to Cloudflare Pages
 pnpm update:data   # refreshes council + OSM data and generated chunks
+pnpm update:pois   # refreshes UK-Ireland-Spain cycling places
+pnpm verify:pois   # verifies POI chunks, hashes, IDs, counts, and coverage
 ```
 
 Install the Playwright browser once before the E2E suite if needed:
@@ -133,6 +135,21 @@ pnpm exec playwright install chromium
 ```
 
 ## Dataset refresh
+
+The category-chip release keeps bicycle shops, repair facilities, and hire
+locations in a separate lazy-loaded release under
+`public/data/cycling-pois/`. Run `pnpm update:pois` to rebuild the full UK,
+Ireland, and Spain coverage from the same cached Geofabrik extracts used by
+parking. Inputs are processed sequentially, overlapping regional OSM IDs are
+deduplicated, and the generated report records per-input checksums, counts,
+source timestamps, resource usage, and static-asset budgets. Parking remains
+the default and continues to use the independent release described below.
+
+The current cycling-place release contains 13,176 unique OpenStreetMap places
+in 2,474 chunks: 4,087 shops, 2,577 repair locations, and 8,006 hire
+locations. Its 2,476 generated files occupy about 3.6 MiB; the largest possible
+initial 3×3 chunk payload is about 36 KiB compressed. The category totals
+overlap because one place can explicitly support more than one service.
 
 `pnpm update:data` performs the complete release pipeline:
 
@@ -154,7 +171,8 @@ pnpm exec playwright install chromium
 
 The cached inputs currently occupy about 3.9 GB and are ignored by Git. The
 first refresh depends on Geofabrik download speed and bounded retry delays; a
-cached refresh avoids those downloads. The generated report records source
+cached parking or cycling-place refresh avoids those downloads. The generated
+reports record source
 timestamps, per-input SHA-256 checksums and elapsed time, geometry counts,
 field completeness, naming-tier counts and samples, discarded features,
 cross-region duplicate IDs, council/OSM matches, peak memory, and output-size

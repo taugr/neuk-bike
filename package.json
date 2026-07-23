@@ -33,6 +33,8 @@
     "deploy:cloudflare": "pnpm build && wrangler pages deploy out --project-name neuk-bike --branch main",
     "start": "next start",
     "update:data": "node scripts/update-cycle-parking-data.mjs",
+    "update:pois": "node scripts/update-cycling-poi-data.mjs",
+    "verify:pois": "node scripts/verify-cycling-poi-data.mjs",
     "verify:data": "node scripts/verify-cycle-parking-data.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",

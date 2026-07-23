@@ -7,6 +7,15 @@
 /data/parking/chunks/*
   Cache-Control: public, max-age=31536000, immutable
 
+/data/cycling-pois/manifest.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+/data/cycling-pois/indexes/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/data/cycling-pois/chunks/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 

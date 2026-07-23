@@ -50,7 +50,7 @@ function tileKey(zoom: number, x: number, y: number) {
 
 export function getParkingTileKeysAroundLocation(
   location: UserLocation,
-  manifest: ParkingDataManifest,
+  manifest: Pick<ParkingDataManifest, 'chunkZoom' | 'chunks'>,
   radius = 1,
 ) {
   const center = toParkingTile(location, manifest.chunkZoom);
@@ -74,7 +74,7 @@ export function getParkingTileKeysAroundLocation(
 
 export function getParkingTileKeysForBounds(
   bounds: ParkingMapBounds,
-  manifest: ParkingDataManifest,
+  manifest: Pick<ParkingDataManifest, 'chunkZoom' | 'chunks'>,
   buffer = 1,
   maximumChunks = defaultMaximumViewportChunks,
 ) {
@@ -115,7 +115,7 @@ export function getParkingTileKeysForBounds(
 
 export function isLocationInParkingCoverage(
   location: UserLocation,
-  manifest: ParkingDataManifest,
+  manifest: Pick<ParkingDataManifest, 'coverage'>,
 ) {
   return manifest.coverage.areas.some((area) => {
     const { bounds } = area;

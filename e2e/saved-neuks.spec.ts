@@ -337,6 +337,79 @@ test('saves a neuk, persists it, and restores Nearby state', async ({
   await expect.poll(() => mapCamera(page)).toEqual(nearbyCamera);
 });
 
+test('saves a cycling place into the same My neuks list as parking', async ({
+  page,
+}) => {
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+
+  const firstParkingRow = page
+    .getByTestId('parking-list')
+    .locator('[data-testid^="parking-row-"]')
+    .first();
+  const firstParkingId = (
+    await firstParkingRow.getAttribute('data-testid')
+  )?.replace('parking-row-', '');
+  expect(firstParkingId).toBeTruthy();
+  await firstParkingRow.click();
+  await page.getByTestId(`parking-more-${firstParkingId}`).click();
+  await page.getByTestId(`parking-save-${firstParkingId}`).click();
+
+  await page.getByTestId('category-chip-shop').click();
+  const shopRow = page.getByTestId('parking-row-osm:node:2967477634');
+  await expect(shopRow).toBeVisible();
+  await shopRow.click();
+  await expect(
+    page.locator('.parking-popup.parking-popup-cycling-place'),
+  ).toBeVisible();
+  const shopSave = page.getByTestId('parking-save-osm:node:2967477634');
+  await expect(shopSave).toBeVisible();
+  await expect(shopSave).toHaveAccessibleName(
+    'Save Cycle Scotland to My neuks',
+  );
+  const shopActions = page.getByTestId('parking-actions-osm:node:2967477634');
+  const shopActionButtons = shopActions.getByRole('button');
+  await expect(shopActionButtons).toHaveCount(2);
+  await expect(shopActionButtons.nth(0)).toHaveAccessibleName(
+    'Save Cycle Scotland to My neuks',
+  );
+  await expect(shopActionButtons.nth(1)).toHaveAccessibleName(
+    'Show cycle directions to Cycle Scotland',
+  );
+  await shopSave.click();
+  await expect(shopSave).toHaveAccessibleName(
+    'Remove Cycle Scotland from My neuks',
+  );
+  await expect(page.getByTestId('open-my-neuks')).toContainText('2');
+
+  await page.getByTestId('open-my-neuks').click();
+  const savedRows = page.locator('.saved-list-item');
+  await expect(savedRows).toHaveCount(2);
+  await expect(
+    savedRows.getByTestId('parking-row-osm:node:2967477634'),
+  ).toContainText('Bicycle shop');
+  await expect(
+    savedRows.getByTestId(`parking-row-${firstParkingId}`),
+  ).toContainText('Parking');
+  await expect(
+    page.locator('.parking-marker:not([data-saved="true"])'),
+  ).toHaveCount(0);
+
+  await page.reload();
+  await page.getByTestId('open-my-neuks').click();
+  await expect(savedRows).toHaveCount(2);
+  await expect
+    .poll(() =>
+      page.evaluate((key) => {
+        const stored = JSON.parse(window.localStorage.getItem(key) ?? '{}');
+        return {
+          kinds: stored.items?.map((item: { kind?: string }) => item.kind),
+          version: stored.version,
+        };
+      }, savedNeuksStorageKey),
+    )
+    .toEqual({ kinds: ['cycling-place', 'parking'], version: 2 });
+});
+
 test('loads a distant saved neuk and keeps My neuks behind Directions', async ({
   page,
 }) => {
