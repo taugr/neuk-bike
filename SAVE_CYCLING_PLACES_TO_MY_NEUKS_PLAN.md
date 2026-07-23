@@ -4,8 +4,8 @@
 
 Implemented on 2026-07-23 on `codex/bike-neuk-categories-prototype`. Application
 code, storage migration, generated point indexes, focused tests, E2E coverage,
-and local browser verification are complete; commit, push, and deployment
-remain release gates.
+local browser verification, commit, push, and production deployment are
+complete.
 
 This plan superseded the parking-only saving limitation originally recorded in
 `BIKE_NEUK_CATEGORIES_PROTOTYPE_PLAN.md`.

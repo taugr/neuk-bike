@@ -4,8 +4,8 @@
 
 Implementation and full-region data generation are complete on
 `codex/bike-neuk-categories-prototype`, updated on 2026-07-23. The application
-and a separate UK-Ireland-Spain POI release have passed local validation;
-commit, push, and production deployment remain release gates.
+and a separate UK-Ireland-Spain POI release passed local validation and were
+committed, pushed, and deployed to Cloudflare Pages.
 
 This plan records the selected map-first design: one compact row of category
 chips for Parking, Shops, Repair, and Hire; one active category at a time; and
