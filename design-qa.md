@@ -736,3 +736,95 @@ final result: passed
 - P0: none. P1: none. P2: none after the final pass.
 
 final result: passed
+
+---
+
+# Website link design QA
+
+## Comparison target
+
+- Source visual truth:
+  `/Users/tomauger/.codex/generated_images/019f8b44-965d-7220-8482-5d0715ddc952/call_xyXdBTqaJ46OD0zff1vYoS8U.png`
+- Source pixels: 1586 × 992.
+- Implementation mobile:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/website-link-mobile-390.png`
+- Mobile viewport and pixels: 390 × 844 CSS px, 390 × 844 screenshot px,
+  density 1.
+- Implementation desktop:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/website-link-desktop-1280.png`
+- Desktop viewport and pixels: 1280 × 800 CSS px, 1280 × 800
+  screenshot px, density 1.
+- State: light theme, Shops selected, a nearby shop with a valid website
+  selected, list and marker popup visible.
+- Browser: Chrome was used because the in-app browser was unavailable.
+
+The source mock shows Wee Spoke Hub while the production dataset places Cycle
+Scotland first at the tested coordinates. The comparison therefore treats the
+selected-place structure as the visual target and preserves the app's existing
+Save action, which the source mock predates.
+
+## Evidence
+
+- Mobile full-view comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/website-link-mobile-comparison.png`
+- Desktop full-view comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/website-link-desktop-comparison.png`
+- Mobile selected-card comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/website-link-mobile-card-comparison.png`
+- Desktop selected-row comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/22/019f8b44-965d-7220-8482-5d0715ddc952/website-link-desktop-row-comparison.png`
+
+The focused comparisons were required because the website label and external
+link glyph are too small to judge reliably from the desktop full view alone.
+
+## Findings
+
+No actionable P0, P1, or P2 differences remain.
+
+- Fonts and typography: the implementation retains the app's existing family,
+  weights, line heights, and hierarchy. The compact website label matches the
+  mock's secondary-information treatment without changing place-name emphasis.
+- Spacing and layout rhythm: the link sits below the selected place's distance
+  and opening hours. On mobile it remains above the unchanged Save/Directions
+  row; on desktop it occupies the selected row's left information column while
+  the existing actions remain on the right. Unselected rows are unchanged.
+- Colors and visual tokens: the link uses the existing accent token and
+  selected-surface treatment. Hover and focus states use existing text and
+  surface tokens.
+- Image quality and asset fidelity: no new raster assets were required. The
+  rendered map uses the app's normal production tiles, and the globe and
+  external-link glyphs use the existing Lucide icon family.
+- Copy and content: the visible label is `Website`, with localized Spanish
+  `Sitio web` and Gaelic `Làrach-lìn` variants. Accessible labels include the
+  selected place name.
+- Responsiveness and accessibility: the 390 px viewport has no horizontal
+  overflow. Save and Directions remain two 44 px-high actions. The external
+  destination is an explicit HTTP(S) link with a visible external-link glyph,
+  keyboard focus styling, `target="_blank"`, and `rel="noopener noreferrer"`.
+- Popup fidelity: the website appears beneath the popup title and distance
+  without increasing the popup beyond its existing content-driven maximum
+  width.
+
+## Interaction verification
+
+- Selected Shops and Cycle Scotland through the rendered interface.
+- Verified the list and visible popup links resolve to
+  `https://www.cyclescotland.co.uk/`.
+- Verified Save remains left and Directions right on mobile.
+- Verified the selected card and the document do not overflow at 390 × 844.
+- Verified the saved cycling-place snapshot retains the website.
+- Verified English, Spanish, and Gaelic website labels in the focused browser
+  test.
+- Checked browser console errors on mobile and desktop; none were present.
+
+## Comparison history
+
+- Pass 1: no actionable P0/P1/P2 visual differences. The content differences
+  are expected production-data and pre-existing-action differences described
+  above, so no design-QA fix loop was required.
+
+## Follow-up polish
+
+- None required for this implementation.
+
+final result: passed

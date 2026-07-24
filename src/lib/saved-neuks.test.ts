@@ -25,7 +25,10 @@ const shop: CyclingPoiPoint = {
   ...point,
   categories: ['shop'],
   name: 'Waverley Cycles',
-  properties: { openingHours: 'Mo-Fr 09:00-17:00' },
+  properties: {
+    openingHours: 'Mo-Fr 09:00-17:00',
+    website: 'https://waverley-cycles.example.com/',
+  },
 };
 
 describe('saved neuks', () => {
@@ -97,6 +100,7 @@ describe('saved neuks', () => {
     expect(items[0].snapshot).toMatchObject({
       categories: ['shop'],
       openingHours: 'Mo-Fr 09:00-17:00',
+      website: 'https://waverley-cycles.example.com/',
     });
   });
 

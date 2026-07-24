@@ -65,6 +65,8 @@ async function main() {
   );
   const pointIndex = JSON.parse(pointIndexContent);
   const counts = { hire: 0, repair: 0, shop: 0 };
+  const websiteCounts = { hire: 0, repair: 0, shop: 0 };
+  let websiteCount = 0;
   let cyclingPoiDataBytes =
     Buffer.byteLength(JSON.stringify(manifest)) +
     1 +
@@ -115,6 +117,21 @@ async function main() {
       ids.add(point.id);
       recordCount += 1;
       for (const category of point.categories) counts[category] += 1;
+      if (typeof point.properties?.website === 'string') {
+        const website = new URL(point.properties.website);
+        invariant(
+          (website.protocol === 'http:' || website.protocol === 'https:') &&
+            (website.hostname.includes('.') ||
+              website.hostname.includes(':')) &&
+            !website.username &&
+            !website.password,
+          `Invalid website for ${point.id}.`,
+        );
+        websiteCount += 1;
+        for (const category of point.categories) {
+          websiteCounts[category] += 1;
+        }
+      }
     }
   }
 
@@ -151,6 +168,14 @@ async function main() {
       report.generatedAssets.pointIndexBytes ===
         Buffer.byteLength(pointIndexContent),
     'Generated POI asset metrics do not match files.',
+  );
+  invariant(
+    report.websites?.total === websiteCount &&
+      [...categories].every(
+        (category) =>
+          report.websites.byCategory[category] === websiteCounts[category],
+      ),
+    'Website coverage metrics do not match chunks.',
   );
   console.log(
     `Verified ${recordCount} cycling POIs across ${Object.keys(manifest.chunks).length} chunks.`,

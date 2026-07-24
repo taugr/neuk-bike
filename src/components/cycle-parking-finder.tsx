@@ -31,6 +31,7 @@ import {
   Download,
   EllipsisVertical,
   ExternalLink,
+  Globe2,
   LocateFixed,
   MapPin,
   Maximize2,
@@ -137,6 +138,7 @@ import {
   CyclingPoiDataClient,
   getCyclingPoiDataBaseUrl,
 } from '@/lib/cycling-poi-data';
+import { getCyclingPoiWebsite } from '@/lib/cycling-poi-website';
 import type { ParkingMapBounds } from '@/lib/map-pins';
 import type { ParkingView } from '@/lib/map-pins';
 import {
@@ -4024,6 +4026,9 @@ export default function CycleParkingFinder() {
                                 const isActive =
                                   point.id === explicitSelectedPoint?.id;
                                 const isSaved = isNeukSaved(savedNeuks, point);
+                                const website = isActive
+                                  ? getCyclingPoiWebsite(point)
+                                  : null;
                                 const openingHoursLines =
                                   isCyclingPoiPoint(point) &&
                                   typeof point.properties.openingHours ===
@@ -4058,8 +4063,7 @@ export default function CycleParkingFinder() {
                                       }
                                     }}
                                   >
-                                    <motion.button
-                                      aria-pressed={isActive}
+                                    <motion.div
                                       className={[
                                         'parking-row',
                                         parkingView === 'saved'
@@ -4074,13 +4078,18 @@ export default function CycleParkingFinder() {
                                       ]
                                         .filter(Boolean)
                                         .join(' ')}
-                                      type="button"
                                       data-testid={`parking-row-${point.id}`}
-                                      whileTap={subtleTap}
-                                      onClick={() =>
-                                        selectParkingPoint(point.id)
-                                      }
                                     >
+                                      <motion.button
+                                        aria-label={point.name}
+                                        aria-pressed={isActive}
+                                        className="parking-row-selection"
+                                        type="button"
+                                        whileTap={subtleTap}
+                                        onClick={() =>
+                                          selectParkingPoint(point.id)
+                                        }
+                                      />
                                       {parkingView === 'nearby' ? (
                                         <span
                                           className={`rank rank-${index + 1}`}
@@ -4105,16 +4114,7 @@ export default function CycleParkingFinder() {
                                             point={point}
                                           />
                                         ) : (
-                                          <span
-                                            className={[
-                                              'cycling-poi-row-meta',
-                                              openingHoursLines.length > 1
-                                                ? 'cycling-poi-row-meta-stacked'
-                                                : null,
-                                            ]
-                                              .filter(Boolean)
-                                              .join(' ')}
-                                          >
+                                          <span className="cycling-poi-row-meta">
                                             <span className="cycling-poi-meta-item">
                                               <MapPin
                                                 size={13}
@@ -4126,9 +4126,6 @@ export default function CycleParkingFinder() {
                                             </span>
                                             {openingHoursLines.length === 1 ? (
                                               <span className="cycling-poi-meta-item cycling-poi-opening-hours-inline">
-                                                <span aria-hidden="true">
-                                                  ·
-                                                </span>
                                                 <Clock
                                                   size={13}
                                                   aria-hidden="true"
@@ -4154,6 +4151,42 @@ export default function CycleParkingFinder() {
                                                 </span>
                                               </span>
                                             ) : null}
+                                            {website ? (
+                                              <a
+                                                aria-label={t('visitWebsite', {
+                                                  name: point.name,
+                                                })}
+                                                className="parking-list-website"
+                                                data-testid={`parking-website-${point.id}`}
+                                                href={website}
+                                                rel="noopener noreferrer"
+                                                target="_blank"
+                                                onClick={(event) => {
+                                                  event.stopPropagation();
+                                                  captureAnalyticsEvent(
+                                                    'cycling_place_website_opened',
+                                                    {
+                                                      category:
+                                                        point.categories.join(
+                                                          ',',
+                                                        ),
+                                                      point_id: point.id,
+                                                      source: 'list',
+                                                    },
+                                                  );
+                                                }}
+                                              >
+                                                <Globe2
+                                                  size={14}
+                                                  aria-hidden="true"
+                                                />
+                                                <span>{t('website')}</span>
+                                                <ExternalLink
+                                                  size={12}
+                                                  aria-hidden="true"
+                                                />
+                                              </a>
+                                            ) : null}
                                           </span>
                                         )}
                                       </span>
@@ -4174,7 +4207,7 @@ export default function CycleParkingFinder() {
                                           </span>
                                         </span>
                                       ) : null}
-                                    </motion.button>
+                                    </motion.div>
                                     {isActive ? (
                                       <motion.div
                                         className="parking-list-actions"

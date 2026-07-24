@@ -150,7 +150,7 @@ test('reveals list actions only for the explicitly selected neuk', async ({
   );
   expect(firstParkingId).toBeTruthy();
 
-  await firstRow.focus();
+  await firstRow.locator('.parking-row-selection').focus();
   await page.keyboard.press('Enter');
   await expect(firstRow).toHaveClass(/\bclosest\b.*\bselected\b/);
   const firstActions = page.getByTestId(`parking-actions-${firstParkingId}`);
@@ -361,6 +361,15 @@ test('saves a cycling place into the same My neuks list as parking', async ({
   await expect(
     page.locator('.parking-popup.parking-popup-cycling-place'),
   ).toBeVisible();
+  await expect(
+    page
+      .locator('.parking-popup.parking-popup-cycling-place')
+      .locator('.parking-popup-desktop')
+      .getByTestId('parking-popup-website-osm:node:2967477634'),
+  ).toHaveAttribute('href', 'https://www.cyclescotland.co.uk/');
+  await expect(
+    page.getByTestId('parking-website-osm:node:2967477634'),
+  ).toHaveAttribute('href', 'https://www.cyclescotland.co.uk/');
   const shopSave = page.getByTestId('parking-save-osm:node:2967477634');
   await expect(shopSave).toBeVisible();
   await expect(shopSave).toHaveAccessibleName(
@@ -403,11 +412,18 @@ test('saves a cycling place into the same My neuks list as parking', async ({
         const stored = JSON.parse(window.localStorage.getItem(key) ?? '{}');
         return {
           kinds: stored.items?.map((item: { kind?: string }) => item.kind),
+          shopWebsite: stored.items?.find(
+            (item: { kind?: string }) => item.kind === 'cycling-place',
+          )?.snapshot?.website,
           version: stored.version,
         };
       }, savedNeuksStorageKey),
     )
-    .toEqual({ kinds: ['cycling-place', 'parking'], version: 2 });
+    .toEqual({
+      kinds: ['cycling-place', 'parking'],
+      shopWebsite: 'https://www.cyclescotland.co.uk/',
+      version: 2,
+    });
 });
 
 test('loads a distant saved neuk and keeps My neuks behind Directions', async ({

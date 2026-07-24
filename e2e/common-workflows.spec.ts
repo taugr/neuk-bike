@@ -309,23 +309,33 @@ test('keeps manual zoom after background parking chunks load', async ({
   const zoomOutButton = page.getByRole('button', { name: 'Zoom out' });
   const map = page.getByTestId('parking-map');
   await expect(selectedParkingMarker).toBeVisible();
-  await page.waitForTimeout(1_200);
+  await expect
+    .poll(async () => Number(await map.getAttribute('data-map-zoom')), {
+      timeout: 10_000,
+    })
+    .toBeLessThan(12.5);
   loadedParkingChunks.clear();
 
   const initialZoom = Number(await map.getAttribute('data-map-zoom'));
+  let settledZoom = initialZoom;
   for (let index = 0; index < 4; index += 1) {
     await zoomOutButton.click();
-    await page.waitForTimeout(450);
+    await expect
+      .poll(async () => Number(await map.getAttribute('data-map-zoom')), {
+        timeout: 2_000,
+      })
+      .toBeLessThan(settledZoom - 0.5);
+    settledZoom = Number(await map.getAttribute('data-map-zoom'));
   }
 
   const markerAfterZoom = await selectedParkingMarker.boundingBox();
-  const zoomAfterManualZoom = Number(await map.getAttribute('data-map-zoom'));
+  const zoomAfterManualZoom = settledZoom;
   expect(zoomAfterManualZoom).toBeLessThan(initialZoom - 0.5);
   const westAfterManualZoom = Number(await map.getAttribute('data-map-west'));
   const northAfterManualZoom = Number(await map.getAttribute('data-map-north'));
   releaseBackgroundChunks();
   await expect
-    .poll(() => loadedParkingChunks.size, { timeout: 5_000 })
+    .poll(() => loadedParkingChunks.size, { timeout: 10_000 })
     .toBeGreaterThan(0);
   const markerAfterChunkLoading = await selectedParkingMarker.boundingBox();
   const zoomAfterChunkLoading = Number(await map.getAttribute('data-map-zoom'));
@@ -655,6 +665,17 @@ for (const [place, mockGps, category, pointId, pointName] of [
     const row = page.getByTestId(`parking-row-${pointId}`);
     await expect(row).toBeVisible();
     await expect(row.locator('strong')).toHaveText(pointName);
+    await expect
+      .poll(() =>
+        row.evaluate(
+          (element) =>
+            Math.abs(
+              element.getBoundingClientRect().width -
+                (element.parentElement?.getBoundingClientRect().width ?? 0),
+            ) < 3,
+        ),
+      )
+      .toBe(true);
     await expect(
       page.getByText('Nearby cycling places could not be loaded.'),
     ).toHaveCount(0);

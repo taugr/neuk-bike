@@ -19,6 +19,7 @@ export type SavedNeukRecord = {
     longitude: number;
     name: string;
     openingHours?: string;
+    website?: string;
   };
 };
 
@@ -184,6 +185,9 @@ export function addSavedNeuk(
         name: point.name,
         ...(typeof point.properties.openingHours === 'string'
           ? { openingHours: point.properties.openingHours }
+          : {}),
+        ...(typeof point.properties.website === 'string'
+          ? { website: point.properties.website }
           : {}),
       },
     },

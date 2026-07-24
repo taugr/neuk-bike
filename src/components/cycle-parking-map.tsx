@@ -18,6 +18,8 @@ import {
   Boxes,
   Building2,
   CircleHelp,
+  ExternalLink,
+  Globe2,
   GraduationCap,
   Lock,
   LockOpen,
@@ -68,6 +70,7 @@ import {
 import type { AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
 import { getPointSavedNeukKey } from '@/lib/saved-neuks';
+import { getCyclingPoiWebsite } from '@/lib/cycling-poi-website';
 
 type CycleParkingMapProps = {
   locale: AppLocale;
@@ -840,6 +843,7 @@ function ParkingPopupContent({
   locale: AppLocale;
 }) {
   const isParking = !isCyclingPoiPoint(point);
+  const website = getCyclingPoiWebsite(point);
   const essentialDetails = isParking
     ? getParkingEssentialDetails(point, locale)
     : [];
@@ -860,6 +864,23 @@ function ParkingPopupContent({
         <span className="parking-popup-title-row">
           <strong>{point.name}</strong>
         </span>
+        {website ? (
+          <a
+            aria-label={translate(locale, 'visitWebsite', {
+              name: point.name,
+            })}
+            className="parking-popup-website"
+            data-testid={`parking-popup-website-${point.id}`}
+            href={website}
+            rel="noopener noreferrer"
+            target="_blank"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Globe2 size={14} aria-hidden="true" />
+            <span>{translate(locale, 'website')}</span>
+            <ExternalLink size={11} aria-hidden="true" />
+          </a>
+        ) : null}
         {essentialDetails.length > 0 ? (
           <span
             className={`parking-popup-details parking-popup-details-count-${essentialDetails.length}`}
@@ -895,6 +916,23 @@ function ParkingPopupContent({
             </span>
           ))}
         </div>
+        {website ? (
+          <a
+            aria-label={translate(locale, 'visitWebsite', {
+              name: point.name,
+            })}
+            className="parking-popup-website"
+            data-testid={`parking-popup-website-${point.id}`}
+            href={website}
+            rel="noopener noreferrer"
+            target="_blank"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Globe2 size={14} aria-hidden="true" />
+            <span>{translate(locale, 'website')}</span>
+            <ExternalLink size={11} aria-hidden="true" />
+          </a>
+        ) : null}
         {isParking ? (
           <div
             className={`parking-popup-details parking-popup-details-count-${popupDetails.details.length}`}

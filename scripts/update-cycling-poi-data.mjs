@@ -29,6 +29,7 @@ const reportPath = resolve(repoRoot, 'src/data/cycling-poi-report.json');
 const selectedTags = [
   'amenity',
   'brand',
+  'contact:website',
   'fee',
   'name',
   'network',
@@ -39,6 +40,8 @@ const selectedTags = [
   'service:bicycle:rental',
   'service:bicycle:repair',
   'service:bicycle:tools',
+  'url',
+  'website',
 ];
 
 function parseArguments() {
@@ -172,7 +175,40 @@ function displayName(tags, categories) {
   return 'Cycle hire';
 }
 
+function normalizeWebsite(value) {
+  if (typeof value !== 'string') return null;
+
+  for (const rawCandidate of value.split(';')) {
+    const candidate = rawCandidate.trim();
+    if (!candidate) continue;
+    const withProtocol = /^[a-z][a-z\d+.-]*:/i.test(candidate)
+      ? candidate
+      : `https://${candidate}`;
+
+    try {
+      const url = new URL(withProtocol);
+      if (
+        (url.protocol === 'http:' || url.protocol === 'https:') &&
+        (url.hostname.includes('.') || url.hostname.includes(':')) &&
+        !url.username &&
+        !url.password
+      ) {
+        return url.toString();
+      }
+    } catch {
+      // Try the next semicolon-separated value.
+    }
+  }
+
+  return null;
+}
+
 function propertiesFor(tags) {
+  const website = [tags['contact:website'], tags.website, tags.url].reduce(
+    (normalized, value) => normalized ?? normalizeWebsite(value),
+    null,
+  );
+
   return Object.fromEntries(
     [
       ['brand', tags.brand],
@@ -184,6 +220,7 @@ function propertiesFor(tags) {
       ['serviceRental', tags['service:bicycle:rental']],
       ['serviceRepair', tags['service:bicycle:repair']],
       ['serviceTools', tags['service:bicycle:tools']],
+      ['website', website],
     ].filter(([, value]) => typeof value === 'string' && value.trim()),
   );
 }
@@ -538,6 +575,21 @@ async function writeSpatialOutput({
         ['Bicycle shop', 'Bicycle repair station', 'Cycle hire'].includes(
           point.name,
         ),
+      ).length,
+    },
+    websites: {
+      byCategory: Object.fromEntries(
+        ['hire', 'repair', 'shop'].map((category) => [
+          category,
+          points.filter(
+            (point) =>
+              point.categories.includes(category) &&
+              typeof point.properties.website === 'string',
+          ).length,
+        ]),
+      ),
+      total: points.filter(
+        (point) => typeof point.properties.website === 'string',
       ).length,
     },
     resourceUsage,

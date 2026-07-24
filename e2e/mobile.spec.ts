@@ -858,7 +858,10 @@ test('keeps the list open for comparison before opening details', async ({
   expect(secondParkingId).toBeTruthy();
 
   await firstRow.click();
-  await expect(firstRow).toHaveAttribute('aria-pressed', 'true');
+  await expect(firstRow.locator('.parking-row-selection')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await expect(
     page.getByTestId(`parking-popup-details-${firstParkingId}`),
   ).toBeVisible();
@@ -876,8 +879,14 @@ test('keeps the list open for comparison before opening details', async ({
   ).toHaveCount(0);
 
   await secondRow.click();
-  await expect(firstRow).toHaveAttribute('aria-pressed', 'false');
-  await expect(secondRow).toHaveAttribute('aria-pressed', 'true');
+  await expect(firstRow.locator('.parking-row-selection')).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+  await expect(secondRow.locator('.parking-row-selection')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await expect(
     page.getByTestId(`parking-popup-details-${secondParkingId}`),
   ).toBeVisible();
@@ -929,7 +938,10 @@ test('returns directions to the mobile view that launched them', async ({
   ).toBeVisible();
   await page.getByRole('button', { exact: true, name: 'Back' }).click();
   await expect(page.getByTestId('parking-list')).toBeVisible();
-  await expect(firstRow).toHaveAttribute('aria-pressed', 'true');
+  await expect(firstRow.locator('.parking-row-selection')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await expect(
     page.getByRole('region', { name: 'Parking details' }),
   ).toHaveCount(0);
@@ -991,11 +1003,91 @@ test('keeps the mobile interaction contract usable with reduced motion', async (
   );
   expect(parkingId).toBeTruthy();
   await firstRow.click();
-  await expect(firstRow).toHaveAttribute('aria-pressed', 'true');
+  await expect(firstRow.locator('.parking-row-selection')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await page.getByTestId(`parking-details-${parkingId}`).click();
   await expect(
     page.getByRole('region', { name: 'Parking details' }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Back to nearby neuks' }).click();
   await expect(page.getByTestId('parking-list')).toBeVisible();
+});
+
+test('shows a compact website link without changing cycling-place actions', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await page.getByTestId('category-chip-shop').click();
+
+  await expect(
+    page
+      .getByTestId('parking-row-osm:node:2275653089')
+      .locator('.cycling-poi-row-meta'),
+  ).not.toContainText('·');
+
+  const weeSpokeRow = page.getByTestId('parking-row-osm:node:2275653089');
+  await weeSpokeRow.click();
+  await expect
+    .poll(() =>
+      weeSpokeRow.evaluate((row) => {
+        const distance = row.querySelector('.cycling-poi-meta-item');
+        const hours = row.querySelector('.cycling-poi-opening-hours-inline');
+        const website = row.querySelector('.parking-list-website');
+        if (!distance || !hours || !website) return false;
+        const distanceTop = distance.getBoundingClientRect().top;
+        const hoursTop = hours.getBoundingClientRect().top;
+        const websiteTop = website.getBoundingClientRect().top;
+        return distanceTop < hoursTop && hoursTop < websiteTop;
+      }),
+    )
+    .toBe(true);
+
+  const pointId = 'osm:node:2967477634';
+  const row = page.getByTestId(`parking-row-${pointId}`);
+  await expect(row).toContainText('Cycle Scotland');
+  await row.click();
+
+  const website = page.getByTestId(`parking-website-${pointId}`);
+  await expect(website).toHaveAttribute(
+    'href',
+    'https://www.cyclescotland.co.uk/',
+  );
+  await expect(website).toHaveAccessibleName(
+    'Open the website for Cycle Scotland',
+  );
+
+  const actions = page.getByTestId(`parking-actions-${pointId}`);
+  await expect(actions.getByRole('button')).toHaveCount(2);
+  await expect(actions.getByRole('button').nth(0)).toHaveAccessibleName(
+    'Save Cycle Scotland to My neuks',
+  );
+  await expect(actions.getByRole('button').nth(1)).toHaveAccessibleName(
+    'Show cycle directions to Cycle Scotland',
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
+
+  await page.getByRole('button', { name: 'Bike Neuks menu' }).click();
+  const languageSelect = page.locator(
+    '.settings-menu--mobile .language-select',
+  );
+  await languageSelect.selectOption('es');
+  await expect(website).toContainText('Sitio web');
+  await expect(website).toHaveAccessibleName(
+    'Abrir el sitio web de Cycle Scotland',
+  );
+  await page.getByRole('button', { name: 'Menú de Bike Neuks' }).click();
+  await languageSelect.selectOption('gd');
+  await expect(website).toContainText('Làrach-lìn');
+  await expect(website).toHaveAccessibleName(
+    'Fosgail an làrach-lìn airson Cycle Scotland',
+  );
 });
