@@ -16,3 +16,4 @@ dist/
 *.tsbuildinfo
 .env.local
 posthog-setup-report.md
+public/vendor/maplibre-gl/

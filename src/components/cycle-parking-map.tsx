@@ -1,6 +1,6 @@
 'use client';
 
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import type {
   FilterSpecification,
   GeoJSONSource,
@@ -71,6 +71,8 @@ import type { AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
 import { getPointSavedNeukKey } from '@/lib/saved-neuks';
 import { getCyclingPoiWebsite } from '@/lib/cycling-poi-website';
+
+maplibregl.setWorkerUrl('/vendor/maplibre-gl/maplibre-gl-worker.mjs');
 
 type CycleParkingMapProps = {
   locale: AppLocale;
@@ -1146,7 +1148,7 @@ function syncLineLayer({
   const source = map.getSource(id) as GeoJSONSource | undefined;
 
   if (source) {
-    source.setData(data);
+    void source.setData(data);
   } else {
     map.addSource(id, {
       data,
@@ -1382,7 +1384,7 @@ export default function CycleParkingMap({
         return;
       }
 
-      nextMap = new maplibregl.Map({
+      const mapInstance = new maplibregl.Map({
         attributionControl: false,
         center: savedCameraRef.current?.center ?? toLngLat(defaultCenter),
         container,
@@ -1394,7 +1396,8 @@ export default function CycleParkingMap({
         touchPitch: false,
         zoom: savedCameraRef.current?.zoom ?? 13,
       });
-      nextMap.touchZoomRotate.disableRotation();
+      nextMap = mapInstance;
+      mapInstance.touchZoomRotate.disableRotation();
       container.addEventListener(
         'pointerdown',
         stopAutomaticFocusOnInteraction,
@@ -1414,55 +1417,43 @@ export default function CycleParkingMap({
         compact: false,
       });
 
-      nextMap.addControl(navigationControl, 'top-left');
-      nextMap.addControl(attributionControl, 'bottom-right');
-      nextMap.on('styleimagemissing', (event) => {
-        if (!nextMap || nextMap.hasImage(event.id)) {
+      mapInstance.addControl(navigationControl, 'top-left');
+      mapInstance.addControl(attributionControl, 'bottom-right');
+      mapInstance.setMissingStyleImageResolver((id) => {
+        if (mapInstance.hasImage(id)) {
           return;
         }
 
-        nextMap.addImage(event.id, {
+        mapInstance.addImage(id, {
           data: new Uint8Array([0, 0, 0, 0]),
           height: 1,
           width: 1,
         });
       });
-      nextMap.on('load', () => {
-        if (!nextMap) {
-          return;
-        }
-
+      mapInstance.on('load', () => {
         setIsMapLoaded(true);
         setStyleRevision((revision) => revision + 1);
         handleViewportChange({
-          bounds: getVisibleMapBounds(nextMap),
-          zoom: nextMap.getZoom(),
+          bounds: getVisibleMapBounds(mapInstance),
+          zoom: mapInstance.getZoom(),
         });
       });
-      nextMap.on('moveend', () => {
-        if (!nextMap) {
-          return;
-        }
-
+      mapInstance.on('moveend', () => {
         isAutomaticFocusAnimationRef.current = false;
         handleViewportChange({
-          bounds: getVisibleMapBounds(nextMap),
-          zoom: nextMap.getZoom(),
+          bounds: getVisibleMapBounds(mapInstance),
+          zoom: mapInstance.getZoom(),
         });
       });
-      nextMap.on('zoomend', () => {
-        if (!nextMap) {
-          return;
-        }
-
+      mapInstance.on('zoomend', () => {
         handleViewportChange({
-          bounds: getVisibleMapBounds(nextMap),
-          zoom: nextMap.getZoom(),
+          bounds: getVisibleMapBounds(mapInstance),
+          zoom: mapInstance.getZoom(),
         });
       });
 
-      mapRef.current = nextMap;
-      setMap(nextMap);
+      mapRef.current = mapInstance;
+      setMap(mapInstance);
     };
 
     void loadMapLibreBasemapStyle(
