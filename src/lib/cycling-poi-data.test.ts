@@ -25,7 +25,7 @@ const manifest: CyclingPoiDataManifest = {
       path: `chunks/${key}.json`,
     },
   },
-  coverage: { areas: [], label: 'UK, Ireland and Spain' },
+  coverage: { areas: [], label: 'UK, Ireland, Spain and Armenia' },
   pointIndexPath: 'indexes/point-index.json',
   recordCount: 1,
   refreshedAt: '2026-07-23T00:00:00.000Z',

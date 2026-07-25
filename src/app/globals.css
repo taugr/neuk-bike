@@ -891,12 +891,22 @@ a {
 }
 
 .category-chips {
-  display: flex;
+  display: grid;
   gap: 0.45rem;
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
   margin: 0 0 0.25rem;
-  overflow-x: auto;
+  overflow: hidden;
   padding: 0 0.05rem;
+}
+
+.category-chips[data-overflow='true'] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: 0.05rem;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
+  touch-action: pan-x;
 }
 
 .category-chips::-webkit-scrollbar {
@@ -910,13 +920,16 @@ a {
   border-radius: 999px;
   color: var(--muted);
   display: inline-flex;
-  flex: 1 0 auto;
   font-size: 0.78rem;
   font-weight: 760;
   gap: 0.35rem;
   justify-content: center;
   min-height: 38px;
+  min-width: 0;
   padding: 0.45rem 0.75rem;
+  scroll-snap-align: start;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .category-chip:hover,
@@ -2820,6 +2833,7 @@ a {
     justify-content: center;
     min-height: 0;
     min-width: 0;
+    overflow: hidden;
     padding: 0 0.42rem;
   }
 
@@ -2834,6 +2848,7 @@ a {
     line-height: 1.18;
     min-width: 0;
     overflow: visible;
+    overflow-wrap: anywhere;
     text-align: center;
     text-overflow: clip;
     white-space: normal;
@@ -3628,11 +3643,8 @@ a {
   }
 
   .category-chip {
-    flex: 1 1 auto;
     gap: 0.2rem;
-    min-width: 0;
-    padding-inline: 0.25rem;
-    white-space: nowrap;
+    padding-inline: 0.4rem;
   }
 
   .category-chip svg {
@@ -3678,21 +3690,6 @@ a {
   }
 }
 
-@media (max-width: 369px) {
-  .category-chips {
-    overscroll-behavior-inline: contain;
-    scroll-padding-inline: 0.05rem;
-    scroll-snap-type: x proximity;
-  }
-
-  .category-chip {
-    flex: 0 0 auto;
-    min-width: max-content;
-    padding-inline: 0.65rem;
-    scroll-snap-align: start;
-  }
-}
-
 @media (max-width: 400px) {
   .parking-row-copy > .parking-row-details {
     grid-template-columns: repeat(2, minmax(0, max-content));
@@ -3706,6 +3703,13 @@ a {
 }
 
 @media (min-width: 821px) {
+  .category-chips[data-overflow='true'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+    scroll-snap-type: none;
+    touch-action: auto;
+  }
+
   .directions-header-actions {
     align-items: stretch;
     flex-direction: column;

@@ -453,7 +453,10 @@ function resolveTheme(mode: ThemeMode, prefersDark: boolean): ResolvedTheme {
   return mode;
 }
 
-function prepareParkingPoints(points: ParkingPoint[], locale: AppLocale) {
+function prepareDisplayPoints<T extends ParkingPoint>(
+  points: T[],
+  locale: AppLocale,
+): T[] {
   return points.map((point) => ({
     ...point,
     name: formatParkingDisplayName(point, locale),
@@ -600,6 +603,7 @@ export default function CycleParkingFinder() {
   const attributionDialog = useRef<HTMLDialogElement>(null);
   const streetViewDialog = useRef<HTMLDialogElement>(null);
   const controlPaneRef = useRef<HTMLElement | null>(null);
+  const categoryChipsRef = useRef<HTMLDivElement>(null);
   const parkingListScroll = useRef<HTMLDivElement>(null);
   const savedHeadingRef = useRef<HTMLHeadingElement>(null);
   const parkingMoreButtonRef = useRef<HTMLButtonElement>(null);
@@ -771,7 +775,7 @@ export default function CycleParkingFinder() {
         setParkingPoints((current) =>
           keepParkingPointsWhenUnchanged(
             current,
-            prepareParkingPoints(client.getLoadedPoints(), localeRef.current),
+            prepareDisplayPoints(client.getLoadedPoints(), localeRef.current),
           ),
         );
         setParkingDataStatus('ready');
@@ -955,7 +959,13 @@ export default function CycleParkingFinder() {
   useEffect(() => {
     const client = parkingDataClient.current;
     if (client) {
-      setParkingPoints(prepareParkingPoints(client.getLoadedPoints(), locale));
+      setParkingPoints(prepareDisplayPoints(client.getLoadedPoints(), locale));
+    }
+    const cyclingPoiClient = cyclingPoiDataClient.current;
+    if (cyclingPoiClient) {
+      setCyclingPoiPoints(
+        prepareDisplayPoints(cyclingPoiClient.getLoadedPoints(), locale),
+      );
     }
     if (placeSearchDebounceTimeout.current !== null) {
       window.clearTimeout(placeSearchDebounceTimeout.current);
@@ -990,7 +1000,7 @@ export default function CycleParkingFinder() {
         setParkingPoints((current) =>
           keepParkingPointsWhenUnchanged(
             current,
-            prepareParkingPoints(client.getLoadedPoints(), locale),
+            prepareDisplayPoints(client.getLoadedPoints(), locale),
           ),
         );
         setParkingDataStatus('ready');
@@ -1034,7 +1044,9 @@ export default function CycleParkingFinder() {
       .then(() => {
         if (cancelled) return;
         const manifest = client.getManifest();
-        setCyclingPoiPoints(client.getLoadedPoints());
+        setCyclingPoiPoints(
+          prepareDisplayPoints(client.getLoadedPoints(), localeRef.current),
+        );
         setCyclingPoiDataStatus('ready');
         setCyclingPoiDataMessage(
           manifest &&
@@ -1067,7 +1079,11 @@ export default function CycleParkingFinder() {
         if (!client) return;
         void client
           .loadBounds(bounds)
-          .then(() => setCyclingPoiPoints(client.getLoadedPoints()))
+          .then(() =>
+            setCyclingPoiPoints(
+              prepareDisplayPoints(client.getLoadedPoints(), locale),
+            ),
+          )
           .catch(() => setCyclingPoiDataMessage(t('cyclingPlacesLoadError')));
         return;
       }
@@ -1083,7 +1099,7 @@ export default function CycleParkingFinder() {
           setParkingPoints((current) =>
             keepParkingPointsWhenUnchanged(
               current,
-              prepareParkingPoints(client.getLoadedPoints(), locale),
+              prepareDisplayPoints(client.getLoadedPoints(), locale),
             ),
           );
         })
@@ -1108,7 +1124,7 @@ export default function CycleParkingFinder() {
       setParkingPoints((current) =>
         keepParkingPointsWhenUnchanged(
           current,
-          prepareParkingPoints(client.getLoadedPoints(), locale),
+          prepareDisplayPoints(client.getLoadedPoints(), locale),
         ),
       );
       setParkingDataStatus('ready');
@@ -1334,14 +1350,10 @@ export default function CycleParkingFinder() {
   const savedPoints = useMemo(
     () =>
       sortByDistance(
-        savedRawPoints.map((point) =>
-          isCyclingPoiPoint(point)
-            ? point
-            : {
-                ...prepareParkingPoints([point], locale)[0],
-                savedNeukKey: point.savedNeukKey,
-              },
-        ),
+        savedRawPoints.map((point) => ({
+          ...prepareDisplayPoints([point], locale)[0],
+          savedNeukKey: point.savedNeukKey,
+        })),
         locationState.location,
       ).sort((left, right) => {
         const distanceDifference =
@@ -1544,6 +1556,48 @@ export default function CycleParkingFinder() {
     return () =>
       mobileViewport.removeEventListener('change', restoreDesktopList);
   }, [parkingPanelState.view]);
+
+  useLayoutEffect(() => {
+    const categoryChips = categoryChipsRef.current;
+    if (!categoryChips) {
+      return;
+    }
+    const measuredCategoryChips = categoryChips;
+
+    let measurementFrame: number | null = null;
+
+    function measureCategoryOverflow() {
+      measuredCategoryChips.dataset.overflow = 'false';
+      measuredCategoryChips.dataset.overflow =
+        measuredCategoryChips.scrollWidth >
+        measuredCategoryChips.clientWidth + 1
+          ? 'true'
+          : 'false';
+    }
+
+    function scheduleCategoryOverflowMeasurement() {
+      if (measurementFrame !== null) {
+        window.cancelAnimationFrame(measurementFrame);
+      }
+      measurementFrame = window.requestAnimationFrame(() => {
+        measurementFrame = null;
+        measureCategoryOverflow();
+      });
+    }
+
+    measureCategoryOverflow();
+    const resizeObserver = new ResizeObserver(
+      scheduleCategoryOverflowMeasurement,
+    );
+    resizeObserver.observe(measuredCategoryChips);
+
+    return () => {
+      resizeObserver.disconnect();
+      if (measurementFrame !== null) {
+        window.cancelAnimationFrame(measurementFrame);
+      }
+    };
+  }, [locale, parkingView]);
 
   useLayoutEffect(() => {
     if (!isContentSizedMobileSheet) {
@@ -2070,7 +2124,7 @@ export default function CycleParkingFinder() {
           setParkingPoints((current) =>
             keepParkingPointsWhenUnchanged(
               current,
-              prepareParkingPoints(client.getLoadedPoints(), locale),
+              prepareDisplayPoints(client.getLoadedPoints(), locale),
             ),
           );
         })
@@ -3890,6 +3944,7 @@ export default function CycleParkingFinder() {
                             aria-label={t('filterNearbyNeuks')}
                             className="category-chips"
                             data-testid="category-chips"
+                            ref={categoryChipsRef}
                             role="group"
                           >
                             {discoverCategories.map(
@@ -4122,6 +4177,7 @@ export default function CycleParkingFinder() {
                                               />
                                               {formatDistance(
                                                 point.distanceMeters ?? 0,
+                                                locale,
                                               )}
                                             </span>
                                             {openingHoursLines.length === 1 ? (

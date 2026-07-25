@@ -9,7 +9,7 @@ const siteUrl = 'https://neuk.bike';
 const sitePath = '/';
 const siteTitle = 'Bike Neuks';
 const siteDescription =
-  'Find nearby cycle parking across the UK, Ireland and Spain.';
+  'Find nearby cycle parking across the UK, Ireland, Spain and Armenia.';
 const socialImage = '/og-image.png';
 const lightThemeColor = '#0f766e';
 const darkThemeColor = '#0f1715';
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
         url: socialImage,
         width: 1200,
         height: 630,
-        alt: 'UK, Ireland and Spain cycle parking map preview',
+        alt: 'UK, Ireland, Spain and Armenia cycle parking map preview',
       },
     ],
     locale: 'en_GB',

@@ -524,6 +524,16 @@ function getMapPointFocusCenter(
     x: visibleArea.center.x,
     y: targetY,
   };
+  return getMapPointCenterAtScreenPosition(map, point, zoom, targetPoint);
+}
+
+function getMapPointCenterAtScreenPosition(
+  map: MapLibreMap,
+  point: CycleRoutePoint,
+  zoom: number,
+  targetPoint: { x: number; y: number },
+): [number, number] {
+  const size = getMapSize(map);
   const mapCenterPoint = { x: size.x / 2, y: size.y / 2 };
   const projectedPoint = projectPointAtZoom(point, zoom);
   const projectedCenter = {
@@ -532,6 +542,43 @@ function getMapPointFocusCenter(
   };
 
   return unprojectPointAtZoom(projectedCenter, zoom);
+}
+
+function getPopupFocusCenter(
+  map: MapLibreMap,
+  point: CycleRoutePoint,
+  popup: MapLibrePopup,
+  zoom: number,
+  mobileSheetState: 'collapsed' | 'expanded',
+): [number, number] {
+  const popupElement = popup.getElement();
+
+  if (!popup.isOpen() || !popupElement) {
+    return getMapPointFocusCenter(map, point, zoom, mobileSheetState);
+  }
+
+  const popupRect = popupElement.getBoundingClientRect();
+
+  if (popupRect.width === 0 || popupRect.height === 0) {
+    return getMapPointFocusCenter(map, point, zoom, mobileSheetState);
+  }
+
+  const mapRect = map.getContainer().getBoundingClientRect();
+  const pointPosition = map.project(toLngLat(point));
+  const popupCenter = {
+    x: (popupRect.left + popupRect.right) / 2 - mapRect.left,
+    y: (popupRect.top + popupRect.bottom) / 2 - mapRect.top,
+  };
+  const popupOffsetFromPoint = {
+    x: popupCenter.x - pointPosition.x,
+    y: popupCenter.y - pointPosition.y,
+  };
+  const visibleCenter = getVisibleMapArea(map).center;
+
+  return getMapPointCenterAtScreenPosition(map, point, zoom, {
+    x: visibleCenter.x - popupOffsetFromPoint.x,
+    y: visibleCenter.y - popupOffsetFromPoint.y,
+  });
 }
 
 function isPointInVisibleMapArea(map: MapLibreMap, point: CycleRoutePoint) {
@@ -1235,6 +1282,7 @@ export default function CycleParkingMap({
   const previousMobileSheetStateRef = useRef(mobileSheetState);
   const previousRouteSheetStateRef = useRef(mobileSheetState);
   const centeredCollapsedPopupPointRef = useRef<string | null>(null);
+  const centeredExpandedPopupPointRef = useRef<string | null>(null);
   const deferredExpandedSelectionFocusRef = useRef<string | null>(null);
   const suppressNextSelectionClearFocusRef = useRef(false);
   const frameRef = useRef<number | null>(null);
@@ -1827,6 +1875,7 @@ export default function CycleParkingMap({
 
     if (!selectedPoint) {
       centeredCollapsedPopupPointRef.current = null;
+      centeredExpandedPopupPointRef.current = null;
     }
 
     let centerTimeoutId: number | null = null;
@@ -2129,9 +2178,14 @@ export default function CycleParkingMap({
 
     const previousMobileSheetState = previousMobileSheetStateRef.current;
     previousMobileSheetStateRef.current = mobileSheetState;
+    const isNewExpandedSelection =
+      window.matchMedia('(max-width: 820px)').matches &&
+      mobileSheetState === 'expanded' &&
+      centeredExpandedPopupPointRef.current !== selectedPoint?.id;
 
     if (
-      previousMobileSheetState === mobileSheetState ||
+      (previousMobileSheetState === mobileSheetState &&
+        !isNewExpandedSelection) ||
       !selectedPoint ||
       route
     ) {
@@ -2139,46 +2193,48 @@ export default function CycleParkingMap({
     }
 
     const shouldDeferSelectionFocus =
-      previousMobileSheetState === 'collapsed' &&
       mobileSheetState === 'expanded' &&
+      (previousMobileSheetState === 'collapsed' || isNewExpandedSelection) &&
       previousFocusTargetRef.current?.selectedPointId !== selectedPoint.id;
 
     if (shouldDeferSelectionFocus) {
       deferredExpandedSelectionFocusRef.current = selectedPoint.id;
     }
 
-    const timeoutId = window.setTimeout(() => {
-      const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
+    const timeoutId = window.setTimeout(
+      () => {
+        const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
 
-      if (!popup?.isOpen()) {
-        return;
-      }
+        if (!popup?.isOpen()) {
+          return;
+        }
 
-      if (mobileSheetState === 'collapsed') {
-        centeredCollapsedPopupPointRef.current = selectedPoint.id;
-        centerPopupInVisibleMapArea(map, popup);
-        return;
-      }
+        if (mobileSheetState === 'collapsed') {
+          centeredCollapsedPopupPointRef.current = selectedPoint.id;
+          centerPopupInVisibleMapArea(map, popup);
+          return;
+        }
 
-      const zoom = map.getZoom();
-      if (deferredExpandedSelectionFocusRef.current === selectedPoint.id) {
-        deferredExpandedSelectionFocusRef.current = null;
-      }
-      isAutomaticFocusAnimationRef.current = true;
-      map.stop();
-      map.panTo(
-        getMapPointFocusCenter(
-          map,
-          parkingPointToRoutePoint(selectedPoint),
+        const zoom = Math.max(map.getZoom(), 16);
+        if (deferredExpandedSelectionFocusRef.current === selectedPoint.id) {
+          deferredExpandedSelectionFocusRef.current = null;
+        }
+        isAutomaticFocusAnimationRef.current = true;
+        centeredExpandedPopupPointRef.current = selectedPoint.id;
+        map.flyTo({
+          center: getPopupFocusCenter(
+            map,
+            parkingPointToRoutePoint(selectedPoint),
+            popup,
+            zoom,
+            mobileSheetState,
+          ),
+          duration: 700,
           zoom,
-          mobileSheetState,
-        ),
-        {
-          duration: 650,
-          easing: (progress) => progress * (2 - progress),
-        },
-      );
-    }, 380);
+        });
+      },
+      previousMobileSheetState === mobileSheetState ? 100 : 380,
+    );
 
     return () => {
       window.clearTimeout(timeoutId);
@@ -2343,14 +2399,26 @@ export default function CycleParkingMap({
       }
 
       const zoom = Math.max(map.getZoom(), 16);
+      const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
       isAutomaticFocusAnimationRef.current = true;
       map.flyTo({
-        center: getMapPointFocusCenter(
-          map,
-          parkingPointToRoutePoint(selectedPoint),
-          zoom,
-          mobileSheetState,
-        ),
+        center:
+          window.matchMedia('(max-width: 820px)').matches &&
+          mobileSheetState === 'expanded' &&
+          popup
+            ? getPopupFocusCenter(
+                map,
+                parkingPointToRoutePoint(selectedPoint),
+                popup,
+                zoom,
+                mobileSheetState,
+              )
+            : getMapPointFocusCenter(
+                map,
+                parkingPointToRoutePoint(selectedPoint),
+                zoom,
+                mobileSheetState,
+              ),
         duration: 700,
         zoom,
       });

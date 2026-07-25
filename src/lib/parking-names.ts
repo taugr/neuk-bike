@@ -1,4 +1,4 @@
-import type { ParkingPoint } from '@/lib/types';
+import { isCyclingPoiPoint, type ParkingPoint } from '@/lib/types';
 import type { AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
 
@@ -21,6 +21,17 @@ export function formatParkingDisplayName(
   locale: AppLocale = 'en',
 ) {
   const displayName = getParkingDisplayName(point);
+  if (isCyclingPoiPoint(point)) {
+    const genericCyclingPoiKey = {
+      'Bicycle repair station': 'categoryRepairPlace',
+      'Bicycle shop': 'categoryShop',
+      'Cycle hire': 'categoryHirePlace',
+    } as const;
+    const messageKey =
+      genericCyclingPoiKey[displayName as keyof typeof genericCyclingPoiKey];
+    return messageKey ? translate(locale, messageKey) : displayName;
+  }
+
   if (displayName !== point.name || locale === 'en') {
     return displayName;
   }

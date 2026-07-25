@@ -3,10 +3,11 @@
 ## Project Shape
 
 - This is a static, backend-free Next.js app for finding cycle parking across
-  the UK and Ireland.
+  the UK, Ireland, Spain, and Armenia.
 - The generated release combines City of Edinburgh Council data with
   OpenStreetMap coverage from Geofabrik extracts for Scotland, Wales, Ireland
-  and Northern Ireland, plus sequential England county extracts.
+  and Northern Ireland, Armenia, plus sequential England county and Spain
+  regional extracts.
 - Runtime parking data is loaded from versioned zoom-12 chunks under
   `public/data/parking/`; there is no database or server API.
 - `src/data/cycle-parking.json` is the generated council snapshot, while

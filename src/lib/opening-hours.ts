@@ -31,6 +31,15 @@ const weekdayLabels: Record<AppLocale, Record<OsmWeekday, string>> = {
     Sa: 'DiS',
     Su: 'DiD',
   },
+  hy: {
+    Mo: 'Երկ',
+    Tu: 'Երք',
+    We: 'Չրք',
+    Th: 'Հնգ',
+    Fr: 'Ուրբ',
+    Sa: 'Շբթ',
+    Su: 'Կիր',
+  },
 };
 
 /**

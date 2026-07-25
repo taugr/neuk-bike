@@ -10,21 +10,21 @@
     <img src="https://img.shields.io/badge/license-MIT-blue" alt="license" />
   </a>
   <br />
-  Static, mobile-friendly map for finding nearby cycle parking across the UK, Ireland and Spain.
+  Static, mobile-friendly map for finding nearby cycle parking across the UK, Ireland, Spain and Armenia.
 </p>
 
 ## Features
 
-- Find nearby cycle parking from your current location in the UK, Ireland or
-  Spain
-- Search from a UK, Irish or Spanish street, postcode, town, or place
+- Find nearby cycle parking from your current location in the UK, Ireland,
+  Spain, or Armenia
+- Search from a UK, Irish, Spanish, or Armenian street, postcode, town, or place
 - Browse a map-first interface without an app account or backend
 - Show cycle directions to a selected parking place with CycleStreets
 - See capacity, access, cover, and stand type when mapped
 - Share parking places with source-qualified `?parking=` links
 - Install the app as a Progressive Web App
 - Reuse previously visited parking chunks offline
-- Use the interface in English, Scottish Gaelic, or Spanish
+- Use the interface in English, Scottish Gaelic, Spanish, or Armenian
 
 ## Live app
 
@@ -52,8 +52,8 @@ The generated parking release combines two free sources:
 - City of Edinburgh Council public cycle-parking GeoJSON, preferred within
   Edinburgh
 - OpenStreetMap `amenity=bicycle_parking` features from sequential Geofabrik
-  extracts for the UK, Ireland and Spain, including a separate Canary Islands
-  extract
+  extracts for the UK, Ireland, Spain, and Armenia, including a separate Canary
+  Islands extract
 
 The refresh script normalizes both sources, suppresses likely Edinburgh
 duplicates in favour of council records, and writes source-qualified IDs such
@@ -71,12 +71,12 @@ src/data/cycle-parking-report.json
 The browser first loads the manifest and a 3×3 neighbourhood of zoom-12 chunks
 around the current location. Map movement loads additional bounded chunks. A
 24-chunk in-memory LRU cache prevents unbounded growth. The point index is only
-loaded when a `?parking=` deep link needs it. The full UK-Ireland-Spain
+loaded when a `?parking=` deep link needs it. The full UK-Ireland-Spain-Armenia
 dataset is not included in the JavaScript bundle.
 
 If geolocation is unavailable or the requested location is outside the UK,
-Ireland and Spain, the app falls back to central Edinburgh and explains what
-happened.
+Ireland, Spain, and Armenia, the app falls back to central Edinburgh and
+explains what happened.
 Place search uses Photon and OpenStreetMap data. After three characters it
 loads suggestions automatically, while Enter and the desktop Search button
 remain available as explicit fallbacks. Results are filtered through the same
@@ -88,6 +88,10 @@ Directions use the CycleStreets v2 API from the browser. Add a public API key to
 ```bash
 NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 ```
+
+Armenia routing was verified with a live Yerevan journey that returned route
+geometry and Armenian street instructions. The app keeps its existing external
+Google Maps action as an alternative.
 
 Street View previews are optional. Add a restricted public browser key:
 
@@ -104,15 +108,16 @@ Analytics are disabled on local and loopback hosts by default.
 ## Language setting
 
 Open the settings menu to switch between English, Scottish Gaelic
-(`Gàidhlig`), and Spanish (`Español`). The choice is stored only in the
-browser and is reused on the next visit. On a first visit the app uses the
-first supported browser language, then falls back to English.
+(`Gàidhlig`), Spanish (`Español`), and Armenian (`Հայերեն`). The choice is
+stored only in the browser and is reused on the next visit. On a first visit
+the app uses the first supported browser language, then falls back to English.
 
 The translated interface, parking-name templates, route instructions, and
 number formatting are bundled into the static app. Street and place names,
 brand names, source attribution, and licence text stay unchanged. Place search
-uses English results for the English interface and local place names for Gaelic
-and Spanish, matching the languages supported by the public Photon service.
+uses English results for the English interface and local place names for
+Gaelic, Spanish, and Armenian. Armenian uses Photon's local-name response
+because Photon does not accept `hy` as a response-language value.
 
 ## Commands
 
@@ -124,7 +129,7 @@ pnpm format
 pnpm build         # writes the static site to out/
 pnpm deploy:cloudflare # builds and deploys out/ to Cloudflare Pages
 pnpm update:data   # refreshes council + OSM data and generated chunks
-pnpm update:pois   # refreshes UK-Ireland-Spain cycling places
+pnpm update:pois   # refreshes UK-Ireland-Spain-Armenia cycling places
 pnpm verify:pois   # verifies POI chunks, hashes, IDs, counts, and coverage
 ```
 
@@ -139,31 +144,33 @@ pnpm exec playwright install chromium
 The category-chip release keeps bicycle shops, repair facilities, and hire
 locations in a separate lazy-loaded release under
 `public/data/cycling-pois/`. Run `pnpm update:pois` to rebuild the full UK,
-Ireland, and Spain coverage from the same cached Geofabrik extracts used by
-parking. Inputs are processed sequentially, overlapping regional OSM IDs are
-deduplicated, and the generated report records per-input checksums, counts,
-source timestamps, resource usage, and static-asset budgets. Parking remains
-the default and continues to use the independent release described below.
+Ireland, Spain, and Armenia coverage from the same cached Geofabrik extracts
+used by parking. Inputs are processed sequentially, overlapping regional OSM
+IDs are deduplicated, and the generated report records per-input checksums,
+counts, source timestamps, resource usage, and static-asset budgets. Parking
+remains the default and continues to use the independent release described
+below.
 
-The current cycling-place release contains 13,176 unique OpenStreetMap places
-in 2,474 chunks: 4,087 shops, 2,577 repair locations, and 8,006 hire
-locations. Its 2,476 generated files occupy about 3.6 MiB; the largest possible
-initial 3×3 chunk payload is about 36 KiB compressed. The category totals
+The current cycling-place release contains 13,212 unique OpenStreetMap places
+in 2,486 chunks: 4,115 shops, 2,590 repair locations, and 8,013 hire
+locations. Its 2,488 generated files occupy about 3.9 MiB; the largest possible
+initial 3×3 chunk payload is about 38 KiB compressed. The category totals
 overlap because one place can explicitly support more than one service.
 
 `pnpm update:data` performs the complete release pipeline:
 
 1. fetch the current City of Edinburgh Council public GeoJSON;
-2. download or reuse the Scotland, Wales, Ireland-and-Northern-Ireland, and
-   Canary Islands PBFs plus 47 England county and 18 Spain regional PBFs from
-   Geofabrik;
+2. download or reuse the Scotland, Wales, Ireland-and-Northern-Ireland, Canary
+   Islands, and Armenia PBFs plus 47 England county and 18 Spain regional PBFs
+   from Geofabrik;
 3. process each region sequentially so contextual naming stays memory-bounded;
 4. extract bicycle-parking nodes, ways, and relations;
 5. normalize fields, representative geometry, and descriptive names;
 6. deduplicate overlapping county extracts by source-qualified OSM ID;
 7. merge likely Edinburgh duplicates with deterministic council priority;
-8. download or reuse the England, Scotland, Wales, Ireland-and-Northern-Ireland,
-   Spain, and Canary Islands Geofabrik coverage polygons;
+8. download or reuse the England, Scotland, Wales,
+   Ireland-and-Northern-Ireland, Spain, Canary Islands, and Armenia Geofabrik
+   coverage polygons;
 9. replace `public/data/parking/` with a schema-v2 manifest,
    content-addressed chunks, and point index;
 10. enforce file, asset, initial-payload, and total-data hard budgets;
@@ -178,11 +185,11 @@ field completeness, naming-tier counts and samples, discarded features,
 cross-region duplicate IDs, council/OSM matches, peak memory, and output-size
 budgets.
 
-The current generated release contains 87,611 merged parking points in 4,342
-chunks. It includes 1,454 council points and 87,555 unique OSM records, with 216
+The current generated release contains 87,667 merged parking points in 4,349
+chunks. It includes 1,454 council points and 87,611 unique OSM records, with 216
 cross-region OSM duplicates removed and 1,398 likely Edinburgh duplicates
 suppressed in favour of council records. The parking release is about 26.7 MiB;
-the largest possible initial 3×3 payload is about 491 KiB compressed. Treat
+the largest possible initial 3×3 payload is about 483 KiB compressed. Treat
 these as a snapshot: `public/data/parking/manifest.json` and
 `src/data/cycle-parking-report.json` are the source of truth after a refresh.
 
@@ -199,13 +206,14 @@ Sources:
 - [Geofabrik Ireland and Northern Ireland extract](https://download.geofabrik.de/europe/ireland-and-northern-ireland.html)
 - [Geofabrik Spain regional extracts](https://download.geofabrik.de/europe/spain.html)
 - [Geofabrik Canary Islands extract](https://download.geofabrik.de/africa/canary-islands.html)
+- [Geofabrik Armenia extract](https://download.geofabrik.de/asia/armenia.html)
 
 ## Offline behaviour
 
 The service worker caches the app shell. The manifest uses network-first
 caching, while immutable versioned parking chunks and the point index use
 cache-first behaviour. Previously visited areas can therefore remain useful
-offline, but the app does not promise UK-Ireland-Spain-wide offline
+offline, but the app does not promise UK-Ireland-Spain-Armenia-wide offline
 coverage.
 
 Live place search, CycleStreets directions, uncached map tiles, and uncached
@@ -232,6 +240,8 @@ On localhost or a loopback host, add mock GPS parameters for browser testing:
 /?parking=cec%3A1&mockGps=unavailable
 /?mockGps=40.4168,-3.7038,5
 /?mockGps=28.1235,-15.4363,5
+/?mockGps=40.1777,44.5126,5
+/?mockGps=40.7869,43.8382,5
 /?mockGps=null-island
 ```
 

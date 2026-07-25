@@ -21,6 +21,9 @@ describe('formatOpeningHours', () => {
     expect(formatOpeningHours('Mo-Fr 09:00-17:00', 'es')).toBe(
       'lun–vie 09:00–17:00',
     );
+    expect(formatOpeningHours('Mo-Fr 09:00-17:00', 'hy')).toBe(
+      'Երկ–Ուրբ 09:00–17:00',
+    );
   });
 
   it('keeps always-open and unfamiliar syntax intact', () => {

@@ -125,6 +125,8 @@ describe('geo utilities', () => {
   it('formats metres and kilometres', () => {
     expect(formatDistance(42.4)).toBe('42 m');
     expect(formatDistance(1_250)).toBe('1.3 km');
+    expect(formatDistance(42.4, 'hy')).toBe('42 մ');
+    expect(formatDistance(1_250, 'hy')).toBe('1,3 կմ');
   });
 
   it('formats parking details with not-listed values', () => {
@@ -338,6 +340,23 @@ describe('geo utilities', () => {
       tone: 'neutral',
       value: 'Artistic',
     });
+  });
+
+  it('localizes the bollard parking type', () => {
+    const point = parkingPoint({ bicycle_pa: 'bollard' });
+
+    expect(getParkingPopupDetails(point, 'en').details[0].value).toBe(
+      'Bollard',
+    );
+    expect(getParkingPopupDetails(point, 'gd').details[0].value).toBe(
+      'Post-bacaidh',
+    );
+    expect(getParkingPopupDetails(point, 'es').details[0].value).toBe(
+      'Bolardo',
+    );
+    expect(getParkingPopupDetails(point, 'hy').details[0].value).toBe(
+      'Արգելասյուն',
+    );
   });
 
   it('groups popup cover and access details', () => {

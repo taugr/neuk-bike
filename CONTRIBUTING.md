@@ -54,10 +54,10 @@ manual fallback and requires an authenticated Wrangler session.
 
 `pnpm update:data` downloads the current council feed and downloads or reuses
 the Geofabrik Scotland, Wales, Ireland-and-Northern-Ireland, and Canary Islands
-PBFs, 47 England county PBFs, 18 Spain regional PBFs, and six coverage polygons.
-The cached inputs currently require about 3.9 GB. Inputs are processed
-sequentially to keep contextual naming memory bounded. The command replaces the
-generated council snapshot, quality report, schema-v2 manifest,
+PBFs, the Armenia PBF, 47 England county PBFs, 18 Spain regional PBFs, and seven
+coverage polygons. The cached inputs currently require about 4 GB. Inputs are
+processed sequentially to keep contextual naming memory bounded. The command
+replaces the generated council snapshot, quality report, schema-v2 manifest,
 content-addressed chunks, and point index.
 
 Do not hand-edit files under `public/data/parking/` or generated JSON under
@@ -65,8 +65,9 @@ Do not hand-edit files under `public/data/parking/` or generated JSON under
 tests, rerun the refresh, and review record counts, completeness, discarded
 features, per-input source timestamps and checksums, cross-region and council
 duplicate matches, naming-tier counts and samples, peak memory, asset budgets,
-and representative UK, Ireland, mainland Spain, Balearic, and Canary locations
-before committing.
+and representative UK, Ireland, mainland Spain, Balearic, Canary, Yerevan, and
+Gyumri locations before committing. Also review Armenian-script names and the
+region-aware directions state.
 
 ## Testing
 

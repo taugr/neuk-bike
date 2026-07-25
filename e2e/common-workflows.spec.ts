@@ -12,6 +12,16 @@ const madridParking = {
   longitude: -3.703248,
 };
 
+const yerevanParking = {
+  id: 'osm:node:4338270190',
+  latitude: 40.1881056,
+  longitude: 44.5167068,
+};
+
+const yerevanSearchParking = {
+  id: 'osm:node:13235966141',
+};
+
 function parkingOneReferenceUrl(extraParams: Record<string, string> = {}) {
   const params = new URLSearchParams({
     lat: String(parkingOne.latitude),
@@ -259,6 +269,74 @@ test('switches and persists the interface language without moving the map', asyn
   await expect(
     page.getByRole('heading', { name: /Bike neuks faisg ort/ }),
   ).toBeVisible();
+
+  await page.locator('.settings-menu--desktop .settings-trigger').click();
+  await page
+    .locator('.settings-menu--desktop .language-select')
+    .selectOption('hy');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'hy');
+  await expect(page.locator('#place-search-desktop')).toHaveAttribute(
+    'placeholder',
+    'Վայր կամ փոստային ինդեքս',
+  );
+  await expect(
+    page.getByRole('heading', { name: /Մոտակա bike neuk-երը/ }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Փոքրացնել' })).toBeVisible();
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'hy');
+});
+
+test('selects Armenian from the browser language', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'languages', {
+      configurable: true,
+      value: ['hy-AM', 'en-GB'],
+    });
+  });
+  await page.goto('/?mockGps=40.1777,44.5126,5');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'hy');
+  await expect(page.locator('#place-search-desktop')).toHaveAttribute(
+    'placeholder',
+    'Վայր կամ փոստային ինդեքս',
+  );
+});
+
+test('uses an Armenian category grid instead of desktop scrolling', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'languages', {
+      configurable: true,
+      value: ['hy-AM', 'en-GB'],
+    });
+  });
+  await page.goto('/?mockGps=40.1777,44.5126,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await expect(page.locator('.parking-list-item')).not.toHaveCount(0);
+
+  const categoryMetrics = await page
+    .getByTestId('category-chips')
+    .evaluate((container) => {
+      const chips = [...container.querySelectorAll<HTMLElement>('button')];
+      return {
+        containerWidth: container.clientWidth,
+        overflow: container.dataset.overflow,
+        overflowX: getComputedStyle(container).overflowX,
+        scrollWidth: container.scrollWidth,
+        chips: chips.map((chip) => ({
+          clientWidth: chip.clientWidth,
+          left: Math.round(chip.getBoundingClientRect().left),
+          top: Math.round(chip.getBoundingClientRect().top),
+        })),
+      };
+    });
+
+  expect(categoryMetrics.overflow).toBe('true');
+  expect(categoryMetrics.overflowX).toBe('hidden');
+  expect(categoryMetrics.scrollWidth).toBe(categoryMetrics.containerWidth);
+  expect(new Set(categoryMetrics.chips.map((chip) => chip.left)).size).toBe(2);
+  expect(new Set(categoryMetrics.chips.map((chip) => chip.top)).size).toBe(2);
 });
 
 test('keeps manual zoom after background parking chunks load', async ({
@@ -449,6 +527,46 @@ test('searches for a Spanish place and loads Madrid parking', async ({
   ).toBeVisible();
 });
 
+test('searches for an Armenian place and loads Yerevan parking', async ({
+  page,
+}) => {
+  await page.route('https://photon.komoot.io/api/**', async (route) => {
+    const url = new URL(route.request().url());
+    expect(url.searchParams.getAll('countrycode')).toContain('AM');
+    expect(url.searchParams.get('lang')).toBe('en');
+    await route.fulfill({
+      contentType: 'application/json',
+      json: {
+        features: [
+          {
+            geometry: { coordinates: [44.5126, 40.1777] },
+            properties: {
+              country: 'Հայաստան',
+              name: 'Երևան',
+              osm_id: 364_087,
+              osm_type: 'R',
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  await page.goto('/?mockGps=55.94155,-3.29625,5');
+  await expectFinderReady(page);
+
+  const finderPanel = page.getByRole('complementary', {
+    name: 'Nearest cycle parking',
+  });
+  await finderPanel.getByRole('searchbox').fill('Երևան');
+  await page.getByRole('option', { name: /Երևան, Հայաստան/ }).click();
+
+  await expectMapFocusedAt(page, 40.1777, 44.5126);
+  await expect(
+    page.getByTestId(`parking-row-${yerevanSearchParking.id}`),
+  ).toBeVisible();
+});
+
 test('opens short local directions to Spanish parking', async ({ page }) => {
   const params = new URLSearchParams({
     lat: String(madridParking.latitude),
@@ -564,6 +682,18 @@ for (const [place, mockGps] of [
 }
 
 for (const [place, mockGps] of [
+  ['Yerevan', '40.1777,44.5126,5'],
+  ['Gyumri', '40.7869,43.8382,5'],
+] as const) {
+  test(`loads mapped cycle parking near ${place}`, async ({ page }) => {
+    await page.goto(`/?mockGps=${mockGps}`);
+    await expectFinderReady(page);
+    const [latitude, longitude] = mockGps.split(',').map(Number);
+    await expectMapFocusedAt(page, latitude, longitude);
+  });
+}
+
+for (const [place, mockGps] of [
   ['Madrid', '40.4168,-3.7038,5'],
   ['Barcelona', '41.3874,2.1686,5'],
   ['Palma', '39.5696,2.6502,5'],
@@ -657,6 +787,7 @@ for (const [place, mockGps, category, pointId, pointName] of [
     'osm:node:11048294943',
     'Sitycleta Paseo de Chil - Av. Escaleritas',
   ],
+  ['Yerevan', '40.2142,44.4906,5', 'shop', 'osm:node:4201765290', 'ՄայԲայք'],
 ] as const) {
   test(`loads nearby cycling places in ${place}`, async ({ page }) => {
     await page.goto(`/?mockGps=${mockGps}`);
@@ -682,6 +813,25 @@ for (const [place, mockGps, category, pointId, pointName] of [
   });
 }
 
+test('opens short local directions to Armenian parking', async ({ page }) => {
+  const params = new URLSearchParams({
+    lat: String(yerevanParking.latitude),
+    lng: String(yerevanParking.longitude),
+    parking: yerevanParking.id,
+  });
+  await page.goto(`/?${params.toString()}`);
+  await expectFinderReady(page);
+
+  const parkingRow = page.getByTestId(`parking-row-${yerevanParking.id}`);
+  await expect(parkingRow).toBeVisible();
+  await page.getByTestId(`parking-directions-${yerevanParking.id}`).click();
+  await expect(
+    page.getByRole('region', { name: 'Cycle directions' }),
+  ).toBeVisible();
+  await expect(page.getByLabel('Route summary')).toBeVisible();
+  await expect(page.getByTestId('directions-list')).toBeVisible();
+});
+
 for (const mockGps of ['denied', 'unavailable'] as const) {
   test(`falls back to Edinburgh when location is ${mockGps}`, async ({
     page,
@@ -699,7 +849,7 @@ test('explains the dataset boundary for an outside location', async ({
   await expectFinderReady(page);
   await expect(
     page.getByText(
-      'That location is outside the UK, Ireland and Spain, showing bike parking near Edinburgh.',
+      'That location is outside the UK, Ireland, Spain and Armenia, showing bike parking near Edinburgh.',
     ),
   ).toBeVisible();
   await expect(page.getByTestId('parking-row-cec:178')).toBeVisible();

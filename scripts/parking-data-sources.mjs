@@ -1,10 +1,11 @@
 const geofabrikRoot = 'https://download.geofabrik.de';
 const geofabrikAfricaRoot = `${geofabrikRoot}/africa`;
+const geofabrikAsiaRoot = `${geofabrikRoot}/asia`;
 const geofabrikEuropeRoot = `${geofabrikRoot}/europe`;
 const geofabrikSpainRoot = `${geofabrikEuropeRoot}/spain`;
 const geofabrikUkRoot = `${geofabrikEuropeRoot}/united-kingdom`;
 
-export const coverageLabel = 'UK, Ireland and Spain';
+export const coverageLabel = 'UK, Ireland, Spain and Armenia';
 
 const englandRegions = [
   ['bedfordshire', 'Bedfordshire'],
@@ -114,6 +115,12 @@ export const osmInputs = [
     label: 'Canary Islands',
     url: `${geofabrikAfricaRoot}/canary-islands-latest.osm.pbf`,
   },
+  {
+    countryId: 'armenia',
+    id: 'armenia',
+    label: 'Armenia',
+    url: `${geofabrikAsiaRoot}/armenia-latest.osm.pbf`,
+  },
 ];
 
 export const coverageInputs = [
@@ -146,6 +153,11 @@ export const coverageInputs = [
     id: 'canary-islands',
     label: 'Canary Islands',
     url: `${geofabrikAfricaRoot}/canary-islands.poly`,
+  },
+  {
+    id: 'armenia',
+    label: 'Armenia',
+    url: `${geofabrikAsiaRoot}/armenia.poly`,
   },
 ];
 

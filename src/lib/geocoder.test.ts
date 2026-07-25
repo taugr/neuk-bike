@@ -6,11 +6,16 @@ import {
 } from '@/lib/geocoder';
 
 describe('place search', () => {
-  it('bounds Photon requests to the UK, Ireland and Spain', () => {
+  it('bounds Photon requests to the UK, Ireland, Spain and Armenia', () => {
     const url = new URL(buildPlaceSearchUrl('Madrid'));
 
     expect(url.searchParams.get('bbox')).toBe(PARKING_COVERAGE_BBOX);
-    expect(url.searchParams.getAll('countrycode')).toEqual(['GB', 'IE', 'ES']);
+    expect(url.searchParams.getAll('countrycode')).toEqual([
+      'GB',
+      'IE',
+      'ES',
+      'AM',
+    ]);
     expect(url.searchParams.get('q')).toBe('Madrid');
     expect(url.searchParams.get('lang')).toBe('en');
     expect(url.searchParams.get('limit')).toBe('5');
@@ -29,6 +34,9 @@ describe('place search', () => {
     expect(url.searchParams.get('lon')).toBe('-3.1883');
     expect(
       new URL(buildPlaceSearchUrl('Madrid', 'es')).searchParams.get('lang'),
+    ).toBe('default');
+    expect(
+      new URL(buildPlaceSearchUrl('Երևան', 'hy')).searchParams.get('lang'),
     ).toBe('default');
   });
 

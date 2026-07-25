@@ -3,7 +3,7 @@ import {
   formatParkingDisplayName,
   getParkingDisplayName,
 } from '@/lib/parking-names';
-import type { ParkingPoint } from '@/lib/types';
+import type { CyclingPoiPoint, ParkingPoint } from '@/lib/types';
 
 function parkingPoint(id: string, name: string): ParkingPoint {
   return {
@@ -52,6 +52,9 @@ describe('formatParkingDisplayName', () => {
     expect(formatParkingDisplayName(point, 'gd')).toBe(
       'Calle de Alcalá faisg air Gran Vía',
     );
+    expect(formatParkingDisplayName(point, 'hy')).toBe(
+      'Gran Vía-ի մոտ գտնվող Calle de Alcalá',
+    );
   });
 
   it('localizes generated suffixes and generic names', () => {
@@ -64,6 +67,28 @@ describe('formatParkingDisplayName', () => {
     const generic = parkingPoint('osm:3', 'Cycle parking 3');
     generic.properties.nameSource = 'generic';
     expect(formatParkingDisplayName(generic, 'es')).toBe('Aparcabicis');
+    expect(formatParkingDisplayName(generic, 'hy')).toBe(
+      'Հեծանիվների կայանատեղի',
+    );
+  });
+
+  it('localizes generated cycling-place fallback names', () => {
+    const shop = {
+      ...parkingPoint('osm:5', 'Bicycle shop'),
+      categories: ['shop'],
+    } satisfies CyclingPoiPoint;
+    const repair = {
+      ...parkingPoint('osm:6', 'Bicycle repair station'),
+      categories: ['repair'],
+    } satisfies CyclingPoiPoint;
+    const hire = {
+      ...parkingPoint('osm:7', 'Cycle hire'),
+      categories: ['hire'],
+    } satisfies CyclingPoiPoint;
+
+    expect(formatParkingDisplayName(shop, 'hy')).toBe('Հեծանիվների խանութ');
+    expect(formatParkingDisplayName(repair, 'hy')).toBe('Վերանորոգում');
+    expect(formatParkingDisplayName(hire, 'hy')).toBe('Հեծանիվների վարձույթ');
   });
 
   it('never rewrites a source-authored or curated name', () => {

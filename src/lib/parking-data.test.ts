@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   getParkingDataBaseUrl,
+  getParkingCoverageAreaId,
   getParkingTileKeysAroundLocation,
   getParkingTileKeysForBounds,
   isLocationInParkingCoverage,
@@ -143,8 +144,24 @@ const manifest: ParkingDataManifest = {
           },
         ],
       },
+      {
+        bounds: { east: 46.7, north: 41.4, south: 38.8, west: 43.4 },
+        id: 'armenia',
+        label: 'Armenia',
+        rings: [
+          {
+            coordinates: [
+              [43.4, 38.8],
+              [46.7, 38.8],
+              [46.7, 41.4],
+              [43.4, 41.4],
+            ],
+            exclude: false,
+          },
+        ],
+      },
     ],
-    label: 'UK, Ireland and Spain',
+    label: 'UK, Ireland, Spain and Armenia',
   },
   pointIndexPath: 'version/point-index.json',
   recordCount: 2,
@@ -207,6 +224,18 @@ describe('parking data tiling', () => {
         manifest,
       ),
     ).toBe(true);
+    expect(
+      isLocationInParkingCoverage(
+        { latitude: 40.1777, longitude: 44.5126 },
+        manifest,
+      ),
+    ).toBe(true);
+    expect(
+      getParkingCoverageAreaId(
+        { latitude: 40.1777, longitude: 44.5126 },
+        manifest,
+      ),
+    ).toBe('armenia');
     expect(
       isLocationInParkingCoverage(
         { latitude: 38.7223, longitude: -9.1393 },

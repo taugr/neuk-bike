@@ -207,6 +207,7 @@ function formatStandType(
 
 const translatedTypeKeys = {
   anchors: 'typeAnchors',
+  bollard: 'typeBollard',
   building: 'typeBuilding',
   customers: 'accessCustomers',
   destination: 'accessDestination',

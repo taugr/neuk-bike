@@ -342,7 +342,11 @@ describe('CycleStreets utilities', () => {
     expect(describeCycleRouteInstruction(instruction, 'gd')).toBe(
       'Tionndaidh gu clì gu Calle de Alcalá',
     );
+    expect(describeCycleRouteInstruction(instruction, 'hy')).toBe(
+      'Թեքվեք ձախ դեպի Calle de Alcalá',
+    );
     expect(formatCycleRouteDuration(811, 'gd')).toBe('14 mion');
+    expect(formatCycleRouteDuration(811, 'hy')).toBe('14 րոպե');
   });
 
   it('builds local short routes for nearby parking', () => {

@@ -1,4 +1,4 @@
-export const supportedLocales = ['en', 'gd', 'es'] as const;
+export const supportedLocales = ['en', 'gd', 'es', 'hy'] as const;
 
 export type AppLocale = (typeof supportedLocales)[number];
 
@@ -27,6 +27,11 @@ export const localeDetails: Record<
     formattingLocale: 'es-ES',
     placeSearchLanguage: 'default',
     selfName: 'Español',
+  },
+  hy: {
+    formattingLocale: 'hy-AM',
+    placeSearchLanguage: 'default',
+    selfName: 'Հայերեն',
   },
 };
 

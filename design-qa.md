@@ -322,6 +322,72 @@ final result: blocked
 
 final result: passed
 
+---
+
+# Armenia localization and coverage QA
+
+## Review setup
+
+- Desktop screenshot:
+  `/Users/tomauger/projects/neuk-bike/playwright-videos/armenia-yerevan-desktop-hy.png`
+- Mobile light screenshot:
+  `/Users/tomauger/projects/neuk-bike/playwright-videos/armenia-yerevan-mobile-390x844-hy.png`
+- Mobile dark screenshot:
+  `/Users/tomauger/projects/neuk-bike/playwright-videos/armenia-yerevan-mobile-360x844-dark-hy.png`
+- Viewports: 1440 × 900, 390 × 844, 375 × 844, and 360 × 844 CSS
+  pixels.
+- Browser: Codex in-app Chromium against the production static export.
+- State: Yerevan mock GPS, Armenian interface, parking and cycling-shop
+  categories, light and dark themes.
+
+## Data and language evidence
+
+- Yerevan loaded Armenian parking from the generated Armenia chunks without an
+  Edinburgh fallback.
+- `<html lang="hy">`, Armenian search copy, coverage copy, category labels,
+  parking details, weekday abbreviations, map controls, and accessible names
+  were present.
+- Source-authored Armenian, Latin, and brand names remained unchanged.
+  Generated parking connectors and generic cycling-place names localized into
+  Armenian.
+- Light OpenFreeMap and dark CARTO styles both rendered Yerevan labels. No
+  Unicode replacement glyphs were present in either theme.
+
+## Responsive and interaction evidence
+
+- The document remained free of horizontal overflow at all four reviewed
+  widths.
+- After user review, the four category filters use one shared two-column grid
+  on desktop and mobile instead of locale-specific flex and scrolling rules.
+  The live export measured four equal 203-pixel buttons in the 419-pixel
+  desktop panel, 172-pixel buttons at 390 pixels, and 157-pixel buttons at
+  360 pixels, with no row or document overflow.
+- The Armenian nearby heading wraps without internal overflow. Parking cards
+  preserve their rank, name, distance, capacity, type, and cover hierarchy.
+- Armenian opening hours use localized weekday abbreviations, including
+  `Երկ–Կիր`.
+- The OSM `bollard` parking type renders as Armenian `Արգելասյուն`; the English
+  fallback is absent from the Armenian view.
+- A live CycleStreets request for a Yerevan journey returned a valid
+  1,612-metre route with 72 geometry points and Armenian street instructions,
+  so the existing directions action remains available.
+
+## Comparison history
+
+- Pass 1 found overlapping Armenian category labels at 390 pixels and English
+  fallback names for unnamed cycling places.
+- Pass 2 made Armenian chips content-sized within the existing horizontal
+  scroller and localized the three generated cycling-place fallback names.
+- Pass 3 followed user review: the content-sized scroller was replaced by an
+  equal-width two-column grid at every viewport, and `bollard` was added to the
+  translated parking-type vocabulary.
+- Focused browser regressions cover desktop/mobile grid geometry, row and page
+  overflow, Armenian `bollard`, and localized Yerevan shop fallbacks.
+
+No actionable P0, P1, or P2 findings remain.
+
+final result: passed
+
 ## Cycling-place opening-hours metadata QA
 
 ### Comparison setup

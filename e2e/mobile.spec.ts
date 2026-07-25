@@ -63,6 +63,126 @@ test('changes language from the mobile menu and keeps the choice', async ({
   );
 });
 
+test('keeps short category translations fitted and scrolls Armenian at 390 pixels', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=40.1777,44.5126,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  const languageSelect = page.locator(
+    '.settings-menu--mobile .language-select',
+  );
+  const categoryChips = page.getByTestId('category-chips');
+  const getCategoryMetrics = () =>
+    categoryChips.evaluate((container) => {
+      const chips = [...container.querySelectorAll<HTMLElement>('button')];
+      return {
+        containerWidth: container.clientWidth,
+        overflow: container.dataset.overflow,
+        overflowX: getComputedStyle(container).overflowX,
+        overflowY: getComputedStyle(container).overflowY,
+        pageWidth: document.documentElement.scrollWidth,
+        scrollLeft: container.scrollLeft,
+        scrollTop: container.scrollTop,
+        scrollWidth: container.scrollWidth,
+        touchAction: getComputedStyle(container).touchAction,
+        viewportWidth: window.innerWidth,
+        chips: chips.map((chip) => ({
+          clientWidth: chip.clientWidth,
+          left: Math.round(chip.getBoundingClientRect().left),
+          top: Math.round(chip.getBoundingClientRect().top),
+          scrollWidth: chip.scrollWidth,
+        })),
+      };
+    });
+
+  const expectFittedCategoryRow = async () => {
+    const fittedMetrics = await getCategoryMetrics();
+    expect(fittedMetrics.overflow).toBe('false');
+    expect(fittedMetrics.overflowX).toBe('hidden');
+    expect(fittedMetrics.scrollWidth).toBe(fittedMetrics.containerWidth);
+    expect(new Set(fittedMetrics.chips.map((chip) => chip.top)).size).toBe(1);
+    expect(
+      fittedMetrics.chips.every((chip) => chip.scrollWidth <= chip.clientWidth),
+    ).toBe(true);
+    await categoryChips.evaluate((container) =>
+      container.scrollTo({ left: 40, top: 40 }),
+    );
+    const fixedMetrics = await getCategoryMetrics();
+    expect(fixedMetrics.scrollLeft).toBe(0);
+    expect(fixedMetrics.scrollTop).toBe(0);
+  };
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expectFittedCategoryRow();
+
+  for (const locale of ['es', 'gd']) {
+    await page.locator('.settings-menu--mobile .settings-trigger').click();
+    await languageSelect.selectOption(locale);
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expectFittedCategoryRow();
+  }
+
+  await page.locator('.settings-menu--mobile .settings-trigger').click();
+  await languageSelect.selectOption('hy');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'hy');
+  await expect(page.getByText('Արգելասյուն', { exact: true })).toBeVisible();
+  await expect(page.getByText('Bollard', { exact: true })).toHaveCount(0);
+
+  await page.locator('.settings-menu--mobile .settings-trigger').click();
+  const themeOptions = page.locator('.settings-menu--mobile .theme-options');
+  await expect(themeOptions.getByText('Սարքի', { exact: true })).toBeVisible();
+  const themeMetrics = await themeOptions.evaluate((container) => ({
+    clientWidth: container.clientWidth,
+    scrollWidth: container.scrollWidth,
+    buttons: [...container.querySelectorAll<HTMLElement>('button')].map(
+      (button) => ({
+        clientWidth: button.clientWidth,
+        scrollWidth: button.scrollWidth,
+      }),
+    ),
+  }));
+  expect(themeMetrics.scrollWidth).toBe(themeMetrics.clientWidth);
+  expect(
+    themeMetrics.buttons.every(
+      (button) => button.scrollWidth <= button.clientWidth,
+    ),
+  ).toBe(true);
+  await page.locator('.settings-menu--mobile .settings-trigger').click();
+
+  const categoryMetrics = await getCategoryMetrics();
+
+  expect(categoryMetrics.overflow).toBe('true');
+  expect(categoryMetrics.overflowX).toBe('auto');
+  expect(categoryMetrics.overflowY).toBe('hidden');
+  expect(categoryMetrics.touchAction).toBe('pan-x');
+  expect(categoryMetrics.scrollWidth).toBeGreaterThan(
+    categoryMetrics.containerWidth,
+  );
+  expect(categoryMetrics.pageWidth).toBeLessThanOrEqual(
+    categoryMetrics.viewportWidth,
+  );
+  expect(
+    categoryMetrics.chips.every((chip) => chip.scrollWidth <= chip.clientWidth),
+  ).toBe(true);
+  expect(new Set(categoryMetrics.chips.map((chip) => chip.top)).size).toBe(1);
+
+  await categoryChips.evaluate((container) =>
+    container.scrollTo({ left: 60, top: 40 }),
+  );
+  const scrolledMetrics = await getCategoryMetrics();
+  expect(scrolledMetrics.scrollLeft).toBeGreaterThan(0);
+  expect(scrolledMetrics.scrollTop).toBe(0);
+
+  await page.getByTestId('category-chip-shop').click();
+  await expect(
+    page
+      .getByTestId('parking-list')
+      .getByText('Հեծանիվների խանութ', { exact: true }),
+  ).toHaveCount(2);
+});
+
 test('keeps the mobile directions panel usable', async ({ page }) => {
   const parkingId = 'cec:1';
   const latitude = 55.9406042783081;
@@ -917,6 +1037,183 @@ test('keeps the list open for comparison before opening details', async ({
   ).toBeVisible();
 });
 
+test('contains Armenian parking type and cover text inside pin popup cells', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=40.1777,44.5126,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  await page.locator('.settings-menu--mobile .settings-trigger').click();
+  await page
+    .locator('.settings-menu--mobile .language-select')
+    .selectOption('hy');
+
+  const parkingId = 'osm:node:13235966141';
+  await page.getByTestId(`parking-row-${parkingId}`).click();
+  const popup = page.getByTestId(`parking-popup-details-${parkingId}`);
+  await expect(popup).toBeVisible();
+  await expect(popup.getByText('Կանգնակ', { exact: true })).toBeVisible();
+  await expect(popup.getByText('Առանց ծածկի', { exact: true })).toBeVisible();
+
+  const popupDetails = popup.locator('.parking-popup-detail');
+  await expect(popupDetails).toHaveCount(3);
+  const metrics = await popupDetails.evaluateAll((details) =>
+    details.map((detail) => {
+      const value = detail.querySelector('.parking-popup-detail-value');
+      const detailBounds = detail.getBoundingClientRect();
+      const valueBounds = value?.getBoundingClientRect();
+      return {
+        detailLeft: detailBounds.left,
+        detailRight: detailBounds.right,
+        valueLeft: valueBounds?.left,
+        valueRight: valueBounds?.right,
+      };
+    }),
+  );
+
+  expect(
+    metrics.every(
+      ({ detailLeft, detailRight, valueLeft, valueRight }) =>
+        valueLeft !== undefined &&
+        valueRight !== undefined &&
+        valueLeft >= detailLeft &&
+        valueRight <= detailRight,
+    ),
+  ).toBe(true);
+});
+
+test('keeps the first TUMO Center pin popup inside the visible mobile map', async ({
+  page,
+}) => {
+  await page.route('https://photon.komoot.io/api/**', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      json: {
+        features: [
+          {
+            geometry: { coordinates: [44.449, 40.066] },
+            properties: {
+              city: 'Masis',
+              country: 'Հայաստան',
+              name: 'Tumo Masis',
+              osm_id: 1,
+              osm_type: 'N',
+            },
+          },
+          {
+            geometry: { coordinates: [44.4794, 40.1965] },
+            properties: {
+              city: 'Yerevan',
+              country: 'Հայաստան',
+              name: 'Tumo Center for Creative Technologies',
+              osm_id: 2,
+              osm_type: 'N',
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=40.1777,44.5126,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  const searchbox = page.locator('#place-search-mobile');
+  await searchbox.fill('tumo');
+  const searchResults = page.getByRole('option');
+  await expect(searchResults).toHaveCount(2);
+  await page
+    .getByRole('option', {
+      name: /Tumo Center for Creative Technologies/,
+    })
+    .click();
+
+  const parkingId = 'osm:node:5973776885';
+  await expect(page.getByTestId(`parking-row-${parkingId}`)).toBeVisible();
+  await page.evaluate(() => {
+    const map = document.querySelector<HTMLElement>('.bike-map');
+
+    if (!map) {
+      throw new Error('Map element not found');
+    }
+
+    const centers = new Set<string>();
+    const observer = new MutationObserver(() => {
+      const latitude = map.dataset.mapCenterLatitude;
+      const longitude = map.dataset.mapCenterLongitude;
+
+      if (latitude && longitude) {
+        centers.add(`${latitude},${longitude}`);
+      }
+    });
+    observer.observe(map, {
+      attributeFilter: [
+        'data-map-center-latitude',
+        'data-map-center-longitude',
+      ],
+      attributes: true,
+    });
+    Object.assign(window, {
+      __tumoCameraCenters: centers,
+      __tumoCameraObserver: observer,
+    });
+  });
+  await page.getByTestId(`parking-marker-${parkingId}`).click();
+  await expect(
+    page.getByRole('region', { name: 'Parking details' }),
+  ).toBeVisible();
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const map = document
+          .querySelector<HTMLElement>('[data-testid="parking-map"]')
+          ?.getBoundingClientRect();
+        const popup = document
+          .querySelector<HTMLElement>('.maplibregl-popup')
+          ?.getBoundingClientRect();
+        const sheet = document
+          .querySelector<HTMLElement>('.control-pane')
+          ?.getBoundingClientRect();
+        const toolbar = document
+          .querySelector<HTMLElement>('.mobile-map-toolbar')
+          ?.getBoundingClientRect();
+
+        if (!map || !popup || !sheet || !toolbar) {
+          return { inside: false };
+        }
+
+        const visibleTop = Math.max(map.top, toolbar.bottom + 12);
+        const visibleBottom = Math.min(map.bottom, sheet.top);
+
+        return {
+          inside:
+            popup.left >= map.left &&
+            popup.right <= map.right &&
+            popup.top >= visibleTop &&
+            popup.bottom <= visibleBottom,
+          popupBottom: Math.round(popup.bottom),
+          popupTop: Math.round(popup.top),
+          visibleBottom: Math.round(visibleBottom),
+          visibleTop: Math.round(visibleTop),
+        };
+      }),
+    )
+    .toMatchObject({ inside: true });
+
+  const cameraCenters = await page.evaluate(() => {
+    const testWindow = window as typeof window & {
+      __tumoCameraCenters?: Set<string>;
+      __tumoCameraObserver?: MutationObserver;
+    };
+    testWindow.__tumoCameraObserver?.disconnect();
+    return [...(testWindow.__tumoCameraCenters ?? [])];
+  });
+  expect(cameraCenters.length).toBeLessThanOrEqual(1);
+});
+
 test('returns directions to the mobile view that launched them', async ({
   page,
 }) => {
@@ -1090,4 +1387,18 @@ test('shows a compact website link without changing cycling-place actions', asyn
   await expect(website).toHaveAccessibleName(
     'Fosgail an làrach-lìn airson Cycle Scotland',
   );
+  await page.getByRole('button', { name: 'Clàr-taice Bike Neuks' }).click();
+  await languageSelect.selectOption('hy');
+  const armenianDistance = row.locator('.cycling-poi-meta-item').first();
+  await expect(armenianDistance).toHaveText(/^\d+(?:[,.]\d+)? (?:մ|կմ)$/);
+  await expect(armenianDistance).not.toHaveText(/\d (?:m|km)$/);
+  await expect(website).toContainText('Կայք');
+  await expect(website).toHaveAccessibleName('Բացել Cycle Scotland-ի կայքը');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
 });

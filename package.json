@@ -2,9 +2,10 @@
   "name": "neuk-bike",
   "version": "0.1.0",
   "private": true,
-  "description": "Static mobile-friendly map for finding nearby cycle parking across the UK, Ireland and Spain.",
+  "description": "Static mobile-friendly map for finding nearby cycle parking across the UK, Ireland, Spain and Armenia.",
   "keywords": [
     "active-travel",
+    "armenia",
     "cycle-parking",
     "cycling",
     "edinburgh",

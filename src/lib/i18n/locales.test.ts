@@ -16,6 +16,7 @@ describe('language support', () => {
     expect(resolveAppLocale('es', ['gd-GB'])).toBe('es');
     expect(resolveAppLocale('unsupported', ['fr-FR', 'gd-GB'])).toBe('gd');
     expect(resolveAppLocale(null, ['es-MX'])).toBe('es');
+    expect(resolveAppLocale(null, ['hy-AM'])).toBe('hy');
     expect(resolveAppLocale(null, ['fr-FR'])).toBe('en');
     expect(localeFromLanguageTag('GD_gb')).toBe('gd');
   });
@@ -27,6 +28,11 @@ describe('language support', () => {
     });
     expect(localeDetails.gd.placeSearchLanguage).toBe('default');
     expect(localeDetails.es.placeSearchLanguage).toBe('default');
+    expect(localeDetails.hy).toMatchObject({
+      formattingLocale: 'hy-AM',
+      placeSearchLanguage: 'default',
+      selfName: 'Հայերեն',
+    });
   });
 
   it('keeps every catalogue complete with matching placeholders', () => {
@@ -43,5 +49,13 @@ describe('language support', () => {
         );
       }
     }
+  });
+
+  it('uses a compact Armenian label for the device theme', () => {
+    expect(getMessageCatalogue('hy').system).toBe('Սարքի');
+  });
+
+  it('uses a compact Armenian label for a parking stand', () => {
+    expect(getMessageCatalogue('hy').typeStands).toBe('Կանգնակ');
   });
 });

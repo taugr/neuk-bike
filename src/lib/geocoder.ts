@@ -3,7 +3,7 @@ import { localeDetails, type AppLocale } from '@/lib/i18n/locales';
 import type { UserLocation } from '@/lib/types';
 
 export const PHOTON_SEARCH_URL = 'https://photon.komoot.io/api/';
-export const PARKING_COVERAGE_BBOX = '-18.2,27.5,4.4,60.9';
+export const PARKING_COVERAGE_BBOX = '-18.2,27.5,46.7,60.9';
 
 export type PlaceSearchResult = {
   id: string;
@@ -45,7 +45,7 @@ export function buildPlaceSearchUrl(
     q: query,
   });
 
-  for (const countryCode of ['GB', 'IE', 'ES']) {
+  for (const countryCode of ['GB', 'IE', 'ES', 'AM']) {
     params.append('countrycode', countryCode);
   }
 

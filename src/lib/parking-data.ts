@@ -117,7 +117,14 @@ export function isLocationInParkingCoverage(
   location: UserLocation,
   manifest: Pick<ParkingDataManifest, 'coverage'>,
 ) {
-  return manifest.coverage.areas.some((area) => {
+  return getParkingCoverageAreaId(location, manifest) !== null;
+}
+
+export function getParkingCoverageAreaId(
+  location: UserLocation,
+  manifest: Pick<ParkingDataManifest, 'coverage'>,
+) {
+  const area = manifest.coverage.areas.find((area) => {
     const { bounds } = area;
     if (
       location.latitude < bounds.south ||
@@ -136,6 +143,8 @@ export function isLocationInParkingCoverage(
     );
     return included && !excluded;
   });
+
+  return area?.id ?? null;
 }
 
 function isPointInRing(

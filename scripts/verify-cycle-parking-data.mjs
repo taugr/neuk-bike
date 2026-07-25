@@ -3,6 +3,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { coverageLabel } from './parking-data-sources.mjs';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const parkingRoot = resolve(repoRoot, 'public/data/parking');
@@ -119,16 +120,16 @@ async function main() {
   assert(manifest.schemaVersion === 2, 'Manifest schema must be version 2.');
   assert(report.schemaVersion === 2, 'Report schema must be version 2.');
   assert(
-    manifest.coverage.label === 'UK, Ireland and Spain',
-    'Coverage label must describe the UK, Ireland and Spain.',
+    manifest.coverage.label === coverageLabel,
+    'Coverage label must describe every configured region.',
   );
   assert(
     manifest.coverage.areas
       .map((area) => area.id)
       .sort()
       .join(',') ===
-      'canary-islands,england,ireland-and-northern-ireland,scotland,spain,wales',
-    'Coverage must contain UK, Ireland, mainland Spain, and Canary areas.',
+      'armenia,canary-islands,england,ireland-and-northern-ireland,scotland,spain,wales',
+    'Coverage must contain the UK, Ireland, Spain, Canary Islands, and Armenia.',
   );
 
   const pointIndexContent = await readFile(
@@ -183,6 +184,8 @@ async function main() {
   );
 
   const representativeInside = {
+    Yerevan: { latitude: 40.1777, longitude: 44.5126 },
+    Gyumri: { latitude: 40.7869, longitude: 43.8382 },
     Edinburgh: { latitude: 55.9533, longitude: -3.1883 },
     London: { latitude: 51.5072, longitude: -0.1276 },
     Manchester: { latitude: 53.4808, longitude: -2.2426 },
@@ -199,6 +202,7 @@ async function main() {
     Melilla: { latitude: 35.2923, longitude: -2.9381 },
   };
   const representativeOutside = {
+    Tbilisi: { latitude: 41.7151, longitude: 44.8271 },
     Douglas: { latitude: 54.1523, longitude: -4.4861 },
     Jersey: { latitude: 49.2144, longitude: -2.1313 },
     Cherbourg: { latitude: 49.6337, longitude: -1.6221 },
