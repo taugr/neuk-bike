@@ -967,6 +967,34 @@ a {
   overflow-wrap: anywhere;
 }
 
+.cycling-poi-services {
+  align-items: center;
+  color: var(--accent-strong);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.76rem;
+  font-weight: 640;
+  gap: 0.18rem 0.35rem;
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.cycling-poi-service {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.cycling-poi-service svg {
+  flex: 0 0 auto;
+}
+
+.cycling-poi-service-separator {
+  color: var(--muted);
+  line-height: 1;
+}
+
 .parking-list-website {
   align-items: center;
   color: var(--accent-strong);

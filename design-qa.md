@@ -894,3 +894,74 @@ No actionable P0, P1, or P2 differences remain.
 - None required for this implementation.
 
 final result: passed
+
+## Service metadata design QA
+
+### Evidence
+
+- Source visual truth:
+  `/Users/tomauger/.codex/generated_images/019f98fd-eb2e-72b0-b790-282eb6c80c39/call_CgG1KsiAqTEaEHb74rH8fPdR.png`
+- Browser-rendered implementation:
+  `/Users/tomauger/.codex/visualizations/2026/07/25/019f98fd-eb2e-72b0-b790-282eb6c80c39/neuk-bike-service-metadata-implementation-light.png`
+- Viewport: 390 × 844 CSS pixels.
+- Source pixels: 853 × 1844. The source was normalized to 390 pixels wide,
+  which produces a 843-pixel-tall comparison image.
+- Implementation pixels: 390 × 844 at device scale factor 1.
+- State: English, light theme, Edinburgh mock location, Shops selected, eight
+  nearby results.
+- Full-view comparison: the source and implementation were opened together in
+  one comparison pass. The implementation preserves the production app's
+  existing proportions and introduces only the selected quiet service line.
+- Focused-region comparison: a separate crop was not needed because the
+  390-pixel full-view evidence keeps the service line legible. Browser
+  inspection additionally measured the inline service text at 12.16 pixels,
+  confirmed a 128-pixel `Repairs · Pump` line inside a 354-pixel row, and found
+  no horizontal page overflow.
+
+### Findings
+
+- No actionable P0, P1 or P2 differences.
+- Fonts and typography: the existing app font, weight hierarchy and metadata
+  scale are preserved. Service labels are secondary to names, distance and
+  opening hours, as intended.
+- Spacing and layout rhythm: service information occupies a separate compact
+  metadata line with wrapping available for longer translations. Existing row
+  padding, radii and list density remain unchanged.
+- Colors and visual tokens: service text uses the existing accessible
+  `--accent-strong` token and separators use `--muted`, matching the selected
+  understated green direction in light and dark themes.
+- Image quality and asset fidelity: the feature adds no raster assets. Icons
+  come from the app's existing Lucide icon library and render sharply at the
+  metadata size.
+- Copy and content: only `Repairs`, explicitly confirmed `Pump`, and explicitly
+  confirmed `Tools` are shown. Hire is deliberately excluded. The source mock's
+  example services are illustrative; the implementation follows the real OSM
+  properties and does not claim a service absent from the dataset.
+- Accessibility and responsiveness: icons are decorative, labels remain
+  readable text, separators are hidden from assistive technology, localized
+  labels are covered by the mobile regression, and the 390-pixel page has no
+  horizontal overflow.
+
+### Comparison history
+
+- Initial capture inherited the browser's saved dark theme. The comparison
+  state was normalized to English and the source's light theme before the
+  passing capture. This was browser state, not an implementation defect.
+- No P0, P1 or P2 visual fixes were required after the normalized comparison.
+
+### Implementation checklist
+
+- [x] Preserve map-first hierarchy and existing list density.
+- [x] Present services as quiet inline metadata rather than pills.
+- [x] Exclude hire metadata.
+- [x] Show pump and tools only for explicit `yes` values.
+- [x] Localize service labels.
+- [x] Verify the production export at 390 × 844.
+- [x] Check browser warnings, errors and horizontal overflow.
+
+### Follow-up polish
+
+- P3: the compact gauge icon is intentionally used for pump availability
+  because it is the closest suitable icon in the existing dependency set.
+
+final result: passed

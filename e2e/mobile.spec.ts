@@ -1319,11 +1319,30 @@ test('shows distance in cycling-place popups and keeps the website in details', 
   await page.goto('/?mockGps=55.9533,-3.1883,5');
   await page.getByTestId('category-chip-shop').click();
 
+  const weeSpokeServices = page.getByTestId(
+    'cycling-poi-services-osm:node:2275653089',
+  );
+  await expect(weeSpokeServices).toHaveText('Repairs');
+  await expect(weeSpokeServices).not.toContainText('Hire');
   await expect(
     page
       .getByTestId('parking-row-osm:node:2275653089')
       .locator('.cycling-poi-row-meta'),
   ).not.toContainText('·');
+
+  const bikeStationServices = page.getByTestId(
+    'cycling-poi-services-osm:node:2161958168',
+  );
+  await expect(bikeStationServices).toHaveText('Repairs·Pump');
+  await expect(bikeStationServices).not.toContainText('Hire');
+
+  await page.getByTestId('category-chip-repair').click();
+  await expect(weeSpokeServices).toHaveCount(0);
+  await expect(bikeStationServices).toHaveText('Pump');
+  await expect(bikeStationServices).not.toContainText('Repairs');
+  await page.getByTestId('category-chip-shop').click();
+  await expect(weeSpokeServices).toHaveText('Repairs');
+  await expect(bikeStationServices).toHaveText('Repairs·Pump');
 
   const weeSpokeRow = page.getByTestId('parking-row-osm:node:2275653089');
   await weeSpokeRow.click();
@@ -1401,18 +1420,21 @@ test('shows distance in cycling-place popups and keeps the website in details', 
     '.settings-menu--mobile .language-select',
   );
   await languageSelect.selectOption('es');
+  await expect(weeSpokeServices).toHaveText('Reparación');
   await expect(website).toContainText('Sitio web');
   await expect(website).toHaveAccessibleName(
     'Abrir el sitio web de Cycle Scotland',
   );
   await page.getByRole('button', { name: 'Menú de Bike Neuks' }).click();
   await languageSelect.selectOption('gd');
+  await expect(weeSpokeServices).toHaveText('Càradh');
   await expect(website).toContainText('Làrach-lìn');
   await expect(website).toHaveAccessibleName(
     'Fosgail an làrach-lìn airson Cycle Scotland',
   );
   await page.getByRole('button', { name: 'Clàr-taice Bike Neuks' }).click();
   await languageSelect.selectOption('hy');
+  await expect(weeSpokeServices).toHaveText('Վերանորոգում');
   const armenianDistance = row.locator('.cycling-poi-meta-item').first();
   await expect(armenianDistance).toHaveText(/^\d+(?:[,.]\d+)? (?:մ|կմ)$/);
   await expect(armenianDistance).not.toHaveText(/\d (?:m|km)$/);

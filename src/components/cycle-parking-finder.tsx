@@ -31,7 +31,9 @@ import {
   Download,
   EllipsisVertical,
   ExternalLink,
+  Gauge,
   Globe2,
+  Hammer,
   LocateFixed,
   MapPin,
   Maximize2,
@@ -140,6 +142,10 @@ import {
   getCyclingPoiDataBaseUrl,
 } from '@/lib/cycling-poi-data';
 import { getCyclingPoiWebsite } from '@/lib/cycling-poi-website';
+import {
+  getCyclingPoiServices,
+  type CyclingPoiService,
+} from '@/lib/cycling-poi-services';
 import type { ParkingMapBounds } from '@/lib/map-pins';
 import type { ParkingView } from '@/lib/map-pins';
 import {
@@ -193,6 +199,15 @@ const discoverCategories: {
   { icon: Wrench, id: 'repair', labelKey: 'categoryRepair' },
   { icon: Bike, id: 'hire', labelKey: 'categoryHire' },
 ];
+
+const cyclingPoiServicePresentation: Record<
+  CyclingPoiService,
+  { icon: LucideIcon; labelKey: MessageKey }
+> = {
+  pump: { icon: Gauge, labelKey: 'servicePump' },
+  repair: { icon: Wrench, labelKey: 'serviceRepairs' },
+  tools: { icon: Hammer, labelKey: 'serviceTools' },
+};
 
 function getPointCategoryLabelKey(point: ParkingPoint): MessageKey {
   if (!isCyclingPoiPoint(point)) return 'categoryParking';
@@ -4095,6 +4110,14 @@ export default function CycleParkingFinder() {
                                         locale,
                                       )
                                     : [];
+                                const cyclingServices = isCyclingPoiPoint(point)
+                                  ? getCyclingPoiServices(point).filter(
+                                      (service) =>
+                                        parkingView !== 'nearby' ||
+                                        discoverCategory !== 'repair' ||
+                                        service !== 'repair',
+                                    )
+                                  : [];
                                 return (
                                   <motion.li
                                     className={[
@@ -4207,6 +4230,47 @@ export default function CycleParkingFinder() {
                                                     ),
                                                   )}
                                                 </span>
+                                              </span>
+                                            ) : null}
+                                            {cyclingServices.length > 0 ? (
+                                              <span
+                                                className="cycling-poi-services"
+                                                data-testid={`cycling-poi-services-${point.id}`}
+                                              >
+                                                {cyclingServices.map(
+                                                  (service, serviceIndex) => {
+                                                    const {
+                                                      icon: ServiceIcon,
+                                                      labelKey,
+                                                    } =
+                                                      cyclingPoiServicePresentation[
+                                                        service
+                                                      ];
+
+                                                    return (
+                                                      <Fragment key={service}>
+                                                        {serviceIndex > 0 ? (
+                                                          <span
+                                                            aria-hidden="true"
+                                                            className="cycling-poi-service-separator"
+                                                          >
+                                                            ·
+                                                          </span>
+                                                        ) : null}
+                                                        <span className="cycling-poi-service">
+                                                          <ServiceIcon
+                                                            size={13}
+                                                            strokeWidth={2}
+                                                            aria-hidden="true"
+                                                          />
+                                                          <span>
+                                                            {t(labelKey)}
+                                                          </span>
+                                                        </span>
+                                                      </Fragment>
+                                                    );
+                                                  },
+                                                )}
                                               </span>
                                             ) : null}
                                             {website ? (

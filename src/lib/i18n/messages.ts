@@ -35,6 +35,9 @@ const en = {
   categoryRepairPlace: 'Repair',
   categoryShop: 'Bicycle shop',
   categoryShops: 'Shops',
+  servicePump: 'Pump',
+  serviceRepairs: 'Repairs',
+  serviceTools: 'Tools',
   cyclingPlacesLoadError: 'Nearby cycling places could not be loaded.',
   cyclingPlacesCoverageOnly:
     'Cycling places currently cover the UK, Ireland, Spain and Armenia.',
@@ -225,6 +228,9 @@ const gd: MessageCatalogue = {
   categoryRepairPlace: 'Càradh',
   categoryShop: 'Bùth bhaidhsagalan',
   categoryShops: 'Bùthan',
+  servicePump: 'Pumpa',
+  serviceRepairs: 'Càradh',
+  serviceTools: 'Innealan',
   cyclingPlacesLoadError:
     'Cha b’ urrainn dhuinn àiteachan baidhsagal faisg ort a luchdadh.',
   cyclingPlacesCoverageOnly:
@@ -418,6 +424,9 @@ const es: MessageCatalogue = {
   categoryRepairPlace: 'Reparación',
   categoryShop: 'Tienda de bicicletas',
   categoryShops: 'Tiendas',
+  servicePump: 'Bomba',
+  serviceRepairs: 'Reparación',
+  serviceTools: 'Herramientas',
   cyclingPlacesLoadError:
     'No se pudieron cargar los lugares ciclistas cercanos.',
   cyclingPlacesCoverageOnly:
@@ -609,6 +618,9 @@ const hy: MessageCatalogue = {
   categoryRepairPlace: 'Վերանորոգում',
   categoryShop: 'Հեծանիվների խանութ',
   categoryShops: 'Խանութներ',
+  servicePump: 'Պոմպ',
+  serviceRepairs: 'Վերանորոգում',
+  serviceTools: 'Գործիքներ',
   cyclingPlacesLoadError: 'Չհաջողվեց բեռնել մոտակա հեծանվային վայրերը։',
   cyclingPlacesCoverageOnly:
     'Հեծանվային վայրերը ներկայում ընդգրկում են ՄԹ-ն, Իռլանդիան, Իսպանիան և Հայաստանը։',
