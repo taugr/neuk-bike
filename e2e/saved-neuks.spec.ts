@@ -361,12 +361,29 @@ test('saves a cycling place into the same My neuks list as parking', async ({
   await expect(
     page.locator('.parking-popup.parking-popup-cycling-place'),
   ).toBeVisible();
+  const desktopPopup = page
+    .locator('.parking-popup.parking-popup-cycling-place')
+    .locator('.parking-popup-desktop');
   await expect(
-    page
-      .locator('.parking-popup.parking-popup-cycling-place')
-      .locator('.parking-popup-desktop')
-      .getByTestId('parking-popup-website-osm:node:2967477634'),
-  ).toHaveAttribute('href', 'https://www.cyclescotland.co.uk/');
+    desktopPopup.getByTestId('parking-popup-distance-osm:node:2967477634'),
+  ).toHaveText(/^\d+(?:[,.]\d+)? (?:m|km) away$/);
+  await expect(desktopPopup.locator('.parking-popup-website')).toHaveCount(0);
+  const popupTitleLayout = await desktopPopup
+    .locator('.parking-popup-title-row')
+    .evaluate((titleRow) => {
+      const name = titleRow.querySelector('strong');
+      const distance = titleRow.querySelector('.parking-popup-distance');
+      if (!name || !distance) return null;
+
+      return {
+        distanceTop: distance.getBoundingClientRect().top,
+        nameBottom: name.getBoundingClientRect().bottom,
+      };
+    });
+  expect(popupTitleLayout).not.toBeNull();
+  expect(popupTitleLayout?.distanceTop).toBeGreaterThanOrEqual(
+    popupTitleLayout?.nameBottom ?? Number.POSITIVE_INFINITY,
+  );
   await expect(
     page.getByTestId('parking-website-osm:node:2967477634'),
   ).toHaveAttribute('href', 'https://www.cyclescotland.co.uk/');

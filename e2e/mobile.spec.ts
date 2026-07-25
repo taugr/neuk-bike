@@ -1312,7 +1312,7 @@ test('keeps the mobile interaction contract usable with reduced motion', async (
   await expect(page.getByTestId('parking-list')).toBeVisible();
 });
 
-test('shows a compact website link without changing cycling-place actions', async ({
+test('shows distance in cycling-place popups and keeps the website in details', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -1346,6 +1346,30 @@ test('shows a compact website link without changing cycling-place actions', asyn
   const row = page.getByTestId(`parking-row-${pointId}`);
   await expect(row).toContainText('Cycle Scotland');
   await row.click();
+
+  const popupPreview = page
+    .locator('.parking-popup.parking-popup-cycling-place')
+    .locator('.parking-popup-preview');
+  await expect(
+    popupPreview.getByTestId(`parking-popup-distance-${pointId}`),
+  ).toHaveText(/^\d+(?:[,.]\d+)? (?:m|km) away$/);
+  await expect(popupPreview.locator('.parking-popup-website')).toHaveCount(0);
+  const popupTitleLayout = await popupPreview
+    .locator('.parking-popup-title-row')
+    .evaluate((titleRow) => {
+      const name = titleRow.querySelector('strong');
+      const distance = titleRow.querySelector('.parking-popup-distance');
+      if (!name || !distance) return null;
+
+      return {
+        distanceTop: distance.getBoundingClientRect().top,
+        nameBottom: name.getBoundingClientRect().bottom,
+      };
+    });
+  expect(popupTitleLayout).not.toBeNull();
+  expect(popupTitleLayout?.distanceTop).toBeGreaterThanOrEqual(
+    popupTitleLayout?.nameBottom ?? Number.POSITIVE_INFINITY,
+  );
 
   const website = page.getByTestId(`parking-website-${pointId}`);
   await expect(website).toHaveAttribute(
@@ -1392,6 +1416,9 @@ test('shows a compact website link without changing cycling-place actions', asyn
   const armenianDistance = row.locator('.cycling-poi-meta-item').first();
   await expect(armenianDistance).toHaveText(/^\d+(?:[,.]\d+)? (?:մ|կմ)$/);
   await expect(armenianDistance).not.toHaveText(/\d (?:m|km)$/);
+  await expect(
+    popupPreview.getByTestId(`parking-popup-distance-${pointId}`),
+  ).toHaveText(/^\d+(?:[,.]\d+)? (?:մ|կմ) հեռու$/);
   await expect(website).toContainText('Կայք');
   await expect(website).toHaveAccessibleName('Բացել Cycle Scotland-ի կայքը');
   await expect

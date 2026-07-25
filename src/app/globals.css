@@ -248,27 +248,11 @@ a {
   margin-bottom: 0.65rem;
 }
 
-.parking-popup-website {
-  align-items: center;
-  color: var(--accent-strong);
-  display: inline-flex;
-  font-size: 0.74rem;
-  font-weight: 740;
-  gap: 0.28rem;
-  line-height: 1.2;
-  max-width: 100%;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-}
-
-.parking-popup-website:hover,
-.parking-popup-website:focus-visible {
-  color: var(--text);
-}
-
-.parking-popup-title-row:has(+ .parking-popup-website) {
-  margin-bottom: 0.35rem;
+.parking-popup-cycling-place .parking-popup-title-row {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.22rem;
+  justify-content: flex-start;
 }
 
 .parking-popup-distance {
@@ -2803,9 +2787,8 @@ a {
     margin-bottom: 0.55rem;
   }
 
-  .parking-popup-preview .parking-popup-website {
-    font-size: 0.74rem;
-    margin-top: -0.15rem;
+  .parking-popup-cycling-place .parking-popup-preview .parking-popup-title-row {
+    gap: 0.18rem;
   }
 
   .parking-popup-preview .parking-popup-details {
