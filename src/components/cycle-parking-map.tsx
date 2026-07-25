@@ -40,6 +40,7 @@ import type { ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { Bollard } from '@/components/icons/bollard';
 import type {
   CyclingPoiCategory,
   ParkingPoint,
@@ -176,6 +177,7 @@ const rankedPointCount = 8;
 const nearbyFocusMaximumDistanceMeters = 50_000;
 const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
   'access-open': LockOpen,
+  bollard: Bollard,
   building: Building2,
   covered: Umbrella,
   customer: ShoppingBag,

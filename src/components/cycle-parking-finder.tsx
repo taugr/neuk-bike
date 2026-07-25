@@ -126,6 +126,7 @@ import {
   buildGoogleStreetViewEmbedUrl,
 } from '@/lib/street-view';
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
+import { Bollard } from '@/components/icons/bollard';
 import { useLanguage } from '@/components/language-provider';
 import { captureAnalyticsEvent } from '@/lib/analytics';
 import { shareParkingLink } from '@/lib/share';
@@ -282,6 +283,7 @@ type PanelMotionContext = {
 };
 
 const parkingListIconByName: Partial<Record<ParkingPopupIcon, LucideIcon>> = {
+  bollard: Bollard,
   building: Building2,
   covered: Umbrella,
   fixture: Boxes,

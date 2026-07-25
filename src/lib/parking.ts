@@ -19,6 +19,7 @@ export type ParkingPopupTone =
 
 export type ParkingPopupIcon =
   | 'access-open'
+  | 'bollard'
   | 'building'
   | 'covered'
   | 'customer'
@@ -146,6 +147,16 @@ function formatStandType(
 
   if (!type) {
     return null;
+  }
+
+  if (type === 'bollard') {
+    return {
+      icon: 'bollard',
+      kind: 'type',
+      label: translate(locale, 'type'),
+      tone: 'teal',
+      value: formatTypeLabel(type, locale),
+    };
   }
 
   if (['stands', 'wide_stands', 'staple', 'hoop', 'post_hoop'].includes(type)) {

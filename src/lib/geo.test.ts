@@ -345,6 +345,12 @@ describe('geo utilities', () => {
   it('localizes the bollard parking type', () => {
     const point = parkingPoint({ bicycle_pa: 'bollard' });
 
+    expect(getParkingPopupDetails(point, 'en').details[0]).toMatchObject({
+      icon: 'bollard',
+      kind: 'type',
+      tone: 'teal',
+      value: 'Bollard',
+    });
     expect(getParkingPopupDetails(point, 'en').details[0].value).toBe(
       'Bollard',
     );
