@@ -1067,3 +1067,70 @@ No actionable P0, P1 or P2 differences remain.
 - None required for this implementation.
 
 final result: passed
+
+## Dark-mode category filter contrast refinement
+
+### Comparison setup
+
+- Source visual truth:
+  `/Users/tomauger/.codex/generated_images/019f9f53-dfea-7092-b87b-b647f88de8b9/exec-7a456111-6088-46d5-9027-7d5e9a56e237.png`
+- Browser-rendered implementation:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9f53-dfea-7092-b87b-b647f88de8b9/option-2-implementation-neutral-mobile.png`
+- Full-view comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9f53-dfea-7092-b87b-b647f88de8b9/option-2-comparison-full.png`
+- Focused category-row comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9f53-dfea-7092-b87b-b647f88de8b9/option-2-comparison-chips.png`
+- Viewport: 390 × 844 CSS pixels.
+- Density normalization: the 853 × 1844 ImageGen source was normalized to
+  390 × 844 pixels; the implementation capture is 390 × 844 pixels at one
+  output pixel per CSS pixel.
+- State: mobile nearby list, dark theme, Parking selected, neutral map focus.
+
+### Findings
+
+No actionable P0, P1 or P2 differences remain.
+
+- Fonts and typography: the existing app family, 0.78rem chip size and 760
+  weight are preserved. Inactive labels are intentionally a little brighter
+  than the mock to improve readability while retaining its hierarchy.
+- Spacing and layout rhythm: all four chips retain the production four-column
+  layout, 38-pixel height, 83-pixel rendered width, pill radius and existing
+  gaps. No nearby-list or sheet geometry changed.
+- Colors and visual tokens: inactive chips render on `#17211e` with a
+  `#48635b` border and `#d5e2de` foreground. The active chip uses `#173f39`,
+  the existing mint accent border and accent-strong foreground. Measured text
+  contrast is 12.38:1 inactive and 9.22:1 active.
+- Image quality and asset fidelity: the change adds no image assets and keeps
+  the existing Lucide category icons. The live map differs from the illustrative
+  ImageGen map, but it is production-owned content outside this color-only
+  change.
+- Copy and content: Parking, Shops, Repair and Hire remain unchanged and in the
+  same order.
+- Accessibility and interaction: every chip remains a real button with an
+  `aria-pressed` state. Selecting Shops transferred the pressed state from
+  Parking, and Parking was restored for handoff. The existing hover and
+  focus-visible selectors now use the same dark palette.
+
+### Interaction verification
+
+- Switched the rendered static export to dark mode through the in-app theme
+  menu.
+- Selected Shops and confirmed `aria-pressed=true` while Parking changed to
+  `false`, then restored Parking for the review handoff.
+- Confirmed all chip dimensions and computed foreground, background and border
+  colors in the browser.
+- Checked browser warnings and errors after the interaction pass; none were
+  present.
+
+### Comparison history
+
+- Pass 1: the normalized full-view and focused comparisons found no actionable
+  P0/P1/P2 drift. The implementation deliberately uses slightly brighter
+  inactive text than the selected mock, matching the user's final readability
+  refinement.
+
+### Follow-up polish
+
+- None required before user review.
+
+final result: passed

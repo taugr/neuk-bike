@@ -928,6 +928,25 @@ a {
   color: #fff;
 }
 
+:root[data-theme='dark'] .category-chip {
+  background: #17211e;
+  border-color: #48635b;
+  color: #d5e2de;
+}
+
+:root[data-theme='dark'] .category-chip:hover,
+:root[data-theme='dark'] .category-chip:focus-visible {
+  background: #1c332f;
+  border-color: var(--accent);
+  color: #e1fff7;
+}
+
+:root[data-theme='dark'] .category-chip[data-active='true'] {
+  background: #173f39;
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
 .cycling-poi-row-meta {
   align-items: flex-start;
   display: flex !important;
