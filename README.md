@@ -19,6 +19,8 @@
   Spain, or Armenia
 - Search from a UK, Irish, Spanish, or Armenian street, postcode, town, or place
 - Browse a map-first interface without an app account or backend
+- See the official UK National Cycle Network as a default-on, optional map
+  layer from zoom 10
 - Show cycle directions to a selected parking place with CycleStreets
 - See capacity, access, cover, and stand type when mapped
 - Share parking places with source-qualified `?parking=` links
@@ -73,6 +75,15 @@ around the current location. Map movement loads additional bounded chunks. A
 24-chunk in-memory LRU cache prevents unbounded growth. The point index is only
 loaded when a `?parking=` deep link needs it. The full UK-Ireland-Spain-Armenia
 dataset is not included in the JavaScript bundle.
+
+The UK National Cycle Network is a separate official Walk Wheel Cycle Trust
+snapshot. The browser loads only nearby content-addressed zoom-10 chunks and
+keeps them behind a persistent Map layers switch. Traffic-free, on-road,
+ferry, and temporarily closed segments are styled distinctly. Numbered routes
+use compact repeated shields, while route popups present route type, confirmed
+surface, ride quality, and lighting in a compact translated fact grid using the
+same icon language as parking details. The layer is not shown outside published
+UK coverage and never changes route calculation.
 
 If geolocation is unavailable or the requested location is outside the UK,
 Ireland, Spain, and Armenia, the app falls back to central Edinburgh and
@@ -133,6 +144,8 @@ pnpm deploy:cloudflare # builds and deploys out/ to Cloudflare Pages
 pnpm update:data   # refreshes council + OSM data and generated chunks
 pnpm update:pois   # refreshes UK-Ireland-Spain-Armenia cycling places
 pnpm verify:pois   # verifies POI chunks, hashes, IDs, counts, and coverage
+pnpm update:network # refreshes the official UK National Cycle Network
+pnpm verify:network # verifies network chunks, hashes, counts, and budgets
 ```
 
 Install the Playwright browser once before the E2E suite if needed:
@@ -152,6 +165,16 @@ IDs are deduplicated, and the generated report records per-input checksums,
 counts, source timestamps, resource usage, and static-asset budgets. Parking
 remains the default and continues to use the independent release described
 below.
+
+`pnpm update:network` pages through the official National Cycle Network
+FeatureServer, validates its schema and record count, normalizes route
+classification, status, surface, ride quality, and lighting, then atomically
+replaces
+`public/data/cycle-network/`. The generated release contains 37,209 segments in
+423 zoom-10 chunks. Its largest asset is about 450 KiB and the measured maximum
+compressed 3×3 payload is about 559 KiB. Run `pnpm verify:network` after a
+refresh and treat `src/data/cycle-network-report.json` as the current snapshot
+report. Do not hand-edit these generated files.
 
 The current cycling-place release contains 13,212 unique OpenStreetMap places
 in 2,486 chunks: 4,115 shops, 2,590 repair locations, and 8,013 hire
@@ -316,6 +339,11 @@ OpenStreetMap-derived records and map/search data:
 - Data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright),
   available under the [Open Database Licence 1.0](https://opendatacommons.org/licenses/odbl/1-0/)
 - [Photon](https://photon.komoot.io/)
+
+National Cycle Network:
+
+- [Walk Wheel Cycle Trust National Cycle Network](https://www.arcgis.com/home/item.html?id=5defd254e78745bfb12d0456abc1bcf1),
+  available under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
 
 Cycle directions:
 

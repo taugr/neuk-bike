@@ -7,7 +7,9 @@
     "next-env.d.ts",
     "public/data/parking/**",
     "public/data/cycling-pois/**",
-    "src/data/cycling-poi-report.json"
+    "public/data/cycle-network/**",
+    "src/data/cycling-poi-report.json",
+    "src/data/cycle-network-report.json"
   ],
   "trailingComma": "all",
   "tabWidth": 2,

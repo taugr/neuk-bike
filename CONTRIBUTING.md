@@ -36,6 +36,8 @@ pnpm run format:fix
 pnpm run test:watch
 pnpm run test:e2e
 pnpm run update:data
+pnpm run update:network
+pnpm run verify:network
 pnpm run deploy:cloudflare
 ```
 
@@ -68,6 +70,15 @@ duplicate matches, naming-tier counts and samples, peak memory, asset budgets,
 and representative UK, Ireland, mainland Spain, Balearic, Canary, Yerevan, and
 Gyumri locations before committing. Also review Armenian-script names and the
 region-aware directions state.
+
+## National Cycle Network data
+
+`pnpm update:network` refreshes the official Walk Wheel Cycle Trust source and
+atomically rewrites `public/data/cycle-network/` plus
+`src/data/cycle-network-report.json`. Do not hand-edit those outputs. Review the
+source timestamps and checksum, classifications, record and vertex counts,
+coverage, chunk duplication, largest asset, and maximum compressed buffered
+payload, then run `pnpm verify:network` before committing a refreshed snapshot.
 
 ## Testing
 

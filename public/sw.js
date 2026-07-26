@@ -1,5 +1,5 @@
 const cachePrefix = 'neuk-bike-';
-const cacheName = `${cachePrefix}v9`;
+const cacheName = `${cachePrefix}v10`;
 const scopePath = new URL(self.registration.scope).pathname;
 const appBasePath = scopePath.endsWith('/')
   ? scopePath.slice(0, -1)
@@ -74,7 +74,8 @@ function isAppData(request) {
   const pathname = new URL(request.url).pathname;
   return (
     pathname.startsWith(appPath('/data/parking/')) ||
-    pathname.startsWith(appPath('/data/cycling-pois/'))
+    pathname.startsWith(appPath('/data/cycling-pois/')) ||
+    pathname.startsWith(appPath('/data/cycle-network/'))
   );
 }
 

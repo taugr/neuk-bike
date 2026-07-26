@@ -144,6 +144,12 @@ import {
   CyclingPoiDataClient,
   getCyclingPoiDataBaseUrl,
 } from '@/lib/cycling-poi-data';
+import {
+  CycleNetworkDataClient,
+  getCycleNetworkDataBaseUrl,
+  type CycleNetworkFeature,
+  type CycleNetworkManifest,
+} from '@/lib/cycle-network-data';
 import { getCyclingPoiWebsite } from '@/lib/cycling-poi-website';
 import {
   getCyclingPoiServices,
@@ -237,6 +243,7 @@ function getPointCategoryLabelKey(point: ParkingPoint): MessageKey {
 }
 const copiedMessageDurationMs = 1_800;
 const themeStorageKey = 'cycle-parking-theme';
+const cycleNetworkStorageKey = 'cycle-parking-cycle-network-visible';
 const mobileSheetCollapsedHeightRem = 5.4;
 const mobileSheetDragIntentThresholdPx = 6;
 const mobileSheetExpandedViewportRatio = 0.52;
@@ -535,6 +542,14 @@ export default function CycleParkingFinder() {
   >(null);
   const [parkingManifest, setParkingManifest] =
     useState<ParkingDataManifest | null>(null);
+  const [cycleNetworkManifest, setCycleNetworkManifest] =
+    useState<CycleNetworkManifest | null>(null);
+  const [cycleNetworkFeatures, setCycleNetworkFeatures] = useState<
+    CycleNetworkFeature[]
+  >([]);
+  const [isCycleNetworkAvailable, setIsCycleNetworkAvailable] = useState(false);
+  const [isCycleNetworkVisible, setIsCycleNetworkVisible] = useState(true);
+  const [cycleNetworkZoom, setCycleNetworkZoom] = useState(13);
   const [parkingDataStatus, setParkingDataStatus] =
     useState<ParkingDataStatus>('loading');
   const [parkingDataMessage, setParkingDataMessage] = useState<string | null>(
@@ -633,6 +648,12 @@ export default function CycleParkingFinder() {
   localeRef.current = locale;
   const parkingDataClient = useRef<ParkingDataClient | null>(null);
   const cyclingPoiDataClient = useRef<CyclingPoiDataClient | null>(null);
+  const cycleNetworkDataClient = useRef<CycleNetworkDataClient | null>(null);
+  const cycleNetworkRequestId = useRef(0);
+  const cycleNetworkViewport = useRef<{
+    bounds: ParkingMapBounds;
+    zoom: number;
+  } | null>(null);
   const directionsCache = useRef(new Map<string, CycleRoutesByPlan>());
   const placeSearchAbortController = useRef<AbortController | null>(null);
   const placeSearchDebounceTimeout = useRef<number | null>(null);
@@ -883,6 +904,32 @@ export default function CycleParkingFinder() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    const client = new CycleNetworkDataClient(
+      getCycleNetworkDataBaseUrl(window.location.href),
+    );
+    cycleNetworkDataClient.current = client;
+    try {
+      setIsCycleNetworkVisible(
+        window.localStorage.getItem(cycleNetworkStorageKey) !== 'false',
+      );
+    } catch {
+      setIsCycleNetworkVisible(true);
+    }
+    void client
+      .initialize()
+      .then((manifest) => {
+        if (!cancelled) setCycleNetworkManifest(manifest);
+      })
+      .catch(() => {
+        if (!cancelled) setCycleNetworkManifest(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const stored = readSavedNeuks(window.localStorage);
     setSavedNeuks(stored.items);
     setSavedNeuksStatus(stored.ok ? 'ready' : 'storage-error');
@@ -1114,8 +1161,43 @@ export default function CycleParkingFinder() {
     t,
   ]);
 
-  const loadParkingForBounds = useCallback(
-    (bounds: ParkingMapBounds) => {
+  const loadCycleNetworkForBounds = useCallback(
+    (bounds: ParkingMapBounds, zoom: number, loadFeatures: boolean) => {
+      const networkClient = cycleNetworkDataClient.current;
+      if (!networkClient) return;
+      const requestId = cycleNetworkRequestId.current + 1;
+      cycleNetworkRequestId.current = requestId;
+      void networkClient
+        .loadBounds(bounds, zoom, { loadFeatures })
+        .then((data) => {
+          if (cycleNetworkRequestId.current !== requestId) return;
+          setIsCycleNetworkAvailable(data.available);
+          setCycleNetworkFeatures(data.features);
+        })
+        .catch(() => {
+          if (cycleNetworkRequestId.current !== requestId) return;
+          setCycleNetworkFeatures([]);
+        });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const viewport = cycleNetworkViewport.current;
+    if (!cycleNetworkManifest || !viewport) return;
+    loadCycleNetworkForBounds(
+      viewport.bounds,
+      viewport.zoom,
+      isCycleNetworkVisible,
+    );
+  }, [cycleNetworkManifest, isCycleNetworkVisible, loadCycleNetworkForBounds]);
+
+  const loadMapDataForBounds = useCallback(
+    (bounds: ParkingMapBounds, zoom: number) => {
+      setCycleNetworkZoom(zoom);
+      cycleNetworkViewport.current = { bounds, zoom };
+      loadCycleNetworkForBounds(bounds, zoom, isCycleNetworkVisible);
+
       if (discoverCategory !== 'parking') {
         const client = cyclingPoiDataClient.current;
         if (!client) return;
@@ -1149,7 +1231,13 @@ export default function CycleParkingFinder() {
           setParkingDataMessage(t('loadAreaError'));
         });
     },
-    [discoverCategory, locale, t],
+    [
+      discoverCategory,
+      isCycleNetworkVisible,
+      loadCycleNetworkForBounds,
+      locale,
+      t,
+    ],
   );
 
   async function retryParkingData() {
@@ -2942,6 +3030,38 @@ export default function CycleParkingFinder() {
                   </option>
                 ))}
               </select>
+              {isCycleNetworkAvailable ? (
+                <Fragment key="cycle-network-setting">
+                  <span className="settings-label">{t('mapLayers')}</span>
+                  <label className="map-layer-option">
+                    <span>
+                      {t('nationalCycleNetwork')}
+                      {cycleNetworkZoom <
+                      (cycleNetworkManifest?.chunkZoom ?? 10) ? (
+                        <small>{t('cycleNetworkZoomIn')}</small>
+                      ) : null}
+                    </span>
+                    <input
+                      aria-label={t('nationalCycleNetwork')}
+                      checked={isCycleNetworkVisible}
+                      role="switch"
+                      type="checkbox"
+                      onChange={(event) => {
+                        const visible = event.target.checked;
+                        setIsCycleNetworkVisible(visible);
+                        try {
+                          window.localStorage.setItem(
+                            cycleNetworkStorageKey,
+                            String(visible),
+                          );
+                        } catch {
+                          // Keep the in-memory choice when storage is unavailable.
+                        }
+                      }}
+                    />
+                  </label>
+                </Fragment>
+              ) : null}
               {canInstall ? (
                 <Fragment key="install-app-action">
                   <span className="settings-label">{t('app')}</span>
@@ -3239,7 +3359,9 @@ export default function CycleParkingFinder() {
               toggleSavedPoint(point, 'popup');
             }}
             onOpenDetails={(point) => openParkingDetails(point, 'map')}
-            onViewportChange={loadParkingForBounds}
+            onViewportChange={loadMapDataForBounds}
+            cycleNetworkFeatures={cycleNetworkFeatures}
+            isCycleNetworkVisible={isCycleNetworkVisible}
           />
         </section>
 
@@ -4803,6 +4925,14 @@ export default function CycleParkingFinder() {
                       <a href={source.licenceUrl}>{source.licenceName}</a>
                     </Fragment>
                   ))}
+                  {cycleNetworkManifest ? (
+                    <Fragment key="cycle-network-source">
+                      <span>{cycleNetworkManifest.source.attribution}</span>
+                      <a href={cycleNetworkManifest.source.licenceUrl}>
+                        {cycleNetworkManifest.source.licenceName}
+                      </a>
+                    </Fragment>
+                  ) : null}
                   <span>
                     Map interface by{' '}
                     <a href="https://maplibre.org/">MapLibre GL JS</a>.

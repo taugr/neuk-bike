@@ -1134,3 +1134,68 @@ No actionable P0, P1 or P2 differences remain.
 - None required before user review.
 
 final result: passed
+
+---
+
+# National Cycle Network popup design QA
+
+## Comparison target
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/019f9fc3-ce2f-7171-beaa-025c8ac1d185/exec-1566defd-e91c-40d9-ad78-20fab99976ec.png`
+- Implementation URL: `http://127.0.0.1:4181/?mockGps=52.0071274271238,1.27843987050158`
+- Desktop implementation screenshot: `/Users/tomauger/projects/neuk-bike/output/playwright/cycle-network-grid-desktop-1687x932.png`
+- Mobile implementation screenshot: `/Users/tomauger/projects/neuk-bike/output/playwright/cycle-network-grid-mobile.png`
+- Full-view comparison: `/Users/tomauger/projects/neuk-bike/output/playwright/cycle-network-design-comparison-full.png` (source left, implementation right)
+- Focused popup comparison: `/Users/tomauger/projects/neuk-bike/output/playwright/cycle-network-design-comparison-popup.png` (source left, implementation right)
+
+## Normalization and state
+
+- Desktop CSS viewport: 1687 × 932.
+- Source pixels: 1687 × 932. The generated mock is treated as a 1× visual target.
+- Implementation pixels: 1687 × 932 at an effective 1× capture density.
+- No image resizing or density normalization was needed for the full-view comparison.
+- Focused evidence uses equal 350 × 300 crops around the route popup. The vertical crop origins differ because the popup is attached to a slightly different point on the same Route 51 geometry.
+- State: English, light theme, National Route 51 selected near the same Suffolk location, standard map/sidebar layout visible.
+- The sidebar's saved-count and list-detail differences are pre-existing app state and are outside the selected popup design. The route title, route facts, map style, and interaction state match the target.
+- The selected implementation brief explicitly tightened the concept image to 40–44 px fact rows, 14 px icons, and mobile-safe dimensions. The mock's larger fact cells are therefore a concept reference, not the final density requirement.
+
+## Findings
+
+No actionable P0, P1, or P2 differences remain.
+
+- Fonts and typography: the implementation keeps the app's existing system stack and reproduces the target hierarchy: bold route title, compact bold values, and clear separation between header and facts. All four values remain legible at desktop and 390 px mobile without truncation.
+- Spacing and layout rhythm: the route kind is the first fact and all four facts form the selected 2 × 2 matrix. The rendered fact panel is 91 px high; the full popup is 161 px high and 282 px wide. The deliberately tighter cells preserve the target grouping while reducing map obstruction.
+- Colors and visual tokens: route shield red, teal fact icons, white surface, subtle green-grey borders, radius, and shadow follow the source and existing app tokens. Contrast remains clear in the captured light state.
+- Image quality and asset fidelity: the screen contains only the existing raster map tiles and Lucide UI icons; both are sharp at the captured density. No placeholder, handcrafted SVG, CSS-art, or substituted image asset was introduced.
+- Copy and content: the first cell says `On-road`; the remaining confirmed facts say `Asphalt`, `Average`, and `Unlit`, matching the selected concept and current translation layer. Unknown facts remain omitted by the existing data presentation logic.
+- Icons: the four facts use a single Lucide stroke family at 14 px. Route kind, surface layers, ride-quality profile, and unlit state are visually distinct and consistently aligned.
+- Responsiveness: at 390 × 844 the popup remains a two-column matrix, measures 282 × 161, and stays within the map width (left 81 px, right 363 px) above the mobile sheet. No overlap, clipping, or awkward wrapping was visible.
+- Interaction and accessibility: the popup opens from the route immediately with a fixed bottom anchor. Fact cells expose accessible labels and tooltips. Focused regression coverage confirms route and parking popups remain mutually exclusive.
+
+## Comparison history
+
+### Pass 1
+
+- Evidence: the full-view and focused side-by-side comparison images listed above.
+- Earlier P0/P1/P2 findings: none.
+- Fixes made in response to QA: none required.
+- Post-fix evidence: not applicable; this first comparison passed.
+- Expected deviation: the implementation is shorter than the initial concept because the user selected the compact mobile refinement before implementation.
+
+## Browser verification
+
+- Primary interactions tested: open a Route 51 popup from the line, verify the four-fact 2 × 2 grid, verify a fixed bottom anchor, and inspect desktop and 390 px mobile layout.
+- Desktop metrics: 4 facts, 2 columns, 91 px fact panel, 282 × 161 px popup.
+- Mobile metrics: 4 facts, 2 columns, 91 px fact panel, 282 × 161 px popup.
+- Console errors checked: none.
+
+## Implementation checklist
+
+- [x] Route kind is part of the fact panel rather than a separate subheading.
+- [x] Four standard facts use a compact 2 × 2 layout.
+- [x] Sparse fact sets retain one-, two-, or three-column layouts.
+- [x] Desktop and narrow-mobile captures match the intended hierarchy.
+- [x] Popup interaction and exclusivity regressions pass.
+- [x] No blocking design differences remain.
+
+final result: passed

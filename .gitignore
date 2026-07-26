@@ -8,6 +8,7 @@ out/
 test-results/
 playwright-report/
 playwright-videos/
+output/
 .pnpm-store
 node_modules/
 coverage/

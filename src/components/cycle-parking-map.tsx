@@ -17,8 +17,12 @@ import {
   Bookmark,
   Boxes,
   Building2,
+  ChartSpline,
   CircleHelp,
   GraduationCap,
+  Layers,
+  Lightbulb,
+  LightbulbOff,
   Lock,
   LockOpen,
   MapPin,
@@ -27,7 +31,9 @@ import {
   Route,
   ScanSearch,
   Share2,
+  Ship,
   ShoppingBag,
+  TriangleAlert,
   Umbrella,
   UmbrellaOff,
   Warehouse,
@@ -69,12 +75,16 @@ import {
 import type { AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
 import { getPointSavedNeukKey } from '@/lib/saved-neuks';
+import type { CycleNetworkFeature } from '@/lib/cycle-network-data';
+import { getCycleNetworkPopupDetails } from '@/lib/cycle-network-presentation';
 
 maplibregl.setWorkerUrl('/vendor/maplibre-gl/maplibre-gl-worker.mjs');
 
 type CycleParkingMapProps = {
   locale: AppLocale;
   points: ParkingPoint[];
+  cycleNetworkFeatures: CycleNetworkFeature[];
+  isCycleNetworkVisible: boolean;
   userLocation: UserLocation;
   currentLocationFocusRequestId: number;
   selectedPoint: ParkingPoint | null;
@@ -110,7 +120,7 @@ type CycleParkingMapProps = {
   onShareParkingLink: (point: ParkingPoint) => void;
   onToggleSavedPoint: (point: ParkingPoint) => void;
   onOpenDetails: (point: ParkingPoint) => void;
-  onViewportChange: (bounds: ParkingMapBounds) => void;
+  onViewportChange: (bounds: ParkingMapBounds, zoom: number) => void;
 };
 
 type VisibleMapArea = {
@@ -471,6 +481,36 @@ function centerPopupInVisibleMapArea(map: MapLibreMap, popup: MapLibrePopup) {
 
   map.panBy([panX, panY], {
     duration: 650,
+    easing: (progress) => progress * (2 - progress),
+  });
+}
+
+function keepPopupInVisibleMapArea(map: MapLibreMap, popup: MapLibrePopup) {
+  if (!popup.isOpen()) return;
+  const popupElement = popup.getElement();
+  if (!popupElement) return;
+
+  const margin = 16;
+  const mapRect = map.getContainer().getBoundingClientRect();
+  const visibleArea = getVisibleMapArea(map);
+  const visibleLeft = mapRect.left + visibleArea.left + margin;
+  const visibleRight = mapRect.left + visibleArea.right - margin;
+  const visibleTop = mapRect.top + visibleArea.top + margin;
+  const visibleBottom = mapRect.top + visibleArea.bottom - margin;
+  const popupRect = popupElement.getBoundingClientRect();
+  let panX = 0;
+  let panY = 0;
+
+  if (popupRect.left < visibleLeft) panX = popupRect.left - visibleLeft;
+  else if (popupRect.right > visibleRight)
+    panX = popupRect.right - visibleRight;
+  if (popupRect.top < visibleTop) panY = popupRect.top - visibleTop;
+  else if (popupRect.bottom > visibleBottom)
+    panY = popupRect.bottom - visibleBottom;
+
+  if (panX === 0 && panY === 0) return;
+  map.panBy([Math.round(panX), Math.round(panY)], {
+    duration: 450,
     easing: (progress) => progress * (2 - progress),
   });
 }
@@ -862,6 +902,103 @@ function ParkingPopupIcon({ icon }: { icon: ParkingPopupIcon }) {
   return <Icon size={15} strokeWidth={2.25} aria-hidden="true" />;
 }
 
+const cycleNetworkDetailIcon = {
+  lighting: Lightbulb,
+  'lighting-off': LightbulbOff,
+  quality: ChartSpline,
+  surface: Layers,
+} as const;
+
+function CycleNetworkPopupContent({
+  feature,
+  locale,
+}: {
+  feature: CycleNetworkFeature;
+  locale: AppLocale;
+}) {
+  const routeNumber =
+    feature.properties.routeNumber ?? feature.properties.linkNumber;
+  const title =
+    routeNumber === undefined
+      ? translate(locale, 'nationalCycleNetwork')
+      : translate(
+          locale,
+          feature.properties.routeType === 'link'
+            ? 'cycleNetworkLinkRoute'
+            : 'cycleNetworkRoute',
+          { number: routeNumber },
+        );
+  const kind = translate(
+    locale,
+    feature.properties.kind === 'traffic-free'
+      ? 'cycleNetworkTrafficFree'
+      : feature.properties.kind === 'on-road'
+        ? 'cycleNetworkOnRoad'
+        : feature.properties.kind === 'ferry'
+          ? 'cycleNetworkFerry'
+          : 'nationalCycleNetwork',
+  );
+  const KindIcon =
+    feature.properties.kind === 'ferry'
+      ? Ship
+      : feature.properties.kind === 'traffic-free'
+        ? Bike
+        : Route;
+  const details = getCycleNetworkPopupDetails(feature, locale);
+  const factCount = details.length + 1;
+
+  return (
+    <div className="cycle-network-popup" data-testid="cycle-network-popup">
+      <div className="cycle-network-popup-title">
+        {routeNumber === undefined ? (
+          <Bike aria-hidden="true" />
+        ) : (
+          <span
+            aria-hidden="true"
+            className={`cycle-network-route-shield cycle-network-route-shield-${feature.properties.routeType}`}
+          >
+            {routeNumber}
+          </span>
+        )}
+        <strong>{title}</strong>
+      </div>
+      {feature.properties.openStatus === 'temporary-closure' ? (
+        <div className="cycle-network-popup-warning">
+          <TriangleAlert aria-hidden="true" />
+          <span>{translate(locale, 'cycleNetworkTemporaryClosure')}</span>
+        </div>
+      ) : null}
+      <div
+        className={`cycle-network-popup-details cycle-network-popup-details-count-${factCount}`}
+        data-testid="cycle-network-popup-facts"
+      >
+        <div
+          aria-label={kind}
+          className="cycle-network-popup-detail"
+          title={kind}
+        >
+          <KindIcon aria-hidden="true" />
+          <span>{kind}</span>
+        </div>
+        {details.map((detail) => {
+          const Icon = cycleNetworkDetailIcon[detail.icon];
+          return (
+            <div
+              aria-label={`${detail.label}: ${detail.value}`}
+              className="cycle-network-popup-detail"
+              key={detail.icon}
+              title={detail.label}
+            >
+              <Icon aria-hidden="true" />
+              <span>{detail.value}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function ParkingPopupContent({
   canRequestDirections,
   canShowStreetView,
@@ -1210,9 +1347,248 @@ function syncLineLayer({
   });
 }
 
+const cycleNetworkSourceId = 'cycle-network-lines';
+const cycleNetworkHitLayerId = 'cycle-network-hit';
+const cycleNetworkShieldImageIds = {
+  link: 'cycle-network-shield-link',
+  ncn: 'cycle-network-shield-ncn',
+  rcn: 'cycle-network-shield-rcn',
+} as const;
+
+function addCycleNetworkShieldImage(
+  map: MapLibreMap,
+  id: string,
+  fill: string,
+) {
+  if (map.hasImage(id)) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = 56;
+  canvas.height = 40;
+  const context = canvas.getContext('2d');
+  if (!context) return;
+
+  const left = 2;
+  const top = 2;
+  const right = 54;
+  const bottom = 38;
+  const radius = 10;
+  context.beginPath();
+  context.moveTo(left + radius, top);
+  context.lineTo(right - radius, top);
+  context.quadraticCurveTo(right, top, right, top + radius);
+  context.lineTo(right, bottom - radius);
+  context.quadraticCurveTo(right, bottom, right - radius, bottom);
+  context.lineTo(left + radius, bottom);
+  context.quadraticCurveTo(left, bottom, left, bottom - radius);
+  context.lineTo(left, top + radius);
+  context.quadraticCurveTo(left, top, left + radius, top);
+  context.closePath();
+  context.fillStyle = fill;
+  context.fill();
+  context.strokeStyle = 'rgba(255,255,255,0.92)';
+  context.lineWidth = 3;
+  context.stroke();
+
+  map.addImage(id, context.getImageData(0, 0, 56, 40), {
+    content: [12, 8, 44, 32],
+    pixelRatio: 2,
+    stretchX: [[20, 36]],
+    stretchY: [[14, 26]],
+  });
+}
+
+function ensureCycleNetworkShieldImages(map: MapLibreMap) {
+  addCycleNetworkShieldImage(map, cycleNetworkShieldImageIds.ncn, '#b4232f');
+  addCycleNetworkShieldImage(map, cycleNetworkShieldImageIds.rcn, '#275dad');
+  addCycleNetworkShieldImage(map, cycleNetworkShieldImageIds.link, '#52606d');
+}
+
+function syncCycleNetworkLayers({
+  features,
+  isDirectionsMode,
+  map,
+  theme,
+}: {
+  features: CycleNetworkFeature[];
+  isDirectionsMode: boolean;
+  map: MapLibreMap;
+  theme: 'light' | 'dark';
+}) {
+  const lineData = {
+    features,
+    type: 'FeatureCollection' as const,
+  };
+  const lineSource = map.getSource(cycleNetworkSourceId) as
+    | GeoJSONSource
+    | undefined;
+  if (lineSource) void lineSource.setData(lineData);
+  else map.addSource(cycleNetworkSourceId, { data: lineData, type: 'geojson' });
+  ensureCycleNetworkShieldImages(map);
+
+  const firstSymbolLayer = map
+    .getStyle()
+    .layers?.find((layer) => layer.type === 'symbol')?.id;
+  const opacity = isDirectionsMode ? 0.24 : 0.86;
+  const styles = [
+    {
+      color: theme === 'dark' ? '#42d6a4' : '#087f5b',
+      filter: ['==', ['get', 'kind'], 'traffic-free'],
+      id: 'cycle-network-traffic-free',
+      width: 3.4,
+    },
+    {
+      color: theme === 'dark' ? '#a5b4fc' : '#4f46a5',
+      dash: [2, 1.4],
+      filter: ['==', ['get', 'kind'], 'on-road'],
+      id: 'cycle-network-on-road',
+      width: 2.4,
+    },
+    {
+      color: theme === 'dark' ? '#67e8f9' : '#08799c',
+      dash: [0.4, 2],
+      filter: ['==', ['get', 'kind'], 'ferry'],
+      id: 'cycle-network-ferry',
+      width: 2.6,
+    },
+    {
+      color: theme === 'dark' ? '#cbd5e1' : '#64748b',
+      dash: [1, 1.5],
+      filter: ['==', ['get', 'kind'], 'unknown'],
+      id: 'cycle-network-other',
+      width: 2,
+    },
+  ];
+  for (const style of styles) {
+    if (map.getLayer(style.id)) {
+      map.setPaintProperty(style.id, 'line-color', style.color);
+      map.setPaintProperty(style.id, 'line-opacity', opacity);
+      continue;
+    }
+    const paint: NonNullable<LineLayerSpecification['paint']> = {
+      'line-color': style.color,
+      'line-opacity': opacity,
+      'line-width': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        10,
+        style.width,
+        15,
+        style.width + 1.2,
+      ],
+    };
+    if (style.dash) paint['line-dasharray'] = style.dash;
+    map.addLayer(
+      {
+        filter: style.filter as FilterSpecification,
+        id: style.id,
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint,
+        source: cycleNetworkSourceId,
+        type: 'line',
+      },
+      firstSymbolLayer,
+    );
+  }
+  if (map.getLayer('cycle-network-temporary-closure')) {
+    map.setPaintProperty(
+      'cycle-network-temporary-closure',
+      'line-color',
+      theme === 'dark' ? '#fb923c' : '#c2410c',
+    );
+    map.setPaintProperty(
+      'cycle-network-temporary-closure',
+      'line-opacity',
+      isDirectionsMode ? 0.3 : 1,
+    );
+  } else {
+    map.addLayer(
+      {
+        filter: ['==', ['get', 'openStatus'], 'temporary-closure'],
+        id: 'cycle-network-temporary-closure',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': theme === 'dark' ? '#fb923c' : '#c2410c',
+          'line-dasharray': [0.8, 1.2],
+          'line-opacity': isDirectionsMode ? 0.3 : 1,
+          'line-width': 5,
+        },
+        source: cycleNetworkSourceId,
+        type: 'line',
+      },
+      firstSymbolLayer,
+    );
+  }
+  if (!map.getLayer(cycleNetworkHitLayerId)) {
+    map.addLayer({
+      id: cycleNetworkHitLayerId,
+      paint: { 'line-color': '#000000', 'line-opacity': 0, 'line-width': 14 },
+      source: cycleNetworkSourceId,
+      type: 'line',
+    });
+  }
+  if (map.getLayer('cycle-network-labels')) {
+    map.setPaintProperty(
+      'cycle-network-labels',
+      'icon-opacity',
+      isDirectionsMode ? 0.42 : 1,
+    );
+    map.setPaintProperty(
+      'cycle-network-labels',
+      'text-opacity',
+      isDirectionsMode ? 0.42 : 1,
+    );
+  } else {
+    map.addLayer({
+      filter: [
+        'all',
+        ['in', ['get', 'routeType'], ['literal', ['ncn', 'rcn', 'link']]],
+        ['any', ['has', 'routeNumber'], ['has', 'linkNumber']],
+      ],
+      id: 'cycle-network-labels',
+      layout: {
+        'icon-allow-overlap': false,
+        'icon-image': [
+          'match',
+          ['get', 'routeType'],
+          'ncn',
+          cycleNetworkShieldImageIds.ncn,
+          'rcn',
+          cycleNetworkShieldImageIds.rcn,
+          cycleNetworkShieldImageIds.link,
+        ],
+        'icon-keep-upright': true,
+        'icon-rotation-alignment': 'viewport',
+        'icon-text-fit': 'both',
+        'icon-text-fit-padding': [2, 5, 2, 5],
+        'symbol-placement': 'line',
+        'symbol-spacing': 360,
+        'text-field': [
+          'to-string',
+          ['coalesce', ['get', 'routeNumber'], ['get', 'linkNumber']],
+        ],
+        'text-font': ['Noto Sans Regular'],
+        'text-keep-upright': true,
+        'text-rotation-alignment': 'viewport',
+        'text-size': 10.5,
+      },
+      minzoom: 10.5,
+      paint: {
+        'icon-opacity': isDirectionsMode ? 0.42 : 1,
+        'text-color': '#ffffff',
+        'text-opacity': isDirectionsMode ? 0.42 : 1,
+      },
+      source: cycleNetworkSourceId,
+      type: 'symbol',
+    });
+  }
+}
+
 export default function CycleParkingMap({
   locale,
   points,
+  cycleNetworkFeatures,
+  isCycleNetworkVisible,
   userLocation,
   currentLocationFocusRequestId,
   selectedPoint,
@@ -1246,6 +1622,8 @@ export default function CycleParkingMap({
   const startMarkerRef = useRef<RenderedMarker | null>(null);
   const liveMarkerRef = useRef<RenderedMarker | null>(null);
   const instructionMarkerRef = useRef<RenderedMarker | null>(null);
+  const cycleNetworkPopupRef = useRef<MapLibrePopup | null>(null);
+  const cycleNetworkPopupRootRef = useRef<Root | null>(null);
   const previousFocusTargetRef = useRef<MapFocusTarget | null>(null);
   const previousParkingViewRef = useRef(parkingView);
   const nearbyCameraRef = useRef<{
@@ -1283,9 +1661,28 @@ export default function CycleParkingMap({
     zoom: 13,
   });
   onViewportChangeRef.current = onViewportChange;
+  const closeCycleNetworkPopup = useCallback(() => {
+    const popup = cycleNetworkPopupRef.current;
+    const root = cycleNetworkPopupRootRef.current;
+    cycleNetworkPopupRef.current = null;
+    cycleNetworkPopupRootRef.current = null;
+    if (popup?.isOpen()) {
+      popup.remove();
+    } else {
+      root?.unmount();
+    }
+  }, []);
+  const closeMarkerPopups = useCallback((exceptPointId?: string) => {
+    startMarkerRef.current?.popup?.remove();
+    parkingMarkerRefs.current.forEach((renderedMarker, pointId) => {
+      if (pointId !== exceptPointId) {
+        renderedMarker.popup?.remove();
+      }
+    });
+  }, []);
   const handleViewportChange = useCallback(
     ({ bounds, zoom }: { bounds: ParkingMapBounds; zoom: number }) => {
-      onViewportChangeRef.current(bounds);
+      onViewportChangeRef.current(bounds, zoom);
       const mapCenter = mapRef.current?.getCenter();
       const center = mapCenter
         ? ([mapCenter.lng, mapCenter.lat] satisfies [number, number])
@@ -1522,6 +1919,7 @@ export default function CycleParkingMap({
       cleanupRenderedMarker(startMarkerRef.current);
       cleanupRenderedMarker(liveMarkerRef.current);
       cleanupRenderedMarker(instructionMarkerRef.current);
+      closeCycleNetworkPopup();
       startMarkerRef.current = null;
       liveMarkerRef.current = null;
       instructionMarkerRef.current = null;
@@ -1537,7 +1935,7 @@ export default function CycleParkingMap({
       setMap(null);
       setIsMapLoaded(false);
     };
-  }, [handleViewportChange, updateViewport]);
+  }, [closeCycleNetworkPopup, handleViewportChange, updateViewport]);
 
   useEffect(() => {
     if (!map) {
@@ -1673,6 +2071,111 @@ export default function CycleParkingMap({
       return;
     }
 
+    syncCycleNetworkLayers({
+      features: isCycleNetworkVisible ? cycleNetworkFeatures : [],
+      isDirectionsMode,
+      map,
+      theme,
+    });
+  }, [
+    cycleNetworkFeatures,
+    isCycleNetworkVisible,
+    isDirectionsMode,
+    isMapLoaded,
+    map,
+    styleRevision,
+    theme,
+  ]);
+
+  useEffect(() => {
+    if (!map || !isMapLoaded || !map.getLayer(cycleNetworkHitLayerId)) {
+      return;
+    }
+
+    const featuresById = new Map(
+      cycleNetworkFeatures.map((feature) => [feature.id, feature]),
+    );
+    const featuresBySegmentId = new Map(
+      cycleNetworkFeatures.map((feature) => [
+        String(feature.properties.segmentId),
+        feature,
+      ]),
+    );
+    const handleClick = (event: maplibregl.MapLayerMouseEvent) => {
+      const renderedFeature = event.features?.[0];
+      const feature = renderedFeature
+        ? (featuresById.get(String(renderedFeature.id)) ??
+          featuresBySegmentId.get(String(renderedFeature.properties.segmentId)))
+        : null;
+      if (!feature) return;
+      closeCycleNetworkPopup();
+      closeMarkerPopups();
+      if (selectedPoint) {
+        suppressNextSelectionClearFocusRef.current = true;
+        onClearSelection();
+      }
+      const { popup, root } = createRenderedPopup(
+        <CycleNetworkPopupContent feature={feature} locale={locale} />,
+        {
+          anchor: 'bottom',
+          closeButton: true,
+          closeOnClick: true,
+          offset: 8,
+        },
+      );
+      cycleNetworkPopupRef.current = popup;
+      cycleNetworkPopupRootRef.current = root;
+      popup.once('close', () => {
+        root.unmount();
+        if (cycleNetworkPopupRef.current === popup) {
+          cycleNetworkPopupRef.current = null;
+          cycleNetworkPopupRootRef.current = null;
+        }
+      });
+      popup.setLngLat(event.lngLat).addTo(map);
+      window.requestAnimationFrame(() => keepPopupInVisibleMapArea(map, popup));
+    };
+    const showPointer = () => {
+      map.getCanvas().style.cursor = 'pointer';
+    };
+    const clearPointer = () => {
+      map.getCanvas().style.cursor = '';
+    };
+    map.on('click', cycleNetworkHitLayerId, handleClick);
+    map.on('mouseenter', cycleNetworkHitLayerId, showPointer);
+    map.on('mouseleave', cycleNetworkHitLayerId, clearPointer);
+    return () => {
+      map.off('click', cycleNetworkHitLayerId, handleClick);
+      map.off('mouseenter', cycleNetworkHitLayerId, showPointer);
+      map.off('mouseleave', cycleNetworkHitLayerId, clearPointer);
+      clearPointer();
+    };
+  }, [
+    closeCycleNetworkPopup,
+    closeMarkerPopups,
+    cycleNetworkFeatures,
+    isMapLoaded,
+    locale,
+    map,
+    onClearSelection,
+    selectedPoint,
+    styleRevision,
+  ]);
+
+  useEffect(() => {
+    if (isCycleNetworkVisible) return;
+    closeCycleNetworkPopup();
+  }, [closeCycleNetworkPopup, isCycleNetworkVisible]);
+
+  useEffect(() => {
+    closeCycleNetworkPopup();
+  }, [closeCycleNetworkPopup, locale]);
+
+  useEffect(() => {
+    if (!map || !isMapLoaded) {
+      return;
+    }
+
     syncLineLayer({
       data: createLineData(route?.points ?? null),
       id: 'route-line',
@@ -1750,6 +2253,8 @@ export default function CycleParkingMap({
       .addTo(map);
 
     const openStartPopup = () => {
+      closeCycleNetworkPopup();
+      closeMarkerPopups();
       popup
         .setLngLat([userLocation.longitude, userLocation.latitude])
         .addTo(map);
@@ -1778,7 +2283,7 @@ export default function CycleParkingMap({
       cleanupRenderedMarker(startMarkerRef.current);
       startMarkerRef.current = null;
     };
-  }, [locale, map, userLocation]);
+  }, [closeCycleNetworkPopup, closeMarkerPopups, locale, map, userLocation]);
 
   useEffect(() => {
     if (!map) {
@@ -2003,6 +2508,8 @@ export default function CycleParkingMap({
         ? null
         : (event) => {
             event.stopImmediatePropagation();
+            closeCycleNetworkPopup();
+            closeMarkerPopups(point.id);
             renderedMarker.popup
               ?.setLngLat([point.longitude, point.latitude])
               .addTo(map);
@@ -2024,6 +2531,8 @@ export default function CycleParkingMap({
 
             event.preventDefault();
             event.stopImmediatePropagation();
+            closeCycleNetworkPopup();
+            closeMarkerPopups(point.id);
             renderedMarker.popup
               ?.setLngLat([point.longitude, point.latitude])
               .addTo(map);
@@ -2054,6 +2563,8 @@ export default function CycleParkingMap({
       : null;
 
     if (currentSelectedPoint && selectedEntry?.popup && !route) {
+      closeCycleNetworkPopup();
+      closeMarkerPopups(currentSelectedPoint.id);
       selectedEntry.popup
         .setLngLat([
           currentSelectedPoint.longitude,
@@ -2093,6 +2604,8 @@ export default function CycleParkingMap({
   }, [
     canRequestDirections,
     canShowStreetView,
+    closeCycleNetworkPopup,
+    closeMarkerPopups,
     copiedShareButton,
     isDirectionsMode,
     locale,
@@ -2133,7 +2646,13 @@ export default function CycleParkingMap({
       }
 
       if (
-        target.closest('.parking-marker, .maplibregl-popup, .maplibregl-ctrl')
+        target.closest(
+          '.parking-marker, .maplibregl-popup, .maplibregl-ctrl',
+        ) ||
+        (map.getLayer(cycleNetworkHitLayerId) &&
+          map.queryRenderedFeatures(event.point, {
+            layers: [cycleNetworkHitLayerId],
+          }).length > 0)
       ) {
         return;
       }
@@ -2510,6 +3029,8 @@ export default function CycleParkingMap({
       data-map-south={viewport.bounds?.south}
       data-map-west={viewport.bounds?.west}
       data-map-zoom={viewport.zoom}
+      data-cycle-network-enabled={isCycleNetworkVisible}
+      data-cycle-network-features={cycleNetworkFeatures.length}
       data-testid="parking-map"
       ref={mapContainerRef}
     />
