@@ -68,17 +68,20 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  buildShortCycleRoute,
+  buildShortCycleRoutes,
   buildCycleRouteCacheKey,
   buildCycleStreetsDirectionsRequest,
+  CYCLESTREETS_DEFAULT_ROUTE_PLAN,
+  CYCLESTREETS_ROUTE_PLANS,
   describeCycleRouteInstruction,
   fetchCycleStreetsDirections,
   formatCycleRouteDuration,
-  parseCycleStreetsRoute,
+  parseCycleStreetsRoutes,
   SHORT_CYCLE_ROUTE_THRESHOLD_METERS,
-  type CycleRoute,
   type CycleRouteInstruction,
+  type CycleRoutePlan,
   type CycleRoutePoint,
+  type CycleRoutesByPlan,
 } from '@/lib/cyclestreets';
 import {
   buildPlaceSearchUrl,
@@ -208,6 +211,23 @@ const cyclingPoiServicePresentation: Record<
   repair: { icon: Wrench, labelKey: 'serviceRepairs' },
   tools: { icon: Hammer, labelKey: 'serviceTools' },
 };
+
+const cycleRoutePlanPresentation: Record<
+  CycleRoutePlan,
+  { labelKey: MessageKey }
+> = {
+  quietest: { labelKey: 'routeQuietest' },
+  balanced: { labelKey: 'routeBalanced' },
+  fastest: { labelKey: 'routeFastest' },
+};
+
+function getInitialCycleRoutePlan(routes: CycleRoutesByPlan) {
+  if (routes[CYCLESTREETS_DEFAULT_ROUTE_PLAN]) {
+    return CYCLESTREETS_DEFAULT_ROUTE_PLAN;
+  }
+
+  return CYCLESTREETS_ROUTE_PLANS.find((plan) => routes[plan]) ?? null;
+}
 
 function getPointCategoryLabelKey(point: ParkingPoint): MessageKey {
   if (!isCyclingPoiPoint(point)) return 'categoryParking';
@@ -413,7 +433,12 @@ type DirectionsState =
   | { status: 'idle' }
   | { status: 'missing-key'; parkingId: string }
   | { status: 'loading'; parkingId: string }
-  | { status: 'loaded'; parkingId: string; route: CycleRoute }
+  | {
+      status: 'loaded';
+      parkingId: string;
+      routes: CycleRoutesByPlan;
+      selectedPlan: CycleRoutePlan;
+    }
   | { status: 'error'; parkingId: string; message: string };
 
 type LiveRouteTrackingState =
@@ -608,7 +633,7 @@ export default function CycleParkingFinder() {
   localeRef.current = locale;
   const parkingDataClient = useRef<ParkingDataClient | null>(null);
   const cyclingPoiDataClient = useRef<CyclingPoiDataClient | null>(null);
-  const directionsCache = useRef(new Map<string, CycleRoute>());
+  const directionsCache = useRef(new Map<string, CycleRoutesByPlan>());
   const placeSearchAbortController = useRef<AbortController | null>(null);
   const placeSearchDebounceTimeout = useRef<number | null>(null);
   const placeSearchRequestId = useRef(0);
@@ -1433,7 +1458,12 @@ export default function CycleParkingFinder() {
         ) ?? null)
       : null;
   const activeRoute =
-    directionsState.status === 'loaded' ? directionsState.route : null;
+    directionsState.status === 'loaded'
+      ? (directionsState.routes[directionsState.selectedPlan] ?? null)
+      : null;
+  const isRoutePlanSelectionLocked =
+    liveRouteTracking.status === 'starting' ||
+    liveRouteTracking.status === 'tracking';
   const activeRouteInstruction =
     activeRoute && activeInstruction
       ? (activeRoute.instructions.find(
@@ -2107,6 +2137,33 @@ export default function CycleParkingFinder() {
     dispatchParkingPanel({ type: 'EXIT_DIRECTIONS' });
   }
 
+  function selectCycleRoutePlan(plan: CycleRoutePlan) {
+    if (
+      directionsState.status !== 'loaded' ||
+      !directionsState.routes[plan] ||
+      liveRouteTracking.status === 'starting' ||
+      liveRouteTracking.status === 'tracking' ||
+      directionsState.selectedPlan === plan
+    ) {
+      return;
+    }
+
+    const route = directionsState.routes[plan];
+    setActiveInstruction(null);
+    setRouteInstructionFocusRequest(null);
+    setDirectionsState({
+      ...directionsState,
+      selectedPlan: plan,
+    });
+    captureAnalyticsEvent('directions_plan_selected', {
+      parking_id: directionsState.parkingId,
+      parking_name: directionsParkingPoint?.name ?? '',
+      route_distance_metres: route.distanceMeters,
+      route_duration_seconds: route.durationSeconds,
+      route_plan: plan,
+    });
+  }
+
   function selectRouteInstruction(id: string) {
     setActiveInstruction((current) => ({
       id,
@@ -2628,13 +2685,23 @@ export default function CycleParkingFinder() {
     }
 
     const cacheKey = buildCycleRouteCacheKey(locationState.location, point);
-    const cachedRoute = directionsCache.current.get(cacheKey);
+    const cachedRoutes = directionsCache.current.get(cacheKey);
 
-    if (cachedRoute) {
+    if (cachedRoutes) {
+      const selectedPlan = getInitialCycleRoutePlan(cachedRoutes);
+      if (!selectedPlan) {
+        setDirectionsState({
+          status: 'error',
+          parkingId: point.id,
+          message: t('directionsError'),
+        });
+        return;
+      }
       setDirectionsState({
         status: 'loaded',
         parkingId: point.id,
-        route: cachedRoute,
+        routes: cachedRoutes,
+        selectedPlan,
       });
       return;
     }
@@ -2643,9 +2710,14 @@ export default function CycleParkingFinder() {
       distanceMeters(locationState.location, point) <=
       SHORT_CYCLE_ROUTE_THRESHOLD_METERS
     ) {
-      const route = buildShortCycleRoute(locationState.location, point);
-      directionsCache.current.set(cacheKey, route);
-      setDirectionsState({ status: 'loaded', parkingId: point.id, route });
+      const routes = buildShortCycleRoutes(locationState.location, point);
+      directionsCache.current.set(cacheKey, routes);
+      setDirectionsState({
+        status: 'loaded',
+        parkingId: point.id,
+        routes,
+        selectedPlan: CYCLESTREETS_DEFAULT_ROUTE_PLAN,
+      });
       return;
     }
 
@@ -2659,7 +2731,7 @@ export default function CycleParkingFinder() {
         origin: locationState.location,
         destination: point,
       });
-      const route = parseCycleStreetsRoute(
+      const routes = parseCycleStreetsRoutes(
         await fetchCycleStreetsDirections(request),
         point,
       );
@@ -2668,13 +2740,24 @@ export default function CycleParkingFinder() {
         return;
       }
 
-      directionsCache.current.set(cacheKey, route);
+      const selectedPlan = getInitialCycleRoutePlan(routes);
+      if (!selectedPlan) {
+        throw new Error('CycleStreets returned no routes.');
+      }
+
+      directionsCache.current.set(cacheKey, routes);
       captureAnalyticsEvent('directions_loaded', {
         parking_id: point.id,
         parking_name: point.name,
-        route_source: route.source,
+        route_plans: Object.keys(routes).join(','),
+        route_source: routes[selectedPlan]?.source ?? 'cyclestreets',
       });
-      setDirectionsState({ status: 'loaded', parkingId: point.id, route });
+      setDirectionsState({
+        status: 'loaded',
+        parkingId: point.id,
+        routes,
+        selectedPlan,
+      });
     } catch {
       if (directionsRequestId.current !== requestId) {
         return;
@@ -3392,30 +3475,76 @@ export default function CycleParkingFinder() {
                       </motion.div>
                     ) : null}
                     <AnimatePresence initial={false}>
-                      {directionsState.status === 'loaded' ? (
+                      {directionsState.status === 'loaded' && activeRoute ? (
                         <motion.div
                           {...directionsRevealPresence}
                           key="directions-summary"
                           className="directions-summary"
                         >
                           <div
-                            className="directions-metrics"
-                            aria-label={t('routeSummary')}
+                            className="directions-route-options"
+                            aria-label={t('routeStyle')}
+                            role="group"
                           >
-                            <span>
-                              <Navigation size={16} aria-hidden="true" />
-                              {formatDistance(
-                                directionsState.route.distanceMeters,
-                                locale,
-                              )}
-                            </span>
-                            <span>
-                              <Bike size={16} aria-hidden="true" />
-                              {formatCycleRouteDuration(
-                                directionsState.route.durationSeconds,
-                                locale,
-                              )}
-                            </span>
+                            {CYCLESTREETS_ROUTE_PLANS.map((plan) => {
+                              const route = directionsState.routes[plan];
+                              const presentation =
+                                cycleRoutePlanPresentation[plan];
+                              const isSelected =
+                                directionsState.selectedPlan === plan;
+                              const [durationValue, ...durationUnitParts] =
+                                route
+                                  ? formatCycleRouteDuration(
+                                      route.durationSeconds,
+                                      locale,
+                                    ).split(/\s+/)
+                                  : ['—'];
+                              const durationUnit = durationUnitParts.join(' ');
+                              return (
+                                <motion.button
+                                  aria-pressed={isSelected}
+                                  className={[
+                                    'directions-route-option',
+                                    isSelected
+                                      ? 'directions-route-option-selected'
+                                      : '',
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                  data-testid={`route-plan-${plan}`}
+                                  disabled={
+                                    !route || isRoutePlanSelectionLocked
+                                  }
+                                  key={plan}
+                                  type="button"
+                                  whileTap={subtleTap}
+                                  onClick={() => selectCycleRoutePlan(plan)}
+                                >
+                                  <span className="directions-route-option-label">
+                                    {t(presentation.labelKey)}
+                                  </span>
+                                  <span className="directions-route-option-duration">
+                                    <strong>{durationValue}</strong>
+                                    {durationUnit ? (
+                                      <>
+                                        {' '}
+                                        <span className="directions-route-option-duration-unit">
+                                          {durationUnit}
+                                        </span>
+                                      </>
+                                    ) : null}
+                                  </span>
+                                  <small>
+                                    {route
+                                      ? formatDistance(
+                                          route.distanceMeters,
+                                          locale,
+                                        )
+                                      : t('routeUnavailable')}
+                                  </small>
+                                </motion.button>
+                              );
+                            })}
                           </div>
                         </motion.div>
                       ) : null}
@@ -3455,7 +3584,7 @@ export default function CycleParkingFinder() {
                       ) : null}
                     </AnimatePresence>
 
-                    {directionsState.status === 'loaded' ? (
+                    {directionsState.status === 'loaded' && activeRoute ? (
                       <motion.div
                         animate="animate"
                         initial="initial"
@@ -3463,80 +3592,78 @@ export default function CycleParkingFinder() {
                         className="directions-route-content"
                         variants={routeContentVariants}
                       >
-                        {directionsState.route.instructions.length > 0 ? (
+                        {activeRoute.instructions.length > 0 ? (
                           <motion.ol
                             layout="position"
                             className="directions-list"
                             data-testid="directions-list"
                             transition={rowLayoutTransition}
                           >
-                            {directionsState.route.instructions.map(
-                              (instruction) => {
-                                const StepIcon =
-                                  getRouteInstructionIcon(instruction);
-                                const isActiveInstruction =
-                                  activeInstruction?.id === instruction.id;
-                                const isLiveActiveInstruction =
-                                  liveRouteTracking.status === 'tracking' &&
-                                  isActiveInstruction;
-                                return (
-                                  <motion.li
-                                    layout="position"
-                                    key={instruction.id}
-                                    className={[
-                                      'directions-list-item',
-                                      isActiveInstruction
-                                        ? 'directions-list-item-active'
-                                        : '',
-                                      isLiveActiveInstruction
-                                        ? 'directions-list-item-live-active'
-                                        : '',
-                                    ]
-                                      .filter(Boolean)
-                                      .join(' ')}
-                                    onClick={() =>
-                                      selectRouteInstruction(instruction.id)
+                            {activeRoute.instructions.map((instruction) => {
+                              const StepIcon =
+                                getRouteInstructionIcon(instruction);
+                              const isActiveInstruction =
+                                activeInstruction?.id === instruction.id;
+                              const isLiveActiveInstruction =
+                                liveRouteTracking.status === 'tracking' &&
+                                isActiveInstruction;
+                              return (
+                                <motion.li
+                                  layout="position"
+                                  key={instruction.id}
+                                  className={[
+                                    'directions-list-item',
+                                    isActiveInstruction
+                                      ? 'directions-list-item-active'
+                                      : '',
+                                    isLiveActiveInstruction
+                                      ? 'directions-list-item-live-active'
+                                      : '',
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                  onClick={() =>
+                                    selectRouteInstruction(instruction.id)
+                                  }
+                                  data-testid={`directions-step-${instruction.id}`}
+                                  onKeyDown={(event) => {
+                                    if (
+                                      event.key === 'Enter' ||
+                                      event.key === ' '
+                                    ) {
+                                      event.preventDefault();
+                                      selectRouteInstruction(instruction.id);
                                     }
-                                    data-testid={`directions-step-${instruction.id}`}
-                                    onKeyDown={(event) => {
-                                      if (
-                                        event.key === 'Enter' ||
-                                        event.key === ' '
-                                      ) {
-                                        event.preventDefault();
-                                        selectRouteInstruction(instruction.id);
-                                      }
-                                    }}
-                                    role="button"
-                                    tabIndex={0}
-                                    transition={rowLayoutTransition}
-                                    variants={routeStepVariants}
+                                  }}
+                                  role="button"
+                                  tabIndex={0}
+                                  transition={rowLayoutTransition}
+                                  variants={routeStepVariants}
+                                >
+                                  <span
+                                    className="directions-step-icon"
+                                    aria-hidden="true"
                                   >
-                                    <span
-                                      className="directions-step-icon"
-                                      aria-hidden="true"
-                                    >
-                                      <StepIcon size={18} />
-                                    </span>
-                                    <span className="directions-step-text">
-                                      {describeCycleRouteInstruction(
-                                        instruction,
-                                        locale,
-                                      )}
-                                    </span>
-                                    <small className="directions-step-distance">
-                                      {formatDistance(
-                                        instruction.distanceMeters,
-                                        locale,
-                                      )}
-                                    </small>
-                                  </motion.li>
-                                );
-                              },
-                            )}
+                                    <StepIcon size={18} />
+                                  </span>
+                                  <span className="directions-step-text">
+                                    {describeCycleRouteInstruction(
+                                      instruction,
+                                      locale,
+                                    )}
+                                  </span>
+                                  <small className="directions-step-distance">
+                                    {formatDistance(
+                                      instruction.distanceMeters,
+                                      locale,
+                                    )}
+                                  </small>
+                                </motion.li>
+                              );
+                            })}
                           </motion.ol>
                         ) : null}
-                        {directionsState.route.source === 'cyclestreets' ? (
+                        {activeRoute.source === 'cyclestreets' ? (
                           <motion.p
                             {...risePresence}
                             key="directions-attribution"
@@ -3553,7 +3680,7 @@ export default function CycleParkingFinder() {
                             <a
                               key="directions-attribution-link"
                               href={
-                                directionsState.route.routeUrl ??
+                                activeRoute.routeUrl ??
                                 'https://www.cyclestreets.net/'
                               }
                             >

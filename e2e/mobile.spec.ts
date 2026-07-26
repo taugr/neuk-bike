@@ -236,6 +236,27 @@ test('keeps the mobile directions panel usable', async ({ page }) => {
   ).toHaveCount(0);
   await expect(page.locator('.directions-mark')).toBeHidden();
 
+  const routeStyle = page.getByLabel('Route style');
+  await expect(routeStyle).toBeVisible();
+  await expect(page.getByTestId('route-plan-quietest')).toContainText('1 min');
+  await expect(page.getByTestId('route-plan-balanced')).toContainText('1 min');
+  await expect(page.getByTestId('route-plan-fastest')).toContainText('1 min');
+  await expect(page.getByTestId('route-plan-balanced')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByTestId('route-plan-fastest').click();
+  await expect(page.getByTestId('route-plan-fastest')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('.directions-route-option-check')).toHaveCount(0);
+  await expect(page.locator('.directions-route-description')).toHaveCount(0);
+  const routeStyleBounds = await routeStyle.boundingBox();
+  expect(
+    routeStyleBounds?.height ?? Number.POSITIVE_INFINITY,
+  ).toBeLessThanOrEqual(80);
+
   const directionsMain = page.locator('.directions-header-main');
   const directionsMainBounds = await directionsMain.boundingBox();
   const backBounds = await page
@@ -267,6 +288,7 @@ test('keeps the mobile directions panel usable', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'Expand directions panel' }),
   ).toBeVisible();
+  await expect(routeStyle).toBeHidden();
 });
 
 test('keeps the nearby heading clear after collapsing and expanding', async ({

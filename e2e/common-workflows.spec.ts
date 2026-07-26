@@ -583,7 +583,7 @@ test('opens short local directions to Spanish parking', async ({ page }) => {
   await expect(
     page.getByRole('region', { name: 'Cycle directions' }),
   ).toBeVisible();
-  await expect(page.getByLabel('Route summary')).toBeVisible();
+  await expect(page.getByLabel('Route style')).toBeVisible();
   await expect(page.getByTestId('directions-list')).toBeVisible();
 });
 
@@ -592,7 +592,18 @@ test('opens short local directions from a mocked location', async ({
 }) => {
   const parkingName = await openShortRouteDirections(page);
 
-  await expect(page.getByLabel('Route summary')).toBeVisible();
+  await expect(page.getByLabel('Route style')).toBeVisible();
+  await expect(page.getByTestId('route-plan-balanced')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByTestId('route-plan-quietest').click();
+  await expect(page.getByTestId('route-plan-quietest')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('.directions-route-option-check')).toHaveCount(0);
+  await expect(page.locator('.directions-route-description')).toHaveCount(0);
   await expect(page.getByTestId('directions-list')).toBeVisible();
   await expect(page.locator('.directions-list-item')).toHaveCount(2);
   await expect(page.locator('.directions-list-item').last()).toContainText(
@@ -619,6 +630,9 @@ test('tracks a mocked live route through arrival', async ({ page }) => {
   await page.getByRole('button', { name: 'Start route' }).click();
 
   await expect(page.getByTestId('live-route-marker')).toBeVisible();
+  await expect(page.getByTestId('route-plan-balanced')).toBeDisabled();
+  await expect(page.getByTestId('route-plan-quietest')).toBeDisabled();
+  await expect(page.getByTestId('route-plan-fastest')).toBeDisabled();
   await expect(page.getByText('Arrived at bike parking.')).toBeVisible({
     timeout: 5_000,
   });
@@ -828,7 +842,7 @@ test('opens short local directions to Armenian parking', async ({ page }) => {
   await expect(
     page.getByRole('region', { name: 'Cycle directions' }),
   ).toBeVisible();
-  await expect(page.getByLabel('Route summary')).toBeVisible();
+  await expect(page.getByLabel('Route style')).toBeVisible();
   await expect(page.getByTestId('directions-list')).toBeVisible();
 });
 

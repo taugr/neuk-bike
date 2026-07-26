@@ -58,4 +58,8 @@ describe('language support', () => {
   it('uses a compact Armenian label for a parking stand', () => {
     expect(getMessageCatalogue('hy').typeStands).toBe('Կանգնակ');
   });
+
+  it('uses a compact Gaelic label for starting directions', () => {
+    expect(getMessageCatalogue('gd').startRoute).toBe('Tòisich');
+  });
 });

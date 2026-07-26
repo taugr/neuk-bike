@@ -965,3 +965,105 @@ final result: passed
   because it is the closest suitable icon in the existing dependency set.
 
 final result: passed
+
+## Cycle route choices design QA
+
+### Evidence
+
+- Source visual truth:
+  `/Users/tomauger/.codex/generated_images/019f9d48-cc13-7dd3-95fd-e86da1bc59cc/exec-abf75e82-18c0-4eec-9096-79346131e275.png`
+- Browser-rendered implementation:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9d48-cc13-7dd3-95fd-e86da1bc59cc/locale-audit-01-english.png`
+- Viewport: 390 × 844 CSS pixels.
+- Source pixels: 853 × 1844, normalized to 390 × 844 for comparison.
+- Implementation pixels: 390 × 844 at device scale factor 1.
+- State: English, light theme, mocked origin at Gylemuir Road, Corstorphine
+  High Street selected, live CycleStreets routes loaded, Balanced selected,
+  with the user-directed check mark and explanatory row removed.
+- Full-view comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9d48-cc13-7dd3-95fd-e86da1bc59cc/route-choices-simplified-final-comparison.png`
+- Focused selector comparison:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9d48-cc13-7dd3-95fd-e86da1bc59cc/route-choices-simplified-focused-comparison.png`
+- Multilingual full-view contact sheet, ordered English, Gaelic, Spanish,
+  Armenian:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9d48-cc13-7dd3-95fd-e86da1bc59cc/locale-audit-route-options-contact-sheet.png`
+- Multilingual focused selector comparison in the same order:
+  `/Users/tomauger/.codex/visualizations/2026/07/26/019f9d48-cc13-7dd3-95fd-e86da1bc59cc/locale-audit-route-options-focused.png`
+
+### Findings
+
+No actionable P0, P1 or P2 differences remain.
+
+- Fonts and typography: the selector uses the app's existing type family with
+  the mock's hierarchy. Labels render at 12.48 pixels/700, duration numbers at
+  20.8 pixels/780, minute units at 14.4 pixels/630, and distance at 12.16
+  pixels/580. Armenian route labels use a scoped 10.08-pixel treatment so its
+  longer words remain on one line without changing the numeric hierarchy.
+- Spacing and layout rhythm: three equal-width options fit in a 78.8-pixel-high
+  control across all four languages, keeping the existing 52dvh directions
+  sheet and independently scrollable instruction list. Removing the explanatory
+  row reclaims vertical space without expanding the sheet.
+- Colors and visual tokens: Balanced uses the selected soft surface, rounded
+  teal outline and bottom inset indicator. Teal is limited to the selected label
+  and duration number; `min` remains dark and distance remains muted. The
+  selected state remains clear without the redundant check mark.
+- Image quality and asset fidelity: the route and map use the production map
+  renderer. Removing the check and explanatory-row icon leaves no selector
+  imagery that can become blurry or misaligned.
+- Copy and content: the selector presents Quietest, Balanced and Fastest with
+  CycleStreets-provided time and distance. The source mock's 6/4/3-minute values
+  are illustrative; the live sample legitimately returned 4 minutes and 605 m
+  for all three plans, so the implementation displays the API truth.
+- Responsiveness and accessibility: each option is a real pressed-state button
+  in a localized labelled group. English, Gaelic, Spanish and Armenian all have
+  equal button widths, no label/duration/distance overflow, no horizontal page
+  overflow, and no button content clipping at 390 × 844. The selector is removed
+  from the collapsed mobile state.
+
+### Interaction verification
+
+- Loaded the three plans from one CycleStreets request with Balanced selected by
+  default.
+- Selected Quietest and Fastest and confirmed the pressed state, route geometry
+  and instruction data switch together without a check mark or explanatory row.
+- Collapsed and expanded the mobile directions sheet and confirmed the selector
+  is hidden while collapsed and restored while expanded.
+- Switched through English, Gaelic, Spanish and Armenian in the rendered app and
+  captured each expanded directions state at 390 × 844.
+- Measured every route option in every language: all had equal widths, matched
+  client/scroll dimensions, and no label, duration or distance overflow.
+- Verified the desktop layout at 1280 × 800 with no page or option overflow.
+- Checked browser warnings and errors after the interaction pass; none were
+  present.
+- Focused Playwright coverage passed for local short routes, live-route locking,
+  mobile expanded/collapsed behavior, and Spanish and Armenian route surfaces.
+
+### Comparison history
+
+- Pass 1: the user identified P2 typography and color drift in the initial
+  implementation: the complete `4 min` string shared one size, weight and teal
+  color, while the source makes the number larger and colors it independently.
+  The duration was split into number and unit elements, weights and sizes were
+  matched more closely, distance was softened, and selected-state color was
+  narrowed to the label and number.
+- Pass 2: the focused comparison showed the selected option still had square
+  corners while the source uses a rounded inset outline. An 8-pixel selected
+  radius and full teal inset outline were added.
+- Pass 3: the final matched full-view and focused comparisons show no remaining
+  actionable P0/P1/P2 differences. The production sheet remains slightly more
+  map-forward than the illustrative source, consistent with the previously
+  approved 52dvh mobile layout.
+- Pass 4: the user removed the selected check mark and route-description row.
+  The teal fill/outline, label, number and semantic pressed state remain as the
+  selection cue, while the first instruction moves upward.
+- Pass 5: the first multilingual capture found a P2 Armenian fit issue: the two
+  longest labels wrapped awkwardly and made the selector taller. A locale-scoped
+  label size and slight tracking adjustment brought all three Armenian labels
+  onto one line. The final capture returns the group to the same height as the
+  other languages with no overflow or browser errors.
+
+### Follow-up polish
+
+- None required for this implementation.
+
+final result: passed

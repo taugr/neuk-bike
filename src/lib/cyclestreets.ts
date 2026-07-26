@@ -9,7 +9,13 @@ import { translate } from '@/lib/i18n/messages';
 
 export const CYCLESTREETS_DIRECTIONS_ENDPOINT =
   'https://api.cyclestreets.net/v2/journey.plan';
-export const CYCLESTREETS_ROUTE_PLAN = 'balanced';
+export const CYCLESTREETS_ROUTE_PLANS = [
+  'quietest',
+  'balanced',
+  'fastest',
+] as const;
+export type CycleRoutePlan = (typeof CYCLESTREETS_ROUTE_PLANS)[number];
+export const CYCLESTREETS_DEFAULT_ROUTE_PLAN: CycleRoutePlan = 'balanced';
 export const CYCLESTREETS_SPEED_KMPH = '16';
 export const SHORT_CYCLE_ROUTE_THRESHOLD_METERS = 10;
 const CYCLESTREETS_JSONP_ATTEMPTS = 2;
@@ -27,7 +33,7 @@ export type CycleRouteInstruction = {
 };
 
 export type CycleRoute = {
-  plan: typeof CYCLESTREETS_ROUTE_PLAN;
+  plan: CycleRoutePlan;
   distanceMeters: number;
   durationSeconds: number;
   points: CycleRoutePoint[];
@@ -36,6 +42,8 @@ export type CycleRoute = {
   itineraryId?: string;
   routeUrl?: string;
 };
+
+export type CycleRoutesByPlan = Partial<Record<CycleRoutePlan, CycleRoute>>;
 
 type CycleStreetsDirectionsRequest = {
   url: string;
@@ -86,7 +94,7 @@ export function buildCycleStreetsDirectionsRequest({
 }): CycleStreetsDirectionsRequest {
   const params = new URLSearchParams({
     key: apiKey,
-    plans: CYCLESTREETS_ROUTE_PLAN,
+    plans: CYCLESTREETS_ROUTE_PLANS.join(','),
     speedKmph: CYCLESTREETS_SPEED_KMPH,
     archive: 'none',
     itineraryFields: 'start,finish,id',
@@ -180,7 +188,7 @@ export function buildCycleRouteCacheKey(
   destination: ParkingPoint,
 ) {
   return [
-    CYCLESTREETS_ROUTE_PLAN,
+    CYCLESTREETS_ROUTE_PLANS.join(','),
     origin.latitude.toFixed(5),
     origin.longitude.toFixed(5),
     destination.id,
@@ -268,6 +276,7 @@ export function describeCycleRouteInstruction(
 export function buildShortCycleRoute(
   origin: UserLocation,
   destination: ParkingPoint,
+  plan: CycleRoutePlan = CYCLESTREETS_DEFAULT_ROUTE_PLAN,
 ): CycleRoute {
   const routeDistanceMeters = distanceMeters(origin, destination);
   const speedMetersPerSecond =
@@ -278,7 +287,7 @@ export function buildShortCycleRoute(
   );
 
   return {
-    plan: CYCLESTREETS_ROUTE_PLAN,
+    plan,
     distanceMeters: routeDistanceMeters,
     durationSeconds,
     points: [
@@ -299,6 +308,18 @@ export function buildShortCycleRoute(
     ],
     source: 'local',
   };
+}
+
+export function buildShortCycleRoutes(
+  origin: UserLocation,
+  destination: ParkingPoint,
+): Record<CycleRoutePlan, CycleRoute> {
+  return Object.fromEntries(
+    CYCLESTREETS_ROUTE_PLANS.map((plan) => [
+      plan,
+      buildShortCycleRoute(origin, destination, plan),
+    ]),
+  ) as Record<CycleRoutePlan, CycleRoute>;
 }
 
 function getObject(value: unknown): Record<string, unknown> | null {
@@ -371,35 +392,18 @@ function parseRouteUrl(properties: CycleStreetsProperties) {
   };
 }
 
-export function parseCycleStreetsRoute(
-  response: unknown,
+function parseCycleStreetsRouteForPlan(
+  features: GeoJsonFeature[],
   destination: ParkingPoint,
-): CycleRoute {
-  const errorMessage = getString(getObject(response)?.error);
-  if (errorMessage) {
-    throw new CycleStreetsRouteError(errorMessage);
-  }
-
-  const collection = getObject(response) as GeoJsonFeatureCollection | null;
-  if (
-    collection?.type !== 'FeatureCollection' ||
-    !Array.isArray(collection.features)
-  ) {
-    throw new CycleStreetsRouteError(
-      'CycleStreets returned an unexpected route response.',
-    );
-  }
-
-  const features = collection.features.filter(isFeature);
+  plan: CycleRoutePlan,
+): CycleRoute | null {
   const routeFeature = features.find((feature) => {
     const properties = getFeatureProperties(feature);
-    return getPath(properties) === `plan/${CYCLESTREETS_ROUTE_PLAN}`;
+    return getPath(properties) === `plan/${plan}`;
   });
 
   if (!routeFeature) {
-    throw new CycleStreetsRouteError(
-      'CycleStreets did not return a usable route.',
-    );
+    return null;
   }
 
   const routeProperties = getFeatureProperties(routeFeature);
@@ -419,9 +423,7 @@ export function parseCycleStreetsRoute(
 
   const instructions = features
     .filter((feature) =>
-      getPath(getFeatureProperties(feature)).startsWith(
-        `plan/${CYCLESTREETS_ROUTE_PLAN}/street/`,
-      ),
+      getPath(getFeatureProperties(feature)).startsWith(`plan/${plan}/street/`),
     )
     .map((feature, index): CycleRouteInstruction | null => {
       const properties = getFeatureProperties(feature);
@@ -456,7 +458,7 @@ export function parseCycleStreetsRoute(
     );
 
   return {
-    plan: CYCLESTREETS_ROUTE_PLAN,
+    plan,
     distanceMeters,
     durationSeconds,
     points,
@@ -464,4 +466,56 @@ export function parseCycleStreetsRoute(
     source: 'cyclestreets',
     ...parseRouteUrl(routeProperties),
   };
+}
+
+export function parseCycleStreetsRoutes(
+  response: unknown,
+  destination: ParkingPoint,
+): CycleRoutesByPlan {
+  const errorMessage = getString(getObject(response)?.error);
+  if (errorMessage) {
+    throw new CycleStreetsRouteError(errorMessage);
+  }
+
+  const collection = getObject(response) as GeoJsonFeatureCollection | null;
+  if (
+    collection?.type !== 'FeatureCollection' ||
+    !Array.isArray(collection.features)
+  ) {
+    throw new CycleStreetsRouteError(
+      'CycleStreets returned an unexpected route response.',
+    );
+  }
+
+  const features = collection.features.filter(isFeature);
+  const routes = Object.fromEntries(
+    CYCLESTREETS_ROUTE_PLANS.flatMap((plan) => {
+      const route = parseCycleStreetsRouteForPlan(features, destination, plan);
+      return route ? [[plan, route] as const] : [];
+    }),
+  ) as CycleRoutesByPlan;
+
+  if (Object.keys(routes).length === 0) {
+    throw new CycleStreetsRouteError(
+      'CycleStreets did not return a usable route.',
+    );
+  }
+
+  return routes;
+}
+
+export function parseCycleStreetsRoute(
+  response: unknown,
+  destination: ParkingPoint,
+  plan: CycleRoutePlan = CYCLESTREETS_DEFAULT_ROUTE_PLAN,
+): CycleRoute {
+  const route = parseCycleStreetsRoutes(response, destination)[plan];
+
+  if (!route) {
+    throw new CycleStreetsRouteError(
+      'CycleStreets did not return a usable route.',
+    );
+  }
+
+  return route;
 }

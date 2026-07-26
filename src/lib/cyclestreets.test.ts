@@ -1,12 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildShortCycleRoute,
+  buildShortCycleRoutes,
   buildCycleStreetsDirectionsRequest,
+  CYCLESTREETS_ROUTE_PLANS,
   CycleStreetsRouteError,
   describeCycleRouteInstruction,
   fetchCycleStreetsDirections,
   formatCycleRouteDuration,
   parseCycleStreetsRoute,
+  parseCycleStreetsRoutes,
 } from '@/lib/cyclestreets';
 import type { ParkingPoint } from '@/lib/types';
 
@@ -105,6 +108,85 @@ const cycleStreetsFixture = {
   ],
 };
 
+const multiPlanFixture = {
+  ...cycleStreetsFixture,
+  features: [
+    ...cycleStreetsFixture.features,
+    {
+      type: 'Feature',
+      properties: {
+        path: 'plan/quietest',
+        plan: 'quietest',
+        lengthMetres: 2240,
+        timeSeconds: 930,
+      },
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [-3.18852, 55.9534],
+          [-3.19, 55.952],
+          [-3.205, 55.94401],
+        ],
+      },
+    },
+    {
+      type: 'Feature',
+      properties: {
+        path: 'plan/quietest/street/1',
+        number: 1,
+        name: 'Quiet Street',
+        lengthMetres: 2240,
+        timeSeconds: 930,
+        travelMode: 'cycling',
+        turnPrevText: 'start',
+      },
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [-3.18852, 55.9534],
+          [-3.19, 55.952],
+        ],
+      },
+    },
+    {
+      type: 'Feature',
+      properties: {
+        path: 'plan/fastest',
+        plan: 'fastest',
+        lengthMetres: 1810,
+        timeSeconds: 680,
+      },
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [-3.18852, 55.9534],
+          [-3.187, 55.95],
+          [-3.205, 55.94401],
+        ],
+      },
+    },
+    {
+      type: 'Feature',
+      properties: {
+        path: 'plan/fastest/street/1',
+        number: 1,
+        name: 'Direct Road',
+        lengthMetres: 1810,
+        timeSeconds: 680,
+        travelMode: 'cycling',
+        turnPrevText: 'start',
+      },
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [-3.18852, 55.9534],
+          [-3.187, 55.95],
+        ],
+      },
+    },
+  ],
+};
+
 function waitForJsonpRetry() {
   return Promise.resolve().then(() => Promise.resolve());
 }
@@ -178,7 +260,7 @@ describe('CycleStreets utilities', () => {
       'https://api.cyclestreets.net/v2/journey.plan',
     );
     expect(url.searchParams.get('key')).toBe('public-test-key');
-    expect(url.searchParams.get('plans')).toBe('balanced');
+    expect(url.searchParams.get('plans')).toBe('quietest,balanced,fastest');
     expect(url.searchParams.get('speedKmph')).toBe('16');
     expect(url.searchParams.get('waypoints')).toBe(
       '-3.18830,55.95330,Start|-3.20500,55.94400,Cycle parking 1',
@@ -275,6 +357,35 @@ describe('CycleStreets utilities', () => {
       [55.94401, -3.205],
     ]);
     expect(route.source).toBe('cyclestreets');
+  });
+
+  it('parses summaries and instructions for every returned route plan', () => {
+    const routes = parseCycleStreetsRoutes(multiPlanFixture, destination);
+
+    expect(Object.keys(routes)).toEqual([...CYCLESTREETS_ROUTE_PLANS]);
+    expect(routes.quietest).toMatchObject({
+      plan: 'quietest',
+      distanceMeters: 2240,
+      durationSeconds: 930,
+    });
+    expect(routes.balanced).toMatchObject({
+      plan: 'balanced',
+      distanceMeters: 1966,
+      durationSeconds: 811,
+    });
+    expect(routes.fastest).toMatchObject({
+      plan: 'fastest',
+      distanceMeters: 1810,
+      durationSeconds: 680,
+    });
+    expect(routes.quietest?.instructions[0]).toMatchObject({
+      id: 'plan/quietest/street/1',
+      streetName: 'Quiet Street',
+    });
+    expect(routes.fastest?.instructions[0]).toMatchObject({
+      id: 'plan/fastest/street/1',
+      streetName: 'Direct Road',
+    });
   });
 
   it('parses and describes route instructions', () => {
@@ -388,6 +499,29 @@ describe('CycleStreets utilities', () => {
       durationSeconds: 0,
       travelMode: 'cycling',
     });
+  });
+
+  it('builds equivalent local routes for each route choice', () => {
+    const routes = buildShortCycleRoutes(
+      { latitude: 55.9533, longitude: -3.1883 },
+      {
+        id: 'near',
+        name: 'Nearby parking',
+        latitude: 55.95332,
+        longitude: -3.18833,
+        properties: {},
+        sourceId: 'test',
+      },
+    );
+
+    expect(Object.keys(routes)).toEqual([...CYCLESTREETS_ROUTE_PLANS]);
+    expect(routes.quietest.plan).toBe('quietest');
+    expect(routes.balanced.plan).toBe('balanced');
+    expect(routes.fastest.plan).toBe('fastest');
+    expect(routes.quietest.distanceMeters).toBe(routes.fastest.distanceMeters);
+    expect(routes.quietest.durationSeconds).toBe(
+      routes.balanced.durationSeconds,
+    );
   });
 
   it('describes local short route instructions as a straight distance', () => {

@@ -82,8 +82,10 @@ loads suggestions automatically, while Enter and the desktop Search button
 remain available as explicit fallbacks. Results are filtered through the same
 country-boundary polygons as the parking data.
 
-Directions use the CycleStreets v2 API from the browser. Add a public API key to
-`.env.local` for local development:
+Directions use the CycleStreets v2 API from the browser. Riders can compare
+quietest, balanced, and fastest routes by estimated time and distance before
+starting; balanced is selected by default. Add a public API key to `.env.local`
+for local development:
 
 ```bash
 NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here

@@ -2048,6 +2048,7 @@ a {
 
 .directions-summary {
   display: grid;
+  gap: 0.4rem;
 }
 
 .directions-current-step {
@@ -2073,29 +2074,117 @@ a {
   overflow-wrap: anywhere;
 }
 
-.directions-metrics {
-  display: grid;
-  gap: 0.55rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.directions-metrics span {
-  align-items: center;
-  background: var(--surface-strong);
+.directions-route-options {
+  background: var(--surface);
+  border: 1px solid var(--subtle);
   border-radius: 8px;
-  color: var(--muted);
-  display: inline-flex;
-  font-size: 0.84rem;
-  font-weight: 760;
-  gap: 0.45rem;
-  justify-content: center;
-  min-height: 2.25rem;
-  padding: 0.35rem 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
 }
 
-.directions-metrics svg {
-  color: var(--accent);
-  flex: 0 0 auto;
+.directions-mode-header .directions-route-option {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  border-right: 1px solid var(--separator);
+  color: var(--text);
+  display: grid;
+  gap: 0.06rem;
+  justify-items: center;
+  min-height: 4.8rem;
+  padding: 0.44rem 0.25rem 0.5rem;
+  position: relative;
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+  white-space: normal;
+  width: 100%;
+}
+
+.directions-mode-header .directions-route-option:last-child {
+  border-right: 0;
+}
+
+.directions-mode-header .directions-route-option:hover,
+.directions-mode-header .directions-route-option:focus-visible {
+  background: var(--hover-soft);
+  border-color: var(--separator);
+}
+
+.directions-mode-header .directions-route-option-selected,
+.directions-mode-header .directions-route-option-selected:hover,
+.directions-mode-header .directions-route-option-selected:focus-visible {
+  background: var(--selected-surface);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 0 1px var(--selected-border),
+    inset 0 -3px 0 var(--selected-border);
+  z-index: 1;
+}
+
+.directions-mode-header .directions-route-option:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.directions-mode-header .directions-route-option-selected:disabled {
+  opacity: 1;
+}
+
+.directions-route-option-label {
+  align-items: center;
+  display: flex;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.05;
+  min-height: 1.15rem;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+:root[lang='hy'] .directions-route-option-label {
+  font-size: 0.63rem;
+  letter-spacing: -0.015em;
+}
+
+.directions-route-option-selected .directions-route-option-label {
+  color: var(--selected-text);
+}
+
+.directions-route-option-duration {
+  align-items: baseline;
+  color: var(--text);
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  line-height: 1;
+  min-height: 1.42rem;
+}
+
+.directions-route-option-duration strong {
+  color: inherit;
+  font-size: 1.3rem;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.directions-route-option-selected .directions-route-option-duration strong {
+  color: var(--selected-text);
+}
+
+.directions-route-option-duration-unit {
+  font-size: 0.9rem;
+  font-weight: 630;
+  line-height: 1;
+}
+
+.directions-route-option small {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 580;
+  line-height: 1.1;
 }
 
 .directions-list {
