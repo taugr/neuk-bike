@@ -11,6 +11,7 @@ import type {
   PositionAnchor,
   Popup as MapLibrePopup,
   StyleSpecification,
+  SymbolLayerSpecification,
 } from 'maplibre-gl';
 import {
   Bike,
@@ -1383,65 +1384,22 @@ const cycleNetworkHitLayerId = 'cycle-network-hit';
 const cycleNetworkCasingLayerId = 'cycle-network-casing';
 const cycleNetworkSelectedCasingLayerId = 'cycle-network-selected-casing';
 const cycleNetworkBundleLayerId = 'cycle-network-bundle-labels';
-const cycleNetworkSelectedBundleLayerId =
-  'cycle-network-selected-bundle-labels';
-const cycleNetworkSelectedLabelLayerId = 'cycle-network-selected-labels';
-const cycleNetworkShieldImageIds = {
-  link: 'cycle-network-shield-link',
-  ncn: 'cycle-network-shield-ncn',
-  rcn: 'cycle-network-shield-rcn',
-} as const;
+const cycleNetworkShieldImageScale = 3;
+// Popup selection re-runs layer styling. Preserve unchanged source data so
+// MapLibre does not remove and re-place labels while the popup opens or closes.
+const cycleNetworkFeaturesByMap = new WeakMap<
+  MapLibreMap,
+  CycleNetworkFeature[]
+>();
+const cycleNetworkBundlesByMap = new WeakMap<
+  MapLibreMap,
+  CycleNetworkRouteBundle[]
+>();
 
-function addCycleNetworkShieldImage(
-  map: MapLibreMap,
-  id: string,
-  fill: string,
+function getCycleNetworkShieldImageId(
+  routeIdentities: CycleNetworkRouteIdentity[],
 ) {
-  if (map.hasImage(id)) return;
-  const canvas = document.createElement('canvas');
-  canvas.width = 56;
-  canvas.height = 40;
-  const context = canvas.getContext('2d');
-  if (!context) return;
-
-  const left = 2;
-  const top = 2;
-  const right = 54;
-  const bottom = 38;
-  const radius = 10;
-  context.beginPath();
-  context.moveTo(left + radius, top);
-  context.lineTo(right - radius, top);
-  context.quadraticCurveTo(right, top, right, top + radius);
-  context.lineTo(right, bottom - radius);
-  context.quadraticCurveTo(right, bottom, right - radius, bottom);
-  context.lineTo(left + radius, bottom);
-  context.quadraticCurveTo(left, bottom, left, bottom - radius);
-  context.lineTo(left, top + radius);
-  context.quadraticCurveTo(left, top, left + radius, top);
-  context.closePath();
-  context.fillStyle = fill;
-  context.fill();
-  context.strokeStyle = 'rgba(255,255,255,0.92)';
-  context.lineWidth = 3;
-  context.stroke();
-
-  map.addImage(id, context.getImageData(0, 0, 56, 40), {
-    content: [12, 8, 44, 32],
-    pixelRatio: 2,
-    stretchX: [[20, 36]],
-    stretchY: [[14, 26]],
-  });
-}
-
-function ensureCycleNetworkShieldImages(map: MapLibreMap) {
-  addCycleNetworkShieldImage(map, cycleNetworkShieldImageIds.ncn, '#b4232f');
-  addCycleNetworkShieldImage(map, cycleNetworkShieldImageIds.rcn, '#275dad');
-  addCycleNetworkShieldImage(map, cycleNetworkShieldImageIds.link, '#52606d');
-}
-
-function getCycleNetworkBundleImageId(bundle: CycleNetworkRouteBundle) {
-  return `cycle-network-bundle-${bundle.routes
+  return `cycle-network-shield-${routeIdentities
     .map((routeIdentity) =>
       `${routeIdentity.shieldType}-${routeIdentity.routeNumber}`.replaceAll(
         /[^a-z0-9-]/g,
@@ -1451,17 +1409,17 @@ function getCycleNetworkBundleImageId(bundle: CycleNetworkRouteBundle) {
     .join('-')}`;
 }
 
-function addCycleNetworkBundleImage(
+function addCycleNetworkShieldImage(
   map: MapLibreMap,
-  bundle: CycleNetworkRouteBundle,
+  routeIdentities: CycleNetworkRouteIdentity[],
 ) {
-  const id = getCycleNetworkBundleImageId(bundle);
+  const id = getCycleNetworkShieldImageId(routeIdentities);
   if (map.hasImage(id)) return id;
-  const scale = 2;
+  const scale = cycleNetworkShieldImageScale;
   const gap = 2 * scale;
   const shieldHeight = 22 * scale;
   const horizontalPadding = 7 * scale;
-  const routeWidths = bundle.routes.map((routeIdentity) =>
+  const routeWidths = routeIdentities.map((routeIdentity) =>
     Math.max(
       24 * scale,
       routeIdentity.routeNumber.toString().length * 7 * scale +
@@ -1478,7 +1436,7 @@ function addCycleNetworkBundleImage(
   if (!context) return null;
 
   let left = 2 * scale;
-  bundle.routes.forEach((routeIdentity, index) => {
+  routeIdentities.forEach((routeIdentity, index) => {
     const width = routeWidths[index];
     const top = 2 * scale;
     const radius = 5 * scale;
@@ -1495,13 +1453,13 @@ function addCycleNetworkBundleImage(
     context.lineWidth = 2 * scale;
     context.stroke();
     context.fillStyle = '#ffffff';
-    context.font = `800 ${12 * scale}px sans-serif`;
+    context.font = `800 ${12 * scale}px system-ui, sans-serif`;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.fillText(
       routeIdentity.routeNumber.toString(),
-      left + width / 2,
-      top + shieldHeight / 2 + scale * 0.25,
+      Math.round(left + width / 2),
+      Math.round(top + shieldHeight / 2 + scale * 0.25),
     );
     left += width + gap;
   });
@@ -1512,15 +1470,24 @@ function addCycleNetworkBundleImage(
   return id;
 }
 
+function addCycleNetworkBundleImage(
+  map: MapLibreMap,
+  bundle: CycleNetworkRouteBundle,
+) {
+  return addCycleNetworkShieldImage(map, bundle.routes);
+}
+
 function syncCycleNetworkBundleSource({
   bundles,
   map,
-  selectedRouteKey,
 }: {
   bundles: CycleNetworkRouteBundle[];
   map: MapLibreMap;
-  selectedRouteKey: string | null;
 }) {
+  const source = map.getSource(cycleNetworkBundleSourceId) as
+    | GeoJSONSource
+    | undefined;
+  if (source && cycleNetworkBundlesByMap.get(map) === bundles) return;
   const bundleData = {
     features: bundles.flatMap((bundle) => {
       const imageId = addCycleNetworkBundleImage(map, bundle);
@@ -1532,9 +1499,6 @@ function syncCycleNetworkBundleSource({
           properties: {
             imageId,
             routeKeys: bundle.routes.map((routeIdentity) => routeIdentity.key),
-            selected: bundle.routes.some(
-              (routeIdentity) => routeIdentity.key === selectedRouteKey,
-            ),
           },
           type: 'Feature' as const,
         },
@@ -1542,15 +1506,13 @@ function syncCycleNetworkBundleSource({
     }),
     type: 'FeatureCollection' as const,
   };
-  const source = map.getSource(cycleNetworkBundleSourceId) as
-    | GeoJSONSource
-    | undefined;
   if (source) void source.setData(bundleData);
   else
     map.addSource(cycleNetworkBundleSourceId, {
       data: bundleData,
       type: 'geojson',
     });
+  cycleNetworkBundlesByMap.set(map, bundles);
 }
 
 function syncCycleNetworkLayers({
@@ -1568,23 +1530,32 @@ function syncCycleNetworkLayers({
   selectedRouteKey: string | null;
   theme: 'light' | 'dark';
 }) {
-  const lineData = {
-    features: features.map((feature) => ({
-      ...feature,
-      properties: {
-        ...feature.properties,
-        routeKey: getCycleNetworkRouteIdentity(feature)?.key ?? '',
-      },
-    })),
-    type: 'FeatureCollection' as const,
-  };
   const lineSource = map.getSource(cycleNetworkSourceId) as
     | GeoJSONSource
     | undefined;
-  if (lineSource) void lineSource.setData(lineData);
-  else map.addSource(cycleNetworkSourceId, { data: lineData, type: 'geojson' });
-  ensureCycleNetworkShieldImages(map);
-  syncCycleNetworkBundleSource({ bundles, map, selectedRouteKey });
+  if (!lineSource || cycleNetworkFeaturesByMap.get(map) !== features) {
+    const lineData = {
+      features: features.map((feature) => {
+        const routeIdentity = getCycleNetworkRouteIdentity(feature);
+        return {
+          ...feature,
+          properties: {
+            ...feature.properties,
+            routeKey: routeIdentity?.key ?? '',
+            shieldImageId: routeIdentity
+              ? addCycleNetworkShieldImage(map, [routeIdentity])
+              : '',
+          },
+        };
+      }),
+      type: 'FeatureCollection' as const,
+    };
+    if (lineSource) void lineSource.setData(lineData);
+    else
+      map.addSource(cycleNetworkSourceId, { data: lineData, type: 'geojson' });
+    cycleNetworkFeaturesByMap.set(map, features);
+  }
+  syncCycleNetworkBundleSource({ bundles, map });
 
   const firstSymbolLayer = map
     .getStyle()
@@ -1778,10 +1749,9 @@ function syncCycleNetworkLayers({
     );
   } else {
     map.addLayer({
-      filter: ['==', ['get', 'selected'], false],
       id: cycleNetworkBundleLayerId,
       layout: {
-        'icon-allow-overlap': false,
+        'icon-allow-overlap': true,
         'icon-image': ['get', 'imageId'],
         'icon-size': ['interpolate', ['linear'], ['zoom'], 10.5, 0.86, 14, 1],
       },
@@ -1791,162 +1761,45 @@ function syncCycleNetworkLayers({
       type: 'symbol',
     });
   }
-  if (map.getLayer(cycleNetworkSelectedBundleLayerId)) {
-    map.setPaintProperty(
-      cycleNetworkSelectedBundleLayerId,
-      'icon-opacity',
-      isDirectionsMode ? 0.45 : 1,
-    );
-  } else {
-    map.addLayer({
-      filter: ['==', ['get', 'selected'], true],
-      id: cycleNetworkSelectedBundleLayerId,
-      layout: {
-        'icon-allow-overlap': true,
-        'icon-image': ['get', 'imageId'],
-        'icon-size': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          10.5,
-          0.92,
-          14,
-          1.06,
-        ],
-      },
-      minzoom: 10.5,
-      paint: { 'icon-opacity': isDirectionsMode ? 0.45 : 1 },
-      source: cycleNetworkBundleSourceId,
-      type: 'symbol',
-    });
-  }
   const numberedRouteFilter = [
     'all',
     ['in', ['get', 'routeType'], ['literal', ['ncn', 'rcn', 'link']]],
     ['any', ['has', 'routeNumber'], ['has', 'linkNumber']],
   ] as FilterSpecification;
-  const ordinaryLabelFilter = (
-    selectedRouteKey
-      ? [
-          'all',
-          numberedRouteFilter,
-          ['!=', ['get', 'routeKey'], selectedRouteKey],
-        ]
-      : numberedRouteFilter
-  ) as FilterSpecification;
-  const routeLabelFont = [
-    theme === 'dark' ? 'Open Sans Bold' : 'Noto Sans Bold',
-  ];
+  const routeLabelOpacity: NonNullable<
+    SymbolLayerSpecification['paint']
+  >['icon-opacity'] = isDirectionsMode
+    ? 0.32
+    : selectedRouteKey
+      ? ['case', ['==', ['get', 'routeKey'], selectedRouteKey], 1, 0.42]
+      : 1;
   if (map.getLayer('cycle-network-labels')) {
-    map.setFilter('cycle-network-labels', ordinaryLabelFilter);
-    map.setLayoutProperty('cycle-network-labels', 'text-font', routeLabelFont);
+    map.setFilter('cycle-network-labels', numberedRouteFilter);
+    map.setLayoutProperty('cycle-network-labels', 'icon-image', [
+      'get',
+      'shieldImageId',
+    ]);
     map.setPaintProperty(
       'cycle-network-labels',
       'icon-opacity',
-      isDirectionsMode ? 0.32 : selectedRouteKey ? 0.42 : 1,
-    );
-    map.setPaintProperty(
-      'cycle-network-labels',
-      'text-opacity',
-      isDirectionsMode ? 0.32 : selectedRouteKey ? 0.42 : 1,
+      routeLabelOpacity,
     );
   } else {
     map.addLayer({
-      filter: ordinaryLabelFilter,
+      filter: numberedRouteFilter,
       id: 'cycle-network-labels',
       layout: {
         'icon-allow-overlap': false,
-        'icon-image': [
-          'match',
-          ['get', 'routeType'],
-          'ncn',
-          cycleNetworkShieldImageIds.ncn,
-          'rcn',
-          cycleNetworkShieldImageIds.rcn,
-          cycleNetworkShieldImageIds.link,
-        ],
+        'icon-image': ['get', 'shieldImageId'],
         'icon-keep-upright': true,
+        'icon-padding': 80,
         'icon-rotation-alignment': 'viewport',
-        'icon-text-fit': 'both',
-        'icon-text-fit-padding': [2, 5, 2, 5],
+        'icon-size': ['interpolate', ['linear'], ['zoom'], 10.5, 0.86, 14, 1],
         'symbol-placement': 'line',
-        'symbol-spacing': 360,
-        'text-field': [
-          'to-string',
-          ['coalesce', ['get', 'routeNumber'], ['get', 'linkNumber']],
-        ],
-        'text-font': routeLabelFont,
-        'text-keep-upright': true,
-        'text-rotation-alignment': 'viewport',
-        'text-size': 12,
+        'symbol-spacing': 570,
       },
       minzoom: 10.5,
-      paint: {
-        'icon-opacity': isDirectionsMode ? 0.32 : selectedRouteKey ? 0.42 : 1,
-        'text-color': '#ffffff',
-        'text-halo-color': 'rgba(15, 23, 42, 0.45)',
-        'text-halo-width': 0.75,
-        'text-opacity': isDirectionsMode ? 0.32 : selectedRouteKey ? 0.42 : 1,
-      },
-      source: cycleNetworkSourceId,
-      type: 'symbol',
-    });
-  }
-  if (map.getLayer(cycleNetworkSelectedLabelLayerId)) {
-    map.setFilter(cycleNetworkSelectedLabelLayerId, selectedRouteFilter);
-    map.setLayoutProperty(
-      cycleNetworkSelectedLabelLayerId,
-      'text-font',
-      routeLabelFont,
-    );
-    map.setPaintProperty(
-      cycleNetworkSelectedLabelLayerId,
-      'icon-opacity',
-      isDirectionsMode ? 0.44 : 1,
-    );
-    map.setPaintProperty(
-      cycleNetworkSelectedLabelLayerId,
-      'text-opacity',
-      isDirectionsMode ? 0.44 : 1,
-    );
-  } else {
-    map.addLayer({
-      filter: selectedRouteFilter,
-      id: cycleNetworkSelectedLabelLayerId,
-      layout: {
-        'icon-allow-overlap': true,
-        'icon-image': [
-          'match',
-          ['get', 'routeType'],
-          'ncn',
-          cycleNetworkShieldImageIds.ncn,
-          'rcn',
-          cycleNetworkShieldImageIds.rcn,
-          cycleNetworkShieldImageIds.link,
-        ],
-        'icon-keep-upright': true,
-        'icon-rotation-alignment': 'viewport',
-        'icon-text-fit': 'both',
-        'icon-text-fit-padding': [2, 5, 2, 5],
-        'symbol-placement': 'line',
-        'symbol-spacing': 520,
-        'text-field': [
-          'to-string',
-          ['coalesce', ['get', 'routeNumber'], ['get', 'linkNumber']],
-        ],
-        'text-font': routeLabelFont,
-        'text-keep-upright': true,
-        'text-rotation-alignment': 'viewport',
-        'text-size': 12,
-      },
-      minzoom: 10.5,
-      paint: {
-        'icon-opacity': isDirectionsMode ? 0.44 : 1,
-        'text-color': '#ffffff',
-        'text-halo-color': 'rgba(15, 23, 42, 0.45)',
-        'text-halo-width': 0.75,
-        'text-opacity': isDirectionsMode ? 0.44 : 1,
-      },
+      paint: { 'icon-opacity': routeLabelOpacity },
       source: cycleNetworkSourceId,
       type: 'symbol',
     });
@@ -2526,10 +2379,7 @@ export default function CycleParkingMap({
       // without a distinct hit target would silently favour one route.
       if (
         map.queryRenderedFeatures(event.point, {
-          layers: [
-            cycleNetworkBundleLayerId,
-            cycleNetworkSelectedBundleLayerId,
-          ],
+          layers: [cycleNetworkBundleLayerId],
         }).length > 0
       ) {
         return;
