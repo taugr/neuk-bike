@@ -52,6 +52,10 @@ test('opens a fixed-anchor route popup immediately and keeps popups exclusive', 
   const routePopup = page.getByTestId('cycle-network-popup');
   await expect(routePopup).toBeVisible();
   await expect(routePopup).toContainText('National Route 51');
+  await expect(map).toHaveAttribute(
+    'data-cycle-network-selected-route',
+    'ncn:51',
+  );
   const facts = routePopup.getByTestId('cycle-network-popup-facts');
   await expect(facts).toHaveClass(/cycle-network-popup-details-count-4/);
   await expect(facts.locator('.cycle-network-popup-detail')).toHaveCount(4);
@@ -102,6 +106,7 @@ test('opens a fixed-anchor route popup immediately and keeps popups exclusive', 
   const firstParkingRow = page.locator('[data-testid^="parking-row-"]').first();
   await firstParkingRow.getByRole('button').first().click();
   await expect(routePopup).toHaveCount(0);
+  await expect(map).not.toHaveAttribute('data-cycle-network-selected-route');
   await expect(page.locator('.maplibregl-popup .parking-popup')).toBeVisible();
   await expect(page.locator('.maplibregl-popup')).toHaveCount(1);
 

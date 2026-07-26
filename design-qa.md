@@ -1199,3 +1199,114 @@ No actionable P0, P1, or P2 differences remain.
 - [x] No blocking design differences remain.
 
 final result: passed
+
+---
+
+# National Cycle Network route distinction design QA
+
+## Comparison target
+
+- Source visual truth:
+  `output/route-distinction-mockups/05-hybrid-selected-route-mobile.png`
+- Rendered implementation:
+  `output/playwright/route-distinction-mobile-fresh-selected.png`
+- Full-view comparison:
+  `output/playwright/route-distinction-mobile-design-comparison.png`
+- Focused popup comparison:
+  `output/playwright/route-distinction-mobile-popup-comparison.png`
+- Viewport: 390 x 844 CSS pixels at device scale factor 1.
+- Source pixels: 390 x 844.
+- Implementation pixels: 390 x 844.
+- Density normalization: none required; both artifacts are the same size.
+- State: light theme, Route 6 selected, Route 10 disclosed as a co-route,
+  paired route shields visible, and the mobile results sheet collapsed.
+
+## Findings
+
+No actionable P0, P1, or P2 differences remain.
+
+The implementation intentionally retains the existing route-condition grid and
+temporary-closure warning, so its popup is taller than the simplified visual
+mockup. A fresh popup opened at the mobile viewport remained fully inside the
+390-pixel viewport and above the collapsed results sheet. This preserves the
+previously agreed route information without compromising the selected-route
+hierarchy.
+
+The source mockup also contains an image-generation artifact that resembles two
+parallel condition lines on one physical route. The implementation follows the
+design decision rather than the artifact: a physical feature is drawn once,
+condition styles change by segment, and paired shields communicate aligned
+co-routes.
+
+## Required fidelity surfaces
+
+- Fonts and typography: the implementation uses the application's existing
+  type system and optical weights. Route title, secondary co-route copy, shield
+  numbers, condition values, and collapsed-sheet text retain the same hierarchy
+  as the source.
+- Spacing and layout rhythm: search controls and the collapsed sheet retain the
+  production mobile layout. The selected popup has consistent 12-pixel content
+  padding, compact internal gaps, and no viewport or sheet overlap.
+- Colors and visual tokens: NCN shields remain red; traffic-free, on-road,
+  ferry, closure, casing, selection opacity, popup, and dark-theme colors use
+  the existing semantic palette. Selection adds width, casing, and opacity, so
+  it does not rely on color alone.
+- Image quality and asset fidelity: the live vector base map remains sharp.
+  Route shields are rendered as density-aware MapLibre images and match the
+  existing shield language. No raster placeholders or duplicate map paths were
+  introduced.
+- Copy and content: `National Route 6` and `Also on route: 10` match the selected
+  design. Existing condition values and the closure warning remain localized
+  product content.
+
+## Full-view comparison evidence
+
+The side-by-side comparison confirms the same map-first composition: fixed
+search controls, prominent selected route, subdued surrounding network,
+paired `6`/`10` shields, one compact popup, parking markers above the map, and
+the collapsed results sheet at the bottom. The live map crop differs from the
+illustrative source, but the responsive hierarchy and interaction state match.
+
+## Focused comparison evidence
+
+The focused comparison was required because shield spacing, popup hierarchy,
+and condition details are too small to judge reliably in the full view. It
+confirms readable shield text, visible selected casing, clear co-route
+disclosure, compact condition cells, and a reachable close control.
+
+## Interaction and responsive verification
+
+- Route selection appeared immediately after a route tap.
+- Selection applied to every visible segment with the same canonical route
+  identity while unselected network routes faded.
+- A Carlisle Route 6 selection disclosed Route 10 and left exactly one popup
+  open.
+- Clicking a parking marker removed the route popup and selected-route state.
+- Disabling the National Cycle Network layer removed its features, popup, and
+  selected-route state; re-enabling restored the viewport data.
+- Fresh light- and dark-theme mobile popups stayed within the viewport and
+  above the collapsed results sheet.
+- Desktop and mobile screenshots showed paired shields without obscuring the
+  current-location pin or results sheet.
+- Browser console warnings and errors: none.
+
+## Comparison history
+
+- Initial resized-state check: a popup opened at the desktop viewport before a
+  resize was partially outside the new mobile viewport. This was not a valid
+  same-state comparison because MapLibre had anchored it before the breakpoint
+  changed.
+- Normalized mobile check: the previous popup was closed, the sheet was
+  collapsed, and the route was tapped again at 390 x 844. The fresh popup was
+  fully within the viewport (`left 92`, `right 374`) and did not overlap the
+  sheet (`popup bottom 632`, `sheet top 758`). No responsive fix remained.
+
+## Follow-up polish
+
+- P3: reassess selected-shield repetition after broader real-device testing at
+  dense urban junctions; current collision and spacing rules were satisfactory
+  in the Carlisle, Suffolk, and mobile examples checked here.
+
+## Final result
+
+final result: passed

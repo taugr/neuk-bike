@@ -736,6 +736,28 @@ a {
   background: #275dad;
 }
 
+.cycle-network-popup-co-routes {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 0.74rem;
+  font-weight: 650;
+  gap: 0.45rem;
+  line-height: 1.2;
+}
+
+.cycle-network-popup-co-route-shields {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.cycle-network-popup-co-routes .cycle-network-route-shield {
+  font-size: 0.66rem;
+  min-height: 1.25rem;
+  min-width: 1.55rem;
+}
+
 .cycle-network-popup-warning {
   align-items: center;
   color: var(--muted);
