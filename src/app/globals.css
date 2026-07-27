@@ -1966,13 +1966,13 @@ a {
 .parking-detail-street-view-frame {
   border: 0;
   display: block;
-  height: 128.25%;
+  height: 142.86%;
   inset: 0 auto auto 0;
   pointer-events: none;
   position: absolute;
-  transform: scale(0.78);
+  transform: scale(0.7);
   transform-origin: top left;
-  width: 128.25%;
+  width: 142.86%;
 }
 
 .parking-detail-street-view-trigger {
