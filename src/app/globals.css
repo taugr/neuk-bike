@@ -894,6 +894,33 @@ a {
   gap: 0.6rem;
 }
 
+.reference-panel--desktop {
+  position: relative;
+  z-index: 10;
+}
+
+.reference-panel--desktop .place-results,
+.reference-panel--desktop .place-search-message {
+  background: var(--surface);
+  border: 1px solid var(--subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.4rem);
+}
+
+.reference-panel--desktop .place-results {
+  max-height: 18rem;
+  overflow: auto;
+  padding: 0.45rem;
+}
+
+.reference-panel--desktop .place-search-message {
+  padding: 0.65rem;
+}
+
 .place-search-form {
   display: grid;
   gap: 0.5rem;
