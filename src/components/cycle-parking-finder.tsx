@@ -2525,6 +2525,14 @@ export default function CycleParkingFinder() {
   }
 
   function selectPlace(result: PlaceSearchResult) {
+    const activeElement = document.activeElement;
+    if (
+      activeElement instanceof HTMLInputElement &&
+      activeElement.name === 'place-search'
+    ) {
+      activeElement.blur();
+    }
+
     cancelPlaceSearchWork();
     captureAnalyticsEvent('place_selected', { place_name: result.name });
     setActivePlaceResultIndex(0);

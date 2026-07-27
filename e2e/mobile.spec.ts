@@ -1151,6 +1151,7 @@ test('keeps the first TUMO Center pin popup inside the visible mobile map', asyn
       name: /Tumo Center for Creative Technologies/,
     })
     .click();
+  await expect(searchbox).not.toBeFocused();
 
   const parkingId = 'osm:node:5973776885';
   await expect(page.getByTestId(`parking-row-${parkingId}`)).toBeVisible();
