@@ -1624,6 +1624,68 @@ test('keeps the first TUMO Center pin popup inside the visible mobile map', asyn
   expect(cameraCenters.length).toBeLessThanOrEqual(1);
 });
 
+test('keeps a drinking-water popup visible while the results tray collapses', async ({
+  page,
+}) => {
+  const waterPointId = 'osm:node:11196118841';
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9565,-3.1885,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  const layersTrigger = page.getByTestId('map-layers-trigger');
+  await layersTrigger.click();
+  await page.getByTestId('drinking-water-layer-toggle').check();
+  await layersTrigger.click();
+
+  const waterMarker = page.getByTestId(`parking-marker-${waterPointId}`);
+  await expect(waterMarker).toHaveCount(1);
+  await expect
+    .poll(async () => {
+      const marker = await waterMarker.boundingBox();
+      const sheet = await page.locator('.control-pane').boundingBox();
+      return Boolean(marker && sheet && marker.y >= sheet.y);
+    })
+    .toBe(true);
+
+  await page.getByRole('button', { name: 'Collapse results panel' }).click();
+  await waterMarker.evaluate((marker: HTMLElement) => marker.click());
+
+  await expect(page.locator('.parking-popup-water')).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const map = document
+          .querySelector<HTMLElement>('[data-testid="parking-map"]')
+          ?.getBoundingClientRect();
+        const popup = document
+          .querySelector<HTMLElement>('.maplibregl-popup')
+          ?.getBoundingClientRect();
+        const sheet = document
+          .querySelector<HTMLElement>('.control-pane')
+          ?.getBoundingClientRect();
+        const toolbar = document
+          .querySelector<HTMLElement>('.mobile-map-toolbar')
+          ?.getBoundingClientRect();
+
+        if (!map || !popup || !sheet || !toolbar) {
+          return false;
+        }
+
+        const visibleTop = Math.max(map.top, toolbar.bottom + 12);
+        const visibleBottom = Math.min(map.bottom, sheet.top);
+
+        return (
+          popup.left >= map.left &&
+          popup.right <= map.right &&
+          popup.top >= visibleTop &&
+          popup.bottom <= visibleBottom
+        );
+      }),
+    )
+    .toBe(true);
+});
+
 test('returns directions to the mobile view that launched them', async ({
   page,
 }) => {

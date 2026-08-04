@@ -13,7 +13,12 @@ export type ParkingPoint = {
   distanceMeters?: number;
 };
 
-export const cyclingPoiCategories = ['shop', 'repair', 'hire'] as const;
+export const cyclingPoiCategories = [
+  'shop',
+  'repair',
+  'hire',
+  'water',
+] as const;
 
 export type CyclingPoiCategory = (typeof cyclingPoiCategories)[number];
 

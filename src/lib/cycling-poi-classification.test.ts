@@ -24,4 +24,32 @@ describe('classifyCyclingPoi', () => {
   it('ignores broad retail tags without a bicycle signal', () => {
     expect(classifyCyclingPoi({ shop: 'sports' })).toEqual([]);
   });
+
+  it('classifies explicitly potable drinking-water features', () => {
+    expect(classifyCyclingPoi({ amenity: 'drinking_water' })).toEqual([
+      'water',
+    ]);
+    expect(
+      classifyCyclingPoi({ amenity: 'water_point', drinking_water: 'yes' }),
+    ).toEqual(['water']);
+  });
+
+  it('keeps a primary cycling-place category ahead of water', () => {
+    expect(
+      classifyCyclingPoi({
+        drinking_water: 'yes',
+        shop: 'bicycle',
+      }),
+    ).toEqual(['shop', 'water']);
+  });
+
+  it('excludes features explicitly tagged as not potable', () => {
+    expect(
+      classifyCyclingPoi({
+        amenity: 'drinking_water',
+        drinking_water: 'no',
+      }),
+    ).toEqual([]);
+    expect(classifyCyclingPoi({ amenity: 'water_point' })).toEqual([]);
+  });
 });

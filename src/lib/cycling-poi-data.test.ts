@@ -16,7 +16,7 @@ const point: CyclingPoiPoint = {
   sourceId: 'osm',
 };
 const manifest: CyclingPoiDataManifest = {
-  categoryCounts: { hire: 0, repair: 1, shop: 1 },
+  categoryCounts: { hire: 0, repair: 1, shop: 1, water: 0 },
   chunkZoom: 12,
   chunks: {
     [key]: {

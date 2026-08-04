@@ -1736,3 +1736,33 @@ design review. The final production captures are
 - Console warnings and errors: none.
 
 final result: passed
+
+# Design QA: drinking-water map overlay
+
+## Visual source
+
+- Combined selected design: `/Users/tomauger/.codex/generated_images/019fcbfc-ca31-7543-89c0-63719ce8ede7/exec-dec78643-f3be-430b-8f8b-d949bdff0fb9.png`
+- Source dimensions: 853 x 1844 px (same 390 x 844 mobile aspect ratio)
+- Implementation viewport: 390 x 844 CSS px
+
+## Implementation evidence
+
+- Overlay-open screenshot: `/private/tmp/neuk-bike-drinking-water-overlay.png`
+- Selected-point screenshot: `/private/tmp/neuk-bike-drinking-water-popup.png`
+- Same-input comparison: `/private/tmp/neuk-bike-design-comparison.png`
+- State: Edinburgh mock GPS, parking category selected, drinking-water overlay enabled, real generated POI data loaded
+- Density: 44 px layers trigger; compact two-row popover; 28 px blue water markers with white border; selected marker has a 4 px blue halo; 13 rem popup with one Directions action
+
+The full mobile viewport is the focused comparison region because the feature spans the upper map controls, map markers, and the unchanged parking sheet. No additional crop was needed.
+
+## Comparison and fixes
+
+- The implementation retains the source's map-first hierarchy, right-edge layers control, compact layer choices, blue droplet marker, selected halo, and compact directions popup.
+- The implementation intentionally separates the layer menu and point popup into successive interaction states; selecting a marker dismisses the menu so the map is not obscured by two overlapping surfaces.
+- Parking remains selected and the eight nearby parking results remain unchanged while the overlay is enabled.
+- Initial browser QA found the selected water point showed `Not listed` for distance. Water points are now enriched against the active reference location; the corrected popup shows `131 m away` in the verified Edinburgh state.
+- No P0, P1, or P2 visual or interaction mismatches remain.
+
+## Final result
+
+passed

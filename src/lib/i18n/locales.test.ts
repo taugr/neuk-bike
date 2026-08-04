@@ -59,6 +59,10 @@ describe('language support', () => {
     expect(getMessageCatalogue('hy').typeStands).toBe('Կանգնակ');
   });
 
+  it('uses the Armenian name for a drinking-water fountain', () => {
+    expect(getMessageCatalogue('hy').drinkingWater).toBe('Պուլպուլակ');
+  });
+
   it('uses a compact Gaelic label for starting directions', () => {
     expect(getMessageCatalogue('gd').startRoute).toBe('Tòisich');
   });

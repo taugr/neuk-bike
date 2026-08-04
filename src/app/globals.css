@@ -223,6 +223,50 @@ a {
   width: fit-content;
 }
 
+.parking-popup.parking-popup-water {
+  min-width: 13rem;
+  width: 13rem;
+}
+
+.parking-popup-water-title {
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.parking-popup-water-title > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.parking-popup-water-icon {
+  align-items: center;
+  background: #dbeafe;
+  border-radius: 999px;
+  color: #2563eb;
+  display: grid;
+  flex: 0 0 auto;
+  height: 2rem;
+  place-items: center;
+  width: 2rem;
+}
+
+:root[data-theme='dark'] .parking-popup-water-icon {
+  background: #172554;
+  color: #93c5fd;
+}
+
+.parking-popup-water .parking-popup-actions {
+  grid-auto-flow: initial;
+  grid-template-columns: 1fr;
+}
+
+.parking-popup-water .parking-popup-directions-button {
+  flex-direction: row;
+  min-height: 2.4rem;
+}
+
 .parking-popup strong {
   display: block;
   color: var(--text);
@@ -456,6 +500,122 @@ a {
   min-width: 0;
   position: relative;
   z-index: 0;
+}
+
+.map-layers-control {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  z-index: 545;
+}
+
+.map-layers-trigger {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--subtle);
+  border-radius: 11px;
+  box-shadow: 0 8px 24px rgb(16 32 28 / 14%);
+  color: var(--accent-strong);
+  display: grid;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  width: 44px;
+}
+
+.map-layers-trigger:hover,
+.map-layers-trigger:focus-visible,
+.map-layers-trigger[aria-expanded='true'] {
+  background: var(--surface-strong);
+  border-color: var(--accent);
+}
+
+.map-layers-popover {
+  background: var(--surface);
+  border: 1px solid var(--subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.7rem;
+  position: absolute;
+  right: calc(100% + 0.55rem);
+  top: 0;
+  width: 17rem;
+}
+
+.map-layers-popover > strong {
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.2;
+  padding: 0.1rem 0.1rem 0.15rem;
+}
+
+.map-layers-option {
+  align-items: center;
+  border-top: 1px solid var(--subtle);
+  color: var(--text);
+  display: flex;
+  font-size: 0.8rem;
+  font-weight: 700;
+  gap: 0.75rem;
+  justify-content: space-between;
+  min-height: 2.7rem;
+  padding: 0.45rem 0.1rem 0;
+}
+
+.map-layers-option > span {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.map-layers-option small {
+  color: var(--muted);
+  font-size: 0.67rem;
+  font-weight: 620;
+}
+
+.map-layers-option input {
+  appearance: none;
+  background: var(--surface-neutral);
+  border: 1px solid var(--subtle);
+  border-radius: 999px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: 1.35rem;
+  margin: 0;
+  position: relative;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+  width: 2.35rem;
+}
+
+.map-layers-option input::after {
+  background: var(--surface);
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 22%);
+  content: '';
+  height: 0.95rem;
+  left: 0.16rem;
+  position: absolute;
+  top: 0.14rem;
+  transition: transform 150ms ease;
+  width: 0.95rem;
+}
+
+.map-layers-option input:checked {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+.map-layers-option input:checked::after {
+  transform: translateX(0.96rem);
+}
+
+.map-layers-option input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 42%, transparent);
+  outline-offset: 2px;
 }
 
 .control-pane {
@@ -1304,6 +1464,26 @@ a {
 
 .parking-marker.cycling-poi-marker-hire span {
   background: #315f8f;
+}
+
+.parking-marker.cycling-poi-marker-water span {
+  background: #2563eb;
+  border: 3px solid #ffffff;
+  color: #ffffff;
+}
+
+.parking-marker.cycling-poi-marker-water span svg {
+  display: block;
+  height: 15px;
+  width: 15px;
+}
+
+.parking-marker.cycling-poi-marker-water.parking-marker-selected span {
+  background: #2563eb;
+  border-color: #ffffff;
+  box-shadow:
+    0 0 0 4px rgb(37 99 235 / 24%),
+    0 8px 20px var(--marker-shadow);
 }
 
 .search-box {
@@ -3955,6 +4135,16 @@ a {
 
   .map-pane {
     height: 100%;
+  }
+
+  .map-layers-control {
+    right: 0.65rem;
+    top: max(5.7rem, calc(env(safe-area-inset-top) + 5.7rem));
+  }
+
+  .map-layers-popover {
+    max-width: calc(100vw - 5.4rem);
+    width: 16.5rem;
   }
 
   .mobile-map-toolbar {

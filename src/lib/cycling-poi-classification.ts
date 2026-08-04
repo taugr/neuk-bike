@@ -20,6 +20,12 @@ export function classifyCyclingPoi(
   ) {
     categories.push('hire');
   }
+  if (
+    tags.drinking_water !== 'no' &&
+    (tags.amenity === 'drinking_water' || tags.drinking_water === 'yes')
+  ) {
+    categories.push('water');
+  }
 
   return categories;
 }

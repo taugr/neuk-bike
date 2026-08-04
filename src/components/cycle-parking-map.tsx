@@ -20,6 +20,7 @@ import {
   Building2,
   ChartSpline,
   CircleHelp,
+  Droplet,
   GraduationCap,
   Layers,
   Lightbulb,
@@ -200,6 +201,7 @@ const mapLibreShieldLayerIds = new Set([
 const highlightedRankCount = 3;
 const rankedPointCount = 8;
 const nearbyFocusMaximumDistanceMeters = 50_000;
+const collapsedSheetPopupFocusDelayMs = 320;
 const popupIconByName: Record<ParkingPopupIcon, LucideIcon> = {
   'access-open': LockOpen,
   bollard: Bollard,
@@ -724,6 +726,24 @@ const bookmarkMarkerMarkup = renderToStaticMarkup(
   />,
 );
 
+const drinkingWaterMarkerMarkup = renderToStaticMarkup(
+  <Droplet
+    aria-hidden="true"
+    fill="currentColor"
+    size={15}
+    strokeWidth={2.4}
+  />,
+);
+
+function updateCyclingPoiMarkerIcon(
+  element: HTMLElement,
+  category: 'parking' | CyclingPoiCategory,
+) {
+  if (category !== 'water') return;
+  const labelElement = element.querySelector(':scope > span:first-child');
+  if (labelElement) labelElement.innerHTML = drinkingWaterMarkerMarkup;
+}
+
 function updateMarkerSavedBadge(element: HTMLElement, isSaved: boolean) {
   const existingBadge = element.querySelector('.parking-marker-bookmark');
   if (!isSaved) {
@@ -1088,10 +1108,53 @@ function ParkingPopupContent({
   locale: AppLocale;
 }) {
   const isParking = !isCyclingPoiPoint(point);
+  const isWaterPoint =
+    isCyclingPoiPoint(point) && point.categories[0] === 'water';
   const essentialDetails = isParking
     ? getParkingEssentialDetails(point, locale)
     : [];
   const popupDetails = getParkingPopupDetails(point, locale);
+
+  if (isWaterPoint) {
+    return (
+      <div className="parking-popup parking-popup-water">
+        <div className="parking-popup-water-title">
+          <span className="parking-popup-water-icon" aria-hidden="true">
+            <Droplet fill="currentColor" size={16} strokeWidth={2.4} />
+          </span>
+          <span>
+            <strong>{point.name}</strong>
+            {popupDetails.metrics.map((metric) => (
+              <span
+                className="parking-popup-distance"
+                data-testid={`parking-popup-distance-${point.id}`}
+                key={metric.label}
+                title={metric.label}
+              >
+                {metric.value}
+              </span>
+            ))}
+          </span>
+        </div>
+        {isDirectionsMode ? null : (
+          <div className="parking-popup-actions">
+            <button
+              className="parking-popup-directions-button"
+              disabled={!canRequestDirections}
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onRequestDirections(point);
+              }}
+            >
+              <Navigation size={15} aria-hidden="true" />
+              {translate(locale, 'directions')}
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -2744,7 +2807,6 @@ export default function CycleParkingMap({
       centeredExpandedPopupPointRef.current = null;
     }
 
-    let centerTimeoutId: number | null = null;
     const reconciledVisiblePoints =
       !isRoutePlanningMode &&
       selectedPoint &&
@@ -2766,11 +2828,7 @@ export default function CycleParkingMap({
       const pointCategory: 'parking' | CyclingPoiCategory = isCyclingPoiPoint(
         point,
       )
-        ? point.categories.includes('shop')
-          ? 'shop'
-          : point.categories.includes('repair')
-            ? 'repair'
-            : 'hire'
+        ? (point.categories[0] ?? 'hire')
         : 'parking';
       const rank = rankedPointRanks.get(point.id);
       const isSaved = savedPointKeySet.has(getPointSavedNeukKey(point));
@@ -2817,6 +2875,7 @@ export default function CycleParkingMap({
           presentation.className,
           presentation.label,
         );
+        updateCyclingPoiMarkerIcon(renderedMarker.element, pointCategory);
         updateMarkerSavedBadge(
           renderedMarker.element,
           isSaved && !isDirectionsMode,
@@ -2834,6 +2893,7 @@ export default function CycleParkingMap({
           presentation.className,
           presentation.label,
         );
+        updateCyclingPoiMarkerIcon(element, pointCategory);
         updateMarkerSavedBadge(element, isSaved && !isDirectionsMode);
         const marker = new maplibregl.Marker({
           anchor: presentation.anchor,
@@ -2867,11 +2927,13 @@ export default function CycleParkingMap({
               locale,
               pointCategory === 'parking'
                 ? 'genericParking'
-                : pointCategory === 'shop'
-                  ? 'categoryShop'
-                  : pointCategory === 'repair'
-                    ? 'categoryRepairPlace'
-                    : 'categoryHirePlace',
+                : pointCategory === 'water'
+                  ? 'drinkingWater'
+                  : pointCategory === 'shop'
+                    ? 'categoryShop'
+                    : pointCategory === 'repair'
+                      ? 'categoryRepairPlace'
+                      : 'categoryHirePlace',
             ),
         isSelected ? translate(locale, 'selected') : null,
         isSaved ? translate(locale, 'savedMarker') : null,
@@ -2956,36 +3018,7 @@ export default function CycleParkingMap({
           currentSelectedPoint.latitude,
         ])
         .addTo(map);
-
-      const shouldCenterPopup =
-        !window.matchMedia('(max-width: 820px)').matches ||
-        mobileSheetStateRef.current === 'collapsed';
-
-      if (
-        shouldCenterPopup &&
-        centeredCollapsedPopupPointRef.current !== currentSelectedPoint.id
-      ) {
-        centeredCollapsedPopupPointRef.current = currentSelectedPoint.id;
-        centerTimeoutId = window.setTimeout(() => {
-          if (
-            window.matchMedia('(max-width: 820px)').matches &&
-            mobileSheetStateRef.current !== 'collapsed'
-          ) {
-            return;
-          }
-
-          if (selectedEntry.popup) {
-            centerPopupInVisibleMapArea(map, selectedEntry.popup);
-          }
-        }, 100);
-      }
     }
-
-    return () => {
-      if (centerTimeoutId !== null) {
-        window.clearTimeout(centerTimeoutId);
-      }
-    };
   }, [
     canRequestDirections,
     canShowStreetView,
@@ -3009,6 +3042,42 @@ export default function CycleParkingMap({
     savedPointKeySet,
     visiblePoints,
   ]);
+
+  useEffect(() => {
+    if (!map || !selectedPoint || route) {
+      return;
+    }
+
+    const isMobile = window.matchMedia('(max-width: 820px)').matches;
+    if (
+      (isMobile && mobileSheetState !== 'collapsed') ||
+      (isMobile && previousMobileSheetStateRef.current !== 'collapsed') ||
+      centeredCollapsedPopupPointRef.current === selectedPoint.id
+    ) {
+      return;
+    }
+
+    // Keep this timer independent from marker reconciliation. The tray resize
+    // changes the visible chunks while it animates and used to cancel the pan.
+    const timeoutId = window.setTimeout(
+      () => {
+        const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
+        if (
+          !popup?.isOpen() ||
+          (window.matchMedia('(max-width: 820px)').matches &&
+            mobileSheetStateRef.current !== 'collapsed')
+        ) {
+          return;
+        }
+
+        centerPopupInVisibleMapArea(map, popup);
+        centeredCollapsedPopupPointRef.current = selectedPoint.id;
+      },
+      isMobile ? collapsedSheetPopupFocusDelayMs : 100,
+    );
+
+    return () => window.clearTimeout(timeoutId);
+  }, [map, mobileSheetState, route, selectedPoint]);
 
   useEffect(() => {
     if (!map) {

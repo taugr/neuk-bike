@@ -11,7 +11,7 @@ import {
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dataRoot = resolve(repoRoot, 'public/data/cycling-pois');
 const reportPath = resolve(repoRoot, 'src/data/cycling-poi-report.json');
-const categories = new Set(['shop', 'repair', 'hire']);
+const categories = new Set(['shop', 'repair', 'hire', 'water']);
 
 function invariant(condition, message) {
   if (!condition) throw new Error(message);
@@ -64,8 +64,8 @@ async function main() {
     'Point index content hash mismatch.',
   );
   const pointIndex = JSON.parse(pointIndexContent);
-  const counts = { hire: 0, repair: 0, shop: 0 };
-  const websiteCounts = { hire: 0, repair: 0, shop: 0 };
+  const counts = { hire: 0, repair: 0, shop: 0, water: 0 };
+  const websiteCounts = { hire: 0, repair: 0, shop: 0, water: 0 };
   let websiteCount = 0;
   let cyclingPoiDataBytes =
     Buffer.byteLength(JSON.stringify(manifest)) +

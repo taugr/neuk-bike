@@ -142,9 +142,9 @@ test('does not download route chunks while the network layer is disabled', async
 
   const map = page.getByTestId('parking-map');
   await expect(map).toHaveAttribute('data-cycle-network-enabled', 'false');
-  const desktopSettings = page.locator('.settings-menu--desktop');
-  await desktopSettings.locator('.settings-trigger').click();
-  const networkSwitch = desktopSettings.getByRole('switch', {
+  await page.getByTestId('map-layers-trigger').click();
+  const mapLayers = page.getByTestId('map-layers-popover');
+  const networkSwitch = mapLayers.getByRole('switch', {
     name: 'National Cycle Network',
   });
   await expect(networkSwitch).toBeVisible();

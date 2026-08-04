@@ -21,6 +21,7 @@
 - Browse a map-first interface without an app account or backend
 - See the official UK National Cycle Network as a default-on, optional map
   layer from zoom 10
+- Show nearby OpenStreetMap drinking-water points as a default-off map layer
 - Show cycle directions to a selected parking place with CycleStreets
 - Build multi-stop cycle routes and compare Quietest, Balanced, and Fastest
   options
@@ -87,6 +88,12 @@ use compact repeated shields, while route popups present route type, confirmed
 surface, ride quality, and lighting in a compact translated fact grid using the
 same icon language as parking details. The layer is not shown outside published
 UK coverage and never changes route calculation.
+
+OpenStreetMap drinking-water points share the lazy-loaded cycling-place
+release. They stay off by default and appear as blue droplet markers when the
+Drinking water switch is enabled in Map layers. Selecting a point shows its
+distance and a Directions action without replacing or reranking the nearby
+parking list. The layer choice is stored only in the current browser.
 
 If geolocation is unavailable or the requested location is outside the UK,
 Ireland, Spain, and Armenia, the app falls back to central Edinburgh and
@@ -171,8 +178,8 @@ pnpm exec playwright install chromium
 
 ## Dataset refresh
 
-The category-chip release keeps bicycle shops, repair facilities, and hire
-locations in a separate lazy-loaded release under
+The cycling-place release keeps bicycle shops, repair facilities, hire
+locations, and drinking-water points in a separate lazy-loaded release under
 `public/data/cycling-pois/`. Run `pnpm update:pois` to rebuild the full UK,
 Ireland, Spain, and Armenia coverage from the same cached Geofabrik extracts
 used by parking. Inputs are processed sequentially, overlapping regional OSM
@@ -191,11 +198,12 @@ compressed 3×3 payload is about 559 KiB. Run `pnpm verify:network` after a
 refresh and treat `src/data/cycle-network-report.json` as the current snapshot
 report. Do not hand-edit these generated files.
 
-The current cycling-place release contains 13,212 unique OpenStreetMap places
-in 2,486 chunks: 4,115 shops, 2,590 repair locations, and 8,013 hire
-locations. Its 2,488 generated files occupy about 3.9 MiB; the largest possible
-initial 3×3 chunk payload is about 38 KiB compressed. The category totals
-overlap because one place can explicitly support more than one service.
+The current cycling-place release contains 66,960 unique OpenStreetMap places
+in 8,254 chunks: 4,115 shops, 2,590 repair locations, 8,013 hire locations,
+and 53,749 drinking-water points. Its 8,256 generated files contain about 15.3
+MiB of JSON; the largest possible initial 3×3 chunk payload is about 79 KiB
+compressed. The category totals overlap because one place can explicitly
+support more than one service.
 
 `pnpm update:data` performs the complete release pipeline:
 

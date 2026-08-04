@@ -30,6 +30,7 @@ const selectedTags = [
   'amenity',
   'brand',
   'contact:website',
+  'drinking_water',
   'fee',
   'name',
   'network',
@@ -163,6 +164,12 @@ function categoriesFor(tags = {}) {
   ) {
     categories.push('hire');
   }
+  if (
+    tags.drinking_water !== 'no' &&
+    (tags.amenity === 'drinking_water' || tags.drinking_water === 'yes')
+  ) {
+    categories.push('water');
+  }
   return categories;
 }
 
@@ -172,6 +179,8 @@ function displayName(tags, categories) {
   }
   if (categories.includes('shop')) return 'Bicycle shop';
   if (categories.includes('repair')) return 'Bicycle repair station';
+  if (categories.includes('hire')) return 'Cycle hire';
+  if (categories.includes('water')) return 'Drinking water';
   return 'Cycle hire';
 }
 
@@ -355,7 +364,7 @@ function json(value) {
 
 function categoryCountsFor(points) {
   return Object.fromEntries(
-    ['shop', 'repair', 'hire'].map((category) => [
+    ['shop', 'repair', 'hire', 'water'].map((category) => [
       category,
       points.filter((point) => point.categories.includes(category)).length,
     ]),
@@ -404,8 +413,11 @@ function maximumInitialCompressedBytes(chunkContents) {
 function assertGeneratedAssetBudgets(metrics) {
   const mebibyte = 1_048_576;
   const failures = [];
-  if (metrics.cyclingPoiDataBytes > 15 * mebibyte) {
-    failures.push('cycling-place data exceeds 15 MiB');
+  // Drinking-water coverage is much denser than the original cycle-service
+  // dataset. Keep a bounded full-export budget while retaining the stricter
+  // per-chunk and initial-viewport limits below.
+  if (metrics.cyclingPoiDataBytes > 20 * mebibyte) {
+    failures.push('cycling-place data exceeds 20 MiB');
   }
   if (metrics.fileCount > 10_000) {
     failures.push('cycling-place file count exceeds 10,000');
@@ -413,8 +425,8 @@ function assertGeneratedAssetBudgets(metrics) {
   if (metrics.largestAssetBytes > 20 * mebibyte) {
     failures.push('a generated cycling-place asset exceeds 20 MiB');
   }
-  if (metrics.manifestBytes > mebibyte) {
-    failures.push('cycling-place manifest exceeds 1 MiB');
+  if (metrics.manifestBytes > 2 * mebibyte) {
+    failures.push('cycling-place manifest exceeds 2 MiB');
   }
   if (metrics.pointIndexBytes > 5 * mebibyte) {
     failures.push('cycling-place point index exceeds 5 MiB');
@@ -567,19 +579,25 @@ async function writeSpatialOutput({
     naming: {
       explicit: points.filter(
         (point) =>
-          !['Bicycle shop', 'Bicycle repair station', 'Cycle hire'].includes(
-            point.name,
-          ),
+          ![
+            'Bicycle shop',
+            'Bicycle repair station',
+            'Cycle hire',
+            'Drinking water',
+          ].includes(point.name),
       ).length,
       generic: points.filter((point) =>
-        ['Bicycle shop', 'Bicycle repair station', 'Cycle hire'].includes(
-          point.name,
-        ),
+        [
+          'Bicycle shop',
+          'Bicycle repair station',
+          'Cycle hire',
+          'Drinking water',
+        ].includes(point.name),
       ).length,
     },
     websites: {
       byCategory: Object.fromEntries(
-        ['hire', 'repair', 'shop'].map((category) => [
+        ['hire', 'repair', 'shop', 'water'].map((category) => [
           category,
           points.filter(
             (point) =>

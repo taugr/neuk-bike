@@ -34,6 +34,7 @@ import {
   Gauge,
   Globe2,
   Hammer,
+  Layers,
   LocateFixed,
   MapPin,
   Maximize2,
@@ -268,13 +269,15 @@ function getInitialCycleRoutePlan(routes: CycleRoutesByPlan) {
 
 function getPointCategoryLabelKey(point: ParkingPoint): MessageKey {
   if (!isCyclingPoiPoint(point)) return 'categoryParking';
-  if (point.categories.includes('shop')) return 'categoryShop';
-  if (point.categories.includes('repair')) return 'categoryRepairPlace';
-  return 'categoryHirePlace';
+  if (point.categories[0] === 'shop') return 'categoryShop';
+  if (point.categories[0] === 'repair') return 'categoryRepairPlace';
+  if (point.categories[0] === 'hire') return 'categoryHirePlace';
+  return 'drinkingWater';
 }
 const copiedMessageDurationMs = 1_800;
 const themeStorageKey = 'cycle-parking-theme';
 const cycleNetworkStorageKey = 'cycle-parking-cycle-network-visible';
+const drinkingWaterStorageKey = 'cycle-parking-drinking-water-visible';
 const mobileSheetCollapsedHeightRem = 5.4;
 const mobileSheetDragIntentThresholdPx = 6;
 const mobileSheetExpandedViewportRatio = 0.52;
@@ -594,6 +597,8 @@ export default function CycleParkingFinder() {
   >([]);
   const [isCycleNetworkAvailable, setIsCycleNetworkAvailable] = useState(false);
   const [isCycleNetworkVisible, setIsCycleNetworkVisible] = useState(true);
+  const [isDrinkingWaterVisible, setIsDrinkingWaterVisible] = useState(false);
+  const [isMapLayersOpen, setIsMapLayersOpen] = useState(false);
   const [cycleNetworkZoom, setCycleNetworkZoom] = useState(13);
   const [parkingDataStatus, setParkingDataStatus] =
     useState<ParkingDataStatus>('loading');
@@ -1002,8 +1007,12 @@ export default function CycleParkingFinder() {
       setIsCycleNetworkVisible(
         window.localStorage.getItem(cycleNetworkStorageKey) !== 'false',
       );
+      setIsDrinkingWaterVisible(
+        window.localStorage.getItem(drinkingWaterStorageKey) === 'true',
+      );
     } catch {
       setIsCycleNetworkVisible(true);
+      setIsDrinkingWaterVisible(false);
     }
     void client
       .initialize()
@@ -1204,7 +1213,7 @@ export default function CycleParkingFinder() {
   ]);
 
   useEffect(() => {
-    if (discoverCategory === 'parking') {
+    if (discoverCategory === 'parking' && !isDrinkingWaterVisible) {
       setCyclingPoiDataMessage(null);
       return;
     }
@@ -1215,7 +1224,11 @@ export default function CycleParkingFinder() {
       new CyclingPoiDataClient(getCyclingPoiDataBaseUrl(window.location.href));
     cyclingPoiDataClient.current = client;
     setCyclingPoiDataStatus('loading');
-    setCyclingPoiDataMessage(t('loadingCyclingPlaces'));
+    setCyclingPoiDataMessage(
+      discoverCategory === 'parking'
+        ? t('loadingDrinkingWater')
+        : t('loadingCyclingPlaces'),
+    );
 
     void client
       .loadLocation(locationState.location)
@@ -1237,7 +1250,11 @@ export default function CycleParkingFinder() {
       .catch(() => {
         if (cancelled) return;
         setCyclingPoiDataStatus('error');
-        setCyclingPoiDataMessage(t('cyclingPlacesLoadError'));
+        setCyclingPoiDataMessage(
+          discoverCategory === 'parking'
+            ? t('drinkingWaterLoadError')
+            : t('cyclingPlacesLoadError'),
+        );
       });
 
     return () => {
@@ -1245,6 +1262,7 @@ export default function CycleParkingFinder() {
     };
   }, [
     discoverCategory,
+    isDrinkingWaterVisible,
     locationState.location.latitude,
     locationState.location.longitude,
     t,
@@ -1287,18 +1305,25 @@ export default function CycleParkingFinder() {
       cycleNetworkViewport.current = { bounds, zoom };
       loadCycleNetworkForBounds(bounds, zoom, isCycleNetworkVisible);
 
-      if (discoverCategory !== 'parking') {
+      if (discoverCategory !== 'parking' || isDrinkingWaterVisible) {
         const client = cyclingPoiDataClient.current;
-        if (!client) return;
-        void client
-          .loadBounds(bounds)
-          .then(() =>
-            setCyclingPoiPoints(
-              prepareDisplayPoints(client.getLoadedPoints(), locale),
-            ),
-          )
-          .catch(() => setCyclingPoiDataMessage(t('cyclingPlacesLoadError')));
-        return;
+        if (client) {
+          void client
+            .loadBounds(bounds)
+            .then(() =>
+              setCyclingPoiPoints(
+                prepareDisplayPoints(client.getLoadedPoints(), locale),
+              ),
+            )
+            .catch(() =>
+              setCyclingPoiDataMessage(
+                discoverCategory === 'parking'
+                  ? t('drinkingWaterLoadError')
+                  : t('cyclingPlacesLoadError'),
+              ),
+            );
+        }
+        if (discoverCategory !== 'parking') return;
       }
       const client = parkingDataClient.current;
       const manifest = client?.getManifest();
@@ -1322,6 +1347,7 @@ export default function CycleParkingFinder() {
     },
     [
       discoverCategory,
+      isDrinkingWaterVisible,
       isCycleNetworkVisible,
       loadCycleNetworkForBounds,
       locale,
@@ -1434,6 +1460,31 @@ export default function CycleParkingFinder() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isSettingsMenuOpen]);
+
+  useEffect(() => {
+    if (!isMapLayersOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (
+        !(target instanceof Element) ||
+        !target.closest('.map-layers-control')
+      ) {
+        setIsMapLayersOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setIsMapLayersOpen(false);
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMapLayersOpen]);
 
   useEffect(() => {
     if (!openParkingMoreMenuId) {
@@ -1609,7 +1660,30 @@ export default function CycleParkingFinder() {
     }
     return [...points.values()];
   }, [nearbyPoints, parkingView, savedPoints]);
-  const mapPoints = availablePoints;
+  const drinkingWaterPoints = useMemo(
+    () =>
+      isDrinkingWaterVisible
+        ? sortByDistance(
+            cyclingPoiPoints.filter(({ categories }) =>
+              categories.includes('water'),
+            ),
+            locationState.location,
+          ).map((point) => ({
+            ...point,
+            categories: [
+              'water' as const,
+              ...point.categories.filter((category) => category !== 'water'),
+            ],
+          }))
+        : [],
+    [cyclingPoiPoints, isDrinkingWaterVisible, locationState.location],
+  );
+  const mapPoints = useMemo(() => {
+    const points = new Map<string, ParkingPoint>();
+    for (const point of drinkingWaterPoints) points.set(point.id, point);
+    for (const point of availablePoints) points.set(point.id, point);
+    return [...points.values()];
+  }, [availablePoints, drinkingWaterPoints]);
   const formattedParkingLocationCount = useMemo(
     () => (parkingManifest?.recordCount ?? 0).toLocaleString(formattingLocale),
     [formattingLocale, parkingManifest?.recordCount],
@@ -1620,7 +1694,7 @@ export default function CycleParkingFinder() {
     parkingView === 'saved' ? savedPoints : closestPoints;
   const explicitSelectedPoint =
     selectedId !== null
-      ? (availablePoints.find((point) => point.id === selectedId) ?? null)
+      ? (mapPoints.find((point) => point.id === selectedId) ?? null)
       : null;
   const explicitSelectedPointDetails = explicitSelectedPoint
     ? getParkingPopupDetails(explicitSelectedPoint, locale)
@@ -1633,9 +1707,8 @@ export default function CycleParkingFinder() {
     : savedNeuksMessage;
   const directionsParkingPoint =
     directionsState.status !== 'idle'
-      ? (availablePoints.find(
-          (point) => point.id === directionsState.parkingId,
-        ) ?? null)
+      ? (mapPoints.find((point) => point.id === directionsState.parkingId) ??
+        null)
       : null;
   const activeRoute =
     directionsState.status === 'loaded'
@@ -3579,6 +3652,40 @@ export default function CycleParkingFinder() {
     setIsAttributionModalOpen(true);
   }
 
+  function setCycleNetworkVisibility(visible: boolean) {
+    setIsCycleNetworkVisible(visible);
+    captureAnalyticsEvent('map_layer_changed', {
+      layer: 'national_cycle_network',
+      visible,
+    });
+    try {
+      window.localStorage.setItem(cycleNetworkStorageKey, String(visible));
+    } catch {
+      // Keep the in-memory choice when storage is unavailable.
+    }
+  }
+
+  function setDrinkingWaterVisibility(visible: boolean) {
+    setIsDrinkingWaterVisible(visible);
+    captureAnalyticsEvent('map_layer_changed', {
+      layer: 'drinking_water',
+      visible,
+    });
+    try {
+      window.localStorage.setItem(drinkingWaterStorageKey, String(visible));
+    } catch {
+      // Keep the in-memory choice when storage is unavailable.
+    }
+    if (
+      !visible &&
+      explicitSelectedPoint &&
+      isCyclingPoiPoint(explicitSelectedPoint) &&
+      explicitSelectedPoint.categories[0] === 'water'
+    ) {
+      clearSelectedParkingPoint();
+    }
+  }
+
   function renderThemeSettings(
     className = '',
     triggerVariant: 'brand' | 'settings' = 'settings',
@@ -3598,7 +3705,10 @@ export default function CycleParkingFinder() {
             .join(' ')}
           type="button"
           whileTap={subtleTap}
-          onClick={() => setIsSettingsMenuOpen((isOpen) => !isOpen)}
+          onClick={() => {
+            setIsMapLayersOpen(false);
+            setIsSettingsMenuOpen((isOpen) => !isOpen);
+          }}
         >
           {isBrandTrigger ? (
             <img src="favicon.svg" alt="" aria-hidden="true" />
@@ -3688,38 +3798,6 @@ export default function CycleParkingFinder() {
                   </option>
                 ))}
               </select>
-              {isCycleNetworkAvailable ? (
-                <Fragment key="cycle-network-setting">
-                  <span className="settings-label">{t('mapLayers')}</span>
-                  <label className="map-layer-option">
-                    <span>
-                      {t('nationalCycleNetwork')}
-                      {cycleNetworkZoom <
-                      (cycleNetworkManifest?.chunkZoom ?? 10) ? (
-                        <small>{t('cycleNetworkZoomIn')}</small>
-                      ) : null}
-                    </span>
-                    <input
-                      aria-label={t('nationalCycleNetwork')}
-                      checked={isCycleNetworkVisible}
-                      role="switch"
-                      type="checkbox"
-                      onChange={(event) => {
-                        const visible = event.target.checked;
-                        setIsCycleNetworkVisible(visible);
-                        try {
-                          window.localStorage.setItem(
-                            cycleNetworkStorageKey,
-                            String(visible),
-                          );
-                        } catch {
-                          // Keep the in-memory choice when storage is unavailable.
-                        }
-                      }}
-                    />
-                  </label>
-                </Fragment>
-              ) : null}
               {canInstall ? (
                 <Fragment key="install-app-action">
                   <span className="settings-label">{t('app')}</span>
@@ -4038,6 +4116,70 @@ export default function CycleParkingFinder() {
             cycleNetworkFeatures={cycleNetworkFeatures}
             isCycleNetworkVisible={isCycleNetworkVisible}
           />
+          {!isDirectionsMode && !isRouteWorkspace ? (
+            <div className="map-layers-control">
+              <motion.button
+                aria-expanded={isMapLayersOpen}
+                aria-label={t('mapLayers')}
+                className="map-layers-trigger"
+                data-testid="map-layers-trigger"
+                type="button"
+                whileTap={subtleTap}
+                onClick={() => {
+                  setIsSettingsMenuOpen(false);
+                  setIsMapLayersOpen((isOpen) => !isOpen);
+                }}
+              >
+                <Layers aria-hidden="true" size={19} strokeWidth={2.2} />
+              </motion.button>
+              <AnimatePresence initial={false}>
+                {isMapLayersOpen ? (
+                  <motion.div
+                    {...popoverPresence}
+                    aria-label={t('mapLayers')}
+                    className="map-layers-popover"
+                    data-testid="map-layers-popover"
+                    role="dialog"
+                  >
+                    <strong>{t('mapLayers')}</strong>
+                    {isCycleNetworkAvailable ? (
+                      <label className="map-layers-option">
+                        <span>
+                          {t('nationalCycleNetwork')}
+                          {cycleNetworkZoom <
+                          (cycleNetworkManifest?.chunkZoom ?? 10) ? (
+                            <small>{t('cycleNetworkZoomIn')}</small>
+                          ) : null}
+                        </span>
+                        <input
+                          aria-label={t('nationalCycleNetwork')}
+                          checked={isCycleNetworkVisible}
+                          role="switch"
+                          type="checkbox"
+                          onChange={(event) =>
+                            setCycleNetworkVisibility(event.target.checked)
+                          }
+                        />
+                      </label>
+                    ) : null}
+                    <label className="map-layers-option">
+                      <span>{t('drinkingWater')}</span>
+                      <input
+                        aria-label={t('drinkingWater')}
+                        checked={isDrinkingWaterVisible}
+                        data-testid="drinking-water-layer-toggle"
+                        role="switch"
+                        type="checkbox"
+                        onChange={(event) =>
+                          setDrinkingWaterVisibility(event.target.checked)
+                        }
+                      />
+                    </label>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+            </div>
+          ) : null}
         </section>
 
         {!isDirectionsMode && !isRouteWorkspace ? (
