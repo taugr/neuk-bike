@@ -322,6 +322,262 @@ final result: blocked
 
 final result: passed
 
+## Saved-route summary modest restyle
+
+The existing Bike Neuks parking fact strip was used as the product reference.
+The saved-route summary keeps its original three values and compact height, but
+now uses the same neutral surface, subtle outline, segmented dividers, and equal
+value emphasis.
+
+### Source and implementation captures
+
+- Existing saved-route desktop source:
+  `/private/tmp/neuk-bike-summary-audit/01-saved-route.png`
+- Existing saved-route mobile source:
+  `/private/tmp/neuk-bike-summary-audit/04-saved-route-mobile.png`
+- Implemented desktop:
+  `/private/tmp/neuk-bike-summary-audit/05-saved-route-after-desktop.png`
+- Implemented mobile:
+  `/private/tmp/neuk-bike-summary-audit/06-saved-route-after-mobile.png`
+- Full desktop comparison:
+  `/private/tmp/neuk-bike-summary-audit/07-desktop-before-after.png`
+- Full mobile comparison:
+  `/private/tmp/neuk-bike-summary-audit/08-mobile-before-after.png`
+- Focused desktop comparison:
+  `/private/tmp/neuk-bike-summary-audit/09-desktop-summary-before-after.png`
+- Focused mobile comparison:
+  `/private/tmp/neuk-bike-summary-audit/10-mobile-summary-before-after.png`
+
+### Viewports and measured result
+
+- Desktop viewport: 1728 x 962 at device-pixel ratio 1.
+- Mobile viewport: 390 x 844 at device-pixel ratio 1.
+- Desktop summary: 415.8 x 42.8 pixels, 1-pixel subtle border, 8-pixel
+  radius, and three equal 137.9-pixel cells.
+- Mobile summary: 352.8 x 39.6 pixels, 1-pixel subtle border, 8-pixel
+  radius, and three equal 116.9-pixel cells.
+- All three values render at 13.12 pixels and weight 760. The second and
+  third cells have 1-pixel dividers.
+- The desktop and mobile production browser checks reported no console
+  warnings or errors.
+
+### Comparison history
+
+1. The initial mobile implementation allowed the flex item to shrink to its
+   border height even though the three cells remained visible.
+2. The summary was made non-shrinking within the scroll column and the static
+   production export was rebuilt.
+3. The final mobile measurement returned to 39.6 pixels, matching the prior
+   compact height while preserving the new outline and dividers.
+4. The full and focused before/after comparisons show no new spacing,
+   truncation, map-visibility, or action-layout regressions.
+
+### Verification
+
+- `pnpm format`
+- `pnpm lint`
+- `pnpm test` — 28 files and 202 tests passed
+- `pnpm build`
+- `pnpm exec playwright test e2e/mobile.spec.ts --grep "adds map route points continuously and calculates while editing"` — 1 passed
+
+final result: passed
+
+## Compact saved-route toolbar and hybrid mobile actions
+
+### Comparison setup
+
+- Desktop source visual:
+  `/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_wDb590dNwl7zCGfPqvRcccTv.png`
+- Mobile compact-toolbar source visual:
+  `/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_0LyZLmjNaP0rlqPOHVWFzIS6.png`
+- Mobile collapsible-actions source visual:
+  `/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_T5ETSSIFC4d0242PXAFk1Gi9.png`
+- Desktop implementation:
+  `/private/tmp/neuk-bike-saved-route-compact-desktop.png`
+- Mobile implementation:
+  `/private/tmp/neuk-bike-saved-route-compact-mobile.png`
+- Desktop side-by-side comparison:
+  `/private/tmp/neuk-bike-saved-route-compact-desktop-comparison.png`
+- Mobile three-way comparison:
+  `/private/tmp/neuk-bike-saved-route-compact-mobile-comparison.png`
+- Desktop viewport: 1728 x 962 CSS pixels at device scale factor 1.
+- Desktop source pixels: 1681 x 936, normalized to 1728 x 962.
+- Desktop implementation pixels: 1728 x 962.
+- Mobile viewport: 390 x 844 CSS pixels at device scale factor 1.
+- Both mobile source images: 852 x 1846 pixels, each normalized to 390 x 844.
+- Mobile implementation pixels: 390 x 844.
+- State: light theme, saved Edinburgh Castle route, normal viewing state,
+  mobile secondary-action menu collapsed.
+
+### Findings
+
+No actionable P0, P1, or P2 differences remain.
+
+The implementation combines the selected Option 2 compact title toolbar with
+the selected Option 3 mobile action hierarchy. It deliberately retains the
+app's existing route-workspace sheet ceiling instead of copying the much taller
+generated mobile sheets, preserving the agreed map visibility.
+
+### Required fidelity surfaces
+
+- Fonts and typography: the toolbar uses the existing product font and an
+  optically compact bold route name. The checked standard route name fits on
+  one line at both 1728 x 962 and 390 x 844; longer names retain deliberate
+  ellipsis behavior and expose their full value through the title and rename
+  field.
+- Spacing and layout rhythm: the separate back row and title row are replaced
+  by one 44 px toolbar. Back, title, and rename controls align on the same
+  baseline, the summary begins 12.8 px below it, and the viewing-state sheet
+  height remains 402.5 px at the checked mobile viewport.
+- Colors and visual tokens: existing white surfaces, teal controls,
+  pale-green summary, separators, danger treatment, focus states, and radii
+  remain unchanged.
+- Image quality and asset fidelity: the live vector map, CycleStreets route,
+  waypoint badges, and existing Lucide controls remain sharp. No new image
+  assets, placeholders, custom SVGs, CSS drawings, or gradients were added.
+- Copy and content: the real route name is the header title. Desktop retains
+  the labelled `My routes` back action and four visible management actions;
+  mobile uses icon-only back and rename controls with accessible labels plus
+  `Edit route` and `More actions`.
+
+### Full-view comparison evidence
+
+The desktop comparison shows the same compact single-row title bar, summary,
+two-by-two action grid, and directions density as the Option 2 source. The
+mobile three-way comparison shows the Option 2 title treatment and Option 3
+action hierarchy combined in the implementation while keeping more map
+visible than either generated source.
+
+### Focused comparison evidence
+
+A separate crop was not needed. The normalized full-view desktop comparison
+keeps the complete 419 px panel legible, and the 390 px mobile triptych keeps
+the toolbar, summary, action row, and first directions legible at the exact
+checked viewport.
+
+### Interaction and responsive verification
+
+- The desktop toolbar measured 44 px high; its standard route title measured
+  261 px available and 261 px content width with no truncation.
+- The mobile toolbar measured 44 px high; both icon controls measured 44 x 44
+  px, and its title measured 257 px available and 257 px content width with no
+  truncation.
+- Desktop management actions remained a visible grid while mobile desktop
+  actions were hidden and the two-button mobile row was visible.
+- `More actions` changed `aria-expanded` from `false` to `true` and revealed
+  exactly one Export GPX, Duplicate, and Delete route control.
+- Activating `Edit route name` revealed the populated, labelled input. Editing
+  enabled Save; Cancel restored the original heading and removed the input.
+- Browser console warnings and errors: none.
+
+### Comparison history
+
+1. The first desktop capture found a P2 route-title truncation: the standard
+   Edinburgh Castle route was eight to 36 px wider than the available title
+   track across the initial desktop and mobile passes.
+2. Toolbar gaps, back-button horizontal padding, and title optical size were
+   tightened without reducing the 44 px mobile targets or increasing toolbar
+   height.
+3. The production export was rebuilt and both viewports were recaptured. The
+   post-fix measurements show equal content and available widths for the
+   standard route name, with no remaining P0, P1, or P2 issue.
+
+### Follow-up polish
+
+- P3: exceptionally long translated route names intentionally ellipsize in the
+  toolbar and remain fully available when the user opens rename mode.
+
+final result: passed
+
+## Continuous route editing QA
+
+### Comparison setup
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/exec-4f2001f7-46af-4fa1-b7f1-0f9f5e0325f6.png`
+- Browser-rendered implementation: `/Users/tomauger/.codex/visualizations/2026/07/29/019faeca-697b-7b61-81f3-3f8f5170736c/route-editor-implementation-full.png`
+- Combined comparison: `/Users/tomauger/.codex/visualizations/2026/07/29/019faeca-697b-7b61-81f3-3f8f5170736c/route-editor-design-comparison.png`
+- CSS viewport: 390 x 844 pixels at device-pixel ratio 1
+- Source pixels: 853 x 1844, normalized to 390 x 844 for comparison
+- Implementation pixels: 390 x 844
+- State: mobile route editor with three ordered points, the newest point
+  highlighted, and the compact editing sheet expanded
+
+### Findings
+
+- P0: none.
+- P1: none.
+- P2: none.
+- The live implementation retains the required OpenStreetMap attribution,
+  production parking markers, and real Edinburgh map crop. These intentionally
+  differ from the simplified illustrative map in the source but do not change
+  the editing hierarchy or obstruct persistent controls.
+
+### Required fidelity surfaces
+
+- Fonts and typography: the existing application family and weights preserve
+  the source hierarchy across the editing title, live count, point-added
+  confirmation, supporting instruction, and primary action. Text remains
+  readable without wrapping or truncation at 390 pixels.
+- Spacing and layout rhythm: the sheet is content-sized and thumb reachable,
+  with the same header, confirmation row, instruction, and full-width primary
+  action order as the source. Its rounded top edge, grip, internal padding, and
+  compact height keep most of the map visible.
+- Colors and visual tokens: existing surface, separator, muted-copy, teal
+  accent, and primary-button tokens reproduce the source's neutral white sheet
+  and green action hierarchy in both normal and disabled states.
+- Image quality and asset fidelity: the production vector map and MapLibre
+  route markers remain sharp at the tested density. Lucide icons are used for
+  editing, success, and Undo; no placeholder or handcrafted image assets were
+  introduced.
+- Copy and content: `Editing route`, the live point count, `Point 3 added`,
+  `Tap the map to keep adding points.`, `Undo`, `Cancel`, and `Done editing`
+  match the approved behavior and remain localized across all supported
+  languages.
+
+### Full-view comparison evidence
+
+The normalized 780 x 844 side-by-side comparison shows the same map-first
+composition, compact bottom editing sheet, live count, newest-point ring,
+confirmation row, secondary controls, and dominant Done editing action. The
+production sheet is slightly denser than the generated reference because it
+uses the app's established type scale and existing 16-pixel panel inset; this
+is consistent with the rest of Neuk Bike and is not actionable drift.
+
+### Focused comparison evidence
+
+A separate crop was not required. At 390 x 844 the complete editing sheet is
+readable in the full comparison, including icon treatment, type hierarchy,
+button spacing, newest-marker ring, and bottom safe-area containment.
+
+### Interaction and responsive verification
+
+- Entering map placement once kept the editor active across successive map
+  taps and updated the count from zero to one to two points in one session.
+- A second loop from the mocked current-location start added another point and
+  retained the editor instead of returning to the full planner.
+- Undo removed only the latest added point, restored the previous count, and
+  disabled itself when no session-added points remained.
+- Cancel restored the exact pre-edit draft, including the original one-point
+  stop list and removal of temporary map markers.
+- Done kept the new point, returned to the full planner, made one route
+  calculation, rendered all three route choices, and enabled Save route.
+- The newest route marker had exactly one active highlight ring.
+- Browser console warnings and errors: none.
+- Unit, lint, formatting, TypeScript, and static production build checks passed.
+
+### Comparison history
+
+- Initial implementation comparison found no actionable P0, P1, or P2 visual
+  difference. No visual fixes were required after the browser capture.
+
+### Follow-up polish
+
+- P3: consider whether parking markers should be visually subdued during route
+  editing after real-device use; they are useful geographic context today but
+  make the live map busier than the illustrative source.
+
+final result: passed
+
 ---
 
 # Armenia localization and coverage QA
@@ -1308,5 +1564,175 @@ disclosure, compact condition cells, and a reachable close control.
   in the Carlisle, Suffolk, and mobile examples checked here.
 
 ## Final result
+
+final result: passed
+
+## Continuous route editing final checkpoint
+
+The detailed `Continuous route editing QA` section above is the latest design
+review. Its source is
+`/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/exec-4f2001f7-46af-4fa1-b7f1-0f9f5e0325f6.png`,
+its browser-rendered implementation is
+`/Users/tomauger/.codex/visualizations/2026/07/29/019faeca-697b-7b61-81f3-3f8f5170736c/route-editor-implementation-full.png`,
+and the normalized side-by-side comparison is
+`/Users/tomauger/.codex/visualizations/2026/07/29/019faeca-697b-7b61-81f3-3f8f5170736c/route-editor-design-comparison.png`.
+
+- Viewport: 390 x 844 CSS pixels at device-pixel ratio 1.
+- State: three-point continuous map editing with the newest point highlighted.
+- Findings: no actionable P0, P1, or P2 differences.
+- Interactions: continuous placement, Undo, Cancel restoration, Done,
+  post-edit route calculation, and Save enablement passed.
+- Console warnings and errors: none.
+- Focused crop: not required because the full 780 x 844 comparison keeps every
+  sheet control and the active marker legible.
+
+final result: passed
+
+## Saved-route name hierarchy and responsive actions
+
+### Comparison setup
+
+- Desktop source visual:
+  `/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_X9GhwO1Z8tuFlWkej20Ytpv4.png`
+- Mobile source visual:
+  `/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_T5ETSSIFC4d0242PXAFk1Gi9.png`
+- Desktop implementation:
+  `/private/tmp/neuk-bike-saved-route-desktop-implementation-2.png`
+- Mobile implementation:
+  `/private/tmp/neuk-bike-saved-route-mobile-implementation.png`
+- Desktop side-by-side comparison:
+  `/private/tmp/neuk-bike-saved-route-desktop-comparison.png`
+- Mobile side-by-side comparison:
+  `/private/tmp/neuk-bike-saved-route-mobile-comparison.png`
+- Desktop viewport: 1728 x 962 CSS pixels at device scale factor 1.
+- Desktop source pixels: 1681 x 936, normalized to 1728 x 962.
+- Desktop implementation pixels: 1728 x 962.
+- Mobile viewport: 390 x 844 CSS pixels at device scale factor 1.
+- Mobile source pixels: 852 x 1846, normalized to 390 x 844.
+- Mobile implementation pixels: 390 x 844.
+- State: light theme, saved route from Princes Street to Edinburgh Castle,
+  normal viewing state with the mobile secondary-action menu collapsed.
+
+### Findings
+
+No actionable P0, P1, or P2 differences remain.
+
+The implementation deliberately keeps the mobile sheet at the app's existing
+52dvh route-workspace ceiling rather than copying the taller generated mock.
+This preserves the previously agreed map visibility and avoids allowing saved
+route controls to cover more of the map than the standard Bike Neuks view.
+
+The generated mobile source invents turn-arrow icons and condenses the real
+instruction data. The implementation retains the product's actual CycleStreets
+directions and route-point badges. This is an intentional content constraint,
+not visual drift in the redesigned header.
+
+### Required fidelity surfaces
+
+- Fonts and typography: the existing product font, weights, and line heights
+  remain intact. The real route name is now the strongest heading, fits on one
+  desktop line for the checked route, and can wrap safely for longer names.
+- Spacing and layout rhythm: Back sits on its own row, the title and rename
+  action share a compact aligned row, the existing summary strip follows
+  directly, and the mobile action row reveals more directions without raising
+  the sheet.
+- Colors and visual tokens: all surfaces, teal actions, pale-green summary,
+  separators, danger styling, radii, and focus treatment use existing Bike
+  Neuks tokens.
+- Image quality and asset fidelity: the live vector map, route line, route
+  points, and Lucide interface icons remain sharp. No new raster assets,
+  placeholder drawings, or custom SVGs were introduced.
+- Copy and content: the generic `Saved route` title and permanent `Route name`
+  field are absent in viewing state. The real route name, `Edit name`, summary,
+  desktop actions, mobile `More actions`, and actual directions are present.
+
+### Full-view comparison evidence
+
+The desktop comparison shows the same map-first split, panel width, compact
+summary, two-by-two management grid, and directions density as the selected
+source. The mobile comparison shows the selected title hierarchy combined with
+the approved simplified action row while retaining more map than the generated
+mock.
+
+### Focused comparison evidence
+
+A separate crop was not needed because both normalized comparisons render the
+entire header, summary, action controls, and first direction rows at readable
+size. The only P2 discovered in the first desktop capture was visible in the
+full-view comparison and was resolved in the second capture.
+
+### Interaction and responsive verification
+
+- The rename field is absent until `Edit route name` is activated.
+- Activating rename focuses the populated field; Cancel restores the heading
+  without changing the route.
+- The focused mobile E2E flow changes the name, saves it, and verifies the new
+  heading.
+- Desktop keeps Edit route, Export GPX, Duplicate, and Delete route visible.
+- Mobile keeps Edit route visible and exposes Export GPX, Duplicate, and Delete
+  route through the `More actions` control.
+- `aria-expanded` changes from `false` to `true` and back as the mobile menu is
+  opened and closed.
+- The production browser reported no console warnings or errors.
+
+### Comparison history
+
+1. Initial desktop capture found a P2 title-wrap mismatch: the visible
+   `Edit route name` label consumed enough width to wrap `Browser test –
+Edinburgh Castle` onto two lines.
+2. The visible label was shortened to `Edit name` while preserving the
+   descriptive `Edit route name` accessible name.
+3. The production export was rebuilt and recaptured. The post-fix comparison
+   shows the route name on one line with the edit action aligned at the right;
+   no P0, P1, or P2 differences remain.
+
+### Follow-up polish
+
+- P3: assess exceptionally long Gaelic and Armenian route names on real devices;
+  the current layout wraps safely and keeps the rename control reachable.
+
+final result: passed
+
+## Compact saved-route toolbar final checkpoint
+
+The detailed `Compact saved-route toolbar and hybrid mobile actions` section
+above is the latest design review. Its desktop source is
+`/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_wDb590dNwl7zCGfPqvRcccTv.png`;
+its mobile sources are
+`/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_0LyZLmjNaP0rlqPOHVWFzIS6.png`
+and
+`/Users/tomauger/.codex/generated_images/019faeca-697b-7b61-81f3-3f8f5170736c/call_T5ETSSIFC4d0242PXAFk1Gi9.png`.
+The browser-rendered implementations are
+`/private/tmp/neuk-bike-saved-route-compact-desktop.png` and
+`/private/tmp/neuk-bike-saved-route-compact-mobile.png`.
+
+- Viewports: 1728 x 962 desktop and 390 x 844 mobile, both at device-pixel
+  ratio 1.
+- State: saved route open, light theme, and mobile secondary actions collapsed.
+- Findings: no actionable P0, P1, or P2 differences.
+- Interactions: More actions disclosure and rename activation, editing, and
+  cancellation passed.
+- Console warnings and errors: none.
+- Full comparisons:
+  `/private/tmp/neuk-bike-saved-route-compact-desktop-comparison.png` and
+  `/private/tmp/neuk-bike-saved-route-compact-mobile-comparison.png`.
+
+final result: passed
+
+## Saved-route summary restyle final checkpoint
+
+The detailed `Saved-route summary modest restyle` section above is the latest
+design review. The final production captures are
+`/private/tmp/neuk-bike-summary-audit/05-saved-route-after-desktop.png` and
+`/private/tmp/neuk-bike-summary-audit/06-saved-route-after-mobile.png`.
+
+- Desktop summary: 415.8 x 42.8 pixels.
+- Mobile summary: 352.8 x 39.6 pixels.
+- Final focused comparisons:
+  `/private/tmp/neuk-bike-summary-audit/09-desktop-summary-before-after.png`
+  and
+  `/private/tmp/neuk-bike-summary-audit/10-mobile-summary-before-after.png`.
+- Findings: no actionable P0, P1, or P2 differences.
+- Console warnings and errors: none.
 
 final result: passed

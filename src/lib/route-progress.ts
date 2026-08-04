@@ -5,6 +5,7 @@ export const LIVE_ROUTE_BASE_SNAP_THRESHOLD_METERS = 35;
 export const LIVE_ROUTE_MAX_SNAP_THRESHOLD_METERS = 60;
 export const LIVE_ROUTE_ARRIVAL_THRESHOLD_METERS = 12;
 export const LIVE_ROUTE_MIN_HEADING_DISTANCE_METERS = 2;
+export const ROUTE_VIEW_NEARBY_THRESHOLD_METERS = 5_000;
 const activeInstructionGraceMeters = 10;
 const metersPerDegreeLatitude = 111_320;
 
@@ -198,6 +199,17 @@ function projectLocationToRoute(
     ...bestProjection,
     totalDistanceMeters,
   };
+}
+
+export function isLocationNearRoute(
+  location: UserLocation,
+  route: CycleRoute,
+  thresholdMeters = ROUTE_VIEW_NEARBY_THRESHOLD_METERS,
+) {
+  const projection = projectLocationToRoute(location, route.points);
+  return Boolean(
+    projection && projection.distanceFromRouteMeters <= thresholdMeters,
+  );
 }
 
 function getInstructionDistances(route: CycleRoute) {

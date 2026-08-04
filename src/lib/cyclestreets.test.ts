@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildShortCycleRoute,
   buildShortCycleRoutes,
+  buildCycleRouteWaypointsCacheKey,
   buildCycleStreetsDirectionsRequest,
+  buildCycleStreetsRouteRequest,
   CYCLESTREETS_ROUTE_PLANS,
   CycleStreetsRouteError,
   describeCycleRouteInstruction,
@@ -268,6 +270,85 @@ describe('CycleStreets utilities', () => {
     expect(request.headers).toEqual({
       Accept: 'application/json',
     });
+  });
+
+  it('builds ordered multi-waypoint requests and stable cache keys', () => {
+    const waypoints = [
+      {
+        id: 'start',
+        label: 'Start',
+        latitude: 55.9533,
+        longitude: -3.1883,
+        source: 'current-location' as const,
+      },
+      {
+        id: 'via',
+        label: 'Water of Leith',
+        latitude: 55.9512,
+        longitude: -3.2015,
+        source: 'search' as const,
+      },
+      {
+        id: 'finish',
+        label: 'Portobello',
+        latitude: 55.9571,
+        longitude: -3.113,
+        source: 'map' as const,
+      },
+    ];
+    const request = buildCycleStreetsRouteRequest({
+      apiKey: 'public-test-key',
+      waypoints,
+    });
+    const url = new URL(request.url);
+
+    expect(url.searchParams.get('waypoints')).toBe(
+      '-3.18830,55.95330,Start|-3.20150,55.95120,Water of Leith|-3.11300,55.95710,Portobello',
+    );
+    expect(buildCycleRouteWaypointsCacheKey(waypoints)).toBe(
+      'quietest,balanced,fastest:16:55.95330:-3.18830:55.95120:-3.20150:55.95710:-3.11300',
+    );
+    expect(
+      buildCycleRouteWaypointsCacheKey([waypoints[1]!, waypoints[0]!]),
+    ).not.toBe(buildCycleRouteWaypointsCacheKey(waypoints));
+  });
+
+  it('accepts the provider waypoint limit and rejects requests outside it', () => {
+    const waypoint = {
+      id: 'stop',
+      label: 'Stop',
+      latitude: 55.9533,
+      longitude: -3.1883,
+      source: 'map' as const,
+    };
+
+    expect(() =>
+      buildCycleStreetsRouteRequest({
+        apiKey: 'public-test-key',
+        waypoints: [waypoint],
+      }),
+    ).toThrow('between 2 and 30 stops');
+
+    const maximumRequest = buildCycleStreetsRouteRequest({
+      apiKey: 'public-test-key',
+      waypoints: Array.from({ length: 30 }, (_, index) => ({
+        ...waypoint,
+        id: `stop-${index}`,
+      })),
+    });
+    expect(
+      new URL(maximumRequest.url).searchParams.get('waypoints')?.split('|'),
+    ).toHaveLength(30);
+
+    expect(() =>
+      buildCycleStreetsRouteRequest({
+        apiKey: 'public-test-key',
+        waypoints: Array.from({ length: 31 }, (_, index) => ({
+          ...waypoint,
+          id: `stop-${index}`,
+        })),
+      }),
+    ).toThrow('between 2 and 30 stops');
   });
 
   it('retries browser JSONP directions once after a script error', async () => {

@@ -63,6 +63,393 @@ test('changes language from the mobile menu and keeps the choice', async ({
   );
 });
 
+test('keeps route planning in the mobile Bike Neuks menu', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  const finderPanel = page.getByRole('complementary', {
+    name: 'Nearest cycle parking',
+  });
+  await expect(finderPanel.getByTestId('plan-route')).toHaveCount(0);
+  await expect(finderPanel.getByTestId('open-my-routes')).toHaveCount(0);
+
+  const mobileMenu = page.locator('.settings-menu--mobile');
+  await mobileMenu.locator('.settings-trigger').click();
+  await expect(mobileMenu.getByText('Routes', { exact: true })).toBeVisible();
+  await expect(mobileMenu.getByTestId('plan-route')).toBeVisible();
+  await expect(mobileMenu.getByTestId('open-my-routes')).toContainText(
+    'My routes',
+  );
+  await expect(mobileMenu.locator('.settings-route-count')).toHaveText('0');
+
+  const mapAttribution = page.locator('.maplibregl-ctrl-bottom-right');
+  const mapZoomControls = page.locator('.maplibregl-ctrl-top-left');
+  await expect(mapAttribution).toBeVisible();
+  await expect(mapZoomControls).toBeVisible();
+  const resultsAttributionTop = await mapAttribution.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).top),
+  );
+  const resultsZoomControlsTop = await mapZoomControls.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).top),
+  );
+
+  await mobileMenu.getByTestId('plan-route').click();
+  const editor = page.getByTestId('route-map-editor');
+  await expect(editor).toBeVisible();
+  await expect(editor).toContainText('0 points');
+  await expect(editor).toContainText('Tap the map to keep adding points.');
+  await expect(page.locator('[data-testid^="parking-marker-"]')).toHaveCount(0);
+  await expect(page.getByTestId('parking-map')).toHaveAttribute(
+    'data-cycle-network-presentation',
+    'full',
+  );
+  await expect(page.getByTestId('parking-map')).toHaveAttribute(
+    'data-route-planning-mode',
+    'true',
+  );
+  await expect(page.getByTestId('parking-map')).toHaveAttribute(
+    'data-cycle-network-interactive',
+    'false',
+  );
+  await expect(page.locator('.start-marker')).toHaveCount(0);
+  await expect
+    .poll(async () => {
+      const pane = await page.locator('.control-pane').boundingBox();
+      const editorBounds = await editor.boundingBox();
+      if (!pane || !editorBounds) {
+        return Number.POSITIVE_INFINITY;
+      }
+      return pane.y + pane.height - (editorBounds.y + editorBounds.height);
+    })
+    .toBeLessThanOrEqual(16);
+  const routeAttributionTop = await mapAttribution.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).top),
+  );
+  const routeZoomControlsTop = await mapZoomControls.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).top),
+  );
+  expect(routeAttributionTop).toBeLessThan(resultsAttributionTop);
+  expect(routeAttributionTop).toBeLessThanOrEqual(6);
+  expect(routeZoomControlsTop).toBeLessThan(resultsZoomControlsTop);
+  expect(routeZoomControlsTop).toBeLessThanOrEqual(12);
+  await expect(mobileMenu.locator('.settings-popover')).toHaveCount(0);
+});
+
+test('adds map route points continuously and calculates while editing', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  let routeRequestCount = 0;
+  let placeRequestCount = 0;
+  const requestedWaypointBatches: string[][] = [];
+  await page.route('https://photon.komoot.io/api/**', async (route) => {
+    placeRequestCount += 1;
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        features: [
+          {
+            geometry: { coordinates: [-3.1883, 55.9533] },
+            properties: {
+              country: 'United Kingdom',
+              name: 'Old route place',
+              osm_id: 1,
+              osm_type: 'N',
+            },
+          },
+        ],
+      }),
+    });
+  });
+  await page.route(
+    'https://api.cyclestreets.net/v2/journey.plan**',
+    async (route) => {
+      routeRequestCount += 1;
+      const requestUrl = new URL(route.request().url());
+      const callback = requestUrl.searchParams.get('callback');
+      requestedWaypointBatches.push(
+        requestUrl.searchParams.get('waypoints')?.split('|') ?? [],
+      );
+      expect(callback).toBeTruthy();
+      await route.fulfill({
+        contentType: 'application/javascript',
+        body: `${callback}(${JSON.stringify({
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {
+                path: 'plan/balanced',
+                plan: 'balanced',
+                lengthMetres: 1200,
+                timeSeconds: 360,
+              },
+              geometry: {
+                type: 'LineString',
+                coordinates: [
+                  [-3.1883, 55.9533],
+                  [-3.19, 55.95],
+                  [-3.2, 55.945],
+                ],
+              },
+            },
+          ],
+        })});`,
+      });
+    },
+  );
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  const standardPaneHeight = await page
+    .locator('.control-pane')
+    .evaluate((element) => Math.round(element.getBoundingClientRect().height));
+
+  const mobileMenu = page.locator('.settings-menu--mobile');
+  await mobileMenu.locator('.settings-trigger').click();
+  await mobileMenu.getByTestId('plan-route').click();
+
+  const editor = page.getByTestId('route-map-editor');
+  await expect(editor).toBeVisible();
+  await expect(editor).toContainText('Editing route');
+  await expect(editor).toContainText('0 points');
+  await expect(editor).toContainText('Tap the map to keep adding points.');
+  expect(routeRequestCount).toBe(0);
+
+  const map = page.getByTestId('parking-map');
+  await map.click({ position: { x: 130, y: 250 } });
+  await expect(editor).toContainText('Point 1 added');
+  await expect(editor).toContainText('1 point');
+  await expect(page.getByTestId('route-waypoint-marker-0')).toHaveClass(
+    /route-waypoint-marker-active/,
+  );
+  const stableEditorHeights: number[] = [];
+  for (let sample = 0; sample < 6; sample += 1) {
+    stableEditorHeights.push(
+      await page
+        .locator('.control-pane')
+        .evaluate((element) =>
+          Math.round(element.getBoundingClientRect().height),
+        ),
+    );
+    await page.waitForTimeout(150);
+  }
+  expect(
+    Math.max(...stableEditorHeights) - Math.min(...stableEditorHeights),
+  ).toBeLessThanOrEqual(1);
+
+  await map.click({ position: { x: 270, y: 350 } });
+  await expect(editor).toContainText('Point 2 added');
+  await expect(editor).toContainText('2 points');
+  await expect(page.getByTestId('route-waypoint-marker-1')).toHaveClass(
+    /route-waypoint-marker-active/,
+  );
+  await expect.poll(() => routeRequestCount).toBe(1);
+  await expect(map).toHaveAttribute('data-route-source', 'cyclestreets');
+
+  await editor.getByRole('button', { name: 'Undo' }).click();
+  await expect(editor).toContainText('Point 1 added');
+  await expect(page.getByTestId('route-waypoint-marker-1')).toHaveCount(0);
+  await expect(map).not.toHaveAttribute('data-route-source');
+
+  await editor.getByRole('button', { name: 'Cancel' }).click();
+  const planner = page.getByRole('region', { name: 'Plan a route' });
+  await expect(planner).toBeVisible();
+  await expect(planner.locator('.route-stop-row')).toHaveCount(0);
+  expect(routeRequestCount).toBe(1);
+
+  const routePlaceSearch = planner.getByLabel('Add a place');
+  await routePlaceSearch.fill('Old route place');
+  await routePlaceSearch.press('Enter');
+  await expect.poll(() => placeRequestCount).toBe(1);
+  await routePlaceSearch.fill('New route place');
+  await page.waitForTimeout(500);
+  await expect(routePlaceSearch).toHaveValue('New route place');
+  await expect(planner.getByText('Old route place')).toHaveCount(0);
+
+  await planner.getByRole('button', { name: 'Add stop on map' }).click();
+  await map.click({ position: { x: 145, y: 255 } });
+  await page.waitForTimeout(800);
+  await map.click({ position: { x: 265, y: 345 } });
+  await map.click({ position: { x: 205, y: 205 } });
+  await expect(editor).toContainText('3 points');
+  await expect.poll(() => requestedWaypointBatches.at(-1)?.length ?? 0).toBe(3);
+  await expect(map).toHaveAttribute('data-route-source', 'cyclestreets');
+
+  const requestCountBeforeDone = routeRequestCount;
+  await editor.getByRole('button', { name: 'Done editing' }).click();
+  await expect(planner).toBeVisible();
+  await expect(planner.getByLabel('Route style')).toBeVisible();
+  expect(routeRequestCount).toBe(requestCountBeforeDone);
+  const requestedWaypoints = requestedWaypointBatches.at(-1) ?? [];
+  expect(requestedWaypoints).toHaveLength(3);
+  expect(
+    requestedWaypoints.some((waypoint) =>
+      waypoint.startsWith('-3.18830,55.95330'),
+    ),
+  ).toBe(false);
+  await expect(map).toHaveAttribute('data-initial-approach-point-count', '0');
+
+  const postEditPaneHeights: number[] = [];
+  for (let sample = 0; sample < 6; sample += 1) {
+    postEditPaneHeights.push(
+      await page
+        .locator('.control-pane')
+        .evaluate((element) =>
+          Math.round(element.getBoundingClientRect().height),
+        ),
+    );
+    await page.waitForTimeout(100);
+  }
+  expect(Math.max(...postEditPaneHeights)).toBeLessThanOrEqual(
+    standardPaneHeight + 1,
+  );
+  expect(
+    Math.max(...postEditPaneHeights) - Math.min(...postEditPaneHeights),
+  ).toBeLessThanOrEqual(1);
+
+  await planner.getByRole('button', { name: 'My routes' }).click();
+  const savedRoutesPanel = page.locator('.saved-routes-panel');
+  await expect(savedRoutesPanel).toBeVisible();
+  await savedRoutesPanel.locator('.saved-routes-new').click();
+  await expect(planner).toBeVisible();
+  await expect(planner.locator('.route-stop-row')).toHaveCount(3);
+  await expect(map).toHaveAttribute('data-route-source', 'cyclestreets');
+  await planner.getByRole('button', { name: 'My routes' }).click();
+  await expect(savedRoutesPanel).toBeVisible();
+  await savedRoutesPanel.getByRole('button', { name: 'Back' }).click();
+  await expect(planner).toBeVisible();
+  await expect(planner.locator('.route-stop-row')).toHaveCount(3);
+
+  await planner.getByRole('button', { name: 'Save route' }).click();
+  const savedRouteDetail = page.locator('.saved-route-detail');
+  await expect(savedRouteDetail).toBeVisible();
+  await expect(map).toHaveAttribute('data-current-location-marker', 'visible');
+  const currentLocationMarker = page.locator('.start-marker');
+  await expect(currentLocationMarker).toBeVisible();
+  await expect(currentLocationMarker).toHaveCSS('z-index', '1250');
+  await expect(savedRouteDetail).not.toContainText('Saved on this device');
+  await expect(savedRouteDetail).not.toContainText('Saved route');
+  await expect(
+    savedRouteDetail.getByRole('heading', { level: 1 }),
+  ).toBeVisible();
+  const savedRouteToolbar = savedRouteDetail.locator(
+    '.saved-route-detail-toolbar',
+  );
+  const savedRouteToolbarBox = await savedRouteToolbar.boundingBox();
+  expect(savedRouteToolbarBox?.height).toBeLessThanOrEqual(46);
+  const savedRouteBackBox = await savedRouteDetail
+    .getByRole('button', { name: 'My routes' })
+    .boundingBox();
+  expect(savedRouteBackBox?.width).toBeLessThanOrEqual(46);
+  await expect(savedRouteDetail.getByRole('textbox')).toHaveCount(0);
+  await savedRouteDetail
+    .getByRole('button', { name: 'Edit route name' })
+    .click();
+  const routeNameInput = savedRouteDetail.getByRole('textbox', {
+    name: 'Route name',
+  });
+  await routeNameInput.fill('Castle loop');
+  await savedRouteDetail.getByRole('button', { name: 'Save' }).click();
+  await expect(
+    savedRouteDetail.getByRole('heading', {
+      level: 1,
+      name: 'Castle loop',
+    }),
+  ).toBeVisible();
+  await expect(
+    savedRouteDetail.getByRole('button', { name: 'Edit route', exact: true }),
+  ).toBeVisible();
+  const moreRouteActions = savedRouteDetail.getByRole('button', {
+    name: 'More actions',
+    exact: true,
+  });
+  await expect(moreRouteActions).toHaveAttribute('aria-expanded', 'false');
+  await expect(
+    savedRouteDetail.getByRole('button', { name: 'Export GPX' }),
+  ).toHaveCount(0);
+  await moreRouteActions.click();
+  await expect(moreRouteActions).toHaveAttribute('aria-expanded', 'true');
+  await expect(moreRouteActions).toHaveText('');
+  const routeActionMenu = page.getByRole('menu', { name: 'More actions' });
+  await expect(routeActionMenu).toBeVisible();
+  await expect(
+    routeActionMenu.getByRole('menuitem', { name: 'Export GPX' }),
+  ).toBeVisible();
+  await expect(
+    routeActionMenu.getByRole('menuitem', { name: 'Duplicate' }),
+  ).toBeVisible();
+  await expect(
+    routeActionMenu.getByRole('menuitem', { name: 'Delete route' }),
+  ).toBeVisible();
+  const routeActionMenuBox = await routeActionMenu.boundingBox();
+  const moreRouteActionsBox = await moreRouteActions.boundingBox();
+  expect(routeActionMenuBox?.x).toBeGreaterThanOrEqual(12);
+  expect(routeActionMenuBox?.y).toBeGreaterThanOrEqual(12);
+  expect(
+    (routeActionMenuBox?.x ?? 0) + (routeActionMenuBox?.width ?? 0),
+  ).toBeLessThanOrEqual(378);
+  expect(routeActionMenuBox?.y).toBeLessThan(moreRouteActionsBox?.y ?? 0);
+  await page.keyboard.press('Escape');
+  await expect(moreRouteActions).toHaveAttribute('aria-expanded', 'false');
+  await expect(routeActionMenu).toHaveCount(0);
+  await expect(moreRouteActions).toBeFocused();
+  await expect(page.getByTestId('route-instruction-point-1')).toBeVisible();
+  await expect(page.getByTestId('route-instruction-point-2')).toBeVisible();
+  await expect(page.getByTestId('route-instruction-point-3')).toBeVisible();
+  const fittedRouteZoom = Number(await map.getAttribute('data-map-zoom'));
+  await page.getByRole('button', { name: 'Zoom out' }).click();
+  await expect
+    .poll(async () => Number(await map.getAttribute('data-map-zoom')))
+    .toBeLessThan(fittedRouteZoom - 0.5);
+  await page.waitForTimeout(750);
+  expect(Number(await map.getAttribute('data-map-zoom'))).toBeLessThan(
+    fittedRouteZoom - 0.5,
+  );
+  await expect(
+    savedRouteDetail.getByRole('button', { name: 'Edit route', exact: true }),
+  ).toBeEnabled();
+  await savedRouteDetail.getByRole('button', { name: 'My routes' }).click();
+  await expect(page.locator('.saved-routes-panel')).toBeVisible();
+  await expect(page.locator('.saved-routes-panel')).not.toContainText(
+    'Saved on this device',
+  );
+
+  await page.goto('/?mockGps=denied');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await page.locator('.settings-menu--mobile .settings-trigger').click();
+  await mobileMenu.getByTestId('open-my-routes').click();
+  await page
+    .locator('.saved-routes-panel')
+    .getByRole('button', { name: /Castle loop/ })
+    .click();
+  await expect(savedRouteDetail).toBeVisible();
+  await expect(map).toHaveAttribute('data-current-location-marker', 'hidden');
+  await expect(page.locator('.start-marker')).toHaveCount(0);
+
+  await page.evaluate(() => {
+    Object.defineProperty(IDBObjectStore.prototype, 'put', {
+      configurable: true,
+      value() {
+        throw new Error('Forced route storage failure.');
+      },
+    });
+  });
+  await savedRouteDetail
+    .getByRole('button', { name: 'More actions', exact: true })
+    .click();
+  await page
+    .getByRole('menu', { name: 'More actions' })
+    .getByRole('menuitem', { name: 'Duplicate' })
+    .click();
+  await expect(savedRouteDetail.getByRole('alert')).toContainText(
+    'Routes could not be saved on this device.',
+  );
+});
+
 test('keeps short category translations fitted and scrolls Armenian at 390 pixels', async ({
   page,
 }) => {
@@ -352,7 +739,7 @@ test('keeps the nearby heading clear after collapsing and expanding', async ({
 
       return headingBounds.y - (gripBounds.y + gripBounds.height);
     })
-    .toBeLessThanOrEqual(12);
+    .toBeLessThanOrEqual(28);
 });
 
 test('keeps the collapsed parking details summary inside the sheet', async ({

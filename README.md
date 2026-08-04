@@ -22,6 +22,9 @@
 - See the official UK National Cycle Network as a default-on, optional map
   layer from zoom 10
 - Show cycle directions to a selected parking place with CycleStreets
+- Build multi-stop cycle routes and compare Quietest, Balanced, and Fastest
+  options
+- Save routes on the current device and export them as GPX files
 - See capacity, access, cover, and stand type when mapped
 - Share parking places with source-qualified `?parking=` links
 - Install the app as a Progressive Web App
@@ -34,8 +37,8 @@ Open [neuk.bike](https://neuk.bike/). The deployed site currently runs on
 Cloudflare Pages, with [neuk-bike.pages.dev](https://neuk-bike.pages.dev/) as
 the provider URL and rollback entry point.
 
-The app runs entirely in the browser. It has no backend, database, paid API, or
-personal-location storage.
+The app runs entirely in the browser. It has no backend, server database, paid
+API, or server-side personal-location storage.
 
 ## Quick start
 
@@ -101,6 +104,18 @@ for local development:
 ```bash
 NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 ```
+
+The route planner extends that integration to ordered routes of up to eight
+stops. Stops can come from place search or a deliberate tap-on-map mode. The
+selected route, including its stops, geometry, instructions, distance, and
+duration, is saved to IndexedDB on the current device. Saved routes can be
+reopened and exported as GPX without recalculation. Route calculation and place
+search still require a connection, and clearing browser site data removes the
+local route library.
+
+Open the Bike Neuks menu and use **Plan a route** to start a draft or **My
+routes** to reopen routes saved on the current device. The normal Nearby sheet
+remains dedicated to finding cycle parking and other cycling places.
 
 Armenia routing was verified with a live Yerevan journey that returned route
 geometry and Armenian street instructions. The app keeps its existing external

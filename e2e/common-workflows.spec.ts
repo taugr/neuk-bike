@@ -478,23 +478,30 @@ test('searches from a place and selects a nearby parking row', async ({
   const nearbyHeading = finderPanel.getByRole('heading', {
     name: /Nearby bike neuks/,
   });
+  const listHeading = finderPanel.locator('.list-heading');
   const headingBeforeSearch = await nearbyHeading.boundingBox();
   await searchbox.fill('Test Place');
   const placeOption = page.getByRole('option', {
     name: /Test Place, Edinburgh/,
   });
   await expect(placeOption).toBeVisible();
-  const [headingWithSuggestions, optionWithSuggestions] = await Promise.all([
+  const [
+    headingWithSuggestions,
+    optionWithSuggestions,
+    listHeadingWithSuggestions,
+  ] = await Promise.all([
     nearbyHeading.boundingBox(),
     placeOption.boundingBox(),
+    listHeading.boundingBox(),
   ]);
   expect(headingBeforeSearch).not.toBeNull();
   expect(headingWithSuggestions).not.toBeNull();
   expect(optionWithSuggestions).not.toBeNull();
+  expect(listHeadingWithSuggestions).not.toBeNull();
   expect(headingWithSuggestions!.y).toBeCloseTo(headingBeforeSearch!.y, 0);
   expect(
     optionWithSuggestions!.y + optionWithSuggestions!.height,
-  ).toBeGreaterThan(headingWithSuggestions!.y);
+  ).toBeGreaterThan(listHeadingWithSuggestions!.y);
   await searchbox.press('Enter');
 
   const parkingRow = page.getByTestId(`parking-row-${parkingOne.id}`);

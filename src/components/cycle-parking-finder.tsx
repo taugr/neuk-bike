@@ -70,8 +70,11 @@ import { createPortal } from 'react-dom';
 import {
   buildShortCycleRoutes,
   buildCycleRouteCacheKey,
+  buildCycleRouteWaypointsCacheKey,
   buildCycleStreetsDirectionsRequest,
+  buildCycleStreetsRouteRequest,
   CYCLESTREETS_DEFAULT_ROUTE_PLAN,
+  CYCLESTREETS_MAX_WAYPOINTS,
   CYCLESTREETS_ROUTE_PLANS,
   describeCycleRouteInstruction,
   fetchCycleStreetsDirections,
@@ -79,8 +82,10 @@ import {
   parseCycleStreetsRoutes,
   SHORT_CYCLE_ROUTE_THRESHOLD_METERS,
   type CycleRouteInstruction,
+  type CycleRoute,
   type CycleRoutePlan,
   type CycleRoutePoint,
+  type CycleRouteWaypoint,
   type CycleRoutesByPlan,
 } from '@/lib/cyclestreets';
 import {
@@ -121,6 +126,7 @@ import { formatOpeningHoursLines } from '@/lib/opening-hours';
 import {
   getBearingDegrees,
   getLiveRouteProgress,
+  isLocationNearRoute,
   LIVE_ROUTE_MIN_HEADING_DISTANCE_METERS,
   type LiveRouteProgress,
 } from '@/lib/route-progress';
@@ -133,6 +139,8 @@ import {
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { Bollard } from '@/components/icons/bollard';
 import { useLanguage } from '@/components/language-provider';
+import { RoutePlanner } from '@/components/route-planner';
+import { SavedRoutesPanel } from '@/components/saved-routes-panel';
 import { captureAnalyticsEvent } from '@/lib/analytics';
 import { shareParkingLink } from '@/lib/share';
 import {
@@ -178,6 +186,28 @@ import {
   type AppLocale,
 } from '@/lib/i18n/locales';
 import { translate, type MessageKey } from '@/lib/i18n/messages';
+import { createLocalId } from '@/lib/local-id';
+import {
+  addRouteWaypoint,
+  buildRouteDraftPreview,
+  canCalculateRoute,
+  createRouteDraft,
+  getDefaultRouteName,
+  isRouteDraftMeaningful,
+  moveRouteWaypoint,
+  removeRouteWaypoint,
+  swapRouteEndpoints,
+  type RouteDraft,
+} from '@/lib/route-draft';
+import {
+  createSavedRouteRecord,
+  deleteSavedRoute,
+  listSavedRoutes,
+  putSavedRoute,
+  savedRouteToCycleRoute,
+  type SavedRouteRecord,
+} from '@/lib/saved-routes';
+import { downloadRouteGpx } from '@/lib/gpx';
 
 const CycleParkingMap = dynamic(
   () => import('@/components/cycle-parking-map'),
@@ -195,6 +225,7 @@ function LocalizedMapLoading() {
 const maxPlaceSearchCacheEntries = 12;
 const placeSearchDebounceMs = 300;
 const placeSearchMinimumCharacters = 3;
+const routePlannerCalculationDebounceMs = 250;
 const closestParkingResultCount = 8;
 type DiscoverCategory = 'parking' | CyclingPoiCategory;
 type SavedResolvedPoint = ParkingPoint & { savedNeukKey: string };
@@ -468,6 +499,20 @@ type ResolvedTheme = 'light' | 'dark';
 type MobileSheetState = 'expanded' | 'collapsed';
 type ParkingDataStatus = 'loading' | 'ready' | 'error';
 type SavedNeuksStatus = 'loading' | 'ready' | 'storage-error';
+type RouteWorkspaceView = 'detail' | 'library' | 'planner';
+type RoutePlannerStatus =
+  | 'error'
+  | 'idle'
+  | 'loaded'
+  | 'loading'
+  | 'missing-key';
+
+type RouteWaypointPlacementSnapshot = {
+  draft: RouteDraft;
+  message: string | null;
+  routes: CycleRoutesByPlan;
+  status: RoutePlannerStatus;
+};
 
 type ParkingMoreMenuPosition = {
   bottom?: number;
@@ -588,6 +633,28 @@ export default function CycleParkingFinder() {
   const [directionsState, setDirectionsState] = useState<DirectionsState>({
     status: 'idle',
   });
+  const [routeWorkspaceView, setRouteWorkspaceView] =
+    useState<RouteWorkspaceView | null>(null);
+  const [routeLibraryReturnView, setRouteLibraryReturnView] = useState<
+    'planner' | null
+  >(null);
+  const [routeDraft, setRouteDraft] = useState<RouteDraft | null>(null);
+  const [routePlannerRoutes, setRoutePlannerRoutes] =
+    useState<CycleRoutesByPlan>({});
+  const [routePlannerStatus, setRoutePlannerStatus] =
+    useState<RoutePlannerStatus>('idle');
+  const [routePlannerMessage, setRoutePlannerMessage] = useState<string | null>(
+    null,
+  );
+  const [routeWaypointPlacementSnapshot, setRouteWaypointPlacementSnapshot] =
+    useState<RouteWaypointPlacementSnapshot | null>(null);
+  const [savedRoutes, setSavedRoutes] = useState<SavedRouteRecord[]>([]);
+  const [savedRoutesStatus, setSavedRoutesStatus] = useState<
+    'error' | 'loading' | 'ready'
+  >('loading');
+  const [savedRoutesError, setSavedRoutesError] = useState<string | null>(null);
+  const [selectedSavedRoute, setSelectedSavedRoute] =
+    useState<SavedRouteRecord | null>(null);
   const [liveRouteTracking, setLiveRouteTracking] =
     useState<LiveRouteTrackingState>({
       status: 'idle',
@@ -655,10 +722,13 @@ export default function CycleParkingFinder() {
     zoom: number;
   } | null>(null);
   const directionsCache = useRef(new Map<string, CycleRoutesByPlan>());
+  const routePlannerCache = useRef(new Map<string, CycleRoutesByPlan>());
   const placeSearchAbortController = useRef<AbortController | null>(null);
   const placeSearchDebounceTimeout = useRef<number | null>(null);
   const placeSearchRequestId = useRef(0);
   const directionsRequestId = useRef(0);
+  const routePlannerRequestId = useRef(0);
+  const routePlannerCalculationTimeout = useRef<number | null>(null);
   const liveRouteWatchId = useRef<number | null>(null);
   const previousLiveRouteMarkerPosition = useRef<CycleRoutePoint | null>(null);
   const copiedMessageTimeout = useRef<number | null>(null);
@@ -807,6 +877,25 @@ export default function CycleParkingFinder() {
         initial: { opacity: 0, scale: 0.94, y: '-50%' },
         transition: tooltipTransition,
       };
+
+  const refreshSavedRoutes = useCallback(async () => {
+    setSavedRoutesStatus('loading');
+    try {
+      const records = await listSavedRoutes();
+      setSavedRoutes(records);
+      setSavedRoutesStatus('ready');
+      setSavedRoutesError(null);
+      return records;
+    } catch {
+      setSavedRoutesStatus('error');
+      setSavedRoutesError(t('routeStorageError'));
+      return [];
+    }
+  }, [t]);
+
+  useEffect(() => {
+    void refreshSavedRoutes();
+  }, [refreshSavedRoutes]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1311,6 +1400,9 @@ export default function CycleParkingFinder() {
       if (placeSearchDebounceTimeout.current !== null) {
         window.clearTimeout(placeSearchDebounceTimeout.current);
       }
+      if (routePlannerCalculationTimeout.current !== null) {
+        window.clearTimeout(routePlannerCalculationTimeout.current);
+      }
       placeSearchAbortController.current?.abort();
     };
   }, []);
@@ -1549,6 +1641,62 @@ export default function CycleParkingFinder() {
     directionsState.status === 'loaded'
       ? (directionsState.routes[directionsState.selectedPlan] ?? null)
       : null;
+  const isRouteWorkspace = routeWorkspaceView !== null;
+  const isRouteWaypointPlacementActive =
+    routeWaypointPlacementSnapshot !== null;
+  const routePlacementStartWaypointCount =
+    routeWaypointPlacementSnapshot?.draft.waypoints.length ?? 0;
+  const routePlacementHasChanges = Boolean(
+    routeDraft &&
+    routeWaypointPlacementSnapshot &&
+    routeDraft.waypoints.length !== routePlacementStartWaypointCount,
+  );
+  const routeDraftPreview = useMemo(
+    () =>
+      routeWorkspaceView === 'planner' && routeDraft
+        ? buildRouteDraftPreview(routeDraft)
+        : null,
+    [routeDraft, routeWorkspaceView],
+  );
+  const selectedSavedCycleRoute = useMemo(
+    () =>
+      selectedSavedRoute ? savedRouteToCycleRoute(selectedSavedRoute) : null,
+    [selectedSavedRoute],
+  );
+  const routeWorkspaceRoute =
+    routeWorkspaceView === 'planner' && routeDraft
+      ? (routePlannerRoutes[routeDraft.plan] ?? routeDraftPreview ?? null)
+      : routeWorkspaceView === 'detail'
+        ? selectedSavedCycleRoute
+        : null;
+  const routeWorkspaceWaypoints =
+    routeWorkspaceView === 'planner'
+      ? (routeDraft?.waypoints ?? [])
+      : routeWorkspaceView === 'detail'
+        ? (selectedSavedRoute?.waypoints ?? [])
+        : [];
+  const activeRouteWaypointId =
+    routeWorkspaceView === 'planner' &&
+    routeDraft &&
+    isRouteWaypointPlacementActive &&
+    routePlacementHasChanges
+      ? (routeDraft.waypoints.at(-1)?.id ?? null)
+      : null;
+  const displayedRoute = routeWorkspaceRoute ?? activeRoute;
+  const mapUserLocation = locationState.location;
+  const showRouteCurrentLocation = useMemo(
+    () =>
+      locationState.status === 'located' &&
+      routeWorkspaceView === 'detail' &&
+      routeWorkspaceRoute !== null &&
+      isLocationNearRoute(mapUserLocation, routeWorkspaceRoute),
+    [
+      locationState.status,
+      mapUserLocation,
+      routeWorkspaceRoute,
+      routeWorkspaceView,
+    ],
+  );
   const isRoutePlanSelectionLocked =
     liveRouteTracking.status === 'starting' ||
     liveRouteTracking.status === 'tracking';
@@ -1565,12 +1713,14 @@ export default function CycleParkingFinder() {
   const isParkingDetailsMode =
     parkingPanelState.view === 'details' &&
     explicitSelectedPoint !== null &&
-    !isDirectionsMode;
+    !isDirectionsMode &&
+    !isRouteWorkspace;
   const isSavedListMode =
     parkingPanelState.view === 'list' &&
     parkingView === 'saved' &&
     !isDirectionsMode;
-  const isContentSizedMobileSheet = isParkingDetailsMode || isSavedListMode;
+  const isContentSizedMobileSheet =
+    isParkingDetailsMode || isSavedListMode || isRouteWaypointPlacementActive;
   const activeMobileSheetExpandedViewportRatio = isParkingDetailsMode
     ? mobileDetailsSheetExpandedViewportRatio
     : mobileSheetExpandedViewportRatio;
@@ -1742,17 +1892,20 @@ export default function CycleParkingFinder() {
     }
 
     const controlPane = controlPaneRef.current;
-    const contentBody = isParkingDetailsMode
-      ? Array.from(
-          controlPane?.querySelectorAll<HTMLElement>(
-            '.parking-detail-body[data-parking-detail-id]',
-          ) ?? [],
-        ).find(
-          (body) => body.dataset.parkingDetailId === explicitSelectedPoint?.id,
-        )
-      : controlPane?.querySelector<HTMLElement>(
-          `.parking-view-content[data-parking-view="${parkingView}"]`,
-        );
+    const contentBody = isRouteWorkspace
+      ? controlPane?.querySelector<HTMLElement>('.route-workspace-view')
+      : isParkingDetailsMode
+        ? Array.from(
+            controlPane?.querySelectorAll<HTMLElement>(
+              '.parking-detail-body[data-parking-detail-id]',
+            ) ?? [],
+          ).find(
+            (body) =>
+              body.dataset.parkingDetailId === explicitSelectedPoint?.id,
+          )
+        : controlPane?.querySelector<HTMLElement>(
+            `.parking-view-content[data-parking-view="${parkingView}"]`,
+          );
     if (!controlPane || !contentBody) {
       return;
     }
@@ -1841,6 +1994,9 @@ export default function CycleParkingFinder() {
     }
 
     measureContentHeight();
+    if (isRouteWaypointPlacementActive) {
+      return;
+    }
     const resizeObserver = new ResizeObserver(scheduleContentHeightMeasurement);
     resizeObserver.observe(measuredContentBody);
     for (const child of measuredContentBody.children) {
@@ -1876,11 +2032,16 @@ export default function CycleParkingFinder() {
     failedSavedIds.length,
     isContentSizedMobileSheet,
     isParkingDetailsMode,
+    isRouteWorkspace,
+    isRouteWaypointPlacementActive,
     isSavedPointsLoading,
     locale,
+    routeDraft?.waypoints.length,
+    routeWorkspaceView,
     savedNeuks.length,
     savedNeuksMessage,
     savedPoints.length,
+    savedRoutes.length,
     shareError,
   ]);
 
@@ -2873,6 +3034,458 @@ export default function CycleParkingFinder() {
     }
   }
 
+  function openNewRoutePlanner(
+    source: 'menu' | 'saved-routes' = 'saved-routes',
+  ) {
+    const draft = createRouteDraft(createLocalId());
+    stopLiveRouteTracking();
+    setRouteLibraryReturnView(null);
+    setSelectedSavedRoute(null);
+    setRouteDraft(draft);
+    setRoutePlannerRoutes({});
+    setRoutePlannerStatus('idle');
+    setRoutePlannerMessage(null);
+    setRouteWaypointPlacementSnapshot({
+      draft: {
+        ...draft,
+        waypoints: [...draft.waypoints],
+      },
+      message: null,
+      routes: {},
+      status: 'idle',
+    });
+    setRouteWorkspaceView('planner');
+    setMobileSheetState('expanded');
+    captureAnalyticsEvent('route_planner_opened', { source });
+  }
+
+  function openSavedRoutes() {
+    stopLiveRouteTracking();
+    const preservePlanner =
+      routeWorkspaceView === 'planner' && routeDraft !== null;
+    if (!preservePlanner) {
+      if (routePlannerCalculationTimeout.current !== null) {
+        window.clearTimeout(routePlannerCalculationTimeout.current);
+        routePlannerCalculationTimeout.current = null;
+      }
+      routePlannerRequestId.current += 1;
+    }
+    setRouteLibraryReturnView(preservePlanner ? 'planner' : null);
+    setSelectedSavedRoute(null);
+    setRouteWaypointPlacementSnapshot(null);
+    setRouteWorkspaceView('library');
+    setMobileSheetState('expanded');
+    void refreshSavedRoutes();
+  }
+
+  function returnToPreservedRouteDraft() {
+    if (routeLibraryReturnView !== 'planner' || routeDraft === null) {
+      return false;
+    }
+    setSelectedSavedRoute(null);
+    setSavedRoutesError(null);
+    setRouteWorkspaceView('planner');
+    setMobileSheetState('expanded');
+    return true;
+  }
+
+  function closeRouteWorkspace() {
+    if (
+      routeWorkspaceView === 'planner' &&
+      routeDraft &&
+      isRouteDraftMeaningful(routeDraft) &&
+      !window.confirm(t('discardRouteDraft'))
+    ) {
+      return;
+    }
+    if (routePlannerCalculationTimeout.current !== null) {
+      window.clearTimeout(routePlannerCalculationTimeout.current);
+      routePlannerCalculationTimeout.current = null;
+    }
+    routePlannerRequestId.current += 1;
+    setRouteLibraryReturnView(null);
+    setRouteWorkspaceView(null);
+    setRouteDraft(null);
+    setRoutePlannerRoutes({});
+    setRoutePlannerStatus('idle');
+    setRoutePlannerMessage(null);
+    setRouteWaypointPlacementSnapshot(null);
+    setSelectedSavedRoute(null);
+  }
+
+  async function calculateRouteDraft(nextDraft: RouteDraft) {
+    routePlannerRequestId.current += 1;
+    const requestId = routePlannerRequestId.current;
+
+    if (!canCalculateRoute(nextDraft)) {
+      setRoutePlannerRoutes({});
+      setRoutePlannerStatus('idle');
+      setRoutePlannerMessage(null);
+      return;
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
+    if (!apiKey) {
+      setRoutePlannerStatus('missing-key');
+      setRoutePlannerRoutes({});
+      return;
+    }
+
+    const cacheKey = buildCycleRouteWaypointsCacheKey(nextDraft.waypoints);
+    const cached = routePlannerCache.current.get(cacheKey);
+    if (cached) {
+      if (routePlannerRequestId.current !== requestId) {
+        return;
+      }
+      setRoutePlannerRoutes(cached);
+      setRoutePlannerStatus('loaded');
+      setRoutePlannerMessage(null);
+      return;
+    }
+
+    setRoutePlannerStatus('loading');
+    setRoutePlannerMessage(null);
+    try {
+      const request = buildCycleStreetsRouteRequest({
+        apiKey,
+        waypoints: nextDraft.waypoints,
+      });
+      const finish = nextDraft.waypoints.at(-1)!;
+      const routes = parseCycleStreetsRoutes(
+        await fetchCycleStreetsDirections(request),
+        {
+          id: finish.id,
+          name: finish.label,
+          latitude: finish.latitude,
+          longitude: finish.longitude,
+          properties: {},
+          sourceId: 'route-planner',
+        },
+      );
+      if (routePlannerRequestId.current !== requestId) {
+        return;
+      }
+      routePlannerCache.current.set(cacheKey, routes);
+      setRoutePlannerRoutes(routes);
+      setRoutePlannerStatus('loaded');
+      captureAnalyticsEvent('route_calculated', {
+        plan_count: Object.keys(routes).length,
+        stop_count: nextDraft.waypoints.length,
+      });
+    } catch {
+      if (routePlannerRequestId.current !== requestId) {
+        return;
+      }
+      setRoutePlannerRoutes({});
+      setRoutePlannerStatus('error');
+      setRoutePlannerMessage(t('directionsError'));
+    }
+  }
+
+  function commitRouteDraft(nextDraft: RouteDraft) {
+    if (routePlannerCalculationTimeout.current !== null) {
+      window.clearTimeout(routePlannerCalculationTimeout.current);
+      routePlannerCalculationTimeout.current = null;
+    }
+    setRouteDraft(nextDraft);
+    setRoutePlannerRoutes({});
+    setRoutePlannerStatus('idle');
+    setRoutePlannerMessage(null);
+    void calculateRouteDraft(nextDraft);
+  }
+
+  function scheduleRouteDraftCalculation(nextDraft: RouteDraft) {
+    if (routePlannerCalculationTimeout.current !== null) {
+      window.clearTimeout(routePlannerCalculationTimeout.current);
+      routePlannerCalculationTimeout.current = null;
+    }
+
+    routePlannerRequestId.current += 1;
+    setRoutePlannerRoutes({});
+    setRoutePlannerMessage(null);
+
+    if (!canCalculateRoute(nextDraft)) {
+      setRoutePlannerStatus('idle');
+      return;
+    }
+
+    if (!process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY) {
+      setRoutePlannerStatus('missing-key');
+      return;
+    }
+
+    setRoutePlannerStatus('loading');
+    routePlannerCalculationTimeout.current = window.setTimeout(() => {
+      routePlannerCalculationTimeout.current = null;
+      void calculateRouteDraft(nextDraft);
+    }, routePlannerCalculationDebounceMs);
+  }
+
+  function addWaypointToRouteDraft(waypoint: CycleRouteWaypoint) {
+    if (!routeDraft) {
+      return;
+    }
+    commitRouteDraft(addRouteWaypoint(routeDraft, waypoint));
+  }
+
+  function beginRouteWaypointPlacement() {
+    if (
+      !routeDraft ||
+      routeDraft.waypoints.length >= CYCLESTREETS_MAX_WAYPOINTS
+    ) {
+      return;
+    }
+
+    if (routePlannerCalculationTimeout.current !== null) {
+      window.clearTimeout(routePlannerCalculationTimeout.current);
+      routePlannerCalculationTimeout.current = null;
+    }
+    routePlannerRequestId.current += 1;
+    setRouteWaypointPlacementSnapshot({
+      draft: {
+        ...routeDraft,
+        waypoints: [...routeDraft.waypoints],
+      },
+      message: routePlannerMessage,
+      routes: routePlannerRoutes,
+      status: routePlannerStatus,
+    });
+    setMobileSheetState('expanded');
+  }
+
+  function placeRouteWaypoint(location: UserLocation) {
+    if (
+      !routeDraft ||
+      !isRouteWaypointPlacementActive ||
+      routeDraft.waypoints.length >= CYCLESTREETS_MAX_WAYPOINTS
+    ) {
+      return;
+    }
+
+    const nextDraft = addRouteWaypoint(routeDraft, {
+      id: createLocalId(),
+      label: t('routeMapStop', { count: routeDraft.waypoints.length + 1 }),
+      latitude: location.latitude,
+      longitude: location.longitude,
+      source: 'map',
+    });
+    setRouteDraft(nextDraft);
+    scheduleRouteDraftCalculation(nextDraft);
+  }
+
+  function undoRouteWaypointPlacement() {
+    if (
+      !routeDraft ||
+      !routeWaypointPlacementSnapshot ||
+      routeDraft.waypoints.length <=
+        routeWaypointPlacementSnapshot.draft.waypoints.length
+    ) {
+      return;
+    }
+
+    const nextDraft = {
+      ...routeDraft,
+      waypoints: routeDraft.waypoints.slice(0, -1),
+    };
+    setRouteDraft(nextDraft);
+
+    if (
+      nextDraft.waypoints.length ===
+      routeWaypointPlacementSnapshot.draft.waypoints.length
+    ) {
+      if (routePlannerCalculationTimeout.current !== null) {
+        window.clearTimeout(routePlannerCalculationTimeout.current);
+        routePlannerCalculationTimeout.current = null;
+      }
+      routePlannerRequestId.current += 1;
+      setRoutePlannerRoutes(routeWaypointPlacementSnapshot.routes);
+      setRoutePlannerStatus(routeWaypointPlacementSnapshot.status);
+      setRoutePlannerMessage(routeWaypointPlacementSnapshot.message);
+      return;
+    }
+
+    scheduleRouteDraftCalculation(nextDraft);
+  }
+
+  function cancelRouteWaypointPlacement() {
+    if (!routeWaypointPlacementSnapshot) {
+      return;
+    }
+
+    const snapshot = routeWaypointPlacementSnapshot;
+    if (routePlannerCalculationTimeout.current !== null) {
+      window.clearTimeout(routePlannerCalculationTimeout.current);
+      routePlannerCalculationTimeout.current = null;
+    }
+    routePlannerRequestId.current += 1;
+    setRouteDraft(snapshot.draft);
+    setRoutePlannerRoutes(snapshot.routes);
+    setRoutePlannerStatus(snapshot.status);
+    setRoutePlannerMessage(snapshot.message);
+    setRouteWaypointPlacementSnapshot(null);
+
+    if (snapshot.status === 'loading') {
+      void calculateRouteDraft(snapshot.draft);
+    }
+  }
+
+  function finishRouteWaypointPlacement() {
+    if (!routeDraft || !routeWaypointPlacementSnapshot) {
+      return;
+    }
+
+    const snapshot = routeWaypointPlacementSnapshot;
+    const hasChanges =
+      routeDraft.waypoints.length !== snapshot.draft.waypoints.length;
+    setRouteWaypointPlacementSnapshot(null);
+
+    if (hasChanges) {
+      return;
+    }
+
+    if (routePlannerCalculationTimeout.current !== null) {
+      window.clearTimeout(routePlannerCalculationTimeout.current);
+      routePlannerCalculationTimeout.current = null;
+    }
+    routePlannerRequestId.current += 1;
+    setRoutePlannerRoutes(snapshot.routes);
+    setRoutePlannerStatus(snapshot.status);
+    setRoutePlannerMessage(snapshot.message);
+    if (snapshot.status === 'loading') {
+      void calculateRouteDraft(snapshot.draft);
+    }
+  }
+
+  async function saveRouteDraft() {
+    if (!routeDraft) {
+      return;
+    }
+    const route = routePlannerRoutes[routeDraft.plan];
+    if (!route) {
+      return;
+    }
+
+    const existing = savedRoutes.find(({ id }) => id === routeDraft.id);
+    const now = new Date().toISOString();
+    const record = createSavedRouteRecord({
+      id: routeDraft.id,
+      name:
+        routeDraft.name.trim() ||
+        getDefaultRouteName(routeDraft.waypoints, (start, finish) =>
+          t('routeNameBetween', { start, finish }),
+        ),
+      route,
+      waypoints: routeDraft.waypoints,
+      createdAt: existing?.createdAt ?? now,
+    });
+    record.updatedAt = now;
+
+    try {
+      await putSavedRoute(record);
+      await refreshSavedRoutes();
+      setSelectedSavedRoute(record);
+      setRouteLibraryReturnView(null);
+      setRouteWorkspaceView('detail');
+      setRoutePlannerMessage(null);
+      captureAnalyticsEvent('route_saved', {
+        plan: route.plan,
+        stop_count: record.waypoints.length,
+      });
+    } catch {
+      setRoutePlannerMessage(t('routeStorageError'));
+      setRoutePlannerStatus('error');
+    }
+  }
+
+  function editSavedRoute(record: SavedRouteRecord) {
+    if (
+      routeLibraryReturnView === 'planner' &&
+      routeDraft &&
+      isRouteDraftMeaningful(routeDraft) &&
+      !window.confirm(t('discardRouteDraft'))
+    ) {
+      return;
+    }
+    const route = savedRouteToCycleRoute(record);
+    setRouteLibraryReturnView(null);
+    setRouteWaypointPlacementSnapshot(null);
+    setRouteDraft({
+      id: record.id,
+      name: record.name,
+      plan: record.plan,
+      waypoints: record.waypoints.map((waypoint) => ({
+        ...waypoint,
+        source: 'saved-route',
+      })),
+    });
+    setRoutePlannerRoutes({ [record.plan]: route });
+    setRoutePlannerStatus('loaded');
+    setRoutePlannerMessage(null);
+    setRouteWorkspaceView('planner');
+  }
+
+  async function renameSavedRoute(record: SavedRouteRecord, name: string) {
+    const renamed = {
+      ...record,
+      name: name.trim(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedRoutesError(null);
+    try {
+      await putSavedRoute(renamed);
+      await refreshSavedRoutes();
+      setSelectedSavedRoute(renamed);
+    } catch {
+      setSavedRoutesError(t('routeStorageError'));
+    }
+  }
+
+  async function duplicateSavedRoute(record: SavedRouteRecord) {
+    const duplicated = {
+      ...record,
+      id: createLocalId(),
+      name: t('routeCopyName', { name: record.name }),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setSavedRoutesError(null);
+    try {
+      await putSavedRoute(duplicated);
+      await refreshSavedRoutes();
+      setSelectedSavedRoute(duplicated);
+    } catch {
+      setSavedRoutesError(t('routeStorageError'));
+    }
+  }
+
+  async function removeSavedRoute(record: SavedRouteRecord) {
+    if (!window.confirm(t('routeDeleteConfirm', { name: record.name }))) {
+      return;
+    }
+    setSavedRoutesError(null);
+    try {
+      await deleteSavedRoute(record.id);
+      await refreshSavedRoutes();
+      setSelectedSavedRoute(null);
+      setRouteWorkspaceView('library');
+      captureAnalyticsEvent('saved_route_deleted');
+    } catch {
+      setSavedRoutesError(t('routeStorageError'));
+    }
+  }
+
+  function exportSavedRoute(record: SavedRouteRecord) {
+    downloadRouteGpx({
+      name: record.name,
+      route: savedRouteToCycleRoute(record),
+      waypoints: record.waypoints,
+    });
+    captureAnalyticsEvent('route_gpx_exported', {
+      plan: record.plan,
+      stop_count: record.waypoints.length,
+    });
+  }
+
   async function shareParkingLinkForPoint(
     point: ParkingPoint,
     source: ParkingActionSource,
@@ -3001,6 +3614,43 @@ export default function CycleParkingFinder() {
               role="menu"
               aria-label={isBrandTrigger ? t('bikeNeuksMenu') : t('settings')}
             >
+              <span className="settings-label">{t('routes')}</span>
+              <div className="settings-route-actions">
+                <motion.button
+                  className="settings-action-button"
+                  data-testid="plan-route"
+                  type="button"
+                  whileTap={subtleTap}
+                  onClick={() => {
+                    setIsSettingsMenuOpen(false);
+                    openNewRoutePlanner('menu');
+                  }}
+                >
+                  <Route size={15} aria-hidden="true" />
+                  <span>{t('planRoute')}</span>
+                </motion.button>
+                <motion.button
+                  className="settings-action-button"
+                  data-testid="open-my-routes"
+                  type="button"
+                  whileTap={subtleTap}
+                  onClick={() => {
+                    setIsSettingsMenuOpen(false);
+                    openSavedRoutes();
+                  }}
+                >
+                  <Bookmark
+                    size={15}
+                    fill={savedRoutes.length > 0 ? 'currentColor' : 'none'}
+                    aria-hidden="true"
+                  />
+                  <span>{t('myRoutes')}</span>
+                  <span className="settings-route-count">
+                    {savedRoutes.length}
+                  </span>
+                </motion.button>
+              </div>
+              <span className="settings-section-divider" aria-hidden="true" />
               <span className="settings-label">{t('theme')}</span>
               <div
                 className="theme-options"
@@ -3316,21 +3966,35 @@ export default function CycleParkingFinder() {
       <main
         className="app-shell"
         data-directions-mode={isDirectionsMode ? 'true' : undefined}
+        data-route-workspace={routeWorkspaceView ?? undefined}
         data-theme={resolvedTheme}
       >
         <section className="map-pane" aria-label={t('map')}>
           <CycleParkingMap
             locale={locale}
             points={mapPoints}
-            userLocation={locationState.location}
+            userLocation={mapUserLocation}
             currentLocationFocusRequestId={currentLocationFocusRequestId}
-            selectedPoint={explicitSelectedPoint}
-            nearestPoint={parkingView === 'nearby' ? nearestPoint : null}
-            rankedPoints={parkingView === 'nearby' ? nearbyPoints : []}
+            selectedPoint={isRouteWorkspace ? null : explicitSelectedPoint}
+            nearestPoint={
+              !isRouteWorkspace && parkingView === 'nearby'
+                ? nearestPoint
+                : null
+            }
+            rankedPoints={
+              !isRouteWorkspace && parkingView === 'nearby' ? nearbyPoints : []
+            }
             parkingView={parkingView}
             savedPointKeys={[...savedKeys]}
-            route={activeRoute}
-            routeInstructionFocusRequest={routeInstructionFocusRequest}
+            route={displayedRoute}
+            routeWaypoints={routeWorkspaceWaypoints}
+            activeRouteWaypointId={activeRouteWaypointId}
+            isRouteWaypointPlacementActive={
+              isRouteWorkspace && isRouteWaypointPlacementActive
+            }
+            routeInstructionFocusRequest={
+              isRouteWorkspace ? null : routeInstructionFocusRequest
+            }
             liveRouteMarker={
               liveRouteTracking.status === 'tracking' && liveRouteProgress
                 ? {
@@ -3342,7 +4006,9 @@ export default function CycleParkingFinder() {
                 : null
             }
             shouldFollowLiveRoute={liveRouteTracking.status === 'tracking'}
-            isDirectionsMode={isDirectionsMode}
+            isDirectionsMode={isDirectionsMode || isRouteWorkspace}
+            isRoutePlanningMode={isRouteWorkspace}
+            showCurrentLocationMarker={showRouteCurrentLocation}
             mobileSheetState={mobileSheetState}
             copiedShareButton={copiedShareButton}
             theme={resolvedTheme}
@@ -3367,13 +4033,14 @@ export default function CycleParkingFinder() {
               toggleSavedPoint(point, 'popup');
             }}
             onOpenDetails={(point) => openParkingDetails(point, 'map')}
+            onPlaceRouteWaypoint={placeRouteWaypoint}
             onViewportChange={loadMapDataForBounds}
             cycleNetworkFeatures={cycleNetworkFeatures}
             isCycleNetworkVisible={isCycleNetworkVisible}
           />
         </section>
 
-        {!isDirectionsMode ? (
+        {!isDirectionsMode && !isRouteWorkspace ? (
           <section className="mobile-map-toolbar" aria-label={t('findNearby')}>
             <header className="app-header app-header--mobile">
               {renderThemeSettings('settings-menu--mobile', 'brand')}
@@ -3397,11 +4064,15 @@ export default function CycleParkingFinder() {
               : undefined
           }
           data-panel-view={
-            isDirectionsMode
-              ? 'directions'
-              : isParkingDetailsMode
-                ? 'details'
-                : 'list'
+            isRouteWaypointPlacementActive
+              ? 'route-editing'
+              : isRouteWorkspace
+                ? routeWorkspaceView
+                : isDirectionsMode
+                  ? 'directions'
+                  : isParkingDetailsMode
+                    ? 'details'
+                    : 'list'
           }
           data-parking-view={parkingView}
           data-panel-transition={parkingPanelState.transition}
@@ -3452,7 +4123,103 @@ export default function CycleParkingFinder() {
               initial={false}
               mode="popLayout"
             >
-              {isDirectionsMode ? (
+              {isRouteWorkspace &&
+              routeWorkspaceView === 'planner' &&
+              routeDraft ? (
+                <motion.div
+                  animate="center"
+                  custom={panelMotionContext}
+                  exit="exit"
+                  initial="enter"
+                  key="route-planner"
+                  className="route-workspace-view"
+                  variants={panelMotionVariants}
+                >
+                  <RoutePlanner
+                    draft={routeDraft}
+                    message={routePlannerMessage}
+                    placementActive={isRouteWaypointPlacementActive}
+                    placementStartWaypointCount={
+                      routePlacementStartWaypointCount
+                    }
+                    routes={routePlannerRoutes}
+                    status={routePlannerStatus}
+                    onAddWaypoint={addWaypointToRouteDraft}
+                    onBack={closeRouteWorkspace}
+                    onCancelMapPlacement={cancelRouteWaypointPlacement}
+                    onDoneMapPlacement={finishRouteWaypointPlacement}
+                    onMoveWaypoint={(fromIndex, toIndex) =>
+                      commitRouteDraft(
+                        moveRouteWaypoint(routeDraft, fromIndex, toIndex),
+                      )
+                    }
+                    onOpenLibrary={openSavedRoutes}
+                    onRemoveWaypoint={(id) =>
+                      commitRouteDraft(removeRouteWaypoint(routeDraft, id))
+                    }
+                    onRename={(name) => setRouteDraft({ ...routeDraft, name })}
+                    onRequestMapPlacement={beginRouteWaypointPlacement}
+                    onSave={() => void saveRouteDraft()}
+                    onSelectPlan={(plan) =>
+                      setRouteDraft({ ...routeDraft, plan })
+                    }
+                    onSwapEndpoints={() =>
+                      commitRouteDraft(swapRouteEndpoints(routeDraft))
+                    }
+                    onUndoMapPlacement={undoRouteWaypointPlacement}
+                  />
+                </motion.div>
+              ) : isRouteWorkspace ? (
+                <motion.div
+                  animate="center"
+                  custom={panelMotionContext}
+                  exit="exit"
+                  initial="enter"
+                  key={`saved-routes-${routeWorkspaceView}`}
+                  className="route-workspace-view"
+                  variants={panelMotionVariants}
+                >
+                  <SavedRoutesPanel
+                    error={savedRoutesError}
+                    loading={savedRoutesStatus === 'loading'}
+                    routes={savedRoutes}
+                    selectedRoute={
+                      routeWorkspaceView === 'detail'
+                        ? selectedSavedRoute
+                        : null
+                    }
+                    onBack={() => {
+                      if (routeWorkspaceView === 'detail') {
+                        setSelectedSavedRoute(null);
+                        setRouteWorkspaceView('library');
+                      } else if (!returnToPreservedRouteDraft()) {
+                        closeRouteWorkspace();
+                      }
+                    }}
+                    onDelete={(record) => void removeSavedRoute(record)}
+                    onDuplicate={(record) => void duplicateSavedRoute(record)}
+                    onEdit={editSavedRoute}
+                    onExport={exportSavedRoute}
+                    onNewRoute={() => {
+                      if (!returnToPreservedRouteDraft()) {
+                        openNewRoutePlanner('saved-routes');
+                      }
+                    }}
+                    onRename={(record, name) =>
+                      void renameSavedRoute(record, name)
+                    }
+                    onSelect={(record) => {
+                      setSavedRoutesError(null);
+                      setSelectedSavedRoute(record);
+                      setRouteWorkspaceView('detail');
+                      captureAnalyticsEvent('saved_route_opened', {
+                        plan: record.plan,
+                        stop_count: record.waypoints.length,
+                      });
+                    }}
+                  />
+                </motion.div>
+              ) : isDirectionsMode ? (
                 <motion.section
                   animate="center"
                   custom={panelMotionContext}
@@ -4140,6 +4907,17 @@ export default function CycleParkingFinder() {
                         exit="exit"
                         initial="enter"
                         key={`parking-view-${parkingView}`}
+                        onAnimationComplete={() => {
+                          const scrollContainer = parkingListScroll.current;
+                          if (
+                            scrollContainer?.closest<HTMLElement>(
+                              '.parking-view-content',
+                            )?.dataset.parkingView === parkingView
+                          ) {
+                            scrollContainer.scrollTop =
+                              parkingViewState.current[parkingView].scrollTop;
+                          }
+                        }}
                         transition={parkingViewSlideTransition}
                         variants={parkingViewSlideVariants}
                       >

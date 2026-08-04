@@ -5,7 +5,7 @@ import {
   resolveAppLocale,
   supportedLocales,
 } from '@/lib/i18n/locales';
-import { getMessageCatalogue } from '@/lib/i18n/messages';
+import { getMessageCatalogue, translate } from '@/lib/i18n/messages';
 
 function placeholders(message: string) {
   return [...message.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort();
@@ -61,5 +61,17 @@ describe('language support', () => {
 
   it('uses a compact Gaelic label for starting directions', () => {
     expect(getMessageCatalogue('gd').startRoute).toBe('Tòisich');
+  });
+
+  it('localizes generated route and duplicate names', () => {
+    expect(
+      translate('gd', 'routeNameBetween', { start: 'A', finish: 'B' }),
+    ).toBe('A gu B');
+    expect(translate('es', 'routeCopyName', { name: 'Ruta' })).toBe(
+      'Copia de Ruta',
+    );
+    expect(translate('hy', 'routeCopyName', { name: 'Երթուղի' })).toBe(
+      'Երթուղի-ի պատճեն',
+    );
   });
 });

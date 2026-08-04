@@ -57,7 +57,11 @@ import {
   getParkingPopupDetails,
 } from '@/lib/parking';
 import type { ParkingPopupIcon } from '@/lib/parking';
-import type { CycleRoute, CycleRoutePoint } from '@/lib/cyclestreets';
+import type {
+  CycleRoute,
+  CycleRoutePoint,
+  CycleRouteWaypoint,
+} from '@/lib/cyclestreets';
 import {
   getRouteInstructionManeuver,
   type RouteInstructionManeuver,
@@ -101,6 +105,9 @@ type CycleParkingMapProps = {
   parkingView: ParkingView;
   savedPointKeys: string[];
   route: CycleRoute | null;
+  routeWaypoints?: CycleRouteWaypoint[];
+  activeRouteWaypointId?: string | null;
+  isRouteWaypointPlacementActive?: boolean;
   routeInstructionFocusRequest: {
     id: string;
     requestId: number;
@@ -113,6 +120,8 @@ type CycleParkingMapProps = {
   } | null;
   shouldFollowLiveRoute: boolean;
   isDirectionsMode: boolean;
+  isRoutePlanningMode?: boolean;
+  showCurrentLocationMarker?: boolean;
   mobileSheetState: 'collapsed' | 'expanded';
   copiedShareButton: {
     parkingId: string;
@@ -128,6 +137,7 @@ type CycleParkingMapProps = {
   onShareParkingLink: (point: ParkingPoint) => void;
   onToggleSavedPoint: (point: ParkingPoint) => void;
   onOpenDetails: (point: ParkingPoint) => void;
+  onPlaceRouteWaypoint?: (location: UserLocation) => void;
   onViewportChange: (bounds: ParkingMapBounds, zoom: number) => void;
 };
 
@@ -846,6 +856,25 @@ function createRankedParkingMarkerElement(rank: number) {
 
 function createPinMarkerElement(className: string) {
   return createMarkerElement(className);
+}
+
+function createRouteWaypointMarkerElement(
+  index: number,
+  isFinish: boolean,
+  isActive: boolean,
+) {
+  const element = createMarkerElement(
+    [
+      'route-waypoint-marker',
+      isFinish ? 'route-waypoint-marker-finish' : '',
+      isActive ? 'route-waypoint-marker-active' : '',
+    ]
+      .filter(Boolean)
+      .join(' '),
+    String(index + 1),
+  );
+  element.dataset.testid = `route-waypoint-marker-${index}`;
+  return element;
 }
 
 function createLiveRouteMarkerElement({
@@ -1819,10 +1848,15 @@ export default function CycleParkingMap({
   parkingView,
   savedPointKeys,
   route,
+  routeWaypoints = [],
+  activeRouteWaypointId = null,
+  isRouteWaypointPlacementActive = false,
   routeInstructionFocusRequest,
   liveRouteMarker,
   shouldFollowLiveRoute,
   isDirectionsMode,
+  isRoutePlanningMode = false,
+  showCurrentLocationMarker = false,
   mobileSheetState,
   copiedShareButton,
   theme,
@@ -1835,6 +1869,7 @@ export default function CycleParkingMap({
   onShareParkingLink,
   onToggleSavedPoint,
   onOpenDetails,
+  onPlaceRouteWaypoint,
   onViewportChange,
 }: CycleParkingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1844,6 +1879,7 @@ export default function CycleParkingMap({
   const startMarkerRef = useRef<RenderedMarker | null>(null);
   const liveMarkerRef = useRef<RenderedMarker | null>(null);
   const instructionMarkerRef = useRef<RenderedMarker | null>(null);
+  const routeWaypointMarkerRefs = useRef(new Map<string, RenderedMarker>());
   const cycleNetworkPopupRef = useRef<MapLibrePopup | null>(null);
   const cycleNetworkPopupRootRef = useRef<Root | null>(null);
   const previousFocusTargetRef = useRef<MapFocusTarget | null>(null);
@@ -1979,26 +2015,62 @@ export default function CycleParkingMap({
     [rankedPoints],
   );
   const finalApproachPositions = useMemo(
-    () => getFinalApproachPositions(route, selectedPoint),
-    [route, selectedPoint],
+    () =>
+      isRoutePlanningMode
+        ? null
+        : getFinalApproachPositions(route, selectedPoint),
+    [isRoutePlanningMode, route, selectedPoint],
   );
   const initialApproachPositions = useMemo(
-    () => getInitialApproachPositions(route, userLocation),
-    [route, userLocation],
+    () =>
+      isRoutePlanningMode
+        ? null
+        : getInitialApproachPositions(route, userLocation),
+    [isRoutePlanningMode, route, userLocation],
   );
+  const routeFocusPoints = useMemo(() => {
+    if (isRoutePlanningMode) {
+      const waypointPoints = routeWaypoints.map(
+        (waypoint) =>
+          [waypoint.latitude, waypoint.longitude] satisfies CycleRoutePoint,
+      );
+      return showCurrentLocationMarker
+        ? [userLocationToPoint(userLocation), ...waypointPoints]
+        : waypointPoints;
+    }
+
+    return routeWaypoints.length >= 2
+      ? routeWaypoints.map(
+          (waypoint) =>
+            [waypoint.latitude, waypoint.longitude] satisfies CycleRoutePoint,
+        )
+      : [
+          userLocationToPoint(userLocation),
+          ...(selectedPoint ? [parkingPointToRoutePoint(selectedPoint)] : []),
+        ];
+  }, [
+    isRoutePlanningMode,
+    routeWaypoints,
+    selectedPoint,
+    showCurrentLocationMarker,
+    userLocation,
+  ]);
   const visiblePoints = useMemo(
     () =>
-      isDirectionsMode && selectedPoint
-        ? [selectedPoint]
-        : getRenderableParkingPoints({
-            bounds: viewport.bounds,
-            pinnedPoints: rankedPoints,
-            points,
-            selectedPoint,
-            zoom: viewport.zoom,
-          }),
+      isRoutePlanningMode
+        ? []
+        : isDirectionsMode && selectedPoint
+          ? [selectedPoint]
+          : getRenderableParkingPoints({
+              bounds: viewport.bounds,
+              pinnedPoints: rankedPoints,
+              points,
+              selectedPoint,
+              zoom: viewport.zoom,
+            }),
     [
       isDirectionsMode,
+      isRoutePlanningMode,
       points,
       rankedPoints,
       selectedPoint,
@@ -2303,7 +2375,7 @@ export default function CycleParkingMap({
     syncCycleNetworkLayers({
       bundles: cycleNetworkBundles,
       features: isCycleNetworkVisible ? cycleNetworkFeatures : [],
-      isDirectionsMode,
+      isDirectionsMode: isDirectionsMode && !isRoutePlanningMode,
       map,
       selectedRouteKey: selectedCycleNetworkRouteKey,
       theme,
@@ -2313,6 +2385,7 @@ export default function CycleParkingMap({
     cycleNetworkFeatures,
     isCycleNetworkVisible,
     isDirectionsMode,
+    isRoutePlanningMode,
     isMapLoaded,
     map,
     selectedCycleNetworkRouteKey,
@@ -2321,7 +2394,12 @@ export default function CycleParkingMap({
   ]);
 
   useEffect(() => {
-    if (!map || !isMapLoaded || !map.getLayer(cycleNetworkHitLayerId)) {
+    if (
+      !map ||
+      !isMapLoaded ||
+      isRoutePlanningMode ||
+      !map.getLayer(cycleNetworkHitLayerId)
+    ) {
       return;
     }
 
@@ -2417,6 +2495,7 @@ export default function CycleParkingMap({
     cycleNetworkBundles,
     cycleNetworkFeatures,
     isMapLoaded,
+    isRoutePlanningMode,
     locale,
     map,
     onClearSelection,
@@ -2425,9 +2504,9 @@ export default function CycleParkingMap({
   ]);
 
   useEffect(() => {
-    if (isCycleNetworkVisible) return;
+    if (isCycleNetworkVisible && !isRoutePlanningMode) return;
     closeCycleNetworkPopup();
-  }, [closeCycleNetworkPopup, isCycleNetworkVisible]);
+  }, [closeCycleNetworkPopup, isCycleNetworkVisible, isRoutePlanningMode]);
 
   useEffect(() => {
     closeCycleNetworkPopup();
@@ -2493,6 +2572,11 @@ export default function CycleParkingMap({
     }
 
     cleanupRenderedMarker(startMarkerRef.current);
+    startMarkerRef.current = null;
+
+    if (isRoutePlanningMode && !showCurrentLocationMarker) {
+      return;
+    }
 
     const { popup, root } = createRenderedPopup(
       <StartPopupContent locale={locale} />,
@@ -2503,6 +2587,9 @@ export default function CycleParkingMap({
       },
     );
     const element = createPinMarkerElement('start-marker');
+    if (showCurrentLocationMarker) {
+      element.style.zIndex = '1250';
+    }
     element.setAttribute('aria-label', translate(locale, 'currentLocation'));
     element.setAttribute('role', 'button');
     element.tabIndex = 0;
@@ -2545,7 +2632,42 @@ export default function CycleParkingMap({
       cleanupRenderedMarker(startMarkerRef.current);
       startMarkerRef.current = null;
     };
-  }, [closeCycleNetworkPopup, closeMarkerPopups, locale, map, userLocation]);
+  }, [
+    closeCycleNetworkPopup,
+    closeMarkerPopups,
+    isRoutePlanningMode,
+    locale,
+    map,
+    showCurrentLocationMarker,
+    userLocation,
+  ]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    routeWaypointMarkerRefs.current.forEach(cleanupRenderedMarker);
+    routeWaypointMarkerRefs.current.clear();
+
+    routeWaypoints.forEach((waypoint, index) => {
+      const element = createRouteWaypointMarkerElement(
+        index,
+        index === routeWaypoints.length - 1,
+        waypoint.id === activeRouteWaypointId,
+      );
+      element.setAttribute('aria-label', waypoint.label);
+      const marker = new maplibregl.Marker({ anchor: 'bottom', element })
+        .setLngLat([waypoint.longitude, waypoint.latitude])
+        .addTo(map);
+      routeWaypointMarkerRefs.current.set(waypoint.id, { element, marker });
+    });
+
+    return () => {
+      routeWaypointMarkerRefs.current.forEach(cleanupRenderedMarker);
+      routeWaypointMarkerRefs.current.clear();
+    };
+  }, [activeRouteWaypointId, map, routeWaypoints]);
 
   useEffect(() => {
     if (!map) {
@@ -2624,6 +2746,7 @@ export default function CycleParkingMap({
 
     let centerTimeoutId: number | null = null;
     const reconciledVisiblePoints =
+      !isRoutePlanningMode &&
       selectedPoint &&
       !visiblePoints.some((point) => point.id === selectedPoint.id)
         ? [selectedPoint, ...visiblePoints]
@@ -2870,6 +2993,7 @@ export default function CycleParkingMap({
     closeMarkerPopups,
     copiedShareButton,
     isDirectionsMode,
+    isRoutePlanningMode,
     locale,
     map,
     onShareParkingLink,
@@ -2892,6 +3016,26 @@ export default function CycleParkingMap({
     }
 
     const handleMapClick = (event: maplibregl.MapMouseEvent) => {
+      const target = event.originalEvent.target;
+      const isInteractiveTarget =
+        target instanceof Element &&
+        Boolean(
+          target.closest(
+            '.parking-marker, .route-waypoint-marker, .maplibregl-popup, .maplibregl-ctrl',
+          ),
+        );
+
+      if (isRouteWaypointPlacementActive && onPlaceRouteWaypoint) {
+        if (isInteractiveTarget) {
+          return;
+        }
+        onPlaceRouteWaypoint({
+          latitude: event.lngLat.lat,
+          longitude: event.lngLat.lng,
+        });
+        return;
+      }
+
       if (!selectedPoint || route) {
         return;
       }
@@ -2900,17 +3044,13 @@ export default function CycleParkingMap({
         suppressNextSelectionClearFocusRef.current = true;
         onClearSelection();
       };
-      const target = event.originalEvent.target;
-
       if (!(target instanceof Element)) {
         clearSelectionWithoutRefocus();
         return;
       }
 
       if (
-        target.closest(
-          '.parking-marker, .maplibregl-popup, .maplibregl-ctrl',
-        ) ||
+        isInteractiveTarget ||
         (map.getLayer(cycleNetworkHitLayerId) &&
           map.queryRenderedFeatures(event.point, {
             layers: [cycleNetworkHitLayerId],
@@ -2927,7 +3067,26 @@ export default function CycleParkingMap({
     return () => {
       map.off('click', handleMapClick);
     };
-  }, [map, onClearSelection, route, selectedPoint]);
+  }, [
+    isRouteWaypointPlacementActive,
+    map,
+    onClearSelection,
+    onPlaceRouteWaypoint,
+    route,
+    selectedPoint,
+  ]);
+
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
+    map.getCanvas().style.cursor = isRouteWaypointPlacementActive
+      ? 'crosshair'
+      : '';
+    return () => {
+      map.getCanvas().style.cursor = '';
+    };
+  }, [isRouteWaypointPlacementActive, map]);
 
   useEffect(() => {
     if (!map) {
@@ -3003,7 +3162,7 @@ export default function CycleParkingMap({
   }, [map, mobileSheetState, route, selectedPoint]);
 
   useEffect(() => {
-    if (!map || !route || !selectedPoint) {
+    if (!map || !route || routeFocusPoints.length < 2) {
       previousRouteSheetStateRef.current = mobileSheetState;
       return;
     }
@@ -3016,11 +3175,7 @@ export default function CycleParkingMap({
     }
 
     const timeoutId = window.setTimeout(() => {
-      const bounds = createBounds([
-        userLocationToPoint(userLocation),
-        parkingPointToRoutePoint(selectedPoint),
-        ...route.points,
-      ]);
+      const bounds = createBounds([...routeFocusPoints, ...route.points]);
 
       isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
@@ -3031,7 +3186,7 @@ export default function CycleParkingMap({
     }, 380);
 
     return () => window.clearTimeout(timeoutId);
-  }, [map, mobileSheetState, route, selectedPoint, userLocation]);
+  }, [map, mobileSheetState, route, routeFocusPoints]);
 
   useEffect(() => {
     if (!map) {
@@ -3117,12 +3272,8 @@ export default function CycleParkingMap({
       return;
     }
 
-    if (route && selectedPoint) {
-      const bounds = createBounds([
-        userLocationToPoint(userLocation),
-        parkingPointToRoutePoint(selectedPoint),
-        ...route.points,
-      ]);
+    if (route && routeFocusPoints.length >= 2) {
+      const bounds = createBounds([...routeFocusPoints, ...route.points]);
 
       isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
@@ -3212,6 +3363,7 @@ export default function CycleParkingMap({
     nearestPoint,
     parkingView,
     route,
+    routeFocusPoints,
     selectedPoint,
     userLocation,
   ]);
@@ -3292,10 +3444,23 @@ export default function CycleParkingMap({
       data-map-west={viewport.bounds?.west}
       data-map-zoom={viewport.zoom}
       data-cycle-network-enabled={isCycleNetworkVisible}
+      data-cycle-network-presentation={
+        isDirectionsMode && !isRoutePlanningMode ? 'dimmed' : 'full'
+      }
+      data-cycle-network-interactive={isRoutePlanningMode ? 'false' : 'true'}
+      data-route-planning-mode={isRoutePlanningMode ? 'true' : undefined}
+      data-current-location-marker={
+        !isRoutePlanningMode || showCurrentLocationMarker ? 'visible' : 'hidden'
+      }
+      data-route-source={route?.source}
+      data-initial-approach-point-count={initialApproachPositions?.length ?? 0}
       data-cycle-network-bundles={cycleNetworkBundles.length}
       data-cycle-network-features={cycleNetworkFeatures.length}
       data-cycle-network-selected-route={
         selectedCycleNetworkRouteKey ?? undefined
+      }
+      data-route-waypoint-placement-active={
+        isRouteWaypointPlacementActive ? 'true' : undefined
       }
       data-testid="parking-map"
       ref={mapContainerRef}

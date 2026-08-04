@@ -17,10 +17,26 @@ export const CYCLESTREETS_ROUTE_PLANS = [
 export type CycleRoutePlan = (typeof CYCLESTREETS_ROUTE_PLANS)[number];
 export const CYCLESTREETS_DEFAULT_ROUTE_PLAN: CycleRoutePlan = 'balanced';
 export const CYCLESTREETS_SPEED_KMPH = '16';
+export const CYCLESTREETS_MAX_WAYPOINTS = 30;
 export const SHORT_CYCLE_ROUTE_THRESHOLD_METERS = 10;
 const CYCLESTREETS_JSONP_ATTEMPTS = 2;
 
 export type CycleRoutePoint = [latitude: number, longitude: number];
+
+export type CycleRouteWaypointSource =
+  | 'current-location'
+  | 'map'
+  | 'parking'
+  | 'saved-route'
+  | 'search';
+
+export type CycleRouteWaypoint = {
+  id: string;
+  label: string;
+  latitude: number;
+  longitude: number;
+  source: CycleRouteWaypointSource;
+};
 
 export type CycleRouteInstruction = {
   id: string;
@@ -83,6 +99,39 @@ function formatWaypoint(location: UserLocation, name?: string) {
   return name ? `${waypoint},${name}` : waypoint;
 }
 
+export function buildCycleStreetsRouteRequest({
+  apiKey,
+  waypoints,
+}: {
+  apiKey: string;
+  waypoints: CycleRouteWaypoint[];
+}): CycleStreetsDirectionsRequest {
+  if (waypoints.length < 2 || waypoints.length > CYCLESTREETS_MAX_WAYPOINTS) {
+    throw new CycleStreetsRouteError(
+      `Routes need between 2 and ${CYCLESTREETS_MAX_WAYPOINTS} stops.`,
+    );
+  }
+
+  const params = new URLSearchParams({
+    key: apiKey,
+    plans: CYCLESTREETS_ROUTE_PLANS.join(','),
+    speedKmph: CYCLESTREETS_SPEED_KMPH,
+    archive: 'none',
+    itineraryFields: 'start,finish,id',
+    journeyFields: 'path,plan,lengthMetres,timeSeconds',
+    waypoints: waypoints
+      .map((waypoint) => formatWaypoint(waypoint, waypoint.label))
+      .join('|'),
+  });
+
+  return {
+    url: `${CYCLESTREETS_DIRECTIONS_ENDPOINT}?${params.toString()}`,
+    headers: {
+      Accept: 'application/json',
+    },
+  };
+}
+
 export function buildCycleStreetsDirectionsRequest({
   apiKey,
   origin,
@@ -92,22 +141,25 @@ export function buildCycleStreetsDirectionsRequest({
   origin: UserLocation;
   destination: ParkingPoint;
 }): CycleStreetsDirectionsRequest {
-  const params = new URLSearchParams({
-    key: apiKey,
-    plans: CYCLESTREETS_ROUTE_PLANS.join(','),
-    speedKmph: CYCLESTREETS_SPEED_KMPH,
-    archive: 'none',
-    itineraryFields: 'start,finish,id',
-    journeyFields: 'path,plan,lengthMetres,timeSeconds',
-    waypoints: `${formatWaypoint(origin, 'Start')}|${formatWaypoint(destination, destination.name)}`,
+  return buildCycleStreetsRouteRequest({
+    apiKey,
+    waypoints: [
+      {
+        id: 'start',
+        label: 'Start',
+        latitude: origin.latitude,
+        longitude: origin.longitude,
+        source: 'current-location',
+      },
+      {
+        id: destination.id,
+        label: destination.name,
+        latitude: destination.latitude,
+        longitude: destination.longitude,
+        source: 'parking',
+      },
+    ],
   });
-
-  return {
-    url: `${CYCLESTREETS_DIRECTIONS_ENDPOINT}?${params.toString()}`,
-    headers: {
-      Accept: 'application/json',
-    },
-  };
 }
 
 function fetchCycleStreetsJsonpOnce(url: string) {
@@ -194,6 +246,19 @@ export function buildCycleRouteCacheKey(
     destination.id,
     destination.latitude.toFixed(5),
     destination.longitude.toFixed(5),
+  ].join(':');
+}
+
+export function buildCycleRouteWaypointsCacheKey(
+  waypoints: CycleRouteWaypoint[],
+) {
+  return [
+    CYCLESTREETS_ROUTE_PLANS.join(','),
+    CYCLESTREETS_SPEED_KMPH,
+    ...waypoints.flatMap((waypoint) => [
+      waypoint.latitude.toFixed(5),
+      waypoint.longitude.toFixed(5),
+    ]),
   ].join(':');
 }
 

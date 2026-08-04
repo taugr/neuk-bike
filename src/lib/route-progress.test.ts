@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { CycleRoute } from '@/lib/cyclestreets';
-import { getBearingDegrees, getLiveRouteProgress } from '@/lib/route-progress';
+import {
+  getBearingDegrees,
+  getLiveRouteProgress,
+  isLocationNearRoute,
+} from '@/lib/route-progress';
 
 const straightRoute: CycleRoute = {
   plan: 'balanced',
@@ -72,6 +76,18 @@ const zeroLengthRoute: CycleRoute = {
 };
 
 describe('live route progress', () => {
+  it('identifies locations near enough to show when viewing a route', () => {
+    expect(
+      isLocationNearRoute(
+        { latitude: 55.001, longitude: -3.0001 },
+        straightRoute,
+      ),
+    ).toBe(true);
+    expect(
+      isLocationNearRoute({ latitude: 55.001, longitude: -3.1 }, straightRoute),
+    ).toBe(false);
+  });
+
   it('snaps a nearby location to a straight route', () => {
     const progress = getLiveRouteProgress({
       accuracyMeters: 12,
