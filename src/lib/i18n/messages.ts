@@ -650,7 +650,7 @@ const es: MessageCatalogue = {
   locating: 'Localizando',
   map: 'Mapa de aparcabicis',
   mapLayers: 'Capas del mapa',
-  nationalCycleNetwork: 'Red Ciclista Nacional',
+  nationalCycleNetwork: 'Routas ciclistas',
   cycleNetworkZoomIn: 'Acerca el mapa para ver la red.',
   cycleNetworkTrafficFree: 'Sin tráfico',
   cycleNetworkOnRoad: 'Por carretera',
