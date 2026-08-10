@@ -4,3 +4,6 @@ allowBuilds:
   protobufjs: true
   sharp: true
   workerd: true
+minimumReleaseAgeExclude:
+  - framer-motion@13.1.0
+  - motion@13.1.0
