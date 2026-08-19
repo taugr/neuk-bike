@@ -4,6 +4,7 @@ import {
   getParkingCoverageAreaId,
   getParkingTileKeysAroundLocation,
   getParkingTileKeysForBounds,
+  getParkingTileKeysForDownloadBounds,
   isLocationInParkingCoverage,
   ParkingDataClient,
   toParkingTile,
@@ -184,6 +185,31 @@ describe('parking data tiling', () => {
     expect(getParkingTileKeysAroundLocation(edinburgh, manifest)).toEqual(
       expect.arrayContaining([centerKey, eastKey]),
     );
+  });
+
+  it('returns every available buffered download chunk without a viewport cap', () => {
+    const chunks = Object.fromEntries(
+      Array.from({ length: 20 }, (_, index) => [
+        `10/${tile.x + index}/${tile.y}`,
+        {
+          bounds: { east: 0, north: 0, south: 0, west: 0 },
+          count: 1,
+          path: `${index}.json`,
+        },
+      ]),
+    );
+    const wideManifest = { ...manifest, chunks };
+    const keys = getParkingTileKeysForDownloadBounds(
+      {
+        north: 56,
+        south: 55.9,
+        west: -3.3,
+        east: 4,
+      },
+      wideManifest,
+    );
+
+    expect(keys).toHaveLength(20);
   });
 
   it('selects viewport chunks and respects regional coverage polygons', () => {

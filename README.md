@@ -29,7 +29,8 @@
 - See capacity, access, cover, and stand type when mapped
 - Share parking places with source-qualified `?parking=` links
 - Install the app as a Progressive Web App
-- Reuse previously visited parking chunks offline
+- Download an explicit map area for predictable offline parking, cycling-place,
+  and National Cycle Network access
 - Use the interface in English, Scottish Gaelic, Spanish, or Armenian
 
 ## Live app
@@ -176,6 +177,14 @@ Install the Playwright browser once before the E2E suite if needed:
 pnpm exec playwright install chromium
 ```
 
+Offline-area E2E tests use local deterministic OpenFreeMap-shaped fixtures, so
+the routine suite does not prefetch from the public provider. To run the
+rate-limited real-provider smoke test explicitly:
+
+```bash
+OPENFREEMAP_SMOKE=1 pnpm exec playwright test e2e/offline-openfreemap-live.spec.ts
+```
+
 ## Dataset refresh
 
 The cycling-place release keeps bicycle shops, repair facilities, hire
@@ -258,14 +267,34 @@ Sources:
 
 ## Offline behaviour
 
-The service worker caches the app shell. The manifest uses network-first
-caching, while immutable versioned parking chunks and the point index use
-cache-first behaviour. Previously visited areas can therefore remain useful
-offline, but the app does not promise UK-Ireland-Spain-Armenia-wide offline
-coverage.
+The service worker caches the app shell and previously visited data. For a
+predictable trip download, open **Offline areas** from the Bike Neuks menu,
+choose **Download this area**, then pan and zoom the highlighted map selection.
+The confirmation shows the estimated size and refresh date for each available
+dataset. Completed areas are kept in a dedicated cache that survives routine
+app updates and can be viewed, updated, or removed from the same panel.
 
-Live place search, CycleStreets directions, uncached map tiles, and uncached
-parking areas still need a network connection.
+Explicit areas include the bounded OpenFreeMap background through zoom 14,
+cycle parking, cycling shops, repair, hire and drinking water, plus National
+Cycle Network geometry where that dataset has coverage. The current
+OpenFreeMap support is deliberately experimental while Bike Neuks is small and
+unpublished; review the provider policy before a public launch or higher-volume
+use.
+
+Downloads are stored by the browser on the current device. Each area is capped
+at 100 MB, with up to five areas and 500 MB in total. Bike Neuks keeps 20% of
+the browser-reported quota free, downloads at most two OpenFreeMap resources at
+a time, and limits request starts to about five per second. Downloads never
+start or update automatically. Bike Neuks requests persistent storage when
+supported, but the browser may still remove site data under storage pressure or
+when site data is cleared. It recommends refreshing an area after 30 days and
+marks it stale after 90 days, without deleting or disabling it.
+
+If a downloaded background is unavailable, Bike Neuks switches to a simple
+local background while continuing to show downloaded cycling data. Live place
+search, new CycleStreets route calculation, Street View, and areas that were
+not downloaded still need a network connection. Saved routes retain their
+existing local geometry and instructions.
 
 ## Sharing
 

@@ -142,10 +142,13 @@ import { Bollard } from '@/components/icons/bollard';
 import { useLanguage } from '@/components/language-provider';
 import { RoutePlanner } from '@/components/route-planner';
 import { SavedRoutesPanel } from '@/components/saved-routes-panel';
+import { OfflineAreasPanel } from '@/components/offline-areas-panel';
+import { OfflineAreaSelection } from '@/components/offline-area-selection';
 import { captureAnalyticsEvent } from '@/lib/analytics';
 import { shareParkingLink } from '@/lib/share';
 import {
   getParkingDataBaseUrl,
+  getParkingTileKeysForDownloadBounds,
   isLocationInParkingCoverage,
   ParkingDataClient,
 } from '@/lib/parking-data';
@@ -209,6 +212,30 @@ import {
   type SavedRouteRecord,
 } from '@/lib/saved-routes';
 import { downloadRouteGpx } from '@/lib/gpx';
+import {
+  downloadOfflineArea,
+  estimateMissingOfflineAreaBytes,
+  getOfflineStorageEstimate,
+  isCacheApiSupported,
+  isIndexedDbSupported,
+  listOfflineAreas,
+  mergeOfflineAreaPlans,
+  maximumOfflineAreaBytes,
+  maximumOfflineAreas,
+  maximumOfflineAreasBytes,
+  offlineStorageHeadroomRatio,
+  planOfflineArea,
+  removeOfflineArea,
+  requestOfflineStoragePersistence,
+  type OfflineAreaDownloadProgress,
+  type OfflineAreaPlan,
+  type OfflineAreaRecord,
+} from '@/lib/offline-areas';
+import {
+  fetchOfflineMapMetadata,
+  planOfflineMapTiles,
+  type OfflineMapMetadata,
+} from '@/lib/offline-map-tiles';
 
 const CycleParkingMap = dynamic(
   () => import('@/components/cycle-parking-map'),
@@ -227,6 +254,7 @@ const maxPlaceSearchCacheEntries = 12;
 const placeSearchDebounceMs = 300;
 const placeSearchMinimumCharacters = 3;
 const routePlannerCalculationDebounceMs = 250;
+const maximumOfflineAreaResources = 5_000;
 const closestParkingResultCount = 8;
 type DiscoverCategory = 'parking' | CyclingPoiCategory;
 type SavedResolvedPoint = ParkingPoint & { savedNeukKey: string };
@@ -285,6 +313,12 @@ const mobileDetailsSheetExpandedViewportRatio = 0.68;
 const mobileSheetFlickVelocityPxPerMs = 0.45;
 const googleStreetViewApiKey =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY?.trim() ?? '';
+const offlineDownloadRequestIntervalMs = (() => {
+  const configured = Number(
+    process.env.NEXT_PUBLIC_OFFLINE_DOWNLOAD_REQUEST_INTERVAL_MS,
+  );
+  return Number.isFinite(configured) && configured >= 0 ? configured : 200;
+})();
 type PresenceMotion = {
   animate: TargetAndTransition;
   exit: TargetAndTransition;
@@ -570,6 +604,52 @@ function keepParkingPointsWhenUnchanged(
     : next;
 }
 
+function getOfflineAreaCenter(bounds: ParkingMapBounds): UserLocation {
+  return {
+    latitude: (bounds.north + bounds.south) / 2,
+    longitude: (bounds.east + bounds.west) / 2,
+  };
+}
+
+function getLoadedAppShellPlan(): OfflineAreaPlan {
+  const origin = window.location.origin;
+  const resources = performance
+    .getEntriesByType('resource')
+    .flatMap((entry) => {
+      const resource = entry as PerformanceResourceTiming;
+      const url = new URL(resource.name, window.location.href);
+      if (
+        url.origin !== origin ||
+        (!url.pathname.includes('/_next/static/') &&
+          !url.pathname.includes('/vendor/maplibre-gl/'))
+      ) {
+        return [];
+      }
+      return [
+        {
+          byteLength: Math.max(
+            1_024,
+            resource.transferSize || resource.decodedBodySize || 0,
+          ),
+          key: `app-shell:${url.pathname}`,
+          url: url.toString(),
+        },
+      ];
+    });
+  const uniqueResources = [
+    ...new Map(resources.map((resource) => [resource.url, resource])).values(),
+  ];
+  return {
+    datasets: [],
+    estimatedBytes: uniqueResources.reduce(
+      (total, resource) => total + resource.byteLength,
+      0,
+    ),
+    manifestRefreshedAt: '',
+    resources: uniqueResources,
+  };
+}
+
 export default function CycleParkingFinder() {
   const { formattingLocale, locale, setLocale, t } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
@@ -599,6 +679,26 @@ export default function CycleParkingFinder() {
   const [isCycleNetworkVisible, setIsCycleNetworkVisible] = useState(true);
   const [isDrinkingWaterVisible, setIsDrinkingWaterVisible] = useState(false);
   const [isMapLayersOpen, setIsMapLayersOpen] = useState(false);
+  const [isOfflineAreasOpen, setIsOfflineAreasOpen] = useState(false);
+  const [offlineAreas, setOfflineAreas] = useState<OfflineAreaRecord[]>([]);
+  const [offlineAreasLoading, setOfflineAreasLoading] = useState(false);
+  const [offlineAreaSelectionBounds, setOfflineAreaSelectionBounds] =
+    useState<ParkingMapBounds | null>(null);
+  const [offlineAreaPlan, setOfflineAreaPlan] =
+    useState<OfflineAreaPlan | null>(null);
+  const [offlineAreaName, setOfflineAreaName] = useState('');
+  const [offlineAreaError, setOfflineAreaError] = useState<string | null>(null);
+  const [offlineAreaMessage, setOfflineAreaMessage] = useState<string | null>(
+    null,
+  );
+  const [offlineAreaStorageWarning, setOfflineAreaStorageWarning] = useState<
+    string | null
+  >(null);
+  const [offlineAreaProgress, setOfflineAreaProgress] =
+    useState<OfflineAreaDownloadProgress | null>(null);
+  const [busyOfflineAreaId, setBusyOfflineAreaId] = useState<string | null>(
+    null,
+  );
   const [cycleNetworkZoom, setCycleNetworkZoom] = useState(13);
   const [parkingDataStatus, setParkingDataStatus] =
     useState<ParkingDataStatus>('loading');
@@ -722,6 +822,11 @@ export default function CycleParkingFinder() {
   const cyclingPoiDataClient = useRef<CyclingPoiDataClient | null>(null);
   const cycleNetworkDataClient = useRef<CycleNetworkDataClient | null>(null);
   const cycleNetworkRequestId = useRef(0);
+  const offlineAreaPlanRequestId = useRef(0);
+  const offlineMapMetadata = useRef<Promise<OfflineMapMetadata> | null>(null);
+  const offlineAreaDownloadAbortController = useRef<AbortController | null>(
+    null,
+  );
   const cycleNetworkViewport = useRef<{
     bounds: ParkingMapBounds;
     zoom: number;
@@ -747,6 +852,7 @@ export default function CycleParkingFinder() {
   const parkingMoreButtonRef = useRef<HTMLButtonElement>(null);
   const parkingMoreMenuRef = useRef<HTMLDivElement>(null);
   const parkingListItemRefs = useRef(new Map<string, HTMLLIElement>());
+  const selectedPointCache = useRef<ParkingPoint | null>(null);
   const savedResolutionRequestId = useRef(0);
   const parkingViewState = useRef<
     Record<ParkingView, { scrollTop: number; selectedId: string | null }>
@@ -754,6 +860,7 @@ export default function CycleParkingFinder() {
     nearby: { scrollTop: 0, selectedId: null },
     saved: { scrollTop: 0, selectedId: null },
   });
+  const restoringParkingViewScroll = useRef<ParkingView | null>(null);
   const mobileSheetDrag = useRef<{
     currentY: number;
     lastTimestamp: number;
@@ -898,9 +1005,31 @@ export default function CycleParkingFinder() {
     }
   }, [t]);
 
+  const refreshOfflineAreas = useCallback(async () => {
+    if (!isCacheApiSupported() || !isIndexedDbSupported()) {
+      setOfflineAreas([]);
+      return [];
+    }
+    setOfflineAreasLoading(true);
+    try {
+      const records = await listOfflineAreas();
+      setOfflineAreas(records);
+      return records;
+    } catch {
+      setOfflineAreaError(t('offlineDownloadFailed'));
+      return [];
+    } finally {
+      setOfflineAreasLoading(false);
+    }
+  }, [t]);
+
   useEffect(() => {
     void refreshSavedRoutes();
   }, [refreshSavedRoutes]);
+
+  useEffect(() => {
+    void refreshOfflineAreas();
+  }, [refreshOfflineAreas]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1303,6 +1432,9 @@ export default function CycleParkingFinder() {
     (bounds: ParkingMapBounds, zoom: number) => {
       setCycleNetworkZoom(zoom);
       cycleNetworkViewport.current = { bounds, zoom };
+      if (offlineAreaSelectionBounds) {
+        setOfflineAreaSelectionBounds(bounds);
+      }
       loadCycleNetworkForBounds(bounds, zoom, isCycleNetworkVisible);
 
       if (discoverCategory !== 'parking' || isDrinkingWaterVisible) {
@@ -1351,9 +1483,136 @@ export default function CycleParkingFinder() {
       isCycleNetworkVisible,
       loadCycleNetworkForBounds,
       locale,
+      offlineAreaSelectionBounds,
       t,
     ],
   );
+
+  const buildOfflineAreaPlan = useCallback(
+    async (bounds: ParkingMapBounds) => {
+      const parkingClient = parkingDataClient.current;
+      const currentParkingManifest =
+        parkingClient?.getManifest() ?? parkingManifest;
+      if (!currentParkingManifest) {
+        throw new Error('Parking data is not ready.');
+      }
+
+      const poiClient =
+        cyclingPoiDataClient.current ??
+        new CyclingPoiDataClient(
+          getCyclingPoiDataBaseUrl(window.location.href),
+        );
+      cyclingPoiDataClient.current = poiClient;
+      const currentPoiManifest = await poiClient.initialize();
+
+      const networkClient = cycleNetworkDataClient.current;
+      const currentNetworkManifest =
+        networkClient?.getManifest() ?? cycleNetworkManifest;
+      const plans: OfflineAreaPlan[] = [];
+
+      const parkingKeys = getParkingTileKeysForDownloadBounds(
+        bounds,
+        currentParkingManifest,
+      );
+      if (parkingKeys.length > 0) {
+        const baseUrl = getParkingDataBaseUrl(window.location.href);
+        plans.push(
+          planOfflineArea(
+            new URL('manifest.json', baseUrl),
+            currentParkingManifest,
+            parkingKeys,
+            { datasetId: 'parking' },
+          ),
+        );
+      }
+
+      const poiKeys = getParkingTileKeysForDownloadBounds(
+        bounds,
+        currentPoiManifest,
+      );
+      if (poiKeys.length > 0) {
+        const baseUrl = getCyclingPoiDataBaseUrl(window.location.href);
+        plans.push(
+          planOfflineArea(
+            new URL('manifest.json', baseUrl),
+            currentPoiManifest,
+            poiKeys,
+            { datasetId: 'cycling-pois' },
+          ),
+        );
+      }
+
+      if (currentNetworkManifest) {
+        const networkKeys = getParkingTileKeysForDownloadBounds(
+          bounds,
+          currentNetworkManifest,
+        );
+        if (networkKeys.length > 0) {
+          const baseUrl = getCycleNetworkDataBaseUrl(window.location.href);
+          plans.push(
+            planOfflineArea(
+              new URL('manifest.json', baseUrl),
+              currentNetworkManifest,
+              networkKeys,
+              { datasetId: 'cycle-network' },
+            ),
+          );
+        }
+      }
+
+      if (plans.length === 0) {
+        throw new Error(t('noOfflineDataHere'));
+      }
+      const metadataRequest =
+        offlineMapMetadata.current ?? fetchOfflineMapMetadata();
+      offlineMapMetadata.current = metadataRequest;
+      let mapMetadata: OfflineMapMetadata;
+      try {
+        mapMetadata = await metadataRequest;
+      } catch (error) {
+        offlineMapMetadata.current = null;
+        throw error;
+      }
+      const plan = mergeOfflineAreaPlans([
+        ...plans,
+        planOfflineMapTiles(bounds, mapMetadata),
+        getLoadedAppShellPlan(),
+      ]);
+      if (
+        plan.resources.length > maximumOfflineAreaResources ||
+        plan.estimatedBytes > maximumOfflineAreaBytes
+      ) {
+        throw new Error(t('offlineAreaTooLarge'));
+      }
+      return plan;
+    },
+    [cycleNetworkManifest, parkingManifest, t],
+  );
+
+  useEffect(() => {
+    if (!offlineAreaSelectionBounds) {
+      setOfflineAreaPlan(null);
+      return;
+    }
+
+    const requestId = offlineAreaPlanRequestId.current + 1;
+    offlineAreaPlanRequestId.current = requestId;
+    setOfflineAreaPlan(null);
+    setOfflineAreaError(null);
+    void buildOfflineAreaPlan(offlineAreaSelectionBounds)
+      .then((plan) => {
+        if (offlineAreaPlanRequestId.current === requestId) {
+          setOfflineAreaPlan(plan);
+        }
+      })
+      .catch((error: unknown) => {
+        if (offlineAreaPlanRequestId.current === requestId) {
+          setOfflineAreaError(
+            error instanceof Error ? error.message : t('offlineDownloadFailed'),
+          );
+        }
+      });
+  }, [buildOfflineAreaPlan, offlineAreaSelectionBounds, t]);
 
   async function retryParkingData() {
     const client = parkingDataClient.current;
@@ -1378,6 +1637,183 @@ export default function CycleParkingFinder() {
       setParkingDataStatus('error');
       setParkingDataMessage(t('nearbyLoadError'));
     }
+  }
+
+  function openOfflineAreas() {
+    setIsSettingsMenuOpen(false);
+    setOfflineAreaMessage(null);
+    setOfflineAreaError(null);
+    if (!isCacheApiSupported() || !isIndexedDbSupported()) {
+      setOfflineAreaError(t('offlineDownloadUnsupported'));
+    }
+    setIsOfflineAreasOpen(true);
+    void refreshOfflineAreas();
+  }
+
+  function startOfflineAreaSelection() {
+    if (offlineAreas.length >= maximumOfflineAreas) {
+      setOfflineAreaError(t('offlineAreaLimitReached'));
+      return;
+    }
+    const viewport = cycleNetworkViewport.current;
+    if (!viewport) {
+      setOfflineAreaError(t('offlineDownloadFailed'));
+      return;
+    }
+    setIsOfflineAreasOpen(false);
+    setOfflineAreaError(null);
+    setOfflineAreaMessage(null);
+    setOfflineAreaStorageWarning(null);
+    setOfflineAreaProgress(null);
+    setOfflineAreaName(
+      locationState.status === 'searched'
+        ? locationState.label
+        : t('currentMapArea'),
+    );
+    setOfflineAreaSelectionBounds(viewport.bounds);
+  }
+
+  function cancelOfflineAreaSelection() {
+    offlineAreaDownloadAbortController.current?.abort();
+    offlineAreaDownloadAbortController.current = null;
+    setOfflineAreaSelectionBounds(null);
+    setOfflineAreaPlan(null);
+    setOfflineAreaProgress(null);
+    setBusyOfflineAreaId(null);
+  }
+
+  async function performOfflineAreaDownload({
+    bounds,
+    id,
+    name,
+    plan,
+  }: {
+    bounds: ParkingMapBounds;
+    id: string;
+    name: string;
+    plan: OfflineAreaPlan;
+  }) {
+    if (offlineAreaDownloadAbortController.current) {
+      setOfflineAreaError(t('offlineDownloadInProgress'));
+      return;
+    }
+    const controller = new AbortController();
+    offlineAreaDownloadAbortController.current = controller;
+    setBusyOfflineAreaId(id);
+    setOfflineAreaError(null);
+    setOfflineAreaMessage(null);
+    setOfflineAreaProgress(null);
+
+    try {
+      const savedAreas = await listOfflineAreas();
+      const existingArea = savedAreas.find((area) => area.id === id);
+      if (!existingArea && savedAreas.length >= maximumOfflineAreas) {
+        throw new Error(t('offlineAreaLimitReached'));
+      }
+      const totalEstimatedBytes = savedAreas
+        .filter((area) => area.id !== id)
+        .reduce((total, area) => total + area.estimatedBytes, 0);
+      if (
+        totalEstimatedBytes + plan.estimatedBytes >
+        maximumOfflineAreasBytes
+      ) {
+        throw new Error(t('offlineTotalLimitReached'));
+      }
+      const missingBytes = await estimateMissingOfflineAreaBytes(plan);
+      const storage = await getOfflineStorageEstimate();
+      if (
+        storage.quota !== undefined &&
+        storage.usage !== undefined &&
+        storage.usage + missingBytes >
+          storage.quota * (1 - offlineStorageHeadroomRatio)
+      ) {
+        throw new Error(t('notEnoughOfflineStorage'));
+      }
+      const persistent = await requestOfflineStoragePersistence().catch(
+        () => false,
+      );
+      setOfflineAreaStorageWarning(
+        persistent ? null : t('storageMayBeCleared'),
+      );
+      await downloadOfflineArea(id, name.trim(), plan, {
+        concurrency: 2,
+        metadata: {
+          bounds,
+          center: getOfflineAreaCenter(bounds),
+          datasets: plan.datasets,
+        },
+        onProgress: setOfflineAreaProgress,
+        minimumRequestIntervalMs: offlineDownloadRequestIntervalMs,
+        signal: controller.signal,
+      });
+      await refreshOfflineAreas();
+      setOfflineAreaSelectionBounds(null);
+      setOfflineAreaPlan(null);
+      setOfflineAreaMessage(t('offlineDownloadReady'));
+      setIsOfflineAreasOpen(true);
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === 'AbortError')) {
+        setOfflineAreaError(
+          error instanceof Error ? error.message : t('offlineDownloadFailed'),
+        );
+      }
+      await refreshOfflineAreas();
+    } finally {
+      if (offlineAreaDownloadAbortController.current === controller) {
+        offlineAreaDownloadAbortController.current = null;
+      }
+      setBusyOfflineAreaId(null);
+    }
+  }
+
+  function downloadSelectedOfflineArea() {
+    if (!offlineAreaSelectionBounds || !offlineAreaPlan) return;
+    void performOfflineAreaDownload({
+      bounds: offlineAreaSelectionBounds,
+      id: createLocalId(),
+      name: offlineAreaName,
+      plan: offlineAreaPlan,
+    });
+  }
+
+  function updateSavedOfflineArea(area: OfflineAreaRecord) {
+    if (!area.bounds) return;
+    setOfflineAreaError(null);
+    void buildOfflineAreaPlan(area.bounds)
+      .then((plan) =>
+        performOfflineAreaDownload({
+          bounds: area.bounds!,
+          id: area.id,
+          name: area.name,
+          plan,
+        }),
+      )
+      .catch((error: unknown) =>
+        setOfflineAreaError(
+          error instanceof Error ? error.message : t('offlineDownloadFailed'),
+        ),
+      );
+  }
+
+  function viewSavedOfflineArea(area: OfflineAreaRecord) {
+    if (!area.center) return;
+    setIsOfflineAreasOpen(false);
+    setLocationState({
+      status: 'searched',
+      location: area.center,
+      label: area.name,
+    });
+    requestCurrentLocationFocus();
+  }
+
+  function removeSavedOfflineArea(area: OfflineAreaRecord) {
+    if (!window.confirm(t('removeOfflineAreaConfirm', { name: area.name }))) {
+      return;
+    }
+    setOfflineAreaError(null);
+    void removeOfflineArea(area.id)
+      .then(() => refreshOfflineAreas())
+      .catch(() => setOfflineAreaError(t('offlineDownloadFailed')));
   }
 
   useEffect(() => {
@@ -1692,10 +2128,21 @@ export default function CycleParkingFinder() {
   const nearestPoint = nearbyPoints[0] ?? null;
   const activeListPoints =
     parkingView === 'saved' ? savedPoints : closestPoints;
-  const explicitSelectedPoint =
+  const selectedPointFromMap =
     selectedId !== null
       ? (mapPoints.find((point) => point.id === selectedId) ?? null)
       : null;
+  if (selectedId === null) {
+    selectedPointCache.current = null;
+  } else if (selectedPointFromMap !== null) {
+    selectedPointCache.current = selectedPointFromMap;
+  } else if (selectedPointCache.current?.id !== selectedId) {
+    selectedPointCache.current = null;
+  }
+  // Chunk updates replace mapPoints in batches. Keep the current selection
+  // mounted through a batch that does not yet contain its still-selected ID.
+  const explicitSelectedPoint =
+    selectedPointFromMap ?? selectedPointCache.current;
   const explicitSelectedPointDetails = explicitSelectedPoint
     ? getParkingPopupDetails(explicitSelectedPoint, locale)
     : null;
@@ -1831,7 +2278,17 @@ export default function CycleParkingFinder() {
     const selectedListItem = parkingListItemRefs.current.get(selectedId);
     const scrollContainer = parkingListScroll.current;
 
-    if (!selectedListItem || !scrollContainer) {
+    if (!scrollContainer) {
+      return;
+    }
+
+    if (restoringParkingViewScroll.current === parkingView) {
+      scrollContainer.scrollTop =
+        parkingViewState.current[parkingView].scrollTop;
+      return;
+    }
+
+    if (!selectedListItem) {
       return;
     }
 
@@ -1856,7 +2313,7 @@ export default function CycleParkingFinder() {
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
       top: scrollContainer.scrollTop + scrollDelta,
     });
-  }, [activeListPoints, selectedId]);
+  }, [activeListPoints, parkingView, selectedId]);
 
   useEffect(() => {
     parkingViewState.current[parkingView].selectedId = selectedId;
@@ -2783,6 +3240,7 @@ export default function CycleParkingFinder() {
 
   function selectParkingPoint(id: string) {
     captureAnalyticsEvent('parking_selected', { parking_id: id });
+    restoringParkingViewScroll.current = null;
     setOpenParkingMoreMenuId(null);
     parkingViewState.current[parkingView].selectedId = id;
     clearDirectionsData();
@@ -2793,6 +3251,7 @@ export default function CycleParkingFinder() {
     point: ParkingPoint,
     origin: 'list' | 'map' = 'map',
   ) {
+    restoringParkingViewScroll.current = null;
     if (!window.matchMedia('(max-width: 820px)').matches) {
       selectParkingPoint(point.id);
       return;
@@ -2848,6 +3307,7 @@ export default function CycleParkingFinder() {
   }
 
   function clearSelectedParkingPoint() {
+    restoringParkingViewScroll.current = null;
     setOpenParkingMoreMenuId(null);
     parkingViewState.current[parkingView].selectedId = null;
     clearDirectionsData();
@@ -2863,6 +3323,7 @@ export default function CycleParkingFinder() {
 
   function openMyNeuks(event?: MouseEvent<HTMLButtonElement>) {
     rememberCurrentParkingView();
+    restoringParkingViewScroll.current = 'saved';
     const selectedSavedId =
       selectedId && savedIds.has(selectedId)
         ? selectedId
@@ -2883,6 +3344,7 @@ export default function CycleParkingFinder() {
 
   function showNearby() {
     rememberCurrentParkingView();
+    restoringParkingViewScroll.current = 'nearby';
     const nearbySelectedId = parkingViewState.current.nearby.selectedId;
     clearDirectionsData();
     dispatchParkingPanel({
@@ -2994,6 +3456,7 @@ export default function CycleParkingFinder() {
       return;
     }
 
+    restoringParkingViewScroll.current = null;
     stopLiveRouteTracking();
     captureAnalyticsEvent('directions_requested', {
       parking_id: point.id,
@@ -3798,9 +4261,19 @@ export default function CycleParkingFinder() {
                   </option>
                 ))}
               </select>
+              <span className="settings-label">{t('app')}</span>
+              <motion.button
+                className="settings-action-button"
+                data-testid="open-offline-areas"
+                type="button"
+                whileTap={subtleTap}
+                onClick={openOfflineAreas}
+              >
+                <Boxes size={15} aria-hidden="true" />
+                {t('offlineAreas')}
+              </motion.button>
               {canInstall ? (
                 <Fragment key="install-app-action">
-                  <span className="settings-label">{t('app')}</span>
                   <motion.button
                     className="settings-action-button"
                     type="button"
@@ -4044,6 +4517,9 @@ export default function CycleParkingFinder() {
       <main
         className="app-shell"
         data-directions-mode={isDirectionsMode ? 'true' : undefined}
+        data-offline-area-selection={
+          offlineAreaSelectionBounds ? 'true' : undefined
+        }
         data-route-workspace={routeWorkspaceView ?? undefined}
         data-theme={resolvedTheme}
       >
@@ -4053,6 +4529,7 @@ export default function CycleParkingFinder() {
             points={mapPoints}
             userLocation={mapUserLocation}
             currentLocationFocusRequestId={currentLocationFocusRequestId}
+            selectedPointId={isRouteWorkspace ? null : selectedId}
             selectedPoint={isRouteWorkspace ? null : explicitSelectedPoint}
             nearestPoint={
               !isRouteWorkspace && parkingView === 'nearby'
@@ -4113,9 +4590,23 @@ export default function CycleParkingFinder() {
             onOpenDetails={(point) => openParkingDetails(point, 'map')}
             onPlaceRouteWaypoint={placeRouteWaypoint}
             onViewportChange={loadMapDataForBounds}
+            offlineAreaSelectionBounds={offlineAreaSelectionBounds}
             cycleNetworkFeatures={cycleNetworkFeatures}
             isCycleNetworkVisible={isCycleNetworkVisible}
           />
+          {offlineAreaSelectionBounds ? (
+            <OfflineAreaSelection
+              error={offlineAreaError}
+              isDownloading={busyOfflineAreaId !== null}
+              name={offlineAreaName}
+              plan={offlineAreaPlan}
+              progress={offlineAreaProgress}
+              storageWarning={offlineAreaStorageWarning}
+              onCancel={cancelOfflineAreaSelection}
+              onDownload={downloadSelectedOfflineArea}
+              onNameChange={setOfflineAreaName}
+            />
+          ) : null}
           {!isDirectionsMode && !isRouteWorkspace ? (
             <div className="map-layers-control">
               <motion.button
@@ -5178,6 +5669,12 @@ export default function CycleParkingFinder() {
 
                         <div
                           className="parking-list-scroll"
+                          onPointerDown={() => {
+                            restoringParkingViewScroll.current = null;
+                          }}
+                          onWheel={() => {
+                            restoringParkingViewScroll.current = null;
+                          }}
                           ref={parkingListScroll}
                         >
                           <AnimatePresence initial={false} mode="popLayout">
@@ -5825,6 +6322,21 @@ export default function CycleParkingFinder() {
             </AnimatePresence>
           </LayoutGroup>
         </motion.aside>
+        {isOfflineAreasOpen ? (
+          <OfflineAreasPanel
+            areas={offlineAreas}
+            busyAreaId={busyOfflineAreaId}
+            error={offlineAreaError}
+            loading={offlineAreasLoading}
+            message={offlineAreaMessage}
+            progress={offlineAreaProgress}
+            onClose={() => setIsOfflineAreasOpen(false)}
+            onDownloadNew={startOfflineAreaSelection}
+            onRemove={removeSavedOfflineArea}
+            onRetry={updateSavedOfflineArea}
+            onView={viewSavedOfflineArea}
+          />
+        ) : null}
         <dialog
           ref={attributionDialog}
           className="attribution-modal"

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createOSMStream } from 'osm-pbf-parser-node';
 import {
+  createManifestReleaseId,
   getTileBounds,
   getTileKey,
   parseGeofabrikPoly,
@@ -482,6 +483,7 @@ async function writeSpatialOutput({
     chunkContents.set(key, content);
     chunkMetadata[key] = {
       bounds: getTileBounds(key),
+      byteLength: contentBytes,
       count: chunkPoints.length,
       path,
     };
@@ -508,6 +510,13 @@ async function writeSpatialOutput({
     pointIndexPath,
     recordCount: points.length,
     refreshedAt,
+    releaseId: createManifestReleaseId({
+      chunkZoom: 12,
+      chunks: chunkMetadata,
+      pointIndexPath,
+      recordCount: points.length,
+      schemaVersion: 2,
+    }),
     schemaVersion: 2,
     sources: [
       {

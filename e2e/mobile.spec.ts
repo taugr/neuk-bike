@@ -1,4 +1,42 @@
 import { expect, test } from '@playwright/test';
+import {
+  expectRenderedBasemap,
+  installOfflineMapFixture,
+  openOfflineAreas,
+  startOfflineAreaDownload,
+  waitForServiceWorker,
+} from './offline-map-fixtures';
+
+test.beforeEach(async ({ context }) => {
+  await installOfflineMapFixture(context);
+});
+
+test('downloads and reopens an offline area on mobile', async ({
+  context,
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await waitForServiceWorker(page);
+
+  await startOfflineAreaDownload(page, 'Mobile tour', true);
+  const library = page.getByRole('dialog', { name: 'Offline areas' });
+  await expect(library).toContainText('Area ready offline.', {
+    timeout: 30_000,
+  });
+  await library.getByRole('button', { name: 'Close' }).click();
+
+  await context.setOffline(true);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await expectRenderedBasemap(page);
+  const reopenedLibrary = await openOfflineAreas(page, true);
+  await expect(reopenedLibrary).toContainText('Mobile tour');
+  await expect(
+    reopenedLibrary.getByRole('button', { name: 'View area' }),
+  ).toBeVisible();
+});
 
 test('keeps the nearby rows stable when the list first loads', async ({
   page,
@@ -1689,6 +1727,39 @@ test('keeps a drinking-water popup visible while the results tray collapses', as
 test('returns directions to the mobile view that launched them', async ({
   page,
 }) => {
+  await page.route(
+    'https://api.cyclestreets.net/v2/journey.plan**',
+    async (route) => {
+      const callback = new URL(route.request().url()).searchParams.get(
+        'callback',
+      );
+      expect(callback).toBeTruthy();
+      await route.fulfill({
+        body: `${callback}(${JSON.stringify({
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {
+                path: 'plan/balanced',
+                plan: 'balanced',
+                lengthMetres: 240,
+                timeSeconds: 90,
+              },
+              geometry: {
+                type: 'LineString',
+                coordinates: [
+                  [-3.1883, 55.9533],
+                  [-3.189, 55.953],
+                ],
+              },
+            },
+          ],
+        })});`,
+        contentType: 'application/javascript',
+      });
+    },
+  );
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?mockGps=55.9533,-3.1883,5');
 
@@ -1701,7 +1772,29 @@ test('returns directions to the mobile view that launched them', async ({
   expect(parkingId).toBeTruthy();
 
   await firstRow.click();
-  await page.getByTestId(`parking-directions-${parkingId}`).click();
+  await expect(firstRow.locator('.parking-row-selection')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  const directionsShortcut = page.getByTestId(
+    `parking-directions-${parkingId}`,
+  );
+  await expect
+    .poll(async () => {
+      const before = await directionsShortcut.boundingBox();
+      await page.waitForTimeout(250);
+      const after = await directionsShortcut.boundingBox();
+      return Boolean(
+        before &&
+        after &&
+        Math.abs(before.x - after.x) < 0.5 &&
+        Math.abs(before.y - after.y) < 0.5 &&
+        Math.abs(before.width - after.width) < 0.5 &&
+        Math.abs(before.height - after.height) < 0.5,
+      );
+    })
+    .toBe(true);
+  await directionsShortcut.click();
   await expect(
     page.getByRole('region', { name: 'Cycle directions' }),
   ).toBeVisible();

@@ -9,7 +9,8 @@
         "west": -7.734375
       },
       "count": 1,
-      "path": "chunks/10/490/323.463d63a4ac760c1d.json"
+      "path": "chunks/10/490/323.463d63a4ac760c1d.json",
+      "byteLength": 2188
     },
     "10/490/324": {
       "bounds": {
@@ -19,7 +20,8 @@
         "west": -7.734375
       },
       "count": 10,
-      "path": "chunks/10/490/324.87855bc727fcc867.json"
+      "path": "chunks/10/490/324.87855bc727fcc867.json",
+      "byteLength": 8193
     },
     "10/490/327": {
       "bounds": {
@@ -29,7 +31,8 @@
         "west": -7.734375
       },
       "count": 17,
-      "path": "chunks/10/490/327.ab1f2d4b07587515.json"
+      "path": "chunks/10/490/327.ab1f2d4b07587515.json",
+      "byteLength": 13949
     },
     "10/491/323": {
       "bounds": {
@@ -39,7 +42,8 @@
         "west": -7.3828125
       },
       "count": 38,
-      "path": "chunks/10/491/323.810f128295f2301b.json"
+      "path": "chunks/10/491/323.810f128295f2301b.json",
+      "byteLength": 39441
     },
     "10/491/324": {
       "bounds": {
@@ -49,7 +53,8 @@
         "west": -7.3828125
       },
       "count": 3,
-      "path": "chunks/10/491/324.8d28c474a434c5d0.json"
+      "path": "chunks/10/491/324.8d28c474a434c5d0.json",
+      "byteLength": 4260
     },
     "10/491/325": {
       "bounds": {
@@ -59,7 +64,8 @@
         "west": -7.3828125
       },
       "count": 16,
-      "path": "chunks/10/491/325.fc0afeeae4d78bcf.json"
+      "path": "chunks/10/491/325.fc0afeeae4d78bcf.json",
+      "byteLength": 14655
     },
     "10/492/322": {
       "bounds": {
@@ -69,7 +75,8 @@
         "west": -7.03125
       },
       "count": 2,
-      "path": "chunks/10/492/322.fb917a4bc04d7b0b.json"
+      "path": "chunks/10/492/322.fb917a4bc04d7b0b.json",
+      "byteLength": 3767
     },
     "10/492/323": {
       "bounds": {
@@ -79,7 +86,8 @@
         "west": -7.03125
       },
       "count": 15,
-      "path": "chunks/10/492/323.6acaa995b6a6bf0a.json"
+      "path": "chunks/10/492/323.6acaa995b6a6bf0a.json",
+      "byteLength": 11249
     },
     "10/493/322": {
       "bounds": {
@@ -89,7 +97,8 @@
         "west": -6.6796875
       },
       "count": 19,
-      "path": "chunks/10/493/322.169e836a5e3b9c9c.json"
+      "path": "chunks/10/493/322.169e836a5e3b9c9c.json",
+      "byteLength": 16380
     },
     "10/493/323": {
       "bounds": {
@@ -99,7 +108,8 @@
         "west": -6.6796875
       },
       "count": 31,
-      "path": "chunks/10/493/323.4f9a544e74215723.json"
+      "path": "chunks/10/493/323.4f9a544e74215723.json",
+      "byteLength": 27043
     },
     "10/493/325": {
       "bounds": {
@@ -109,7 +119,8 @@
         "west": -6.6796875
       },
       "count": 1,
-      "path": "chunks/10/493/325.0905aa29a56d08da.json"
+      "path": "chunks/10/493/325.0905aa29a56d08da.json",
+      "byteLength": 1677
     },
     "10/493/326": {
       "bounds": {
@@ -119,7 +130,8 @@
         "west": -6.6796875
       },
       "count": 27,
-      "path": "chunks/10/493/326.f6145337af5738a3.json"
+      "path": "chunks/10/493/326.f6145337af5738a3.json",
+      "byteLength": 30314
     },
     "10/493/327": {
       "bounds": {
@@ -129,7 +141,8 @@
         "west": -6.6796875
       },
       "count": 21,
-      "path": "chunks/10/493/327.adc4509b22f47873.json"
+      "path": "chunks/10/493/327.adc4509b22f47873.json",
+      "byteLength": 39218
     },
     "10/494/324": {
       "bounds": {
@@ -139,7 +152,8 @@
         "west": -6.328125
       },
       "count": 5,
-      "path": "chunks/10/494/324.25151c556ef60b51.json"
+      "path": "chunks/10/494/324.25151c556ef60b51.json",
+      "byteLength": 7236
     },
     "10/494/325": {
       "bounds": {
@@ -149,7 +163,8 @@
         "west": -6.328125
       },
       "count": 14,
-      "path": "chunks/10/494/325.8301f50fcb9f4440.json"
+      "path": "chunks/10/494/325.8301f50fcb9f4440.json",
+      "byteLength": 16247
     },
     "10/494/326": {
       "bounds": {
@@ -159,7 +174,8 @@
         "west": -6.328125
       },
       "count": 25,
-      "path": "chunks/10/494/326.8daf5840dbc8fb1e.json"
+      "path": "chunks/10/494/326.8daf5840dbc8fb1e.json",
+      "byteLength": 31276
     },
     "10/495/324": {
       "bounds": {
@@ -169,7 +185,8 @@
         "west": -5.9765625
       },
       "count": 5,
-      "path": "chunks/10/495/324.05e4f392f3e08461.json"
+      "path": "chunks/10/495/324.05e4f392f3e08461.json",
+      "byteLength": 5330
     },
     "10/495/325": {
       "bounds": {
@@ -179,7 +196,8 @@
         "west": -5.9765625
       },
       "count": 114,
-      "path": "chunks/10/495/325.7e6069d069c1609a.json"
+      "path": "chunks/10/495/325.7e6069d069c1609a.json",
+      "byteLength": 104444
     },
     "10/495/326": {
       "bounds": {
@@ -189,7 +207,8 @@
         "west": -5.9765625
       },
       "count": 12,
-      "path": "chunks/10/495/326.b82f519fcb971385.json"
+      "path": "chunks/10/495/326.b82f519fcb971385.json",
+      "byteLength": 24155
     },
     "10/495/346": {
       "bounds": {
@@ -199,7 +218,8 @@
         "west": -5.9765625
       },
       "count": 6,
-      "path": "chunks/10/495/346.6a054c5fb4f9b019.json"
+      "path": "chunks/10/495/346.6a054c5fb4f9b019.json",
+      "byteLength": 10763
     },
     "10/496/315": {
       "bounds": {
@@ -209,7 +229,8 @@
         "west": -5.625
       },
       "count": 9,
-      "path": "chunks/10/496/315.09d089bd24ef470d.json"
+      "path": "chunks/10/496/315.09d089bd24ef470d.json",
+      "byteLength": 16385
     },
     "10/496/316": {
       "bounds": {
@@ -219,7 +240,8 @@
         "west": -5.625
       },
       "count": 45,
-      "path": "chunks/10/496/316.dc2625d076ff0180.json"
+      "path": "chunks/10/496/316.dc2625d076ff0180.json",
+      "byteLength": 57828
     },
     "10/496/318": {
       "bounds": {
@@ -229,7 +251,8 @@
         "west": -5.625
       },
       "count": 11,
-      "path": "chunks/10/496/318.a18957ecc79a72f5.json"
+      "path": "chunks/10/496/318.a18957ecc79a72f5.json",
+      "byteLength": 18706
     },
     "10/496/320": {
       "bounds": {
@@ -239,7 +262,8 @@
         "west": -5.625
       },
       "count": 2,
-      "path": "chunks/10/496/320.a7afec7e74458c89.json"
+      "path": "chunks/10/496/320.a7afec7e74458c89.json",
+      "byteLength": 4875
     },
     "10/496/338": {
       "bounds": {
@@ -249,7 +273,8 @@
         "west": -5.625
       },
       "count": 1,
-      "path": "chunks/10/496/338.a7d45e5f962b6168.json"
+      "path": "chunks/10/496/338.a7d45e5f962b6168.json",
+      "byteLength": 2970
     },
     "10/496/346": {
       "bounds": {
@@ -259,7 +284,8 @@
         "west": -5.625
       },
       "count": 137,
-      "path": "chunks/10/496/346.bbf9c7f1b268e2cb.json"
+      "path": "chunks/10/496/346.bbf9c7f1b268e2cb.json",
+      "byteLength": 88783
     },
     "10/496/347": {
       "bounds": {
@@ -269,7 +295,8 @@
         "west": -5.625
       },
       "count": 2,
-      "path": "chunks/10/496/347.acf4d50cd17983c6.json"
+      "path": "chunks/10/496/347.acf4d50cd17983c6.json",
+      "byteLength": 2074
     },
     "10/497/313": {
       "bounds": {
@@ -279,7 +306,8 @@
         "west": -5.2734375
       },
       "count": 2,
-      "path": "chunks/10/497/313.f20ac2648908269c.json"
+      "path": "chunks/10/497/313.f20ac2648908269c.json",
+      "byteLength": 11402
     },
     "10/497/314": {
       "bounds": {
@@ -289,7 +317,8 @@
         "west": -5.2734375
       },
       "count": 33,
-      "path": "chunks/10/497/314.d4b43f809afc3312.json"
+      "path": "chunks/10/497/314.d4b43f809afc3312.json",
+      "byteLength": 58928
     },
     "10/497/315": {
       "bounds": {
@@ -299,7 +328,8 @@
         "west": -5.2734375
       },
       "count": 30,
-      "path": "chunks/10/497/315.28bab8dbfbbf83ef.json"
+      "path": "chunks/10/497/315.28bab8dbfbbf83ef.json",
+      "byteLength": 39597
     },
     "10/497/320": {
       "bounds": {
@@ -309,7 +339,8 @@
         "west": -5.2734375
       },
       "count": 8,
-      "path": "chunks/10/497/320.4b1868fec42a1116.json"
+      "path": "chunks/10/497/320.4b1868fec42a1116.json",
+      "byteLength": 11710
     },
     "10/497/321": {
       "bounds": {
@@ -319,7 +350,8 @@
         "west": -5.2734375
       },
       "count": 2,
-      "path": "chunks/10/497/321.6f782346396e7e02.json"
+      "path": "chunks/10/497/321.6f782346396e7e02.json",
+      "byteLength": 2144
     },
     "10/497/324": {
       "bounds": {
@@ -329,7 +361,8 @@
         "west": -5.2734375
       },
       "count": 14,
-      "path": "chunks/10/497/324.a64fbbb47e177642.json"
+      "path": "chunks/10/497/324.a64fbbb47e177642.json",
+      "byteLength": 10537
     },
     "10/497/338": {
       "bounds": {
@@ -339,7 +372,8 @@
         "west": -5.2734375
       },
       "count": 54,
-      "path": "chunks/10/497/338.dc63046af3529e39.json"
+      "path": "chunks/10/497/338.dc63046af3529e39.json",
+      "byteLength": 49087
     },
     "10/497/339": {
       "bounds": {
@@ -349,7 +383,8 @@
         "west": -5.2734375
       },
       "count": 77,
-      "path": "chunks/10/497/339.69ec3fc6daefafc5.json"
+      "path": "chunks/10/497/339.69ec3fc6daefafc5.json",
+      "byteLength": 65862
     },
     "10/497/344": {
       "bounds": {
@@ -359,7 +394,8 @@
         "west": -5.2734375
       },
       "count": 19,
-      "path": "chunks/10/497/344.9b5a0056ff7b6eff.json"
+      "path": "chunks/10/497/344.9b5a0056ff7b6eff.json",
+      "byteLength": 14250
     },
     "10/497/345": {
       "bounds": {
@@ -369,7 +405,8 @@
         "west": -5.2734375
       },
       "count": 84,
-      "path": "chunks/10/497/345.8241a98e5a109948.json"
+      "path": "chunks/10/497/345.8241a98e5a109948.json",
+      "byteLength": 61181
     },
     "10/497/346": {
       "bounds": {
@@ -379,7 +416,8 @@
         "west": -5.2734375
       },
       "count": 103,
-      "path": "chunks/10/497/346.24df7f6cdd13f738.json"
+      "path": "chunks/10/497/346.24df7f6cdd13f738.json",
+      "byteLength": 81227
     },
     "10/498/312": {
       "bounds": {
@@ -389,7 +427,8 @@
         "west": -4.921875
       },
       "count": 6,
-      "path": "chunks/10/498/312.a391ea0a2d1821b8.json"
+      "path": "chunks/10/498/312.a391ea0a2d1821b8.json",
+      "byteLength": 8275
     },
     "10/498/313": {
       "bounds": {
@@ -399,7 +438,8 @@
         "west": -4.921875
       },
       "count": 18,
-      "path": "chunks/10/498/313.a0d4f5809320da98.json"
+      "path": "chunks/10/498/313.a0d4f5809320da98.json",
+      "byteLength": 37543
     },
     "10/498/318": {
       "bounds": {
@@ -409,7 +449,8 @@
         "west": -4.921875
       },
       "count": 17,
-      "path": "chunks/10/498/318.3595cf05be190502.json"
+      "path": "chunks/10/498/318.3595cf05be190502.json",
+      "byteLength": 13451
     },
     "10/498/319": {
       "bounds": {
@@ -419,7 +460,8 @@
         "west": -4.921875
       },
       "count": 105,
-      "path": "chunks/10/498/319.83636bbcfc0c0c6e.json"
+      "path": "chunks/10/498/319.83636bbcfc0c0c6e.json",
+      "byteLength": 91792
     },
     "10/498/320": {
       "bounds": {
@@ -429,7 +471,8 @@
         "west": -4.921875
       },
       "count": 159,
-      "path": "chunks/10/498/320.ca948f6d2be8cfc2.json"
+      "path": "chunks/10/498/320.ca948f6d2be8cfc2.json",
+      "byteLength": 121706
     },
     "10/498/321": {
       "bounds": {
@@ -439,7 +482,8 @@
         "west": -4.921875
       },
       "count": 109,
-      "path": "chunks/10/498/321.7281bf2ce319d330.json"
+      "path": "chunks/10/498/321.7281bf2ce319d330.json",
+      "byteLength": 72608
     },
     "10/498/322": {
       "bounds": {
@@ -449,7 +493,8 @@
         "west": -4.921875
       },
       "count": 14,
-      "path": "chunks/10/498/322.e1b6b9435d04fbbf.json"
+      "path": "chunks/10/498/322.e1b6b9435d04fbbf.json",
+      "byteLength": 24453
     },
     "10/498/323": {
       "bounds": {
@@ -459,7 +504,8 @@
         "west": -4.921875
       },
       "count": 2,
-      "path": "chunks/10/498/323.11fea7ff78df7db5.json"
+      "path": "chunks/10/498/323.11fea7ff78df7db5.json",
+      "byteLength": 20381
     },
     "10/498/324": {
       "bounds": {
@@ -469,7 +515,8 @@
         "west": -4.921875
       },
       "count": 25,
-      "path": "chunks/10/498/324.dee82ce3f15e749b.json"
+      "path": "chunks/10/498/324.dee82ce3f15e749b.json",
+      "byteLength": 25994
     },
     "10/498/332": {
       "bounds": {
@@ -479,7 +526,8 @@
         "west": -4.921875
       },
       "count": 20,
-      "path": "chunks/10/498/332.be6a97dc7086975a.json"
+      "path": "chunks/10/498/332.be6a97dc7086975a.json",
+      "byteLength": 24275
     },
     "10/498/337": {
       "bounds": {
@@ -489,7 +537,8 @@
         "west": -4.921875
       },
       "count": 16,
-      "path": "chunks/10/498/337.0ac0d447849d1c17.json"
+      "path": "chunks/10/498/337.0ac0d447849d1c17.json",
+      "byteLength": 14341
     },
     "10/498/338": {
       "bounds": {
@@ -499,7 +548,8 @@
         "west": -4.921875
       },
       "count": 25,
-      "path": "chunks/10/498/338.b0137877056957ab.json"
+      "path": "chunks/10/498/338.b0137877056957ab.json",
+      "byteLength": 36221
     },
     "10/498/339": {
       "bounds": {
@@ -509,7 +559,8 @@
         "west": -4.921875
       },
       "count": 83,
-      "path": "chunks/10/498/339.463d37c892a20bcc.json"
+      "path": "chunks/10/498/339.463d37c892a20bcc.json",
+      "byteLength": 66811
     },
     "10/498/343": {
       "bounds": {
@@ -519,7 +570,8 @@
         "west": -4.921875
       },
       "count": 2,
-      "path": "chunks/10/498/343.29c481ecdcdd0f36.json"
+      "path": "chunks/10/498/343.29c481ecdcdd0f36.json",
+      "byteLength": 4728
     },
     "10/498/344": {
       "bounds": {
@@ -529,7 +581,8 @@
         "west": -4.921875
       },
       "count": 41,
-      "path": "chunks/10/498/344.d55182e6993f1db5.json"
+      "path": "chunks/10/498/344.d55182e6993f1db5.json",
+      "byteLength": 41145
     },
     "10/498/345": {
       "bounds": {
@@ -539,7 +592,8 @@
         "west": -4.921875
       },
       "count": 170,
-      "path": "chunks/10/498/345.ada8a594642aa6fa.json"
+      "path": "chunks/10/498/345.ada8a594642aa6fa.json",
+      "byteLength": 158149
     },
     "10/498/346": {
       "bounds": {
@@ -549,7 +603,8 @@
         "west": -4.921875
       },
       "count": 22,
-      "path": "chunks/10/498/346.f6b998db81dfb945.json"
+      "path": "chunks/10/498/346.f6b998db81dfb945.json",
+      "byteLength": 28300
     },
     "10/499/309": {
       "bounds": {
@@ -559,7 +614,8 @@
         "west": -4.5703125
       },
       "count": 3,
-      "path": "chunks/10/499/309.b1695b22cb803c52.json"
+      "path": "chunks/10/499/309.b1695b22cb803c52.json",
+      "byteLength": 3039
     },
     "10/499/310": {
       "bounds": {
@@ -569,7 +625,8 @@
         "west": -4.5703125
       },
       "count": 80,
-      "path": "chunks/10/499/310.c1ae37edc8649100.json"
+      "path": "chunks/10/499/310.c1ae37edc8649100.json",
+      "byteLength": 52567
     },
     "10/499/311": {
       "bounds": {
@@ -579,7 +636,8 @@
         "west": -4.5703125
       },
       "count": 79,
-      "path": "chunks/10/499/311.44f292f3d99990ca.json"
+      "path": "chunks/10/499/311.44f292f3d99990ca.json",
+      "byteLength": 57331
     },
     "10/499/313": {
       "bounds": {
@@ -589,7 +647,8 @@
         "west": -4.5703125
       },
       "count": 1,
-      "path": "chunks/10/499/313.99b85232beb646d3.json"
+      "path": "chunks/10/499/313.99b85232beb646d3.json",
+      "byteLength": 2312
     },
     "10/499/314": {
       "bounds": {
@@ -599,7 +658,8 @@
         "west": -4.5703125
       },
       "count": 12,
-      "path": "chunks/10/499/314.d9468fa80c4b84fa.json"
+      "path": "chunks/10/499/314.d9468fa80c4b84fa.json",
+      "byteLength": 16371
     },
     "10/499/316": {
       "bounds": {
@@ -609,7 +669,8 @@
         "west": -4.5703125
       },
       "count": 22,
-      "path": "chunks/10/499/316.52cb23bc61369229.json"
+      "path": "chunks/10/499/316.52cb23bc61369229.json",
+      "byteLength": 24177
     },
     "10/499/317": {
       "bounds": {
@@ -619,7 +680,8 @@
         "west": -4.5703125
       },
       "count": 46,
-      "path": "chunks/10/499/317.f8cd8747ff15f559.json"
+      "path": "chunks/10/499/317.f8cd8747ff15f559.json",
+      "byteLength": 69587
     },
     "10/499/318": {
       "bounds": {
@@ -629,7 +691,8 @@
         "west": -4.5703125
       },
       "count": 35,
-      "path": "chunks/10/499/318.6cac639a53cbb011.json"
+      "path": "chunks/10/499/318.6cac639a53cbb011.json",
+      "byteLength": 31570
     },
     "10/499/319": {
       "bounds": {
@@ -639,7 +702,8 @@
         "west": -4.5703125
       },
       "count": 281,
-      "path": "chunks/10/499/319.dc2a85dc50ad0bde.json"
+      "path": "chunks/10/499/319.dc2a85dc50ad0bde.json",
+      "byteLength": 227692
     },
     "10/499/320": {
       "bounds": {
@@ -649,7 +713,8 @@
         "west": -4.5703125
       },
       "count": 14,
-      "path": "chunks/10/499/320.7b4b17017050183f.json"
+      "path": "chunks/10/499/320.7b4b17017050183f.json",
+      "byteLength": 11115
     },
     "10/499/322": {
       "bounds": {
@@ -659,7 +724,8 @@
         "west": -4.5703125
       },
       "count": 1,
-      "path": "chunks/10/499/322.338964a44045b541.json"
+      "path": "chunks/10/499/322.338964a44045b541.json",
+      "byteLength": 14394
     },
     "10/499/323": {
       "bounds": {
@@ -669,7 +735,8 @@
         "west": -4.5703125
       },
       "count": 12,
-      "path": "chunks/10/499/323.882b7ee0cb2cad9c.json"
+      "path": "chunks/10/499/323.882b7ee0cb2cad9c.json",
+      "byteLength": 47506
     },
     "10/499/324": {
       "bounds": {
@@ -679,7 +746,8 @@
         "west": -4.5703125
       },
       "count": 34,
-      "path": "chunks/10/499/324.3301f01498bf76c9.json"
+      "path": "chunks/10/499/324.3301f01498bf76c9.json",
+      "byteLength": 56157
     },
     "10/499/331": {
       "bounds": {
@@ -689,7 +757,8 @@
         "west": -4.5703125
       },
       "count": 7,
-      "path": "chunks/10/499/331.4a6c08dabce0a072.json"
+      "path": "chunks/10/499/331.4a6c08dabce0a072.json",
+      "byteLength": 9983
     },
     "10/499/332": {
       "bounds": {
@@ -699,7 +768,8 @@
         "west": -4.5703125
       },
       "count": 116,
-      "path": "chunks/10/499/332.1d73da2f4547a617.json"
+      "path": "chunks/10/499/332.1d73da2f4547a617.json",
+      "byteLength": 109841
     },
     "10/499/333": {
       "bounds": {
@@ -709,7 +779,8 @@
         "west": -4.5703125
       },
       "count": 47,
-      "path": "chunks/10/499/333.1e8d64bc4e6959a0.json"
+      "path": "chunks/10/499/333.1e8d64bc4e6959a0.json",
+      "byteLength": 47144
     },
     "10/499/337": {
       "bounds": {
@@ -719,7 +790,8 @@
         "west": -4.5703125
       },
       "count": 19,
-      "path": "chunks/10/499/337.2660e19fdaf21008.json"
+      "path": "chunks/10/499/337.2660e19fdaf21008.json",
+      "byteLength": 16592
     },
     "10/499/338": {
       "bounds": {
@@ -729,7 +801,8 @@
         "west": -4.5703125
       },
       "count": 88,
-      "path": "chunks/10/499/338.fcbad55966538522.json"
+      "path": "chunks/10/499/338.fcbad55966538522.json",
+      "byteLength": 84608
     },
     "10/499/339": {
       "bounds": {
@@ -739,7 +812,8 @@
         "west": -4.5703125
       },
       "count": 53,
-      "path": "chunks/10/499/339.7524fbccb4c50481.json"
+      "path": "chunks/10/499/339.7524fbccb4c50481.json",
+      "byteLength": 53564
     },
     "10/499/342": {
       "bounds": {
@@ -749,7 +823,8 @@
         "west": -4.5703125
       },
       "count": 3,
-      "path": "chunks/10/499/342.c8ac258136169bc3.json"
+      "path": "chunks/10/499/342.c8ac258136169bc3.json",
+      "byteLength": 2537
     },
     "10/499/343": {
       "bounds": {
@@ -759,7 +834,8 @@
         "west": -4.5703125
       },
       "count": 72,
-      "path": "chunks/10/499/343.3daf1e1d51475ec6.json"
+      "path": "chunks/10/499/343.3daf1e1d51475ec6.json",
+      "byteLength": 59707
     },
     "10/499/344": {
       "bounds": {
@@ -769,7 +845,8 @@
         "west": -4.5703125
       },
       "count": 33,
-      "path": "chunks/10/499/344.ae5900fec7ffe1d4.json"
+      "path": "chunks/10/499/344.ae5900fec7ffe1d4.json",
+      "byteLength": 31470
     },
     "10/500/309": {
       "bounds": {
@@ -779,7 +856,8 @@
         "west": -4.21875
       },
       "count": 37,
-      "path": "chunks/10/500/309.1e399f1de0122624.json"
+      "path": "chunks/10/500/309.1e399f1de0122624.json",
+      "byteLength": 26763
     },
     "10/500/310": {
       "bounds": {
@@ -789,7 +867,8 @@
         "west": -4.21875
       },
       "count": 22,
-      "path": "chunks/10/500/310.360f9d5db55cb7b3.json"
+      "path": "chunks/10/500/310.360f9d5db55cb7b3.json",
+      "byteLength": 18620
     },
     "10/500/311": {
       "bounds": {
@@ -799,7 +878,8 @@
         "west": -4.21875
       },
       "count": 67,
-      "path": "chunks/10/500/311.3c11924780803e36.json"
+      "path": "chunks/10/500/311.3c11924780803e36.json",
+      "byteLength": 56728
     },
     "10/500/312": {
       "bounds": {
@@ -809,7 +889,8 @@
         "west": -4.21875
       },
       "count": 7,
-      "path": "chunks/10/500/312.b0a41067d13a931c.json"
+      "path": "chunks/10/500/312.b0a41067d13a931c.json",
+      "byteLength": 8979
     },
     "10/500/313": {
       "bounds": {
@@ -819,7 +900,8 @@
         "west": -4.21875
       },
       "count": 23,
-      "path": "chunks/10/500/313.848f399e1b04d79a.json"
+      "path": "chunks/10/500/313.848f399e1b04d79a.json",
+      "byteLength": 28654
     },
     "10/500/314": {
       "bounds": {
@@ -829,7 +911,8 @@
         "west": -4.21875
       },
       "count": 19,
-      "path": "chunks/10/500/314.673f5b34652329fa.json"
+      "path": "chunks/10/500/314.673f5b34652329fa.json",
+      "byteLength": 19598
     },
     "10/500/315": {
       "bounds": {
@@ -839,7 +922,8 @@
         "west": -4.21875
       },
       "count": 15,
-      "path": "chunks/10/500/315.d00d2b41fd477709.json"
+      "path": "chunks/10/500/315.d00d2b41fd477709.json",
+      "byteLength": 13630
     },
     "10/500/316": {
       "bounds": {
@@ -849,7 +933,8 @@
         "west": -4.21875
       },
       "count": 2,
-      "path": "chunks/10/500/316.6169afe09624f282.json"
+      "path": "chunks/10/500/316.6169afe09624f282.json",
+      "byteLength": 6052
     },
     "10/500/317": {
       "bounds": {
@@ -859,7 +944,8 @@
         "west": -4.21875
       },
       "count": 37,
-      "path": "chunks/10/500/317.8126581aa4ff6368.json"
+      "path": "chunks/10/500/317.8126581aa4ff6368.json",
+      "byteLength": 25497
     },
     "10/500/318": {
       "bounds": {
@@ -869,7 +955,8 @@
         "west": -4.21875
       },
       "count": 83,
-      "path": "chunks/10/500/318.9be5434e37e679e1.json"
+      "path": "chunks/10/500/318.9be5434e37e679e1.json",
+      "byteLength": 78718
     },
     "10/500/319": {
       "bounds": {
@@ -879,7 +966,8 @@
         "west": -4.21875
       },
       "count": 285,
-      "path": "chunks/10/500/319.eb051bd0ec549aa0.json"
+      "path": "chunks/10/500/319.eb051bd0ec549aa0.json",
+      "byteLength": 232408
     },
     "10/500/320": {
       "bounds": {
@@ -889,7 +977,8 @@
         "west": -4.21875
       },
       "count": 62,
-      "path": "chunks/10/500/320.cd5dd8c4e1922e16.json"
+      "path": "chunks/10/500/320.cd5dd8c4e1922e16.json",
+      "byteLength": 49009
     },
     "10/500/324": {
       "bounds": {
@@ -899,7 +988,8 @@
         "west": -4.21875
       },
       "count": 42,
-      "path": "chunks/10/500/324.3ad5a02be53b44c2.json"
+      "path": "chunks/10/500/324.3ad5a02be53b44c2.json",
+      "byteLength": 44195
     },
     "10/500/332": {
       "bounds": {
@@ -909,7 +999,8 @@
         "west": -4.21875
       },
       "count": 138,
-      "path": "chunks/10/500/332.40625742ec24bc5d.json"
+      "path": "chunks/10/500/332.40625742ec24bc5d.json",
+      "byteLength": 115688
     },
     "10/500/333": {
       "bounds": {
@@ -919,7 +1010,8 @@
         "west": -4.21875
       },
       "count": 84,
-      "path": "chunks/10/500/333.5332b851d1af9dca.json"
+      "path": "chunks/10/500/333.5332b851d1af9dca.json",
+      "byteLength": 71389
     },
     "10/500/334": {
       "bounds": {
@@ -929,7 +1021,8 @@
         "west": -4.21875
       },
       "count": 81,
-      "path": "chunks/10/500/334.1a35000f20d6b6e2.json"
+      "path": "chunks/10/500/334.1a35000f20d6b6e2.json",
+      "byteLength": 97170
     },
     "10/500/335": {
       "bounds": {
@@ -939,7 +1032,8 @@
         "west": -4.21875
       },
       "count": 21,
-      "path": "chunks/10/500/335.935f8c5feff2bc15.json"
+      "path": "chunks/10/500/335.935f8c5feff2bc15.json",
+      "byteLength": 28134
     },
     "10/500/336": {
       "bounds": {
@@ -949,7 +1043,8 @@
         "west": -4.21875
       },
       "count": 46,
-      "path": "chunks/10/500/336.151265f313e0e4b2.json"
+      "path": "chunks/10/500/336.151265f313e0e4b2.json",
+      "byteLength": 35527
     },
     "10/500/337": {
       "bounds": {
@@ -959,7 +1054,8 @@
         "west": -4.21875
       },
       "count": 15,
-      "path": "chunks/10/500/337.eadf7efdd0f1c381.json"
+      "path": "chunks/10/500/337.eadf7efdd0f1c381.json",
+      "byteLength": 18437
     },
     "10/500/338": {
       "bounds": {
@@ -969,7 +1065,8 @@
         "west": -4.21875
       },
       "count": 7,
-      "path": "chunks/10/500/338.5bac1c3935831db0.json"
+      "path": "chunks/10/500/338.5bac1c3935831db0.json",
+      "byteLength": 18444
     },
     "10/500/339": {
       "bounds": {
@@ -979,7 +1076,8 @@
         "west": -4.21875
       },
       "count": 199,
-      "path": "chunks/10/500/339.5c3611b01624c897.json"
+      "path": "chunks/10/500/339.5c3611b01624c897.json",
+      "byteLength": 163500
     },
     "10/500/340": {
       "bounds": {
@@ -989,7 +1087,8 @@
         "west": -4.21875
       },
       "count": 24,
-      "path": "chunks/10/500/340.8ca01b69d14449a4.json"
+      "path": "chunks/10/500/340.8ca01b69d14449a4.json",
+      "byteLength": 20201
     },
     "10/500/341": {
       "bounds": {
@@ -999,7 +1098,8 @@
         "west": -4.21875
       },
       "count": 38,
-      "path": "chunks/10/500/341.2f3e4ecf73436d10.json"
+      "path": "chunks/10/500/341.2f3e4ecf73436d10.json",
+      "byteLength": 35758
     },
     "10/500/342": {
       "bounds": {
@@ -1009,7 +1109,8 @@
         "west": -4.21875
       },
       "count": 134,
-      "path": "chunks/10/500/342.32f019d9f7e80d4e.json"
+      "path": "chunks/10/500/342.32f019d9f7e80d4e.json",
+      "byteLength": 117569
     },
     "10/500/343": {
       "bounds": {
@@ -1019,7 +1120,8 @@
         "west": -4.21875
       },
       "count": 67,
-      "path": "chunks/10/500/343.fa084fc4f71fb237.json"
+      "path": "chunks/10/500/343.fa084fc4f71fb237.json",
+      "byteLength": 64763
     },
     "10/500/344": {
       "bounds": {
@@ -1029,7 +1131,8 @@
         "west": -4.21875
       },
       "count": 100,
-      "path": "chunks/10/500/344.84220b71adafe003.json"
+      "path": "chunks/10/500/344.84220b71adafe003.json",
+      "byteLength": 99847
     },
     "10/500/345": {
       "bounds": {
@@ -1039,7 +1142,8 @@
         "west": -4.21875
       },
       "count": 317,
-      "path": "chunks/10/500/345.a23c18abb7f1969a.json"
+      "path": "chunks/10/500/345.a23c18abb7f1969a.json",
+      "byteLength": 214295
     },
     "10/501/310": {
       "bounds": {
@@ -1049,7 +1153,8 @@
         "west": -3.8671875
       },
       "count": 47,
-      "path": "chunks/10/501/310.f810b96e9f2786d9.json"
+      "path": "chunks/10/501/310.f810b96e9f2786d9.json",
+      "byteLength": 34369
     },
     "10/501/311": {
       "bounds": {
@@ -1059,7 +1164,8 @@
         "west": -3.8671875
       },
       "count": 1,
-      "path": "chunks/10/501/311.aca4bf6ca9009e5d.json"
+      "path": "chunks/10/501/311.aca4bf6ca9009e5d.json",
+      "byteLength": 2981
     },
     "10/501/312": {
       "bounds": {
@@ -1069,7 +1175,8 @@
         "west": -3.8671875
       },
       "count": 41,
-      "path": "chunks/10/501/312.2c23eae5af759481.json"
+      "path": "chunks/10/501/312.2c23eae5af759481.json",
+      "byteLength": 42636
     },
     "10/501/313": {
       "bounds": {
@@ -1079,7 +1186,8 @@
         "west": -3.8671875
       },
       "count": 1,
-      "path": "chunks/10/501/313.6d354993d337c233.json"
+      "path": "chunks/10/501/313.6d354993d337c233.json",
+      "byteLength": 2322
     },
     "10/501/315": {
       "bounds": {
@@ -1089,7 +1197,8 @@
         "west": -3.8671875
       },
       "count": 48,
-      "path": "chunks/10/501/315.de8dae7f87d02162.json"
+      "path": "chunks/10/501/315.de8dae7f87d02162.json",
+      "byteLength": 39181
     },
     "10/501/316": {
       "bounds": {
@@ -1099,7 +1208,8 @@
         "west": -3.8671875
       },
       "count": 16,
-      "path": "chunks/10/501/316.5f940d80c6404934.json"
+      "path": "chunks/10/501/316.5f940d80c6404934.json",
+      "byteLength": 14564
     },
     "10/501/318": {
       "bounds": {
@@ -1109,7 +1219,8 @@
         "west": -3.8671875
       },
       "count": 203,
-      "path": "chunks/10/501/318.e113769da36b970a.json"
+      "path": "chunks/10/501/318.e113769da36b970a.json",
+      "byteLength": 208795
     },
     "10/501/319": {
       "bounds": {
@@ -1119,7 +1230,8 @@
         "west": -3.8671875
       },
       "count": 91,
-      "path": "chunks/10/501/319.4d3f00acbd190419.json"
+      "path": "chunks/10/501/319.4d3f00acbd190419.json",
+      "byteLength": 114571
     },
     "10/501/320": {
       "bounds": {
@@ -1129,7 +1241,8 @@
         "west": -3.8671875
       },
       "count": 4,
-      "path": "chunks/10/501/320.588a6c2f22d4cd5e.json"
+      "path": "chunks/10/501/320.588a6c2f22d4cd5e.json",
+      "byteLength": 7306
     },
     "10/501/321": {
       "bounds": {
@@ -1139,7 +1252,8 @@
         "west": -3.8671875
       },
       "count": 18,
-      "path": "chunks/10/501/321.0bb806e801c38a52.json"
+      "path": "chunks/10/501/321.0bb806e801c38a52.json",
+      "byteLength": 17331
     },
     "10/501/323": {
       "bounds": {
@@ -1149,7 +1263,8 @@
         "west": -3.8671875
       },
       "count": 60,
-      "path": "chunks/10/501/323.67c5d7d9541cec41.json"
+      "path": "chunks/10/501/323.67c5d7d9541cec41.json",
+      "byteLength": 43129
     },
     "10/501/324": {
       "bounds": {
@@ -1159,7 +1274,8 @@
         "west": -3.8671875
       },
       "count": 3,
-      "path": "chunks/10/501/324.ca4f735243c54128.json"
+      "path": "chunks/10/501/324.ca4f735243c54128.json",
+      "byteLength": 4636
     },
     "10/501/325": {
       "bounds": {
@@ -1169,7 +1285,8 @@
         "west": -3.8671875
       },
       "count": 51,
-      "path": "chunks/10/501/325.716b395582a6e935.json"
+      "path": "chunks/10/501/325.716b395582a6e935.json",
+      "byteLength": 45492
     },
     "10/501/326": {
       "bounds": {
@@ -1179,7 +1296,8 @@
         "west": -3.8671875
       },
       "count": 55,
-      "path": "chunks/10/501/326.634ce3144cbb9bb1.json"
+      "path": "chunks/10/501/326.634ce3144cbb9bb1.json",
+      "byteLength": 48376
     },
     "10/501/332": {
       "bounds": {
@@ -1189,7 +1307,8 @@
         "west": -3.8671875
       },
       "count": 93,
-      "path": "chunks/10/501/332.6bf315e863480ca8.json"
+      "path": "chunks/10/501/332.6bf315e863480ca8.json",
+      "byteLength": 89209
     },
     "10/501/334": {
       "bounds": {
@@ -1199,7 +1318,8 @@
         "west": -3.8671875
       },
       "count": 7,
-      "path": "chunks/10/501/334.0dd5c8157e3f47de.json"
+      "path": "chunks/10/501/334.0dd5c8157e3f47de.json",
+      "byteLength": 12965
     },
     "10/501/335": {
       "bounds": {
@@ -1209,7 +1329,8 @@
         "west": -3.8671875
       },
       "count": 33,
-      "path": "chunks/10/501/335.29856f4a4414cbf4.json"
+      "path": "chunks/10/501/335.29856f4a4414cbf4.json",
+      "byteLength": 40654
     },
     "10/501/336": {
       "bounds": {
@@ -1219,7 +1340,8 @@
         "west": -3.8671875
       },
       "count": 48,
-      "path": "chunks/10/501/336.2f6102ce61fa5608.json"
+      "path": "chunks/10/501/336.2f6102ce61fa5608.json",
+      "byteLength": 69665
     },
     "10/501/337": {
       "bounds": {
@@ -1229,7 +1351,8 @@
         "west": -3.8671875
       },
       "count": 9,
-      "path": "chunks/10/501/337.63bef1c425805b40.json"
+      "path": "chunks/10/501/337.63bef1c425805b40.json",
+      "byteLength": 15934
     },
     "10/501/339": {
       "bounds": {
@@ -1239,7 +1362,8 @@
         "west": -3.8671875
       },
       "count": 220,
-      "path": "chunks/10/501/339.5f2b673912556e74.json"
+      "path": "chunks/10/501/339.5f2b673912556e74.json",
+      "byteLength": 196117
     },
     "10/501/340": {
       "bounds": {
@@ -1249,7 +1373,8 @@
         "west": -3.8671875
       },
       "count": 201,
-      "path": "chunks/10/501/340.8955d9840d800392.json"
+      "path": "chunks/10/501/340.8955d9840d800392.json",
+      "byteLength": 149789
     },
     "10/501/341": {
       "bounds": {
@@ -1259,7 +1384,8 @@
         "west": -3.8671875
       },
       "count": 30,
-      "path": "chunks/10/501/341.b9749a557ffacc22.json"
+      "path": "chunks/10/501/341.b9749a557ffacc22.json",
+      "byteLength": 39311
     },
     "10/501/342": {
       "bounds": {
@@ -1269,7 +1395,8 @@
         "west": -3.8671875
       },
       "count": 5,
-      "path": "chunks/10/501/342.27d65a1d47e95bcc.json"
+      "path": "chunks/10/501/342.27d65a1d47e95bcc.json",
+      "byteLength": 12298
     },
     "10/501/344": {
       "bounds": {
@@ -1279,7 +1406,8 @@
         "west": -3.8671875
       },
       "count": 109,
-      "path": "chunks/10/501/344.0fa39c094535b786.json"
+      "path": "chunks/10/501/344.0fa39c094535b786.json",
+      "byteLength": 117300
     },
     "10/501/345": {
       "bounds": {
@@ -1289,7 +1417,8 @@
         "west": -3.8671875
       },
       "count": 93,
-      "path": "chunks/10/501/345.10b78283d38d11c0.json"
+      "path": "chunks/10/501/345.10b78283d38d11c0.json",
+      "byteLength": 76894
     },
     "10/501/346": {
       "bounds": {
@@ -1299,7 +1428,8 @@
         "west": -3.8671875
       },
       "count": 42,
-      "path": "chunks/10/501/346.c71b3438d21b5573.json"
+      "path": "chunks/10/501/346.c71b3438d21b5573.json",
+      "byteLength": 36495
     },
     "10/502/303": {
       "bounds": {
@@ -1309,7 +1439,8 @@
         "west": -3.515625
       },
       "count": 1,
-      "path": "chunks/10/502/303.527f18d35c01954b.json"
+      "path": "chunks/10/502/303.527f18d35c01954b.json",
+      "byteLength": 2471
     },
     "10/502/310": {
       "bounds": {
@@ -1319,7 +1450,8 @@
         "west": -3.515625
       },
       "count": 30,
-      "path": "chunks/10/502/310.5470afa3f3de7f30.json"
+      "path": "chunks/10/502/310.5470afa3f3de7f30.json",
+      "byteLength": 23907
     },
     "10/502/316": {
       "bounds": {
@@ -1329,7 +1461,8 @@
         "west": -3.515625
       },
       "count": 50,
-      "path": "chunks/10/502/316.d4b681b485df70a4.json"
+      "path": "chunks/10/502/316.d4b681b485df70a4.json",
+      "byteLength": 44764
     },
     "10/502/317": {
       "bounds": {
@@ -1339,7 +1472,8 @@
         "west": -3.515625
       },
       "count": 69,
-      "path": "chunks/10/502/317.0d6cd533aa195e98.json"
+      "path": "chunks/10/502/317.0d6cd533aa195e98.json",
+      "byteLength": 56090
     },
     "10/502/318": {
       "bounds": {
@@ -1349,7 +1483,8 @@
         "west": -3.515625
       },
       "count": 244,
-      "path": "chunks/10/502/318.0eef99f98e231316.json"
+      "path": "chunks/10/502/318.0eef99f98e231316.json",
+      "byteLength": 189297
     },
     "10/502/319": {
       "bounds": {
@@ -1359,7 +1494,8 @@
         "west": -3.515625
       },
       "count": 294,
-      "path": "chunks/10/502/319.4a544d40b2187878.json"
+      "path": "chunks/10/502/319.4a544d40b2187878.json",
+      "byteLength": 221389
     },
     "10/502/320": {
       "bounds": {
@@ -1369,7 +1505,8 @@
         "west": -3.515625
       },
       "count": 2,
-      "path": "chunks/10/502/320.b960fd41dbfb17f8.json"
+      "path": "chunks/10/502/320.b960fd41dbfb17f8.json",
+      "byteLength": 1613
     },
     "10/502/323": {
       "bounds": {
@@ -1379,7 +1516,8 @@
         "west": -3.515625
       },
       "count": 37,
-      "path": "chunks/10/502/323.20c327d58a16fb02.json"
+      "path": "chunks/10/502/323.20c327d58a16fb02.json",
+      "byteLength": 22511
     },
     "10/502/324": {
       "bounds": {
@@ -1389,7 +1527,8 @@
         "west": -3.515625
       },
       "count": 47,
-      "path": "chunks/10/502/324.37628be514a1127a.json"
+      "path": "chunks/10/502/324.37628be514a1127a.json",
+      "byteLength": 37797
     },
     "10/502/325": {
       "bounds": {
@@ -1399,7 +1538,8 @@
         "west": -3.515625
       },
       "count": 70,
-      "path": "chunks/10/502/325.0d32c45455a39f00.json"
+      "path": "chunks/10/502/325.0d32c45455a39f00.json",
+      "byteLength": 65728
     },
     "10/502/326": {
       "bounds": {
@@ -1409,7 +1549,8 @@
         "west": -3.515625
       },
       "count": 32,
-      "path": "chunks/10/502/326.1dbb1ee4701a3684.json"
+      "path": "chunks/10/502/326.1dbb1ee4701a3684.json",
+      "byteLength": 39351
     },
     "10/502/327": {
       "bounds": {
@@ -1419,7 +1560,8 @@
         "west": -3.515625
       },
       "count": 7,
-      "path": "chunks/10/502/327.d494d7407ac2c57b.json"
+      "path": "chunks/10/502/327.d494d7407ac2c57b.json",
+      "byteLength": 5230
     },
     "10/502/328": {
       "bounds": {
@@ -1429,7 +1571,8 @@
         "west": -3.515625
       },
       "count": 73,
-      "path": "chunks/10/502/328.079fbd39f41d70c6.json"
+      "path": "chunks/10/502/328.079fbd39f41d70c6.json",
+      "byteLength": 45758
     },
     "10/502/331": {
       "bounds": {
@@ -1439,7 +1582,8 @@
         "west": -3.515625
       },
       "count": 69,
-      "path": "chunks/10/502/331.29db785bf3222e41.json"
+      "path": "chunks/10/502/331.29db785bf3222e41.json",
+      "byteLength": 59866
     },
     "10/502/332": {
       "bounds": {
@@ -1449,7 +1593,8 @@
         "west": -3.515625
       },
       "count": 89,
-      "path": "chunks/10/502/332.152101647e427b84.json"
+      "path": "chunks/10/502/332.152101647e427b84.json",
+      "byteLength": 73138
     },
     "10/502/333": {
       "bounds": {
@@ -1459,7 +1604,8 @@
         "west": -3.515625
       },
       "count": 7,
-      "path": "chunks/10/502/333.cfee84b188da5644.json"
+      "path": "chunks/10/502/333.cfee84b188da5644.json",
+      "byteLength": 4271
     },
     "10/502/335": {
       "bounds": {
@@ -1469,7 +1615,8 @@
         "west": -3.515625
       },
       "count": 66,
-      "path": "chunks/10/502/335.ac801d908a95b584.json"
+      "path": "chunks/10/502/335.ac801d908a95b584.json",
+      "byteLength": 55959
     },
     "10/502/336": {
       "bounds": {
@@ -1479,7 +1626,8 @@
         "west": -3.515625
       },
       "count": 23,
-      "path": "chunks/10/502/336.5415051ea7c1a6a1.json"
+      "path": "chunks/10/502/336.5415051ea7c1a6a1.json",
+      "byteLength": 32122
     },
     "10/502/337": {
       "bounds": {
@@ -1489,7 +1637,8 @@
         "west": -3.515625
       },
       "count": 57,
-      "path": "chunks/10/502/337.5c36d69432a28b63.json"
+      "path": "chunks/10/502/337.5c36d69432a28b63.json",
+      "byteLength": 61801
     },
     "10/502/338": {
       "bounds": {
@@ -1499,7 +1648,8 @@
         "west": -3.515625
       },
       "count": 66,
-      "path": "chunks/10/502/338.4f7264e8035f6175.json"
+      "path": "chunks/10/502/338.4f7264e8035f6175.json",
+      "byteLength": 58622
     },
     "10/502/339": {
       "bounds": {
@@ -1509,7 +1659,8 @@
         "west": -3.515625
       },
       "count": 549,
-      "path": "chunks/10/502/339.7989405e3da443bd.json"
+      "path": "chunks/10/502/339.7989405e3da443bd.json",
+      "byteLength": 390633
     },
     "10/502/340": {
       "bounds": {
@@ -1519,7 +1670,8 @@
         "west": -3.515625
       },
       "count": 436,
-      "path": "chunks/10/502/340.2b38fa0745fee647.json"
+      "path": "chunks/10/502/340.2b38fa0745fee647.json",
+      "byteLength": 297598
     },
     "10/502/341": {
       "bounds": {
@@ -1529,7 +1681,8 @@
         "west": -3.515625
       },
       "count": 25,
-      "path": "chunks/10/502/341.7c30015e583d7541.json"
+      "path": "chunks/10/502/341.7c30015e583d7541.json",
+      "byteLength": 20459
     },
     "10/502/342": {
       "bounds": {
@@ -1539,7 +1692,8 @@
         "west": -3.515625
       },
       "count": 26,
-      "path": "chunks/10/502/342.5c37b624f30250bc.json"
+      "path": "chunks/10/502/342.5c37b624f30250bc.json",
+      "byteLength": 33422
     },
     "10/502/343": {
       "bounds": {
@@ -1549,7 +1703,8 @@
         "west": -3.515625
       },
       "count": 74,
-      "path": "chunks/10/502/343.a4fad46af1f7f8fe.json"
+      "path": "chunks/10/502/343.a4fad46af1f7f8fe.json",
+      "byteLength": 53550
     },
     "10/502/344": {
       "bounds": {
@@ -1559,7 +1714,8 @@
         "west": -3.515625
       },
       "count": 170,
-      "path": "chunks/10/502/344.d2b4cdf355ee6e4b.json"
+      "path": "chunks/10/502/344.d2b4cdf355ee6e4b.json",
+      "byteLength": 127022
     },
     "10/503/309": {
       "bounds": {
@@ -1569,7 +1725,8 @@
         "west": -3.1640625
       },
       "count": 4,
-      "path": "chunks/10/503/309.fbdfbf545cb770f2.json"
+      "path": "chunks/10/503/309.fbdfbf545cb770f2.json",
+      "byteLength": 2469
     },
     "10/503/310": {
       "bounds": {
@@ -1579,7 +1736,8 @@
         "west": -3.1640625
       },
       "count": 85,
-      "path": "chunks/10/503/310.4e1374c0acb01279.json"
+      "path": "chunks/10/503/310.4e1374c0acb01279.json",
+      "byteLength": 50882
     },
     "10/503/313": {
       "bounds": {
@@ -1589,7 +1747,8 @@
         "west": -3.1640625
       },
       "count": 16,
-      "path": "chunks/10/503/313.dd1d2dafd907d0bf.json"
+      "path": "chunks/10/503/313.dd1d2dafd907d0bf.json",
+      "byteLength": 13425
     },
     "10/503/316": {
       "bounds": {
@@ -1599,7 +1758,8 @@
         "west": -3.1640625
       },
       "count": 106,
-      "path": "chunks/10/503/316.2595af0155683740.json"
+      "path": "chunks/10/503/316.2595af0155683740.json",
+      "byteLength": 90033
     },
     "10/503/317": {
       "bounds": {
@@ -1609,7 +1769,8 @@
         "west": -3.1640625
       },
       "count": 59,
-      "path": "chunks/10/503/317.1dbb95b85c107a75.json"
+      "path": "chunks/10/503/317.1dbb95b85c107a75.json",
+      "byteLength": 49153
     },
     "10/503/318": {
       "bounds": {
@@ -1619,7 +1780,8 @@
         "west": -3.1640625
       },
       "count": 36,
-      "path": "chunks/10/503/318.64b992e4399619a5.json"
+      "path": "chunks/10/503/318.64b992e4399619a5.json",
+      "byteLength": 20782
     },
     "10/503/319": {
       "bounds": {
@@ -1629,7 +1791,8 @@
         "west": -3.1640625
       },
       "count": 115,
-      "path": "chunks/10/503/319.961943646c950f34.json"
+      "path": "chunks/10/503/319.961943646c950f34.json",
+      "byteLength": 89252
     },
     "10/503/320": {
       "bounds": {
@@ -1639,7 +1802,8 @@
         "west": -3.1640625
       },
       "count": 28,
-      "path": "chunks/10/503/320.20e1fec3627d8bb9.json"
+      "path": "chunks/10/503/320.20e1fec3627d8bb9.json",
+      "byteLength": 26924
     },
     "10/503/323": {
       "bounds": {
@@ -1649,7 +1813,8 @@
         "west": -3.1640625
       },
       "count": 28,
-      "path": "chunks/10/503/323.db646b7666eabdee.json"
+      "path": "chunks/10/503/323.db646b7666eabdee.json",
+      "byteLength": 23800
     },
     "10/503/324": {
       "bounds": {
@@ -1659,7 +1824,8 @@
         "west": -3.1640625
       },
       "count": 121,
-      "path": "chunks/10/503/324.e9068927a2d32f27.json"
+      "path": "chunks/10/503/324.e9068927a2d32f27.json",
+      "byteLength": 96137
     },
     "10/503/325": {
       "bounds": {
@@ -1669,7 +1835,8 @@
         "west": -3.1640625
       },
       "count": 76,
-      "path": "chunks/10/503/325.d47be0ab8810b9bc.json"
+      "path": "chunks/10/503/325.d47be0ab8810b9bc.json",
+      "byteLength": 65550
     },
     "10/503/326": {
       "bounds": {
@@ -1679,7 +1846,8 @@
         "west": -3.1640625
       },
       "count": 113,
-      "path": "chunks/10/503/326.b41e4b281adae68b.json"
+      "path": "chunks/10/503/326.b41e4b281adae68b.json",
+      "byteLength": 111784
     },
     "10/503/327": {
       "bounds": {
@@ -1689,7 +1857,8 @@
         "west": -3.1640625
       },
       "count": 117,
-      "path": "chunks/10/503/327.06a49223c622ba7d.json"
+      "path": "chunks/10/503/327.06a49223c622ba7d.json",
+      "byteLength": 88836
     },
     "10/503/328": {
       "bounds": {
@@ -1699,7 +1868,8 @@
         "west": -3.1640625
       },
       "count": 76,
-      "path": "chunks/10/503/328.309069cf7471d789.json"
+      "path": "chunks/10/503/328.309069cf7471d789.json",
+      "byteLength": 59531
     },
     "10/503/329": {
       "bounds": {
@@ -1709,7 +1879,8 @@
         "west": -3.1640625
       },
       "count": 85,
-      "path": "chunks/10/503/329.3d76791749ecfe5f.json"
+      "path": "chunks/10/503/329.3d76791749ecfe5f.json",
+      "byteLength": 77866
     },
     "10/503/330": {
       "bounds": {
@@ -1719,7 +1890,8 @@
         "west": -3.1640625
       },
       "count": 127,
-      "path": "chunks/10/503/330.870e118552037d96.json"
+      "path": "chunks/10/503/330.870e118552037d96.json",
+      "byteLength": 103286
     },
     "10/503/331": {
       "bounds": {
@@ -1729,7 +1901,8 @@
         "west": -3.1640625
       },
       "count": 461,
-      "path": "chunks/10/503/331.ba2af73655a954f3.json"
+      "path": "chunks/10/503/331.ba2af73655a954f3.json",
+      "byteLength": 296521
     },
     "10/503/332": {
       "bounds": {
@@ -1739,7 +1912,8 @@
         "west": -3.1640625
       },
       "count": 321,
-      "path": "chunks/10/503/332.daf0f486e9a2b3f4.json"
+      "path": "chunks/10/503/332.daf0f486e9a2b3f4.json",
+      "byteLength": 220375
     },
     "10/503/333": {
       "bounds": {
@@ -1749,7 +1923,8 @@
         "west": -3.1640625
       },
       "count": 30,
-      "path": "chunks/10/503/333.d23571bb07220bc3.json"
+      "path": "chunks/10/503/333.d23571bb07220bc3.json",
+      "byteLength": 28967
     },
     "10/503/334": {
       "bounds": {
@@ -1759,7 +1934,8 @@
         "west": -3.1640625
       },
       "count": 26,
-      "path": "chunks/10/503/334.f017ca0ee2ca6d7c.json"
+      "path": "chunks/10/503/334.f017ca0ee2ca6d7c.json",
+      "byteLength": 31467
     },
     "10/503/335": {
       "bounds": {
@@ -1769,7 +1945,8 @@
         "west": -3.1640625
       },
       "count": 32,
-      "path": "chunks/10/503/335.694568684ea6cf08.json"
+      "path": "chunks/10/503/335.694568684ea6cf08.json",
+      "byteLength": 41646
     },
     "10/503/336": {
       "bounds": {
@@ -1779,7 +1956,8 @@
         "west": -3.1640625
       },
       "count": 19,
-      "path": "chunks/10/503/336.53441aed6ec9ba7c.json"
+      "path": "chunks/10/503/336.53441aed6ec9ba7c.json",
+      "byteLength": 21039
     },
     "10/503/337": {
       "bounds": {
@@ -1789,7 +1967,8 @@
         "west": -3.1640625
       },
       "count": 18,
-      "path": "chunks/10/503/337.bed83691f4013447.json"
+      "path": "chunks/10/503/337.bed83691f4013447.json",
+      "byteLength": 20757
     },
     "10/503/338": {
       "bounds": {
@@ -1799,7 +1978,8 @@
         "west": -3.1640625
       },
       "count": 36,
-      "path": "chunks/10/503/338.88c513121c75b4fb.json"
+      "path": "chunks/10/503/338.88c513121c75b4fb.json",
+      "byteLength": 45292
     },
     "10/503/339": {
       "bounds": {
@@ -1809,7 +1989,8 @@
         "west": -3.1640625
       },
       "count": 354,
-      "path": "chunks/10/503/339.68744c1d3785760e.json"
+      "path": "chunks/10/503/339.68744c1d3785760e.json",
+      "byteLength": 266614
     },
     "10/503/340": {
       "bounds": {
@@ -1819,7 +2000,8 @@
         "west": -3.1640625
       },
       "count": 256,
-      "path": "chunks/10/503/340.52467c21ac321e51.json"
+      "path": "chunks/10/503/340.52467c21ac321e51.json",
+      "byteLength": 186287
     },
     "10/503/341": {
       "bounds": {
@@ -1829,7 +2011,8 @@
         "west": -3.1640625
       },
       "count": 136,
-      "path": "chunks/10/503/341.6def07cbfee05006.json"
+      "path": "chunks/10/503/341.6def07cbfee05006.json",
+      "byteLength": 101087
     },
     "10/503/342": {
       "bounds": {
@@ -1839,7 +2022,8 @@
         "west": -3.1640625
       },
       "count": 118,
-      "path": "chunks/10/503/342.ff69cb55e5c45bca.json"
+      "path": "chunks/10/503/342.ff69cb55e5c45bca.json",
+      "byteLength": 98719
     },
     "10/503/343": {
       "bounds": {
@@ -1849,7 +2033,8 @@
         "west": -3.1640625
       },
       "count": 91,
-      "path": "chunks/10/503/343.b606cfd0ff60ac36.json"
+      "path": "chunks/10/503/343.b606cfd0ff60ac36.json",
+      "byteLength": 73569
     },
     "10/503/344": {
       "bounds": {
@@ -1859,7 +2044,8 @@
         "west": -3.1640625
       },
       "count": 39,
-      "path": "chunks/10/503/344.15fd472c474be6f5.json"
+      "path": "chunks/10/503/344.15fd472c474be6f5.json",
+      "byteLength": 26195
     },
     "10/504/310": {
       "bounds": {
@@ -1869,7 +2055,8 @@
         "west": -2.8125
       },
       "count": 59,
-      "path": "chunks/10/504/310.a5837542f0ea0770.json"
+      "path": "chunks/10/504/310.a5837542f0ea0770.json",
+      "byteLength": 41559
     },
     "10/504/313": {
       "bounds": {
@@ -1879,7 +2066,8 @@
         "west": -2.8125
       },
       "count": 44,
-      "path": "chunks/10/504/313.63724a5b368184bd.json"
+      "path": "chunks/10/504/313.63724a5b368184bd.json",
+      "byteLength": 40517
     },
     "10/504/315": {
       "bounds": {
@@ -1889,7 +2077,8 @@
         "west": -2.8125
       },
       "count": 23,
-      "path": "chunks/10/504/315.25f3c8a471967d3d.json"
+      "path": "chunks/10/504/315.25f3c8a471967d3d.json",
+      "byteLength": 18473
     },
     "10/504/316": {
       "bounds": {
@@ -1899,7 +2088,8 @@
         "west": -2.8125
       },
       "count": 36,
-      "path": "chunks/10/504/316.b1489293b95f472b.json"
+      "path": "chunks/10/504/316.b1489293b95f472b.json",
+      "byteLength": 43263
     },
     "10/504/317": {
       "bounds": {
@@ -1909,7 +2099,8 @@
         "west": -2.8125
       },
       "count": 10,
-      "path": "chunks/10/504/317.4516d93753141d5b.json"
+      "path": "chunks/10/504/317.4516d93753141d5b.json",
+      "byteLength": 6337
     },
     "10/504/318": {
       "bounds": {
@@ -1919,7 +2110,8 @@
         "west": -2.8125
       },
       "count": 25,
-      "path": "chunks/10/504/318.ba9c0aa9a2f4b61e.json"
+      "path": "chunks/10/504/318.ba9c0aa9a2f4b61e.json",
+      "byteLength": 20337
     },
     "10/504/319": {
       "bounds": {
@@ -1929,7 +2121,8 @@
         "west": -2.8125
       },
       "count": 24,
-      "path": "chunks/10/504/319.9f0b2f778d6b59b5.json"
+      "path": "chunks/10/504/319.9f0b2f778d6b59b5.json",
+      "byteLength": 18176
     },
     "10/504/320": {
       "bounds": {
@@ -1939,7 +2132,8 @@
         "west": -2.8125
       },
       "count": 25,
-      "path": "chunks/10/504/320.99abf7b1050d34dc.json"
+      "path": "chunks/10/504/320.99abf7b1050d34dc.json",
+      "byteLength": 18305
     },
     "10/504/321": {
       "bounds": {
@@ -1949,7 +2143,8 @@
         "west": -2.8125
       },
       "count": 1,
-      "path": "chunks/10/504/321.4c9efcdb29d2e0a9.json"
+      "path": "chunks/10/504/321.4c9efcdb29d2e0a9.json",
+      "byteLength": 1135
     },
     "10/504/322": {
       "bounds": {
@@ -1959,7 +2154,8 @@
         "west": -2.8125
       },
       "count": 26,
-      "path": "chunks/10/504/322.c1df4c72b0b3853b.json"
+      "path": "chunks/10/504/322.c1df4c72b0b3853b.json",
+      "byteLength": 51065
     },
     "10/504/323": {
       "bounds": {
@@ -1969,7 +2165,8 @@
         "west": -2.8125
       },
       "count": 55,
-      "path": "chunks/10/504/323.bb1146b40d31be8e.json"
+      "path": "chunks/10/504/323.bb1146b40d31be8e.json",
+      "byteLength": 61591
     },
     "10/504/324": {
       "bounds": {
@@ -1979,7 +2176,8 @@
         "west": -2.8125
       },
       "count": 59,
-      "path": "chunks/10/504/324.c007b8fd83b9b66a.json"
+      "path": "chunks/10/504/324.c007b8fd83b9b66a.json",
+      "byteLength": 52604
     },
     "10/504/325": {
       "bounds": {
@@ -1989,7 +2187,8 @@
         "west": -2.8125
       },
       "count": 88,
-      "path": "chunks/10/504/325.c9cf0e8e89710a29.json"
+      "path": "chunks/10/504/325.c9cf0e8e89710a29.json",
+      "byteLength": 74107
     },
     "10/504/326": {
       "bounds": {
@@ -1999,7 +2198,8 @@
         "west": -2.8125
       },
       "count": 36,
-      "path": "chunks/10/504/326.9cdd85e5d7949ce6.json"
+      "path": "chunks/10/504/326.9cdd85e5d7949ce6.json",
+      "byteLength": 32076
     },
     "10/504/327": {
       "bounds": {
@@ -2009,7 +2209,8 @@
         "west": -2.8125
       },
       "count": 135,
-      "path": "chunks/10/504/327.4eec3f62ded8d142.json"
+      "path": "chunks/10/504/327.4eec3f62ded8d142.json",
+      "byteLength": 105416
     },
     "10/504/328": {
       "bounds": {
@@ -2019,7 +2220,8 @@
         "west": -2.8125
       },
       "count": 116,
-      "path": "chunks/10/504/328.c0e38c88e6b2b089.json"
+      "path": "chunks/10/504/328.c0e38c88e6b2b089.json",
+      "byteLength": 95007
     },
     "10/504/329": {
       "bounds": {
@@ -2029,7 +2231,8 @@
         "west": -2.8125
       },
       "count": 251,
-      "path": "chunks/10/504/329.e673d1c25906b9b7.json"
+      "path": "chunks/10/504/329.e673d1c25906b9b7.json",
+      "byteLength": 198585
     },
     "10/504/330": {
       "bounds": {
@@ -2039,7 +2242,8 @@
         "west": -2.8125
       },
       "count": 216,
-      "path": "chunks/10/504/330.22fad6a0206ed449.json"
+      "path": "chunks/10/504/330.22fad6a0206ed449.json",
+      "byteLength": 169919
     },
     "10/504/331": {
       "bounds": {
@@ -2049,7 +2253,8 @@
         "west": -2.8125
       },
       "count": 175,
-      "path": "chunks/10/504/331.8ee1d9ee95a06756.json"
+      "path": "chunks/10/504/331.8ee1d9ee95a06756.json",
+      "byteLength": 114916
     },
     "10/504/332": {
       "bounds": {
@@ -2059,7 +2264,8 @@
         "west": -2.8125
       },
       "count": 260,
-      "path": "chunks/10/504/332.129804b5bf377b72.json"
+      "path": "chunks/10/504/332.129804b5bf377b72.json",
+      "byteLength": 186330
     },
     "10/504/333": {
       "bounds": {
@@ -2069,7 +2275,8 @@
         "west": -2.8125
       },
       "count": 120,
-      "path": "chunks/10/504/333.57a5df119786dafe.json"
+      "path": "chunks/10/504/333.57a5df119786dafe.json",
+      "byteLength": 98832
     },
     "10/504/334": {
       "bounds": {
@@ -2079,7 +2286,8 @@
         "west": -2.8125
       },
       "count": 128,
-      "path": "chunks/10/504/334.24b72197126c9cbb.json"
+      "path": "chunks/10/504/334.24b72197126c9cbb.json",
+      "byteLength": 99008
     },
     "10/504/335": {
       "bounds": {
@@ -2089,7 +2297,8 @@
         "west": -2.8125
       },
       "count": 43,
-      "path": "chunks/10/504/335.9892dadf27e6c8a3.json"
+      "path": "chunks/10/504/335.9892dadf27e6c8a3.json",
+      "byteLength": 29342
     },
     "10/504/336": {
       "bounds": {
@@ -2099,7 +2308,8 @@
         "west": -2.8125
       },
       "count": 14,
-      "path": "chunks/10/504/336.fa1ec3ae3d843a19.json"
+      "path": "chunks/10/504/336.fa1ec3ae3d843a19.json",
+      "byteLength": 11126
     },
     "10/504/337": {
       "bounds": {
@@ -2109,7 +2319,8 @@
         "west": -2.8125
       },
       "count": 17,
-      "path": "chunks/10/504/337.b270f8b284e9185e.json"
+      "path": "chunks/10/504/337.b270f8b284e9185e.json",
+      "byteLength": 10832
     },
     "10/504/338": {
       "bounds": {
@@ -2119,7 +2330,8 @@
         "west": -2.8125
       },
       "count": 46,
-      "path": "chunks/10/504/338.443ff67712c699da.json"
+      "path": "chunks/10/504/338.443ff67712c699da.json",
+      "byteLength": 36003
     },
     "10/504/339": {
       "bounds": {
@@ -2129,7 +2341,8 @@
         "west": -2.8125
       },
       "count": 105,
-      "path": "chunks/10/504/339.bbafa0f405597674.json"
+      "path": "chunks/10/504/339.bbafa0f405597674.json",
+      "byteLength": 90781
     },
     "10/504/340": {
       "bounds": {
@@ -2139,7 +2352,8 @@
         "west": -2.8125
       },
       "count": 515,
-      "path": "chunks/10/504/340.766a3bb57018d9f1.json"
+      "path": "chunks/10/504/340.766a3bb57018d9f1.json",
+      "byteLength": 369718
     },
     "10/504/341": {
       "bounds": {
@@ -2149,7 +2363,8 @@
         "west": -2.8125
       },
       "count": 79,
-      "path": "chunks/10/504/341.f527fa8828c95ef8.json"
+      "path": "chunks/10/504/341.f527fa8828c95ef8.json",
+      "byteLength": 55322
     },
     "10/504/342": {
       "bounds": {
@@ -2159,7 +2374,8 @@
         "west": -2.8125
       },
       "count": 51,
-      "path": "chunks/10/504/342.a4163702e0498fb5.json"
+      "path": "chunks/10/504/342.a4163702e0498fb5.json",
+      "byteLength": 47913
     },
     "10/504/343": {
       "bounds": {
@@ -2169,7 +2385,8 @@
         "west": -2.8125
       },
       "count": 106,
-      "path": "chunks/10/504/343.647dd2b31cbf0ab2.json"
+      "path": "chunks/10/504/343.647dd2b31cbf0ab2.json",
+      "byteLength": 74297
     },
     "10/504/344": {
       "bounds": {
@@ -2179,7 +2396,8 @@
         "west": -2.8125
       },
       "count": 83,
-      "path": "chunks/10/504/344.4f006556d0b8fe9a.json"
+      "path": "chunks/10/504/344.4f006556d0b8fe9a.json",
+      "byteLength": 68812
     },
     "10/505/310": {
       "bounds": {
@@ -2189,7 +2407,8 @@
         "west": -2.4609375
       },
       "count": 15,
-      "path": "chunks/10/505/310.9cb4d711c35c37a1.json"
+      "path": "chunks/10/505/310.9cb4d711c35c37a1.json",
+      "byteLength": 14244
     },
     "10/505/311": {
       "bounds": {
@@ -2199,7 +2418,8 @@
         "west": -2.4609375
       },
       "count": 18,
-      "path": "chunks/10/505/311.34c5ddbea1f41f37.json"
+      "path": "chunks/10/505/311.34c5ddbea1f41f37.json",
+      "byteLength": 15607
     },
     "10/505/312": {
       "bounds": {
@@ -2209,7 +2429,8 @@
         "west": -2.4609375
       },
       "count": 66,
-      "path": "chunks/10/505/312.3fcd8654e2b7c858.json"
+      "path": "chunks/10/505/312.3fcd8654e2b7c858.json",
+      "byteLength": 45632
     },
     "10/505/313": {
       "bounds": {
@@ -2219,7 +2440,8 @@
         "west": -2.4609375
       },
       "count": 94,
-      "path": "chunks/10/505/313.ec30d1707a6ce648.json"
+      "path": "chunks/10/505/313.ec30d1707a6ce648.json",
+      "byteLength": 68246
     },
     "10/505/314": {
       "bounds": {
@@ -2229,7 +2451,8 @@
         "west": -2.4609375
       },
       "count": 35,
-      "path": "chunks/10/505/314.ef9852d24b889b56.json"
+      "path": "chunks/10/505/314.ef9852d24b889b56.json",
+      "byteLength": 26822
     },
     "10/505/315": {
       "bounds": {
@@ -2239,7 +2462,8 @@
         "west": -2.4609375
       },
       "count": 27,
-      "path": "chunks/10/505/315.fb74bcba2cd3e281.json"
+      "path": "chunks/10/505/315.fb74bcba2cd3e281.json",
+      "byteLength": 18521
     },
     "10/505/318": {
       "bounds": {
@@ -2249,7 +2473,8 @@
         "west": -2.4609375
       },
       "count": 1,
-      "path": "chunks/10/505/318.9340554aa1404a0b.json"
+      "path": "chunks/10/505/318.9340554aa1404a0b.json",
+      "byteLength": 1415
     },
     "10/505/319": {
       "bounds": {
@@ -2259,7 +2484,8 @@
         "west": -2.4609375
       },
       "count": 4,
-      "path": "chunks/10/505/319.9d9324bce5982629.json"
+      "path": "chunks/10/505/319.9d9324bce5982629.json",
+      "byteLength": 3164
     },
     "10/505/320": {
       "bounds": {
@@ -2269,7 +2495,8 @@
         "west": -2.4609375
       },
       "count": 19,
-      "path": "chunks/10/505/320.4ba74937860cee39.json"
+      "path": "chunks/10/505/320.4ba74937860cee39.json",
+      "byteLength": 17766
     },
     "10/505/322": {
       "bounds": {
@@ -2279,7 +2506,8 @@
         "west": -2.4609375
       },
       "count": 10,
-      "path": "chunks/10/505/322.5c4821a538fd4d31.json"
+      "path": "chunks/10/505/322.5c4821a538fd4d31.json",
+      "byteLength": 11308
     },
     "10/505/323": {
       "bounds": {
@@ -2289,7 +2517,8 @@
         "west": -2.4609375
       },
       "count": 55,
-      "path": "chunks/10/505/323.fc8ed265736c8145.json"
+      "path": "chunks/10/505/323.fc8ed265736c8145.json",
+      "byteLength": 55417
     },
     "10/505/324": {
       "bounds": {
@@ -2299,7 +2528,8 @@
         "west": -2.4609375
       },
       "count": 33,
-      "path": "chunks/10/505/324.f80d8c1029323722.json"
+      "path": "chunks/10/505/324.f80d8c1029323722.json",
+      "byteLength": 35508
     },
     "10/505/325": {
       "bounds": {
@@ -2309,7 +2539,8 @@
         "west": -2.4609375
       },
       "count": 6,
-      "path": "chunks/10/505/325.ef11bbacc4880f4f.json"
+      "path": "chunks/10/505/325.ef11bbacc4880f4f.json",
+      "byteLength": 9636
     },
     "10/505/326": {
       "bounds": {
@@ -2319,7 +2550,8 @@
         "west": -2.4609375
       },
       "count": 16,
-      "path": "chunks/10/505/326.ce49f164174a9d78.json"
+      "path": "chunks/10/505/326.ce49f164174a9d78.json",
+      "byteLength": 25605
     },
     "10/505/327": {
       "bounds": {
@@ -2329,7 +2561,8 @@
         "west": -2.4609375
       },
       "count": 6,
-      "path": "chunks/10/505/327.a9c2506c008d3eac.json"
+      "path": "chunks/10/505/327.a9c2506c008d3eac.json",
+      "byteLength": 8609
     },
     "10/505/328": {
       "bounds": {
@@ -2339,7 +2572,8 @@
         "west": -2.4609375
       },
       "count": 43,
-      "path": "chunks/10/505/328.70a1ec2ce883248f.json"
+      "path": "chunks/10/505/328.70a1ec2ce883248f.json",
+      "byteLength": 40683
     },
     "10/505/329": {
       "bounds": {
@@ -2349,7 +2583,8 @@
         "west": -2.4609375
       },
       "count": 137,
-      "path": "chunks/10/505/329.e6a506a0b1bf0687.json"
+      "path": "chunks/10/505/329.e6a506a0b1bf0687.json",
+      "byteLength": 149514
     },
     "10/505/330": {
       "bounds": {
@@ -2359,7 +2594,8 @@
         "west": -2.4609375
       },
       "count": 310,
-      "path": "chunks/10/505/330.dd7ec1eb141abdc7.json"
+      "path": "chunks/10/505/330.dd7ec1eb141abdc7.json",
+      "byteLength": 188829
     },
     "10/505/331": {
       "bounds": {
@@ -2369,7 +2605,8 @@
         "west": -2.4609375
       },
       "count": 754,
-      "path": "chunks/10/505/331.f5611ae34f954ac1.json"
+      "path": "chunks/10/505/331.f5611ae34f954ac1.json",
+      "byteLength": 459043
     },
     "10/505/332": {
       "bounds": {
@@ -2379,7 +2616,8 @@
         "west": -2.4609375
       },
       "count": 169,
-      "path": "chunks/10/505/332.6348e949f610ec1a.json"
+      "path": "chunks/10/505/332.6348e949f610ec1a.json",
+      "byteLength": 120275
     },
     "10/505/333": {
       "bounds": {
@@ -2389,7 +2627,8 @@
         "west": -2.4609375
       },
       "count": 246,
-      "path": "chunks/10/505/333.3ad17d242674e801.json"
+      "path": "chunks/10/505/333.3ad17d242674e801.json",
+      "byteLength": 178193
     },
     "10/505/334": {
       "bounds": {
@@ -2399,7 +2638,8 @@
         "west": -2.4609375
       },
       "count": 122,
-      "path": "chunks/10/505/334.42233acbc54b134e.json"
+      "path": "chunks/10/505/334.42233acbc54b134e.json",
+      "byteLength": 85836
     },
     "10/505/335": {
       "bounds": {
@@ -2409,7 +2649,8 @@
         "west": -2.4609375
       },
       "count": 148,
-      "path": "chunks/10/505/335.cc3bc72877319388.json"
+      "path": "chunks/10/505/335.cc3bc72877319388.json",
+      "byteLength": 107312
     },
     "10/505/336": {
       "bounds": {
@@ -2419,7 +2660,8 @@
         "west": -2.4609375
       },
       "count": 178,
-      "path": "chunks/10/505/336.8eee3bdcec0fe8bb.json"
+      "path": "chunks/10/505/336.8eee3bdcec0fe8bb.json",
+      "byteLength": 136153
     },
     "10/505/337": {
       "bounds": {
@@ -2429,7 +2671,8 @@
         "west": -2.4609375
       },
       "count": 257,
-      "path": "chunks/10/505/337.27632d41d0ba5bd3.json"
+      "path": "chunks/10/505/337.27632d41d0ba5bd3.json",
+      "byteLength": 174162
     },
     "10/505/338": {
       "bounds": {
@@ -2439,7 +2682,8 @@
         "west": -2.4609375
       },
       "count": 152,
-      "path": "chunks/10/505/338.4d01eccfad8d5f5d.json"
+      "path": "chunks/10/505/338.4d01eccfad8d5f5d.json",
+      "byteLength": 97198
     },
     "10/505/339": {
       "bounds": {
@@ -2449,7 +2693,8 @@
         "west": -2.4609375
       },
       "count": 105,
-      "path": "chunks/10/505/339.2e8e98faac8db75e.json"
+      "path": "chunks/10/505/339.2e8e98faac8db75e.json",
+      "byteLength": 75725
     },
     "10/505/340": {
       "bounds": {
@@ -2459,7 +2704,8 @@
         "west": -2.4609375
       },
       "count": 40,
-      "path": "chunks/10/505/340.cf2fd38598644c4f.json"
+      "path": "chunks/10/505/340.cf2fd38598644c4f.json",
+      "byteLength": 27659
     },
     "10/505/341": {
       "bounds": {
@@ -2469,7 +2715,8 @@
         "west": -2.4609375
       },
       "count": 275,
-      "path": "chunks/10/505/341.86a0f7fb05638f0e.json"
+      "path": "chunks/10/505/341.86a0f7fb05638f0e.json",
+      "byteLength": 182648
     },
     "10/505/342": {
       "bounds": {
@@ -2479,7 +2726,8 @@
         "west": -2.4609375
       },
       "count": 62,
-      "path": "chunks/10/505/342.f9477abbf0785abf.json"
+      "path": "chunks/10/505/342.f9477abbf0785abf.json",
+      "byteLength": 45526
     },
     "10/505/343": {
       "bounds": {
@@ -2489,7 +2737,8 @@
         "west": -2.4609375
       },
       "count": 50,
-      "path": "chunks/10/505/343.5bccfbdc6b06523d.json"
+      "path": "chunks/10/505/343.5bccfbdc6b06523d.json",
+      "byteLength": 45537
     },
     "10/505/344": {
       "bounds": {
@@ -2499,7 +2748,8 @@
         "west": -2.4609375
       },
       "count": 91,
-      "path": "chunks/10/505/344.1a5e31ea2573b2f6.json"
+      "path": "chunks/10/505/344.1a5e31ea2573b2f6.json",
+      "byteLength": 68263
     },
     "10/506/312": {
       "bounds": {
@@ -2509,7 +2759,8 @@
         "west": -2.109375
       },
       "count": 45,
-      "path": "chunks/10/506/312.f32e3327ac4b9d4b.json"
+      "path": "chunks/10/506/312.f32e3327ac4b9d4b.json",
+      "byteLength": 26649
     },
     "10/506/313": {
       "bounds": {
@@ -2519,7 +2770,8 @@
         "west": -2.109375
       },
       "count": 26,
-      "path": "chunks/10/506/313.5639746e76d833b2.json"
+      "path": "chunks/10/506/313.5639746e76d833b2.json",
+      "byteLength": 20502
     },
     "10/506/320": {
       "bounds": {
@@ -2529,7 +2781,8 @@
         "west": -2.109375
       },
       "count": 56,
-      "path": "chunks/10/506/320.b437e90d0a667fc0.json"
+      "path": "chunks/10/506/320.b437e90d0a667fc0.json",
+      "byteLength": 45367
     },
     "10/506/321": {
       "bounds": {
@@ -2539,7 +2792,8 @@
         "west": -2.109375
       },
       "count": 19,
-      "path": "chunks/10/506/321.786e149171185aa2.json"
+      "path": "chunks/10/506/321.786e149171185aa2.json",
+      "byteLength": 19048
     },
     "10/506/322": {
       "bounds": {
@@ -2549,7 +2803,8 @@
         "west": -2.109375
       },
       "count": 7,
-      "path": "chunks/10/506/322.e5ef0f0e4db89a2e.json"
+      "path": "chunks/10/506/322.e5ef0f0e4db89a2e.json",
+      "byteLength": 10025
     },
     "10/506/323": {
       "bounds": {
@@ -2559,7 +2814,8 @@
         "west": -2.109375
       },
       "count": 30,
-      "path": "chunks/10/506/323.84ce7554702b5dc9.json"
+      "path": "chunks/10/506/323.84ce7554702b5dc9.json",
+      "byteLength": 27884
     },
     "10/506/324": {
       "bounds": {
@@ -2569,7 +2825,8 @@
         "west": -2.109375
       },
       "count": 110,
-      "path": "chunks/10/506/324.935e4e758c8170ab.json"
+      "path": "chunks/10/506/324.935e4e758c8170ab.json",
+      "byteLength": 88597
     },
     "10/506/325": {
       "bounds": {
@@ -2579,7 +2836,8 @@
         "west": -2.109375
       },
       "count": 10,
-      "path": "chunks/10/506/325.382784022bffe448.json"
+      "path": "chunks/10/506/325.382784022bffe448.json",
+      "byteLength": 14983
     },
     "10/506/326": {
       "bounds": {
@@ -2589,7 +2847,8 @@
         "west": -2.109375
       },
       "count": 42,
-      "path": "chunks/10/506/326.5f4e9c50b8ac2b3c.json"
+      "path": "chunks/10/506/326.5f4e9c50b8ac2b3c.json",
+      "byteLength": 42438
     },
     "10/506/327": {
       "bounds": {
@@ -2599,7 +2858,8 @@
         "west": -2.109375
       },
       "count": 2,
-      "path": "chunks/10/506/327.421833a84f6f1490.json"
+      "path": "chunks/10/506/327.421833a84f6f1490.json",
+      "byteLength": 4916
     },
     "10/506/328": {
       "bounds": {
@@ -2609,7 +2869,8 @@
         "west": -2.109375
       },
       "count": 24,
-      "path": "chunks/10/506/328.09370bc5bec224fa.json"
+      "path": "chunks/10/506/328.09370bc5bec224fa.json",
+      "byteLength": 20725
     },
     "10/506/329": {
       "bounds": {
@@ -2619,7 +2880,8 @@
         "west": -2.109375
       },
       "count": 133,
-      "path": "chunks/10/506/329.b4c3d9bb0418eb98.json"
+      "path": "chunks/10/506/329.b4c3d9bb0418eb98.json",
+      "byteLength": 96480
     },
     "10/506/330": {
       "bounds": {
@@ -2629,7 +2891,8 @@
         "west": -2.109375
       },
       "count": 262,
-      "path": "chunks/10/506/330.92335634ae72957a.json"
+      "path": "chunks/10/506/330.92335634ae72957a.json",
+      "byteLength": 165947
     },
     "10/506/331": {
       "bounds": {
@@ -2639,7 +2902,8 @@
         "west": -2.109375
       },
       "count": 161,
-      "path": "chunks/10/506/331.fba8676c13bf41c9.json"
+      "path": "chunks/10/506/331.fba8676c13bf41c9.json",
+      "byteLength": 110957
     },
     "10/506/332": {
       "bounds": {
@@ -2649,7 +2913,8 @@
         "west": -2.109375
       },
       "count": 77,
-      "path": "chunks/10/506/332.f0b9fafe3470ac10.json"
+      "path": "chunks/10/506/332.f0b9fafe3470ac10.json",
+      "byteLength": 65894
     },
     "10/506/333": {
       "bounds": {
@@ -2659,7 +2924,8 @@
         "west": -2.109375
       },
       "count": 38,
-      "path": "chunks/10/506/333.1490b8a8b783a3d4.json"
+      "path": "chunks/10/506/333.1490b8a8b783a3d4.json",
+      "byteLength": 46008
     },
     "10/506/334": {
       "bounds": {
@@ -2669,7 +2935,8 @@
         "west": -2.109375
       },
       "count": 31,
-      "path": "chunks/10/506/334.42cc51ffd7a14b85.json"
+      "path": "chunks/10/506/334.42cc51ffd7a14b85.json",
+      "byteLength": 23199
     },
     "10/506/335": {
       "bounds": {
@@ -2679,7 +2946,8 @@
         "west": -2.109375
       },
       "count": 384,
-      "path": "chunks/10/506/335.4d968f8829eda068.json"
+      "path": "chunks/10/506/335.4d968f8829eda068.json",
+      "byteLength": 277696
     },
     "10/506/336": {
       "bounds": {
@@ -2689,7 +2957,8 @@
         "west": -2.109375
       },
       "count": 241,
-      "path": "chunks/10/506/336.aca36177e871def4.json"
+      "path": "chunks/10/506/336.aca36177e871def4.json",
+      "byteLength": 172431
     },
     "10/506/337": {
       "bounds": {
@@ -2699,7 +2968,8 @@
         "west": -2.109375
       },
       "count": 66,
-      "path": "chunks/10/506/337.2f29921092a8a445.json"
+      "path": "chunks/10/506/337.2f29921092a8a445.json",
+      "byteLength": 56523
     },
     "10/506/338": {
       "bounds": {
@@ -2709,7 +2979,8 @@
         "west": -2.109375
       },
       "count": 34,
-      "path": "chunks/10/506/338.89fb8190c8049335.json"
+      "path": "chunks/10/506/338.89fb8190c8049335.json",
+      "byteLength": 27688
     },
     "10/506/339": {
       "bounds": {
@@ -2719,7 +2990,8 @@
         "west": -2.109375
       },
       "count": 62,
-      "path": "chunks/10/506/339.6a2cfeb2ea55f397.json"
+      "path": "chunks/10/506/339.6a2cfeb2ea55f397.json",
+      "byteLength": 47832
     },
     "10/506/340": {
       "bounds": {
@@ -2729,7 +3001,8 @@
         "west": -2.109375
       },
       "count": 131,
-      "path": "chunks/10/506/340.043098be72d4e542.json"
+      "path": "chunks/10/506/340.043098be72d4e542.json",
+      "byteLength": 93686
     },
     "10/506/341": {
       "bounds": {
@@ -2739,7 +3012,8 @@
         "west": -2.109375
       },
       "count": 57,
-      "path": "chunks/10/506/341.75962673f628d8bd.json"
+      "path": "chunks/10/506/341.75962673f628d8bd.json",
+      "byteLength": 46785
     },
     "10/506/342": {
       "bounds": {
@@ -2749,7 +3023,8 @@
         "west": -2.109375
       },
       "count": 95,
-      "path": "chunks/10/506/342.c05863fbaecd2cef.json"
+      "path": "chunks/10/506/342.c05863fbaecd2cef.json",
+      "byteLength": 68461
     },
     "10/506/343": {
       "bounds": {
@@ -2759,7 +3034,8 @@
         "west": -2.109375
       },
       "count": 137,
-      "path": "chunks/10/506/343.a447fe176f18c54d.json"
+      "path": "chunks/10/506/343.a447fe176f18c54d.json",
+      "byteLength": 87829
     },
     "10/506/344": {
       "bounds": {
@@ -2769,7 +3045,8 @@
         "west": -2.109375
       },
       "count": 200,
-      "path": "chunks/10/506/344.5b90147dd1dcbadd.json"
+      "path": "chunks/10/506/344.5b90147dd1dcbadd.json",
+      "byteLength": 126416
     },
     "10/507/320": {
       "bounds": {
@@ -2779,7 +3056,8 @@
         "west": -1.7578125
       },
       "count": 8,
-      "path": "chunks/10/507/320.6324577495799ae1.json"
+      "path": "chunks/10/507/320.6324577495799ae1.json",
+      "byteLength": 6334
     },
     "10/507/321": {
       "bounds": {
@@ -2789,7 +3067,8 @@
         "west": -1.7578125
       },
       "count": 46,
-      "path": "chunks/10/507/321.0fc74031c9cf8e49.json"
+      "path": "chunks/10/507/321.0fc74031c9cf8e49.json",
+      "byteLength": 39180
     },
     "10/507/322": {
       "bounds": {
@@ -2799,7 +3078,8 @@
         "west": -1.7578125
       },
       "count": 56,
-      "path": "chunks/10/507/322.c1f92d160cf6c9c2.json"
+      "path": "chunks/10/507/322.c1f92d160cf6c9c2.json",
+      "byteLength": 49097
     },
     "10/507/323": {
       "bounds": {
@@ -2809,7 +3089,8 @@
         "west": -1.7578125
       },
       "count": 234,
-      "path": "chunks/10/507/323.23743c95cc4adb56.json"
+      "path": "chunks/10/507/323.23743c95cc4adb56.json",
+      "byteLength": 184656
     },
     "10/507/324": {
       "bounds": {
@@ -2819,7 +3100,8 @@
         "west": -1.7578125
       },
       "count": 334,
-      "path": "chunks/10/507/324.6a8c70538375390b.json"
+      "path": "chunks/10/507/324.6a8c70538375390b.json",
+      "byteLength": 257291
     },
     "10/507/325": {
       "bounds": {
@@ -2829,7 +3111,8 @@
         "west": -1.7578125
       },
       "count": 72,
-      "path": "chunks/10/507/325.ab9ec1efc7328891.json"
+      "path": "chunks/10/507/325.ab9ec1efc7328891.json",
+      "byteLength": 53644
     },
     "10/507/326": {
       "bounds": {
@@ -2839,7 +3122,8 @@
         "west": -1.7578125
       },
       "count": 63,
-      "path": "chunks/10/507/326.30b8b15fc4f54dae.json"
+      "path": "chunks/10/507/326.30b8b15fc4f54dae.json",
+      "byteLength": 49997
     },
     "10/507/327": {
       "bounds": {
@@ -2849,7 +3133,8 @@
         "west": -1.7578125
       },
       "count": 56,
-      "path": "chunks/10/507/327.9808f23be895a8c7.json"
+      "path": "chunks/10/507/327.9808f23be895a8c7.json",
+      "byteLength": 41398
     },
     "10/507/328": {
       "bounds": {
@@ -2859,7 +3144,8 @@
         "west": -1.7578125
       },
       "count": 119,
-      "path": "chunks/10/507/328.9ce26205fbd99e0f.json"
+      "path": "chunks/10/507/328.9ce26205fbd99e0f.json",
+      "byteLength": 85908
     },
     "10/507/329": {
       "bounds": {
@@ -2869,7 +3155,8 @@
         "west": -1.7578125
       },
       "count": 208,
-      "path": "chunks/10/507/329.445146884b0454ba.json"
+      "path": "chunks/10/507/329.445146884b0454ba.json",
+      "byteLength": 154263
     },
     "10/507/330": {
       "bounds": {
@@ -2879,7 +3166,8 @@
         "west": -1.7578125
       },
       "count": 186,
-      "path": "chunks/10/507/330.31b8ac643e9ac598.json"
+      "path": "chunks/10/507/330.31b8ac643e9ac598.json",
+      "byteLength": 133669
     },
     "10/507/331": {
       "bounds": {
@@ -2889,7 +3177,8 @@
         "west": -1.7578125
       },
       "count": 275,
-      "path": "chunks/10/507/331.3e2edece1911a571.json"
+      "path": "chunks/10/507/331.3e2edece1911a571.json",
+      "byteLength": 192990
     },
     "10/507/332": {
       "bounds": {
@@ -2899,7 +3188,8 @@
         "west": -1.7578125
       },
       "count": 53,
-      "path": "chunks/10/507/332.00a8c5d3532152d7.json"
+      "path": "chunks/10/507/332.00a8c5d3532152d7.json",
+      "byteLength": 43377
     },
     "10/507/333": {
       "bounds": {
@@ -2909,7 +3199,8 @@
         "west": -1.7578125
       },
       "count": 129,
-      "path": "chunks/10/507/333.882ab6f019e2c3eb.json"
+      "path": "chunks/10/507/333.882ab6f019e2c3eb.json",
+      "byteLength": 107453
     },
     "10/507/334": {
       "bounds": {
@@ -2919,7 +3210,8 @@
         "west": -1.7578125
       },
       "count": 233,
-      "path": "chunks/10/507/334.8febcfa912cba086.json"
+      "path": "chunks/10/507/334.8febcfa912cba086.json",
+      "byteLength": 178526
     },
     "10/507/335": {
       "bounds": {
@@ -2929,7 +3221,8 @@
         "west": -1.7578125
       },
       "count": 101,
-      "path": "chunks/10/507/335.89a60e36897e581c.json"
+      "path": "chunks/10/507/335.89a60e36897e581c.json",
+      "byteLength": 78474
     },
     "10/507/336": {
       "bounds": {
@@ -2939,7 +3232,8 @@
         "west": -1.7578125
       },
       "count": 139,
-      "path": "chunks/10/507/336.7b5013cffb452018.json"
+      "path": "chunks/10/507/336.7b5013cffb452018.json",
+      "byteLength": 103614
     },
     "10/507/337": {
       "bounds": {
@@ -2949,7 +3243,8 @@
         "west": -1.7578125
       },
       "count": 110,
-      "path": "chunks/10/507/337.44205bcc97a22b56.json"
+      "path": "chunks/10/507/337.44205bcc97a22b56.json",
+      "byteLength": 92363
     },
     "10/507/338": {
       "bounds": {
@@ -2959,7 +3254,8 @@
         "west": -1.7578125
       },
       "count": 77,
-      "path": "chunks/10/507/338.d8a7e6c1f657f958.json"
+      "path": "chunks/10/507/338.d8a7e6c1f657f958.json",
+      "byteLength": 70187
     },
     "10/507/339": {
       "bounds": {
@@ -2969,7 +3265,8 @@
         "west": -1.7578125
       },
       "count": 33,
-      "path": "chunks/10/507/339.4c26f5438d8eb60f.json"
+      "path": "chunks/10/507/339.4c26f5438d8eb60f.json",
+      "byteLength": 24798
     },
     "10/507/340": {
       "bounds": {
@@ -2979,7 +3276,8 @@
         "west": -1.7578125
       },
       "count": 77,
-      "path": "chunks/10/507/340.3342a0f20dc82a16.json"
+      "path": "chunks/10/507/340.3342a0f20dc82a16.json",
+      "byteLength": 49534
     },
     "10/507/341": {
       "bounds": {
@@ -2989,7 +3287,8 @@
         "west": -1.7578125
       },
       "count": 53,
-      "path": "chunks/10/507/341.4acdd5d65d4d7937.json"
+      "path": "chunks/10/507/341.4acdd5d65d4d7937.json",
+      "byteLength": 50358
     },
     "10/507/342": {
       "bounds": {
@@ -2999,7 +3298,8 @@
         "west": -1.7578125
       },
       "count": 87,
-      "path": "chunks/10/507/342.d8f86317f945df96.json"
+      "path": "chunks/10/507/342.d8f86317f945df96.json",
+      "byteLength": 60765
     },
     "10/507/343": {
       "bounds": {
@@ -3009,7 +3309,8 @@
         "west": -1.7578125
       },
       "count": 129,
-      "path": "chunks/10/507/343.9e516e45baf5145b.json"
+      "path": "chunks/10/507/343.9e516e45baf5145b.json",
+      "byteLength": 98585
     },
     "10/507/344": {
       "bounds": {
@@ -3019,7 +3320,8 @@
         "west": -1.7578125
       },
       "count": 17,
-      "path": "chunks/10/507/344.de61270d5b243e3e.json"
+      "path": "chunks/10/507/344.de61270d5b243e3e.json",
+      "byteLength": 12061
     },
     "10/508/323": {
       "bounds": {
@@ -3029,7 +3331,8 @@
         "west": -1.40625
       },
       "count": 1,
-      "path": "chunks/10/508/323.614060bf58a49da5.json"
+      "path": "chunks/10/508/323.614060bf58a49da5.json",
+      "byteLength": 3991
     },
     "10/508/324": {
       "bounds": {
@@ -3039,7 +3342,8 @@
         "west": -1.40625
       },
       "count": 110,
-      "path": "chunks/10/508/324.a2f1a45edcc165e1.json"
+      "path": "chunks/10/508/324.a2f1a45edcc165e1.json",
+      "byteLength": 73178
     },
     "10/508/325": {
       "bounds": {
@@ -3049,7 +3353,8 @@
         "west": -1.40625
       },
       "count": 192,
-      "path": "chunks/10/508/325.0902fef2f95b020d.json"
+      "path": "chunks/10/508/325.0902fef2f95b020d.json",
+      "byteLength": 144988
     },
     "10/508/326": {
       "bounds": {
@@ -3059,7 +3364,8 @@
         "west": -1.40625
       },
       "count": 149,
-      "path": "chunks/10/508/326.bd914f56b45e268f.json"
+      "path": "chunks/10/508/326.bd914f56b45e268f.json",
+      "byteLength": 119864
     },
     "10/508/327": {
       "bounds": {
@@ -3069,7 +3375,8 @@
         "west": -1.40625
       },
       "count": 75,
-      "path": "chunks/10/508/327.32b4ff545c69feb7.json"
+      "path": "chunks/10/508/327.32b4ff545c69feb7.json",
+      "byteLength": 67914
     },
     "10/508/328": {
       "bounds": {
@@ -3079,7 +3386,8 @@
         "west": -1.40625
       },
       "count": 107,
-      "path": "chunks/10/508/328.badd859ae78ae0b7.json"
+      "path": "chunks/10/508/328.badd859ae78ae0b7.json",
+      "byteLength": 79772
     },
     "10/508/329": {
       "bounds": {
@@ -3089,7 +3397,8 @@
         "west": -1.40625
       },
       "count": 166,
-      "path": "chunks/10/508/329.31b43856ed335cbe.json"
+      "path": "chunks/10/508/329.31b43856ed335cbe.json",
+      "byteLength": 132081
     },
     "10/508/330": {
       "bounds": {
@@ -3099,7 +3408,8 @@
         "west": -1.40625
       },
       "count": 53,
-      "path": "chunks/10/508/330.78f52239e457cc26.json"
+      "path": "chunks/10/508/330.78f52239e457cc26.json",
+      "byteLength": 39130
     },
     "10/508/331": {
       "bounds": {
@@ -3109,7 +3419,8 @@
         "west": -1.40625
       },
       "count": 205,
-      "path": "chunks/10/508/331.b026d93a1ef8c08b.json"
+      "path": "chunks/10/508/331.b026d93a1ef8c08b.json",
+      "byteLength": 146172
     },
     "10/508/332": {
       "bounds": {
@@ -3119,7 +3430,8 @@
         "west": -1.40625
       },
       "count": 185,
-      "path": "chunks/10/508/332.1b59783492510724.json"
+      "path": "chunks/10/508/332.1b59783492510724.json",
+      "byteLength": 140061
     },
     "10/508/333": {
       "bounds": {
@@ -3129,7 +3441,8 @@
         "west": -1.40625
       },
       "count": 164,
-      "path": "chunks/10/508/333.abd1014768912212.json"
+      "path": "chunks/10/508/333.abd1014768912212.json",
+      "byteLength": 116889
     },
     "10/508/334": {
       "bounds": {
@@ -3139,7 +3452,8 @@
         "west": -1.40625
       },
       "count": 218,
-      "path": "chunks/10/508/334.b30919cde0245ed5.json"
+      "path": "chunks/10/508/334.b30919cde0245ed5.json",
+      "byteLength": 154911
     },
     "10/508/335": {
       "bounds": {
@@ -3149,7 +3463,8 @@
         "west": -1.40625
       },
       "count": 276,
-      "path": "chunks/10/508/335.09e197778dbe7912.json"
+      "path": "chunks/10/508/335.09e197778dbe7912.json",
+      "byteLength": 193764
     },
     "10/508/336": {
       "bounds": {
@@ -3159,7 +3474,8 @@
         "west": -1.40625
       },
       "count": 91,
-      "path": "chunks/10/508/336.8324f1aaa2ce63c5.json"
+      "path": "chunks/10/508/336.8324f1aaa2ce63c5.json",
+      "byteLength": 72114
     },
     "10/508/337": {
       "bounds": {
@@ -3169,7 +3485,8 @@
         "west": -1.40625
       },
       "count": 46,
-      "path": "chunks/10/508/337.2d7808bdee864d9c.json"
+      "path": "chunks/10/508/337.2d7808bdee864d9c.json",
+      "byteLength": 42565
     },
     "10/508/338": {
       "bounds": {
@@ -3179,7 +3496,8 @@
         "west": -1.40625
       },
       "count": 128,
-      "path": "chunks/10/508/338.fd21368f9c8072f5.json"
+      "path": "chunks/10/508/338.fd21368f9c8072f5.json",
+      "byteLength": 89513
     },
     "10/508/339": {
       "bounds": {
@@ -3189,7 +3507,8 @@
         "west": -1.40625
       },
       "count": 239,
-      "path": "chunks/10/508/339.e2f358275ed9f2b7.json"
+      "path": "chunks/10/508/339.e2f358275ed9f2b7.json",
+      "byteLength": 151748
     },
     "10/508/340": {
       "bounds": {
@@ -3199,7 +3518,8 @@
         "west": -1.40625
       },
       "count": 117,
-      "path": "chunks/10/508/340.63ea268a94aba028.json"
+      "path": "chunks/10/508/340.63ea268a94aba028.json",
+      "byteLength": 121281
     },
     "10/508/341": {
       "bounds": {
@@ -3209,7 +3529,8 @@
         "west": -1.40625
       },
       "count": 63,
-      "path": "chunks/10/508/341.7b399b85d11e5e82.json"
+      "path": "chunks/10/508/341.7b399b85d11e5e82.json",
+      "byteLength": 84709
     },
     "10/508/342": {
       "bounds": {
@@ -3219,7 +3540,8 @@
         "west": -1.40625
       },
       "count": 121,
-      "path": "chunks/10/508/342.0d028922760847f7.json"
+      "path": "chunks/10/508/342.0d028922760847f7.json",
+      "byteLength": 83557
     },
     "10/508/343": {
       "bounds": {
@@ -3229,7 +3551,8 @@
         "west": -1.40625
       },
       "count": 341,
-      "path": "chunks/10/508/343.c06677fda6d50e1c.json"
+      "path": "chunks/10/508/343.c06677fda6d50e1c.json",
+      "byteLength": 210619
     },
     "10/508/344": {
       "bounds": {
@@ -3239,7 +3562,8 @@
         "west": -1.40625
       },
       "count": 113,
-      "path": "chunks/10/508/344.2fff6df0fdef8827.json"
+      "path": "chunks/10/508/344.2fff6df0fdef8827.json",
+      "byteLength": 71979
     },
     "10/509/325": {
       "bounds": {
@@ -3249,7 +3573,8 @@
         "west": -1.0546875
       },
       "count": 20,
-      "path": "chunks/10/509/325.9700accf472e5370.json"
+      "path": "chunks/10/509/325.9700accf472e5370.json",
+      "byteLength": 15279
     },
     "10/509/326": {
       "bounds": {
@@ -3259,7 +3584,8 @@
         "west": -1.0546875
       },
       "count": 68,
-      "path": "chunks/10/509/326.1bc1f500eb42d2e3.json"
+      "path": "chunks/10/509/326.1bc1f500eb42d2e3.json",
+      "byteLength": 55824
     },
     "10/509/328": {
       "bounds": {
@@ -3269,7 +3595,8 @@
         "west": -1.0546875
       },
       "count": 66,
-      "path": "chunks/10/509/328.b94b7d2f0e8d2e4e.json"
+      "path": "chunks/10/509/328.b94b7d2f0e8d2e4e.json",
+      "byteLength": 52850
     },
     "10/509/329": {
       "bounds": {
@@ -3279,7 +3606,8 @@
         "west": -1.0546875
       },
       "count": 56,
-      "path": "chunks/10/509/329.c6a2127a46130d61.json"
+      "path": "chunks/10/509/329.c6a2127a46130d61.json",
+      "byteLength": 41211
     },
     "10/509/330": {
       "bounds": {
@@ -3289,7 +3617,8 @@
         "west": -1.0546875
       },
       "count": 32,
-      "path": "chunks/10/509/330.4dfb72dec2c41fb9.json"
+      "path": "chunks/10/509/330.4dfb72dec2c41fb9.json",
+      "byteLength": 22621
     },
     "10/509/332": {
       "bounds": {
@@ -3299,7 +3628,8 @@
         "west": -1.0546875
       },
       "count": 57,
-      "path": "chunks/10/509/332.8b05807b6cf345d4.json"
+      "path": "chunks/10/509/332.8b05807b6cf345d4.json",
+      "byteLength": 40386
     },
     "10/509/333": {
       "bounds": {
@@ -3309,7 +3639,8 @@
         "west": -1.0546875
       },
       "count": 155,
-      "path": "chunks/10/509/333.5ca174a3e5cdce5b.json"
+      "path": "chunks/10/509/333.5ca174a3e5cdce5b.json",
+      "byteLength": 107049
     },
     "10/509/334": {
       "bounds": {
@@ -3319,7 +3650,8 @@
         "west": -1.0546875
       },
       "count": 70,
-      "path": "chunks/10/509/334.d8b829167684fad8.json"
+      "path": "chunks/10/509/334.d8b829167684fad8.json",
+      "byteLength": 54228
     },
     "10/509/335": {
       "bounds": {
@@ -3329,7 +3661,8 @@
         "west": -1.0546875
       },
       "count": 45,
-      "path": "chunks/10/509/335.4bdcf29c66bc3a57.json"
+      "path": "chunks/10/509/335.4bdcf29c66bc3a57.json",
+      "byteLength": 49588
     },
     "10/509/336": {
       "bounds": {
@@ -3339,7 +3672,8 @@
         "west": -1.0546875
       },
       "count": 86,
-      "path": "chunks/10/509/336.df566bee10029271.json"
+      "path": "chunks/10/509/336.df566bee10029271.json",
+      "byteLength": 74216
     },
     "10/509/337": {
       "bounds": {
@@ -3349,7 +3683,8 @@
         "west": -1.0546875
       },
       "count": 202,
-      "path": "chunks/10/509/337.1b1b98ad5cbd2a6b.json"
+      "path": "chunks/10/509/337.1b1b98ad5cbd2a6b.json",
+      "byteLength": 154908
     },
     "10/509/338": {
       "bounds": {
@@ -3359,7 +3694,8 @@
         "west": -1.0546875
       },
       "count": 207,
-      "path": "chunks/10/509/338.0e9955cf49170e83.json"
+      "path": "chunks/10/509/338.0e9955cf49170e83.json",
+      "byteLength": 165994
     },
     "10/509/339": {
       "bounds": {
@@ -3369,7 +3705,8 @@
         "west": -1.0546875
       },
       "count": 79,
-      "path": "chunks/10/509/339.95a320bf5fc2b905.json"
+      "path": "chunks/10/509/339.95a320bf5fc2b905.json",
+      "byteLength": 60419
     },
     "10/509/340": {
       "bounds": {
@@ -3379,7 +3716,8 @@
         "west": -1.0546875
       },
       "count": 201,
-      "path": "chunks/10/509/340.f29c43460e2f1ad0.json"
+      "path": "chunks/10/509/340.f29c43460e2f1ad0.json",
+      "byteLength": 192990
     },
     "10/509/341": {
       "bounds": {
@@ -3389,7 +3727,8 @@
         "west": -1.0546875
       },
       "count": 51,
-      "path": "chunks/10/509/341.1be5b7256fb2e0dd.json"
+      "path": "chunks/10/509/341.1be5b7256fb2e0dd.json",
+      "byteLength": 49548
     },
     "10/509/342": {
       "bounds": {
@@ -3399,7 +3738,8 @@
         "west": -1.0546875
       },
       "count": 138,
-      "path": "chunks/10/509/342.b626df0e55af8cca.json"
+      "path": "chunks/10/509/342.b626df0e55af8cca.json",
+      "byteLength": 108830
     },
     "10/509/343": {
       "bounds": {
@@ -3409,7 +3749,8 @@
         "west": -1.0546875
       },
       "count": 270,
-      "path": "chunks/10/509/343.26e1a4a855a602c4.json"
+      "path": "chunks/10/509/343.26e1a4a855a602c4.json",
+      "byteLength": 191380
     },
     "10/509/344": {
       "bounds": {
@@ -3419,7 +3760,8 @@
         "west": -1.0546875
       },
       "count": 1,
-      "path": "chunks/10/509/344.f40ce3a2cbe5df89.json"
+      "path": "chunks/10/509/344.f40ce3a2cbe5df89.json",
+      "byteLength": 1928
     },
     "10/510/326": {
       "bounds": {
@@ -3429,7 +3771,8 @@
         "west": -0.703125
       },
       "count": 45,
-      "path": "chunks/10/510/326.d018c226be42a07f.json"
+      "path": "chunks/10/510/326.d018c226be42a07f.json",
+      "byteLength": 39037
     },
     "10/510/327": {
       "bounds": {
@@ -3439,7 +3782,8 @@
         "west": -0.703125
       },
       "count": 63,
-      "path": "chunks/10/510/327.16cbc4c2b5d2a4bd.json"
+      "path": "chunks/10/510/327.16cbc4c2b5d2a4bd.json",
+      "byteLength": 49037
     },
     "10/510/328": {
       "bounds": {
@@ -3449,7 +3793,8 @@
         "west": -0.703125
       },
       "count": 70,
-      "path": "chunks/10/510/328.2c7852f32682a135.json"
+      "path": "chunks/10/510/328.2c7852f32682a135.json",
+      "byteLength": 53057
     },
     "10/510/329": {
       "bounds": {
@@ -3459,7 +3804,8 @@
         "west": -0.703125
       },
       "count": 167,
-      "path": "chunks/10/510/329.6d89d26ee955b44e.json"
+      "path": "chunks/10/510/329.6d89d26ee955b44e.json",
+      "byteLength": 110953
     },
     "10/510/330": {
       "bounds": {
@@ -3469,7 +3815,8 @@
         "west": -0.703125
       },
       "count": 185,
-      "path": "chunks/10/510/330.c8450d00ab711528.json"
+      "path": "chunks/10/510/330.c8450d00ab711528.json",
+      "byteLength": 121920
     },
     "10/510/331": {
       "bounds": {
@@ -3479,7 +3826,8 @@
         "west": -0.703125
       },
       "count": 6,
-      "path": "chunks/10/510/331.3bf6fbcd10076851.json"
+      "path": "chunks/10/510/331.3bf6fbcd10076851.json",
+      "byteLength": 4149
     },
     "10/510/332": {
       "bounds": {
@@ -3489,7 +3837,8 @@
         "west": -0.703125
       },
       "count": 84,
-      "path": "chunks/10/510/332.acfb876e0e4f6e19.json"
+      "path": "chunks/10/510/332.acfb876e0e4f6e19.json",
+      "byteLength": 57972
     },
     "10/510/333": {
       "bounds": {
@@ -3499,7 +3848,8 @@
         "west": -0.703125
       },
       "count": 50,
-      "path": "chunks/10/510/333.72a077a7e919c803.json"
+      "path": "chunks/10/510/333.72a077a7e919c803.json",
+      "byteLength": 32055
     },
     "10/510/334": {
       "bounds": {
@@ -3509,7 +3859,8 @@
         "west": -0.703125
       },
       "count": 18,
-      "path": "chunks/10/510/334.49d10ebc7346b79a.json"
+      "path": "chunks/10/510/334.49d10ebc7346b79a.json",
+      "byteLength": 13224
     },
     "10/510/335": {
       "bounds": {
@@ -3519,7 +3870,8 @@
         "west": -0.703125
       },
       "count": 6,
-      "path": "chunks/10/510/335.8477b482e011947d.json"
+      "path": "chunks/10/510/335.8477b482e011947d.json",
+      "byteLength": 5670
     },
     "10/510/336": {
       "bounds": {
@@ -3529,7 +3881,8 @@
         "west": -0.703125
       },
       "count": 7,
-      "path": "chunks/10/510/336.c3cc8c1971f8fb4e.json"
+      "path": "chunks/10/510/336.c3cc8c1971f8fb4e.json",
+      "byteLength": 6255
     },
     "10/510/337": {
       "bounds": {
@@ -3539,7 +3892,8 @@
         "west": -0.703125
       },
       "count": 94,
-      "path": "chunks/10/510/337.089c1fbd9dd5135c.json"
+      "path": "chunks/10/510/337.089c1fbd9dd5135c.json",
+      "byteLength": 79752
     },
     "10/510/338": {
       "bounds": {
@@ -3549,7 +3903,8 @@
         "west": -0.703125
       },
       "count": 177,
-      "path": "chunks/10/510/338.cd76411b3e65c92a.json"
+      "path": "chunks/10/510/338.cd76411b3e65c92a.json",
+      "byteLength": 146255
     },
     "10/510/339": {
       "bounds": {
@@ -3559,7 +3914,8 @@
         "west": -0.703125
       },
       "count": 155,
-      "path": "chunks/10/510/339.99f0e1d2b06877b0.json"
+      "path": "chunks/10/510/339.99f0e1d2b06877b0.json",
+      "byteLength": 103636
     },
     "10/510/340": {
       "bounds": {
@@ -3569,7 +3925,8 @@
         "west": -0.703125
       },
       "count": 270,
-      "path": "chunks/10/510/340.3bb6c62977e5b55b.json"
+      "path": "chunks/10/510/340.3bb6c62977e5b55b.json",
+      "byteLength": 277824
     },
     "10/510/341": {
       "bounds": {
@@ -3579,7 +3936,8 @@
         "west": -0.703125
       },
       "count": 244,
-      "path": "chunks/10/510/341.fe85c38f363852d9.json"
+      "path": "chunks/10/510/341.fe85c38f363852d9.json",
+      "byteLength": 268390
     },
     "10/510/342": {
       "bounds": {
@@ -3589,7 +3947,8 @@
         "west": -0.703125
       },
       "count": 24,
-      "path": "chunks/10/510/342.6661b2c8dbcd2ca7.json"
+      "path": "chunks/10/510/342.6661b2c8dbcd2ca7.json",
+      "byteLength": 50425
     },
     "10/510/343": {
       "bounds": {
@@ -3599,7 +3958,8 @@
         "west": -0.703125
       },
       "count": 18,
-      "path": "chunks/10/510/343.0a61d708f3c1b535.json"
+      "path": "chunks/10/510/343.0a61d708f3c1b535.json",
+      "byteLength": 21694
     },
     "10/511/327": {
       "bounds": {
@@ -3609,7 +3969,8 @@
         "west": -0.3515625
       },
       "count": 14,
-      "path": "chunks/10/511/327.1ba75e29017dec40.json"
+      "path": "chunks/10/511/327.1ba75e29017dec40.json",
+      "byteLength": 10177
     },
     "10/511/328": {
       "bounds": {
@@ -3619,7 +3980,8 @@
         "west": -0.3515625
       },
       "count": 65,
-      "path": "chunks/10/511/328.7493365fe72eac2c.json"
+      "path": "chunks/10/511/328.7493365fe72eac2c.json",
+      "byteLength": 39337
     },
     "10/511/329": {
       "bounds": {
@@ -3629,7 +3991,8 @@
         "west": -0.3515625
       },
       "count": 75,
-      "path": "chunks/10/511/329.b3e9315fc573ed23.json"
+      "path": "chunks/10/511/329.b3e9315fc573ed23.json",
+      "byteLength": 56484
     },
     "10/511/330": {
       "bounds": {
@@ -3639,7 +4002,8 @@
         "west": -0.3515625
       },
       "count": 35,
-      "path": "chunks/10/511/330.998563b18f836068.json"
+      "path": "chunks/10/511/330.998563b18f836068.json",
+      "byteLength": 27246
     },
     "10/511/331": {
       "bounds": {
@@ -3649,7 +4013,8 @@
         "west": -0.3515625
       },
       "count": 23,
-      "path": "chunks/10/511/331.c8e0858a99ec0ccd.json"
+      "path": "chunks/10/511/331.c8e0858a99ec0ccd.json",
+      "byteLength": 17869
     },
     "10/511/332": {
       "bounds": {
@@ -3659,7 +4024,8 @@
         "west": -0.3515625
       },
       "count": 18,
-      "path": "chunks/10/511/332.16e8b476e130d5eb.json"
+      "path": "chunks/10/511/332.16e8b476e130d5eb.json",
+      "byteLength": 17769
     },
     "10/511/333": {
       "bounds": {
@@ -3669,7 +4035,8 @@
         "west": -0.3515625
       },
       "count": 52,
-      "path": "chunks/10/511/333.c4e5e405f1978779.json"
+      "path": "chunks/10/511/333.c4e5e405f1978779.json",
+      "byteLength": 38597
     },
     "10/511/334": {
       "bounds": {
@@ -3679,7 +4046,8 @@
         "west": -0.3515625
       },
       "count": 11,
-      "path": "chunks/10/511/334.2c5fe8b159117737.json"
+      "path": "chunks/10/511/334.2c5fe8b159117737.json",
+      "byteLength": 13081
     },
     "10/511/335": {
       "bounds": {
@@ -3689,7 +4057,8 @@
         "west": -0.3515625
       },
       "count": 264,
-      "path": "chunks/10/511/335.366b21b5de387982.json"
+      "path": "chunks/10/511/335.366b21b5de387982.json",
+      "byteLength": 170908
     },
     "10/511/336": {
       "bounds": {
@@ -3699,7 +4068,8 @@
         "west": -0.3515625
       },
       "count": 110,
-      "path": "chunks/10/511/336.64c8b1dc8895f980.json"
+      "path": "chunks/10/511/336.64c8b1dc8895f980.json",
+      "byteLength": 90255
     },
     "10/511/337": {
       "bounds": {
@@ -3709,7 +4079,8 @@
         "west": -0.3515625
       },
       "count": 117,
-      "path": "chunks/10/511/337.3333016769ad960a.json"
+      "path": "chunks/10/511/337.3333016769ad960a.json",
+      "byteLength": 76830
     },
     "10/511/338": {
       "bounds": {
@@ -3719,7 +4090,8 @@
         "west": -0.3515625
       },
       "count": 122,
-      "path": "chunks/10/511/338.c05292201470540b.json"
+      "path": "chunks/10/511/338.c05292201470540b.json",
+      "byteLength": 90409
     },
     "10/511/339": {
       "bounds": {
@@ -3729,7 +4101,8 @@
         "west": -0.3515625
       },
       "count": 343,
-      "path": "chunks/10/511/339.b6b92d942aee6109.json"
+      "path": "chunks/10/511/339.b6b92d942aee6109.json",
+      "byteLength": 312925
     },
     "10/511/340": {
       "bounds": {
@@ -3739,7 +4112,8 @@
         "west": -0.3515625
       },
       "count": 589,
-      "path": "chunks/10/511/340.0f8df42c5da83521.json"
+      "path": "chunks/10/511/340.0f8df42c5da83521.json",
+      "byteLength": 349420
     },
     "10/511/341": {
       "bounds": {
@@ -3749,7 +4123,8 @@
         "west": -0.3515625
       },
       "count": 319,
-      "path": "chunks/10/511/341.9265964a1435080e.json"
+      "path": "chunks/10/511/341.9265964a1435080e.json",
+      "byteLength": 244507
     },
     "10/511/342": {
       "bounds": {
@@ -3759,7 +4134,8 @@
         "west": -0.3515625
       },
       "count": 162,
-      "path": "chunks/10/511/342.3e53d84335b12922.json"
+      "path": "chunks/10/511/342.3e53d84335b12922.json",
+      "byteLength": 106052
     },
     "10/511/343": {
       "bounds": {
@@ -3769,7 +4145,8 @@
         "west": -0.3515625
       },
       "count": 220,
-      "path": "chunks/10/511/343.38abbf7fe84a470c.json"
+      "path": "chunks/10/511/343.38abbf7fe84a470c.json",
+      "byteLength": 171918
     },
     "10/512/334": {
       "bounds": {
@@ -3779,7 +4156,8 @@
         "west": 0
       },
       "count": 42,
-      "path": "chunks/10/512/334.7a9962912a50b2d6.json"
+      "path": "chunks/10/512/334.7a9962912a50b2d6.json",
+      "byteLength": 34031
     },
     "10/512/335": {
       "bounds": {
@@ -3789,7 +4167,8 @@
         "west": 0
       },
       "count": 109,
-      "path": "chunks/10/512/335.0226c647cdcd0745.json"
+      "path": "chunks/10/512/335.0226c647cdcd0745.json",
+      "byteLength": 68886
     },
     "10/512/336": {
       "bounds": {
@@ -3799,7 +4178,8 @@
         "west": 0
       },
       "count": 90,
-      "path": "chunks/10/512/336.fdff23808aed10f0.json"
+      "path": "chunks/10/512/336.fdff23808aed10f0.json",
+      "byteLength": 59988
     },
     "10/512/337": {
       "bounds": {
@@ -3809,7 +4189,8 @@
         "west": 0
       },
       "count": 230,
-      "path": "chunks/10/512/337.3ea795e1bb4c7904.json"
+      "path": "chunks/10/512/337.3ea795e1bb4c7904.json",
+      "byteLength": 148383
     },
     "10/512/338": {
       "bounds": {
@@ -3819,7 +4200,8 @@
         "west": 0
       },
       "count": 47,
-      "path": "chunks/10/512/338.6992f86bddf91dd5.json"
+      "path": "chunks/10/512/338.6992f86bddf91dd5.json",
+      "byteLength": 36760
     },
     "10/512/339": {
       "bounds": {
@@ -3829,7 +4211,8 @@
         "west": 0
       },
       "count": 91,
-      "path": "chunks/10/512/339.3a34f2f216a7552a.json"
+      "path": "chunks/10/512/339.3a34f2f216a7552a.json",
+      "byteLength": 99037
     },
     "10/512/340": {
       "bounds": {
@@ -3839,7 +4222,8 @@
         "west": 0
       },
       "count": 475,
-      "path": "chunks/10/512/340.3de7868c6fba3048.json"
+      "path": "chunks/10/512/340.3de7868c6fba3048.json",
+      "byteLength": 323615
     },
     "10/512/341": {
       "bounds": {
@@ -3849,7 +4233,8 @@
         "west": 0
       },
       "count": 57,
-      "path": "chunks/10/512/341.2d7df2cf7f677524.json"
+      "path": "chunks/10/512/341.2d7df2cf7f677524.json",
+      "byteLength": 38334
     },
     "10/512/342": {
       "bounds": {
@@ -3859,7 +4244,8 @@
         "west": 0
       },
       "count": 67,
-      "path": "chunks/10/512/342.e32e3936627fe7f2.json"
+      "path": "chunks/10/512/342.e32e3936627fe7f2.json",
+      "byteLength": 61446
     },
     "10/512/343": {
       "bounds": {
@@ -3869,7 +4255,8 @@
         "west": 0
       },
       "count": 152,
-      "path": "chunks/10/512/343.488235ba8766d543.json"
+      "path": "chunks/10/512/343.488235ba8766d543.json",
+      "byteLength": 138828
     },
     "10/513/333": {
       "bounds": {
@@ -3879,7 +4266,8 @@
         "west": 0.3515625
       },
       "count": 6,
-      "path": "chunks/10/513/333.3d1367310a64fe55.json"
+      "path": "chunks/10/513/333.3d1367310a64fe55.json",
+      "byteLength": 5590
     },
     "10/513/334": {
       "bounds": {
@@ -3889,7 +4277,8 @@
         "west": 0.3515625
       },
       "count": 76,
-      "path": "chunks/10/513/334.a78e0442e90d42af.json"
+      "path": "chunks/10/513/334.a78e0442e90d42af.json",
+      "byteLength": 54304
     },
     "10/513/335": {
       "bounds": {
@@ -3899,7 +4288,8 @@
         "west": 0.3515625
       },
       "count": 64,
-      "path": "chunks/10/513/335.de6a1a53373df690.json"
+      "path": "chunks/10/513/335.de6a1a53373df690.json",
+      "byteLength": 43330
     },
     "10/513/336": {
       "bounds": {
@@ -3909,7 +4299,8 @@
         "west": 0.3515625
       },
       "count": 21,
-      "path": "chunks/10/513/336.8e5ae34e8ab9a4fd.json"
+      "path": "chunks/10/513/336.8e5ae34e8ab9a4fd.json",
+      "byteLength": 15533
     },
     "10/513/337": {
       "bounds": {
@@ -3919,7 +4310,8 @@
         "west": 0.3515625
       },
       "count": 56,
-      "path": "chunks/10/513/337.29fcb8ba52b4b5ef.json"
+      "path": "chunks/10/513/337.29fcb8ba52b4b5ef.json",
+      "byteLength": 38473
     },
     "10/513/338": {
       "bounds": {
@@ -3929,7 +4321,8 @@
         "west": 0.3515625
       },
       "count": 78,
-      "path": "chunks/10/513/338.8075917fcb8ccacc.json"
+      "path": "chunks/10/513/338.8075917fcb8ccacc.json",
+      "byteLength": 54617
     },
     "10/513/339": {
       "bounds": {
@@ -3939,7 +4332,8 @@
         "west": 0.3515625
       },
       "count": 204,
-      "path": "chunks/10/513/339.f16464497f85b195.json"
+      "path": "chunks/10/513/339.f16464497f85b195.json",
+      "byteLength": 164883
     },
     "10/513/340": {
       "bounds": {
@@ -3949,7 +4343,8 @@
         "west": 0.3515625
       },
       "count": 235,
-      "path": "chunks/10/513/340.4d68b70adeb4676f.json"
+      "path": "chunks/10/513/340.4d68b70adeb4676f.json",
+      "byteLength": 161671
     },
     "10/513/341": {
       "bounds": {
@@ -3959,7 +4354,8 @@
         "west": 0.3515625
       },
       "count": 268,
-      "path": "chunks/10/513/341.ef5b26b305aff71b.json"
+      "path": "chunks/10/513/341.ef5b26b305aff71b.json",
+      "byteLength": 178691
     },
     "10/513/342": {
       "bounds": {
@@ -3969,7 +4365,8 @@
         "west": 0.3515625
       },
       "count": 27,
-      "path": "chunks/10/513/342.890065b8315dd0fb.json"
+      "path": "chunks/10/513/342.890065b8315dd0fb.json",
+      "byteLength": 34331
     },
     "10/513/343": {
       "bounds": {
@@ -3979,7 +4376,8 @@
         "west": 0.3515625
       },
       "count": 59,
-      "path": "chunks/10/513/343.ff730244eaf69338.json"
+      "path": "chunks/10/513/343.ff730244eaf69338.json",
+      "byteLength": 43701
     },
     "10/514/333": {
       "bounds": {
@@ -3989,7 +4387,8 @@
         "west": 0.703125
       },
       "count": 36,
-      "path": "chunks/10/514/333.3dab956c723c5699.json"
+      "path": "chunks/10/514/333.3dab956c723c5699.json",
+      "byteLength": 24335
     },
     "10/514/334": {
       "bounds": {
@@ -3999,7 +4398,8 @@
         "west": 0.703125
       },
       "count": 50,
-      "path": "chunks/10/514/334.cb2eba5f23a9db89.json"
+      "path": "chunks/10/514/334.cb2eba5f23a9db89.json",
+      "byteLength": 42386
     },
     "10/514/335": {
       "bounds": {
@@ -4009,7 +4409,8 @@
         "west": 0.703125
       },
       "count": 55,
-      "path": "chunks/10/514/335.81201e370c780d48.json"
+      "path": "chunks/10/514/335.81201e370c780d48.json",
+      "byteLength": 41157
     },
     "10/514/336": {
       "bounds": {
@@ -4019,7 +4420,8 @@
         "west": 0.703125
       },
       "count": 58,
-      "path": "chunks/10/514/336.665fe8f68ac5b584.json"
+      "path": "chunks/10/514/336.665fe8f68ac5b584.json",
+      "byteLength": 45819
     },
     "10/514/337": {
       "bounds": {
@@ -4029,7 +4431,8 @@
         "west": 0.703125
       },
       "count": 161,
-      "path": "chunks/10/514/337.abad4d47360126a6.json"
+      "path": "chunks/10/514/337.abad4d47360126a6.json",
+      "byteLength": 113352
     },
     "10/514/338": {
       "bounds": {
@@ -4039,7 +4442,8 @@
         "west": 0.703125
       },
       "count": 182,
-      "path": "chunks/10/514/338.f7f790363a22fa5e.json"
+      "path": "chunks/10/514/338.f7f790363a22fa5e.json",
+      "byteLength": 137303
     },
     "10/514/339": {
       "bounds": {
@@ -4049,7 +4453,8 @@
         "west": 0.703125
       },
       "count": 25,
-      "path": "chunks/10/514/339.5af88d6f8146412d.json"
+      "path": "chunks/10/514/339.5af88d6f8146412d.json",
+      "byteLength": 20276
     },
     "10/514/340": {
       "bounds": {
@@ -4059,7 +4464,8 @@
         "west": 0.703125
       },
       "count": 65,
-      "path": "chunks/10/514/340.88418c4dc6fc5b39.json"
+      "path": "chunks/10/514/340.88418c4dc6fc5b39.json",
+      "byteLength": 41393
     },
     "10/514/341": {
       "bounds": {
@@ -4069,7 +4475,8 @@
         "west": 0.703125
       },
       "count": 264,
-      "path": "chunks/10/514/341.fda2c9346915a501.json"
+      "path": "chunks/10/514/341.fda2c9346915a501.json",
+      "byteLength": 188365
     },
     "10/514/342": {
       "bounds": {
@@ -4079,7 +4486,8 @@
         "west": 0.703125
       },
       "count": 118,
-      "path": "chunks/10/514/342.bf31383b9c91302f.json"
+      "path": "chunks/10/514/342.bf31383b9c91302f.json",
+      "byteLength": 101396
     },
     "10/514/343": {
       "bounds": {
@@ -4089,7 +4497,8 @@
         "west": 0.703125
       },
       "count": 52,
-      "path": "chunks/10/514/343.530e2c88f62696a9.json"
+      "path": "chunks/10/514/343.530e2c88f62696a9.json",
+      "byteLength": 52609
     },
     "10/515/334": {
       "bounds": {
@@ -4099,7 +4508,8 @@
         "west": 1.0546875
       },
       "count": 27,
-      "path": "chunks/10/515/334.6ebaf4ad0087309b.json"
+      "path": "chunks/10/515/334.6ebaf4ad0087309b.json",
+      "byteLength": 17637
     },
     "10/515/335": {
       "bounds": {
@@ -4109,7 +4519,8 @@
         "west": 1.0546875
       },
       "count": 102,
-      "path": "chunks/10/515/335.868aa43efba90ab2.json"
+      "path": "chunks/10/515/335.868aa43efba90ab2.json",
+      "byteLength": 60723
     },
     "10/515/336": {
       "bounds": {
@@ -4119,7 +4530,8 @@
         "west": 1.0546875
       },
       "count": 98,
-      "path": "chunks/10/515/336.2df117c34e8430d8.json"
+      "path": "chunks/10/515/336.2df117c34e8430d8.json",
+      "byteLength": 79428
     },
     "10/515/337": {
       "bounds": {
@@ -4129,7 +4541,8 @@
         "west": 1.0546875
       },
       "count": 198,
-      "path": "chunks/10/515/337.9363dbacdc246402.json"
+      "path": "chunks/10/515/337.9363dbacdc246402.json",
+      "byteLength": 129200
     },
     "10/515/338": {
       "bounds": {
@@ -4139,7 +4552,8 @@
         "west": 1.0546875
       },
       "count": 186,
-      "path": "chunks/10/515/338.cabe0e7b9b73fcfc.json"
+      "path": "chunks/10/515/338.cabe0e7b9b73fcfc.json",
+      "byteLength": 122215
     },
     "10/515/339": {
       "bounds": {
@@ -4149,7 +4563,8 @@
         "west": 1.0546875
       },
       "count": 18,
-      "path": "chunks/10/515/339.beaa48644fe7b141.json"
+      "path": "chunks/10/515/339.beaa48644fe7b141.json",
+      "byteLength": 20125
     },
     "10/515/341": {
       "bounds": {
@@ -4159,7 +4574,8 @@
         "west": 1.0546875
       },
       "count": 369,
-      "path": "chunks/10/515/341.ba58ba65fa0a3b83.json"
+      "path": "chunks/10/515/341.ba58ba65fa0a3b83.json",
+      "byteLength": 229859
     },
     "10/515/342": {
       "bounds": {
@@ -4169,7 +4585,8 @@
         "west": 1.0546875
       },
       "count": 184,
-      "path": "chunks/10/515/342.2d084d57af9d01ac.json"
+      "path": "chunks/10/515/342.2d084d57af9d01ac.json",
+      "byteLength": 113034
     },
     "10/516/335": {
       "bounds": {
@@ -4179,7 +4596,8 @@
         "west": 1.40625
       },
       "count": 106,
-      "path": "chunks/10/516/335.c85037a8a76111ee.json"
+      "path": "chunks/10/516/335.c85037a8a76111ee.json",
+      "byteLength": 72498
     },
     "10/516/336": {
       "bounds": {
@@ -4189,7 +4607,8 @@
         "west": 1.40625
       },
       "count": 199,
-      "path": "chunks/10/516/336.03a2391ae1199975.json"
+      "path": "chunks/10/516/336.03a2391ae1199975.json",
+      "byteLength": 151653
     },
     "10/516/337": {
       "bounds": {
@@ -4199,7 +4618,8 @@
         "west": 1.40625
       },
       "count": 1,
-      "path": "chunks/10/516/337.65e2323ffddad0b1.json"
+      "path": "chunks/10/516/337.65e2323ffddad0b1.json",
+      "byteLength": 2338
     },
     "10/516/341": {
       "bounds": {
@@ -4209,7 +4629,8 @@
         "west": 1.40625
       },
       "count": 36,
-      "path": "chunks/10/516/341.1cdf06a3f943fed2.json"
+      "path": "chunks/10/516/341.1cdf06a3f943fed2.json",
+      "byteLength": 26102
     },
     "10/517/335": {
       "bounds": {
@@ -4219,7 +4640,8 @@
         "west": 1.7578125
       },
       "count": 1,
-      "path": "chunks/10/517/335.5f8232eab5dcdb2f.json"
+      "path": "chunks/10/517/335.5f8232eab5dcdb2f.json",
+      "byteLength": 1060
     },
     "10/517/336": {
       "bounds": {
@@ -4229,7 +4651,8 @@
         "west": 1.7578125
       },
       "count": 5,
-      "path": "chunks/10/517/336.408ca7593aa156e6.json"
+      "path": "chunks/10/517/336.408ca7593aa156e6.json",
+      "byteLength": 2935
     }
   },
   "coverage": {
@@ -4286,10 +4709,11 @@
     "featureCopies": 38276,
     "fileCount": 424,
     "largestAssetBytes": 459043,
-    "manifestBytes": 74184,
+    "manifestBytes": 82361,
     "maximumBufferedCompressedBytes": 569930,
-    "totalBytes": 30179475
+    "totalBytes": 30187652
   },
   "pageCount": 19,
-  "sourceRecordCount": 37209
+  "sourceRecordCount": 37209,
+  "releaseId": "sha256-a4016f39bb097c9c02c0c7d2d7401d78cd8ad7787a54d3b4e1c9d13eb53b9f66"
 }

@@ -100,6 +100,7 @@ type CycleParkingMapProps = {
   isCycleNetworkVisible: boolean;
   userLocation: UserLocation;
   currentLocationFocusRequestId: number;
+  selectedPointId: string | null;
   selectedPoint: ParkingPoint | null;
   nearestPoint: ParkingPoint | null;
   rankedPoints: ParkingPoint[];
@@ -140,6 +141,7 @@ type CycleParkingMapProps = {
   onOpenDetails: (point: ParkingPoint) => void;
   onPlaceRouteWaypoint?: (location: UserLocation) => void;
   onViewportChange: (bounds: ParkingMapBounds, zoom: number) => void;
+  offlineAreaSelectionBounds?: ParkingMapBounds | null;
 };
 
 type VisibleMapArea = {
@@ -190,9 +192,28 @@ type ParkingMarkerPresentation = {
 
 const defaultCenter: CycleRoutePoint = [55.9533, -3.1883];
 const mapLibreBasemapStyleUrls = {
-  dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+  dark: 'https://tiles.openfreemap.org/styles/dark',
   light: 'https://tiles.openfreemap.org/styles/liberty',
 } satisfies Record<'dark' | 'light', string>;
+
+function createOfflineBasemapStyle(
+  theme: 'dark' | 'light',
+): StyleSpecification {
+  return {
+    version: 8,
+    name: 'Bike Neuks offline background',
+    sources: {},
+    layers: [
+      {
+        id: 'offline-background',
+        type: 'background',
+        paint: {
+          'background-color': theme === 'dark' ? '#0f1715' : '#e9f0ec',
+        },
+      },
+    ],
+  };
+}
 const mapLibreShieldLayerIds = new Set([
   'highway-shield-non-us',
   'highway-shield-us-interstate',
@@ -1472,6 +1493,9 @@ function syncLineLayer({
 
 const cycleNetworkSourceId = 'cycle-network-lines';
 const cycleNetworkBundleSourceId = 'cycle-network-route-bundles';
+const offlineAreaSelectionSourceId = 'offline-area-selection';
+const offlineAreaSelectionFillLayerId = 'offline-area-selection-fill';
+const offlineAreaSelectionLineLayerId = 'offline-area-selection-line';
 const cycleNetworkHitLayerId = 'cycle-network-hit';
 const cycleNetworkCasingLayerId = 'cycle-network-casing';
 const cycleNetworkSelectedCasingLayerId = 'cycle-network-selected-casing';
@@ -1905,6 +1929,7 @@ export default function CycleParkingMap({
   isCycleNetworkVisible,
   userLocation,
   currentLocationFocusRequestId,
+  selectedPointId,
   selectedPoint,
   nearestPoint,
   rankedPoints,
@@ -1934,10 +1959,12 @@ export default function CycleParkingMap({
   onOpenDetails,
   onPlaceRouteWaypoint,
   onViewportChange,
+  offlineAreaSelectionBounds = null,
 }: CycleParkingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const onViewportChangeRef = useRef(onViewportChange);
+  const selectedPointIdRef = useRef(selectedPointId);
   const parkingMarkerRefs = useRef(new Map<string, RenderedMarker>());
   const startMarkerRef = useRef<RenderedMarker | null>(null);
   const liveMarkerRef = useRef<RenderedMarker | null>(null);
@@ -1960,6 +1987,9 @@ export default function CycleParkingMap({
   const centeredCollapsedPopupPointRef = useRef<string | null>(null);
   const centeredExpandedPopupPointRef = useRef<string | null>(null);
   const deferredExpandedSelectionFocusRef = useRef<string | null>(null);
+  const previousSelectedPointIdRef = useRef(selectedPointId);
+  const hasUserAdjustedSelectionCameraRef = useRef(false);
+  const hasCompletedNearbySelectionFocusRef = useRef(false);
   const suppressNextSelectionClearFocusRef = useRef(false);
   const frameRef = useRef<number | null>(null);
   const savedCameraRef = useRef<{
@@ -1971,6 +2001,9 @@ export default function CycleParkingMap({
   const activeBasemapThemeRef = useRef(theme);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isOfflineBasemap, setIsOfflineBasemap] = useState(false);
+  const [renderedBasemapFeatureCount, setRenderedBasemapFeatureCount] =
+    useState(0);
   const [styleRevision, setStyleRevision] = useState(0);
   const [selectedCycleNetworkRouteKey, setSelectedCycleNetworkRouteKey] =
     useState<string | null>(null);
@@ -2147,6 +2180,10 @@ export default function CycleParkingMap({
   }, [mobileSheetState]);
 
   useEffect(() => {
+    selectedPointIdRef.current = selectedPointId;
+  }, [selectedPointId]);
+
+  useEffect(() => {
     const container = mapContainerRef.current;
 
     if (!container || mapRef.current) {
@@ -2157,6 +2194,9 @@ export default function CycleParkingMap({
     let nextMap: MapLibreMap | null = null;
     let isDisposed = false;
     const stopAutomaticFocusOnInteraction = () => {
+      if (selectedPointIdRef.current !== null) {
+        hasUserAdjustedSelectionCameraRef.current = true;
+      }
       if (!isAutomaticFocusAnimationRef.current) {
         return;
       }
@@ -2165,7 +2205,10 @@ export default function CycleParkingMap({
       nextMap?.stop();
     };
 
-    const createMap = (style: StyleSpecification | string) => {
+    const createMap = (
+      style: StyleSpecification | string,
+      offlineBasemap = false,
+    ) => {
       if (isDisposed) {
         return;
       }
@@ -2183,6 +2226,7 @@ export default function CycleParkingMap({
         zoom: savedCameraRef.current?.zoom ?? 13,
       });
       nextMap = mapInstance;
+      setIsOfflineBasemap(offlineBasemap);
       mapInstance.touchZoomRotate.disableRotation();
       container.addEventListener(
         'pointerdown',
@@ -2224,6 +2268,16 @@ export default function CycleParkingMap({
           zoom: mapInstance.getZoom(),
         });
       });
+      mapInstance.on('idle', () => {
+        const count = mapInstance
+          .queryRenderedFeatures()
+          .filter(
+            (feature) =>
+              feature.source === 'openmaptiles' ||
+              feature.source === 'offline-test-rendered',
+          ).length;
+        setRenderedBasemapFeatureCount(count);
+      });
       mapInstance.on('moveend', () => {
         isAutomaticFocusAnimationRef.current = false;
         handleViewportChange({
@@ -2246,14 +2300,17 @@ export default function CycleParkingMap({
       abortController.signal,
       initialBasemapThemeRef.current,
     )
-      .then(createMap)
+      .then((style) => createMap(style))
       .catch((error: unknown) => {
         if (abortController.signal.aborted) {
           return;
         }
 
-        console.warn('Falling back to unpatched MapLibre style.', error);
-        createMap(mapLibreBasemapStyleUrls[initialBasemapThemeRef.current]);
+        console.warn('Falling back to the offline map background.', error);
+        createMap(
+          createOfflineBasemapStyle(initialBasemapThemeRef.current),
+          true,
+        );
       });
 
     return () => {
@@ -2298,6 +2355,7 @@ export default function CycleParkingMap({
       mapRef.current = null;
       setMap(null);
       setIsMapLoaded(false);
+      setRenderedBasemapFeatureCount(0);
     };
   }, [closeCycleNetworkPopup, handleViewportChange, updateViewport]);
 
@@ -2320,6 +2378,114 @@ export default function CycleParkingMap({
   }, [map, theme]);
 
   useEffect(() => {
+    if (!map) {
+      return;
+    }
+
+    const abortController = new AbortController();
+    const applyStyle = (style: StyleSpecification, offlineBasemap: boolean) => {
+      setIsMapLoaded(false);
+      setIsOfflineBasemap(offlineBasemap);
+      setRenderedBasemapFeatureCount(0);
+      void map.once('style.load', () => {
+        setIsMapLoaded(true);
+        setStyleRevision((revision) => revision + 1);
+        handleViewportChange({
+          bounds: getVisibleMapBounds(map),
+          zoom: map.getZoom(),
+        });
+      });
+      map.setStyle(style);
+    };
+    const handleOnline = () => {
+      if (!isOfflineBasemap) {
+        return;
+      }
+      void loadMapLibreBasemapStyle(abortController.signal, theme)
+        .then((style) => applyStyle(style, false))
+        .catch(() => {
+          // Keep the dependable local background until the provider is reachable.
+        });
+    };
+
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      abortController.abort();
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [handleViewportChange, isOfflineBasemap, map, theme]);
+
+  useEffect(() => {
+    if (!map || !isMapLoaded) {
+      return;
+    }
+
+    const coordinates = offlineAreaSelectionBounds
+      ? [
+          [
+            [offlineAreaSelectionBounds.west, offlineAreaSelectionBounds.north],
+            [offlineAreaSelectionBounds.east, offlineAreaSelectionBounds.north],
+            [offlineAreaSelectionBounds.east, offlineAreaSelectionBounds.south],
+            [offlineAreaSelectionBounds.west, offlineAreaSelectionBounds.south],
+            [offlineAreaSelectionBounds.west, offlineAreaSelectionBounds.north],
+          ],
+        ]
+      : [];
+    const data = {
+      type: 'FeatureCollection' as const,
+      features: offlineAreaSelectionBounds
+        ? [
+            {
+              type: 'Feature' as const,
+              properties: {},
+              geometry: {
+                type: 'Polygon' as const,
+                coordinates,
+              },
+            },
+          ]
+        : [],
+    };
+    const source = map.getSource(offlineAreaSelectionSourceId) as
+      | GeoJSONSource
+      | undefined;
+
+    if (source) {
+      void source.setData(data);
+    } else {
+      map.addSource(offlineAreaSelectionSourceId, {
+        type: 'geojson',
+        data,
+      });
+    }
+
+    if (!map.getLayer(offlineAreaSelectionFillLayerId)) {
+      map.addLayer({
+        id: offlineAreaSelectionFillLayerId,
+        type: 'fill',
+        source: offlineAreaSelectionSourceId,
+        paint: {
+          'fill-color': theme === 'dark' ? '#5eead4' : '#0f766e',
+          'fill-opacity': 0.1,
+        },
+      });
+    }
+    if (!map.getLayer(offlineAreaSelectionLineLayerId)) {
+      map.addLayer({
+        id: offlineAreaSelectionLineLayerId,
+        type: 'line',
+        source: offlineAreaSelectionSourceId,
+        paint: {
+          'line-color': theme === 'dark' ? '#99f6e4' : '#0b5c55',
+          'line-dasharray': [2, 1.5],
+          'line-width': 3,
+        },
+      });
+    }
+  }, [isMapLoaded, map, offlineAreaSelectionBounds, styleRevision, theme]);
+
+  useEffect(() => {
     if (!map || activeBasemapThemeRef.current === theme) {
       return;
     }
@@ -2340,25 +2506,29 @@ export default function CycleParkingMap({
         zoom: map.getZoom(),
       });
     };
-    const applyStyle = (style: StyleSpecification | string) => {
+    const applyStyle = (
+      style: StyleSpecification | string,
+      offlineBasemap = false,
+    ) => {
       if (!isActive) {
         return;
       }
 
       setIsMapLoaded(false);
+      setIsOfflineBasemap(offlineBasemap);
       void map.once('style.load', handleStyleLoad);
       map.setStyle(style);
     };
 
     void loadMapLibreBasemapStyle(abortController.signal, theme)
-      .then(applyStyle)
+      .then((style) => applyStyle(style))
       .catch((error: unknown) => {
         if (abortController.signal.aborted) {
           return;
         }
 
-        console.warn('Falling back to unpatched MapLibre style.', error);
-        applyStyle(mapLibreBasemapStyleUrls[theme]);
+        console.warn('Falling back to the offline map background.', error);
+        applyStyle(createOfflineBasemapStyle(theme), true);
       });
 
     return () => {
@@ -3288,6 +3458,22 @@ export default function CycleParkingMap({
           parkingPointToRoutePoint(point),
         ) <= nearbyFocusMaximumDistanceMeters,
     );
+    if (previousSelectedPointIdRef.current !== selectedPointId) {
+      previousSelectedPointIdRef.current = selectedPointId;
+      hasUserAdjustedSelectionCameraRef.current = false;
+      hasCompletedNearbySelectionFocusRef.current = false;
+    }
+    // The finder retains the selected ID while data reconciliation can
+    // temporarily omit its point. Keep the existing camera through that gap.
+    if (!selectedPoint && selectedPointId !== null && !route) {
+      return;
+    }
+    const needsInitialNearbySelectionFocus =
+      selectedPoint !== null &&
+      selectedPoint.id === nearestPoint?.id &&
+      mobileSheetState === 'expanded' &&
+      !hasUserAdjustedSelectionCameraRef.current &&
+      !hasCompletedNearbySelectionFocusRef.current;
     if (suppressParkingViewFocusRef.current) {
       suppressParkingViewFocusRef.current = false;
       previousFocusTargetRef.current = nextFocusTarget;
@@ -3299,7 +3485,8 @@ export default function CycleParkingMap({
         hasNearbyFocusPoints: focusPoints.length > 0,
         next: nextFocusTarget,
         previous: previousFocusTarget,
-      })
+      }) &&
+      !needsInitialNearbySelectionFocus
     ) {
       return;
     }
@@ -3358,10 +3545,17 @@ export default function CycleParkingMap({
         return;
       }
 
+      if (hasUserAdjustedSelectionCameraRef.current) {
+        return;
+      }
+
       if (
         selectedPoint.id === nearestPoint?.id &&
         mobileSheetState === 'expanded'
       ) {
+        if (focusPoints.length >= highlightedRankCount) {
+          hasCompletedNearbySelectionFocusRef.current = true;
+        }
         const bounds = createBounds([
           userLocationToPoint(userLocation),
           ...focusPoints.map(parkingPointToRoutePoint),
@@ -3503,36 +3697,48 @@ export default function CycleParkingMap({
   ]);
 
   return (
-    <div
-      className={`bike-map bike-map-${theme}`}
-      data-map-east={viewport.bounds?.east}
-      data-map-center-latitude={viewport.center?.[1]}
-      data-map-center-longitude={viewport.center?.[0]}
-      data-map-north={viewport.bounds?.north}
-      data-map-south={viewport.bounds?.south}
-      data-map-west={viewport.bounds?.west}
-      data-map-zoom={viewport.zoom}
-      data-cycle-network-enabled={isCycleNetworkVisible}
-      data-cycle-network-presentation={
-        isDirectionsMode && !isRoutePlanningMode ? 'dimmed' : 'full'
-      }
-      data-cycle-network-interactive={isRoutePlanningMode ? 'false' : 'true'}
-      data-route-planning-mode={isRoutePlanningMode ? 'true' : undefined}
-      data-current-location-marker={
-        !isRoutePlanningMode || showCurrentLocationMarker ? 'visible' : 'hidden'
-      }
-      data-route-source={route?.source}
-      data-initial-approach-point-count={initialApproachPositions?.length ?? 0}
-      data-cycle-network-bundles={cycleNetworkBundles.length}
-      data-cycle-network-features={cycleNetworkFeatures.length}
-      data-cycle-network-selected-route={
-        selectedCycleNetworkRouteKey ?? undefined
-      }
-      data-route-waypoint-placement-active={
-        isRouteWaypointPlacementActive ? 'true' : undefined
-      }
-      data-testid="parking-map"
-      ref={mapContainerRef}
-    />
+    <>
+      <div
+        className={`bike-map bike-map-${theme}`}
+        data-map-east={viewport.bounds?.east}
+        data-map-center-latitude={viewport.center?.[1]}
+        data-map-center-longitude={viewport.center?.[0]}
+        data-map-north={viewport.bounds?.north}
+        data-map-south={viewport.bounds?.south}
+        data-map-west={viewport.bounds?.west}
+        data-map-zoom={viewport.zoom}
+        data-rendered-basemap-features={renderedBasemapFeatureCount}
+        data-cycle-network-enabled={isCycleNetworkVisible}
+        data-cycle-network-presentation={
+          isDirectionsMode && !isRoutePlanningMode ? 'dimmed' : 'full'
+        }
+        data-cycle-network-interactive={isRoutePlanningMode ? 'false' : 'true'}
+        data-route-planning-mode={isRoutePlanningMode ? 'true' : undefined}
+        data-current-location-marker={
+          !isRoutePlanningMode || showCurrentLocationMarker
+            ? 'visible'
+            : 'hidden'
+        }
+        data-route-source={route?.source}
+        data-initial-approach-point-count={
+          initialApproachPositions?.length ?? 0
+        }
+        data-cycle-network-bundles={cycleNetworkBundles.length}
+        data-cycle-network-features={cycleNetworkFeatures.length}
+        data-cycle-network-selected-route={
+          selectedCycleNetworkRouteKey ?? undefined
+        }
+        data-route-waypoint-placement-active={
+          isRouteWaypointPlacementActive ? 'true' : undefined
+        }
+        data-testid="parking-map"
+        ref={mapContainerRef}
+      />
+      {isOfflineBasemap ? (
+        <div className="offline-basemap-notice" role="status">
+          {translate(locale, 'offlineMapBackgroundUnavailable')}
+        </div>
+      ) : null}
+    </>
   );
 }

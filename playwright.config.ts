@@ -8,6 +8,7 @@ export default defineConfig({
   fullyParallel: true,
   reporter: [['list']],
   retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : 3,
   use: {
     baseURL,
     trace: 'on-first-retry',
@@ -20,6 +21,8 @@ export default defineConfig({
     env: {
       NEXT_PUBLIC_CYCLESTREETS_API_KEY: 'playwright-local-route-key',
       NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY: 'playwright-google-maps-embed-key',
+      NEXT_PUBLIC_OFFLINE_DOWNLOAD_REQUEST_INTERVAL_MS:
+        process.env.OPENFREEMAP_SMOKE === '1' ? '200' : '0',
     },
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

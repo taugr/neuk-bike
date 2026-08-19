@@ -1,8 +1,44 @@
+import { createHash } from 'node:crypto';
+
 export const PARKING_SCHEMA_VERSION = 2;
 export const PARKING_CHUNK_ZOOM = 12;
 
 const earthRadiusMeters = 6_371_000;
 const spatialCellSizeDegrees = 0.01;
+
+/**
+ * Returns a stable identifier for a generated spatial dataset release.
+ *
+ * The identifier deliberately excludes operational metadata such as
+ * `refreshedAt`, source timestamps, and the manifest's own byte length. It is
+ * therefore reproducible for the same published chunk set while changing when
+ * an addressed asset, its size, or the dataset shape changes.
+ */
+export function createManifestReleaseId({
+  chunkZoom,
+  chunks,
+  pointIndexPath,
+  recordCount,
+  schemaVersion,
+}) {
+  const chunkAssets = Object.entries(chunks)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, metadata]) => [
+      key,
+      metadata.path,
+      metadata.count,
+      metadata.byteLength,
+    ]);
+  const content = JSON.stringify({
+    chunkAssets,
+    chunkZoom,
+    pointIndexPath: pointIndexPath ?? null,
+    recordCount,
+    schemaVersion,
+  });
+
+  return `sha256-${createHash('sha256').update(content).digest('hex')}`;
+}
 
 function toRadians(value) {
   return (value * Math.PI) / 180;

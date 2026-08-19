@@ -1,4 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
+import { installOfflineMapFixture } from './offline-map-fixtures';
+
+test.beforeEach(async ({ context }) => {
+  await installOfflineMapFixture(context);
+});
 
 const savedNeuksStorageKey = 'cycle-parking-saved-neuks';
 const edinburghParking = {

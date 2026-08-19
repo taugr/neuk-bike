@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createOSMStream } from 'osm-pbf-parser-node';
 import {
+  createManifestReleaseId,
   deduplicateParkingPoints,
   deriveParkingNames,
   distanceMeters,
@@ -775,6 +776,7 @@ async function writeSpatialOutput({
     parkingDataBytes += contentBytes;
     chunkManifest[key] = {
       bounds: getTileBounds(key),
+      byteLength: contentBytes,
       count: points.length,
       path,
     };
@@ -821,6 +823,13 @@ async function writeSpatialOutput({
     recordCount: merged.points.length,
     refreshedAt,
     pointIndexPath,
+    releaseId: createManifestReleaseId({
+      chunkZoom: PARKING_CHUNK_ZOOM,
+      chunks: chunkManifest,
+      pointIndexPath,
+      recordCount: merged.points.length,
+      schemaVersion: PARKING_SCHEMA_VERSION,
+    }),
     schemaVersion: PARKING_SCHEMA_VERSION,
     sources,
   };

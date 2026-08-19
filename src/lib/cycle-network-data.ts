@@ -56,6 +56,7 @@ export type CycleNetworkManifest = {
     string,
     {
       bounds: ParkingMapBounds;
+      byteLength?: number;
       count: number;
       path: string;
     }
@@ -63,6 +64,7 @@ export type CycleNetworkManifest = {
   coverage: { bounds: ParkingMapBounds; label: string };
   recordCount: number;
   refreshedAt: string;
+  releaseId?: string;
   schemaVersion: 2;
   source: {
     attribution: string;

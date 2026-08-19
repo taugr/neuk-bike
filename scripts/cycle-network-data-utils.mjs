@@ -1,4 +1,7 @@
-import { toTileCoordinate } from './parking-data-utils.mjs';
+import {
+  createManifestReleaseId,
+  toTileCoordinate,
+} from './parking-data-utils.mjs';
 
 export const CYCLE_NETWORK_CHUNK_ZOOM = 10;
 export const CYCLE_NETWORK_SCHEMA_VERSION = 2;
@@ -47,6 +50,15 @@ const knownLighting = new Map([
 export const CYCLE_NETWORK_SURFACES = new Set(knownSurfaces.values());
 export const CYCLE_NETWORK_QUALITIES = new Set(knownQualities.values());
 export const CYCLE_NETWORK_LIGHTING = new Set(knownLighting.values());
+
+export function createCycleNetworkManifestReleaseId({ chunks, recordCount }) {
+  return createManifestReleaseId({
+    chunkZoom: CYCLE_NETWORK_CHUNK_ZOOM,
+    chunks,
+    recordCount,
+    schemaVersion: CYCLE_NETWORK_SCHEMA_VERSION,
+  });
+}
 
 function optionalString(value) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;

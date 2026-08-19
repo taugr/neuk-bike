@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  createManifestReleaseId,
   deduplicateParkingPoints,
   deriveParkingNames,
   getTileKey,
@@ -21,6 +22,32 @@ function point(
 }
 
 describe('parking data generation utilities', () => {
+  it('derives reproducible release IDs from published chunk metadata', () => {
+    const input = {
+      chunkZoom: 12,
+      chunks: {
+        '12/2/1': { byteLength: 180, count: 2, path: 'chunks/two.json' },
+        '12/1/1': { byteLength: 90, count: 1, path: 'chunks/one.json' },
+      },
+      pointIndexPath: 'indexes/point-index.json',
+      recordCount: 3,
+      schemaVersion: 2,
+    };
+
+    expect(createManifestReleaseId(input)).toBe(
+      createManifestReleaseId({ ...input, chunks: { ...input.chunks } }),
+    );
+    expect(
+      createManifestReleaseId({
+        ...input,
+        chunks: {
+          ...input.chunks,
+          '12/2/1': { ...input.chunks['12/2/1'], byteLength: 181 },
+        },
+      }),
+    ).not.toBe(createManifestReleaseId(input));
+  });
+
   it('creates stable tile keys and representative points', () => {
     expect(getTileKey({ latitude: 55.9533, longitude: -3.1883 })).toBe(
       '12/2011/1276',

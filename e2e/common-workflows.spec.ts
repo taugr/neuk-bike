@@ -1,4 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
+import { installOfflineMapFixture } from './offline-map-fixtures';
+
+test.beforeEach(async ({ context }) => {
+  await installOfflineMapFixture(context);
+});
 
 const parkingOne = {
   id: 'cec:1',
@@ -392,6 +397,17 @@ test('keeps manual zoom after background parking chunks load', async ({
       timeout: 10_000,
     })
     .toBeLessThan(12.5);
+  await expect
+    .poll(
+      async () => {
+        const before = Number(await map.getAttribute('data-map-zoom'));
+        await page.waitForTimeout(200);
+        const after = Number(await map.getAttribute('data-map-zoom'));
+        return Math.abs(after - before);
+      },
+      { timeout: 5_000 },
+    )
+    .toBeLessThan(0.01);
   loadedParkingChunks.clear();
 
   const initialZoom = Number(await map.getAttribute('data-map-zoom'));

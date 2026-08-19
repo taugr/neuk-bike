@@ -9,6 +9,7 @@ import {
   CYCLE_NETWORK_QUALITIES,
   CYCLE_NETWORK_SCHEMA_VERSION,
   CYCLE_NETWORK_SURFACES,
+  createCycleNetworkManifestReleaseId,
   getCycleNetworkTileKeys,
 } from './cycle-network-data-utils.mjs';
 
@@ -57,8 +58,20 @@ async function main() {
     'Manifest schema is unsupported.',
   );
   assert(
+    manifest.releaseId ===
+      createCycleNetworkManifestReleaseId({
+        chunks: manifest.chunks,
+        recordCount: manifest.recordCount,
+      }),
+    'Manifest release ID does not match published assets.',
+  );
+  assert(
     report.schemaVersion === CYCLE_NETWORK_SCHEMA_VERSION,
     'Report schema is unsupported.',
+  );
+  assert(
+    report.releaseId === manifest.releaseId,
+    'Network report release ID does not match the manifest.',
   );
   assert(
     manifest.chunkZoom === CYCLE_NETWORK_CHUNK_ZOOM,
@@ -101,6 +114,10 @@ async function main() {
       `Chunk ${key} count does not match its manifest entry.`,
     );
     const bytes = Buffer.byteLength(content);
+    assert(
+      bytes === metadata.byteLength,
+      `Chunk ${key} byte length does not match its manifest entry.`,
+    );
     totalBytes += bytes;
     largestAssetBytes = Math.max(largestAssetBytes, bytes);
     chunkContents.set(key, content);

@@ -13,6 +13,14 @@ type GeneratedParkingPoint = Coordinate & {
 export const PARKING_SCHEMA_VERSION: number;
 export const PARKING_CHUNK_ZOOM: number;
 
+export function createManifestReleaseId(input: {
+  chunkZoom: number;
+  chunks: Record<string, { byteLength: number; count: number; path: string }>;
+  pointIndexPath?: string;
+  recordCount: number;
+  schemaVersion: number;
+}): string;
+
 export function distanceMeters(from: Coordinate, to: Coordinate): number;
 export function toTileCoordinate(
   latitude: number,

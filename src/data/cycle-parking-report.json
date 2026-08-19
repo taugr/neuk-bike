@@ -7102,9 +7102,9 @@
   "generatedAssets": {
     "fileCount": 4351,
     "largestAssetBytes": 3248553,
-    "manifestBytes": 820963,
+    "manifestBytes": 897156,
     "maximumInitialCompressedBytes": 494434,
-    "parkingDataBytes": 27992167,
+    "parkingDataBytes": 28068360,
     "pointIndexBytes": 3248553
   },
   "mergedRecordCount": 87667,
@@ -11412,5 +11412,6 @@
     "elapsedSeconds": 1343,
     "peakRssBytes": 2842509312
   },
-  "schemaVersion": 2
+  "schemaVersion": 2,
+  "releaseId": "sha256-51607cf736924b25c16c52b54c2641dfad1c65e17b7a38cad49ecf1276173d86"
 }

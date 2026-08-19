@@ -113,6 +113,18 @@ export function getParkingTileKeysForBounds(
     .map(({ key }) => key);
 }
 
+export function getParkingTileKeysForDownloadBounds(
+  bounds: ParkingMapBounds,
+  manifest: Pick<ParkingDataManifest, 'chunkZoom' | 'chunks'>,
+) {
+  return getParkingTileKeysForBounds(
+    bounds,
+    manifest,
+    1,
+    Number.POSITIVE_INFINITY,
+  );
+}
+
 export function isLocationInParkingCoverage(
   location: UserLocation,
   manifest: Pick<ParkingDataManifest, 'coverage'>,

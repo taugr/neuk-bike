@@ -67,6 +67,7 @@ export type ParkingDataManifest = {
     string,
     {
       bounds: { east: number; north: number; south: number; west: number };
+      byteLength?: number;
       count: number;
       path: string;
     }
@@ -78,6 +79,7 @@ export type ParkingDataManifest = {
   pointIndexPath: string;
   recordCount: number;
   refreshedAt: string;
+  releaseId?: string;
   schemaVersion: number;
   sources: ParkingDataSource[];
 };

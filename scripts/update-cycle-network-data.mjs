@@ -6,6 +6,7 @@ import { gzipSync } from 'node:zlib';
 import {
   CYCLE_NETWORK_CHUNK_ZOOM,
   CYCLE_NETWORK_SCHEMA_VERSION,
+  createCycleNetworkManifestReleaseId,
   getCycleNetworkFeatureBounds,
   getCycleNetworkTileKeys,
   normalizeCycleNetworkFeature,
@@ -277,6 +278,7 @@ async function main() {
     chunkContents.set(key, content);
     chunkManifest[key] = {
       bounds: getTileBounds(key),
+      byteLength: bytes,
       count: chunk.features.length,
       path,
     };
@@ -290,6 +292,10 @@ async function main() {
     coverage: { bounds: overallBounds(features), label: 'United Kingdom' },
     recordCount: features.length,
     refreshedAt,
+    releaseId: createCycleNetworkManifestReleaseId({
+      chunks: chunkManifest,
+      recordCount: features.length,
+    }),
     schemaVersion: CYCLE_NETWORK_SCHEMA_VERSION,
     source: {
       attribution:

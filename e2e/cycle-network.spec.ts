@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { installOfflineMapFixture } from './offline-map-fixtures';
+
+test.beforeEach(async ({ context }) => {
+  await installOfflineMapFixture(context);
+});
 
 const routeLocation = {
   latitude: 52.0071274271238,

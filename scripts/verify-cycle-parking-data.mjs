@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { coverageLabel } from './parking-data-sources.mjs';
+import { createManifestReleaseId } from './parking-data-utils.mjs';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const parkingRoot = resolve(repoRoot, 'public/data/parking');
@@ -118,6 +119,17 @@ async function main() {
   const manifest = JSON.parse(manifestContent);
   const report = JSON.parse(await readFile(reportPath, 'utf8'));
   assert(manifest.schemaVersion === 2, 'Manifest schema must be version 2.');
+  assert(
+    manifest.releaseId ===
+      createManifestReleaseId({
+        chunkZoom: manifest.chunkZoom,
+        chunks: manifest.chunks,
+        pointIndexPath: manifest.pointIndexPath,
+        recordCount: manifest.recordCount,
+        schemaVersion: manifest.schemaVersion,
+      }),
+    'Manifest release ID does not match published assets.',
+  );
   assert(report.schemaVersion === 2, 'Report schema must be version 2.');
   assert(
     manifest.coverage.label === coverageLabel,
@@ -156,6 +168,10 @@ async function main() {
       chunk.points.length === metadata.count,
       `Chunk ${key} count does not match the manifest.`,
     );
+    assert(
+      Buffer.byteLength(content) === metadata.byteLength,
+      `Chunk ${key} byte length does not match the manifest.`,
+    );
     chunkContents.set(key, content);
     largestAssetBytes = Math.max(largestAssetBytes, Buffer.byteLength(content));
     pointCount += chunk.points.length;
@@ -181,6 +197,10 @@ async function main() {
   assert(
     report.mergedRecordCount === manifest.recordCount,
     'Quality report count does not match the manifest.',
+  );
+  assert(
+    report.releaseId === manifest.releaseId,
+    'Quality report release ID does not match the manifest.',
   );
 
   const representativeInside = {
@@ -240,6 +260,18 @@ async function main() {
     'Point index exceeds 5 MiB.',
   );
   assert(maximumInitialBytes <= mebibyte, 'Initial payload exceeds 1 MiB.');
+  assert(
+    report.generatedAssets.fileCount === files.length &&
+      report.generatedAssets.largestAssetBytes === largestAssetBytes &&
+      report.generatedAssets.manifestBytes ===
+        Buffer.byteLength(manifestContent) &&
+      report.generatedAssets.maximumInitialCompressedBytes ===
+        maximumInitialBytes &&
+      report.generatedAssets.parkingDataBytes === parkingDataBytes &&
+      report.generatedAssets.pointIndexBytes ===
+        Buffer.byteLength(pointIndexContent),
+    'Quality report asset metrics do not match current files.',
+  );
 
   console.log(
     JSON.stringify(

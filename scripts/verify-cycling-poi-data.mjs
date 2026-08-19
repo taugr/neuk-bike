@@ -7,6 +7,7 @@ import {
   coverageLabel,
   osmInputs,
 } from './parking-data-sources.mjs';
+import { createManifestReleaseId } from './parking-data-utils.mjs';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dataRoot = resolve(repoRoot, 'public/data/cycling-pois');
@@ -23,7 +24,22 @@ async function main() {
   );
   const report = JSON.parse(await readFile(reportPath, 'utf8'));
   invariant(manifest.schemaVersion === 2, 'Unexpected POI manifest schema.');
+  invariant(
+    manifest.releaseId ===
+      createManifestReleaseId({
+        chunkZoom: manifest.chunkZoom,
+        chunks: manifest.chunks,
+        pointIndexPath: manifest.pointIndexPath,
+        recordCount: manifest.recordCount,
+        schemaVersion: manifest.schemaVersion,
+      }),
+    'POI manifest release ID does not match published assets.',
+  );
   invariant(manifest.chunkZoom === 12, 'Unexpected POI chunk zoom.');
+  invariant(
+    report.releaseId === manifest.releaseId,
+    'POI report release ID does not match the manifest.',
+  );
   invariant(
     Array.isArray(manifest.coverage?.areas) &&
       manifest.coverage.areas.length > 0,
@@ -80,6 +96,10 @@ async function main() {
     const path = resolve(dataRoot, metadata.path);
     const content = await readFile(path, 'utf8');
     const contentBytes = Buffer.byteLength(content);
+    invariant(
+      contentBytes === metadata.byteLength,
+      `Byte-length mismatch for ${key}.`,
+    );
     cyclingPoiDataBytes += contentBytes;
     largestAssetBytes = Math.max(largestAssetBytes, contentBytes);
     const expectedHash = metadata.path.match(/\.([a-f0-9]{16})\.json$/)?.[1];

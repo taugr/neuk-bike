@@ -1,5 +1,10 @@
-const cachePrefix = 'neuk-bike-';
-const cacheName = `${cachePrefix}v10`;
+const runtimeCachePrefix = 'neuk-bike-';
+const cacheName = `${runtimeCachePrefix}v11`;
+// Explicit offline-area downloads deliberately use a separate, stable cache.
+// It must outlive routine app-shell upgrades so a completed area remains ready
+// after a new service worker activates.
+const offlineAreaCacheName = 'neuk-bike-offline-areas-v1';
+const openFreeMapOrigin = 'https://tiles.openfreemap.org';
 const scopePath = new URL(self.registration.scope).pathname;
 const appBasePath = scopePath.endsWith('/')
   ? scopePath.slice(0, -1)
@@ -37,7 +42,9 @@ self.addEventListener('activate', (event) => {
           cacheNames
             .filter(
               (candidate) =>
-                candidate.startsWith(cachePrefix) && candidate !== cacheName,
+                candidate.startsWith(runtimeCachePrefix) &&
+                candidate !== cacheName &&
+                candidate !== offlineAreaCacheName,
             )
             .map((candidate) => caches.delete(candidate)),
         ),
@@ -48,6 +55,23 @@ self.addEventListener('activate', (event) => {
 
 function isSameOrigin(request) {
   return new URL(request.url).origin === self.location.origin;
+}
+
+function isOpenFreeMapResource(request) {
+  const url = new URL(request.url);
+
+  if (url.origin !== openFreeMapOrigin) {
+    return false;
+  }
+
+  return (
+    /^\/styles\/(liberty|dark)(?:\/style\.json)?$/.test(url.pathname) ||
+    /^\/sprites\/ofm_f384\/ofm(?:@2x)?\.(?:json|png)$/.test(url.pathname) ||
+    /^\/fonts\/[^/]+\/\d+-\d+\.pbf$/.test(url.pathname) ||
+    url.pathname === '/planet' ||
+    /^\/planet\/\d[\d_]*_pt\/\d+\/\d+\/\d+\.pbf$/.test(url.pathname) ||
+    /^\/natural_earth\/ne2sr\/\d+\/\d+\/\d+\.png$/.test(url.pathname)
+  );
 }
 
 function isStaticAsset(request) {
@@ -62,7 +86,8 @@ function isStaticAsset(request) {
     request.destination === 'style' ||
     request.destination === 'font' ||
     request.destination === 'image' ||
-    url.pathname.startsWith(appPath('/_next/static/'))
+    url.pathname.startsWith(appPath('/_next/static/')) ||
+    url.pathname.startsWith(appPath('/vendor/maplibre-gl/'))
   );
 }
 
@@ -86,7 +111,16 @@ async function cacheFirst(request) {
     return cachedResponse;
   }
 
-  const response = await fetch(request);
+  let response;
+  try {
+    response = await fetch(request);
+  } catch (error) {
+    const compatibleOfflineChunk = await matchCompatibleOfflineChunk(request);
+    if (compatibleOfflineChunk) {
+      return compatibleOfflineChunk;
+    }
+    throw error;
+  }
 
   if (response.ok) {
     const cache = await caches.open(cacheName);
@@ -94,6 +128,28 @@ async function cacheFirst(request) {
   }
 
   return response;
+}
+
+async function matchCompatibleOfflineChunk(request) {
+  const pathname = new URL(request.url).pathname;
+  const match = pathname.match(
+    /\/data\/(parking|cycling-pois|cycle-network)\/chunks\/(\d+\/\d+\/\d+)\.[a-f0-9]+\.json$/,
+  );
+  if (!match) {
+    return undefined;
+  }
+
+  const expectedPathPrefix = appPath(`/data/${match[1]}/chunks/${match[2]}.`);
+  const cache = await caches.open(offlineAreaCacheName);
+  const keys = await cache.keys();
+  const compatibleRequest = keys.find((candidate) => {
+    const candidatePath = new URL(candidate.url).pathname;
+    return (
+      candidatePath.startsWith(expectedPathPrefix) &&
+      candidatePath.endsWith('.json')
+    );
+  });
+  return compatibleRequest ? cache.match(compatibleRequest) : undefined;
 }
 
 async function networkFirstNavigation(request) {
@@ -126,7 +182,9 @@ async function networkFirstData(request) {
     }
     return response;
   } catch {
-    const cachedResponse = await caches.match(request);
+    const offlineCache = await caches.open(offlineAreaCacheName);
+    const cachedResponse =
+      (await offlineCache.match(request)) ?? (await caches.match(request));
     if (cachedResponse) {
       return cachedResponse;
     }
@@ -134,10 +192,29 @@ async function networkFirstData(request) {
   }
 }
 
+async function offlineAreaCacheFirst(request) {
+  const offlineCache = await caches.open(offlineAreaCacheName);
+  const cachedResponse = await offlineCache.match(request);
+
+  // This cache is populated only by an explicit offline-area download. Runtime
+  // map use may read it, but must never turn incidental browsing into a trip
+  // download.
+  return cachedResponse ?? fetch(request);
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  if (request.method !== 'GET' || !isSameOrigin(request)) {
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  if (isOpenFreeMapResource(request)) {
+    event.respondWith(offlineAreaCacheFirst(request));
+    return;
+  }
+
+  if (!isSameOrigin(request)) {
     return;
   }
 
