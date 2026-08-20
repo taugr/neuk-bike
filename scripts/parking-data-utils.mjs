@@ -268,10 +268,15 @@ export function representativePoint(coordinates) {
 
 export function normalizeOsmProperties(tags) {
   const capacity = Number(tags.capacity);
+  const cargoBikeCapacity = Number(tags['capacity:cargo_bike']);
   return {
     access: tags.access ?? 'unknown',
     bicycle_pa: tags.bicycle_parking ?? '',
     capacity: Number.isFinite(capacity) && capacity > 0 ? capacity : 0,
+    ...(Number.isFinite(cargoBikeCapacity) && cargoBikeCapacity > 0
+      ? { capacity_cargo_bike: cargoBikeCapacity }
+      : {}),
+    ...(tags.cargo_bike ? { cargo_bike: tags.cargo_bike } : {}),
     covered: tags.covered ?? '',
     fee: tags.fee ?? '',
     operator: tags.operator ?? '',

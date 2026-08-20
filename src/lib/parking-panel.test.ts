@@ -100,4 +100,23 @@ describe('parking panel navigation', () => {
 
     expect(cleared).toMatchObject({ selectedId: null, view: 'list' });
   });
+
+  it('opens filters and returns to the nearby list', () => {
+    const filters = reduceParkingPanel(initialParkingPanelState, {
+      type: 'OPEN_FILTERS',
+    });
+    const returned = reduceParkingPanel(filters, { type: 'CLOSE_FILTERS' });
+
+    expect(filters).toMatchObject({
+      direction: 1,
+      returnView: 'list',
+      transition: 'crossfade',
+      view: 'filters',
+    });
+    expect(returned).toMatchObject({
+      direction: -1,
+      transition: 'crossfade',
+      view: 'list',
+    });
+  });
 });

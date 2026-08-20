@@ -1,8 +1,11 @@
 import type { ParkingView } from '@/lib/map-pins';
 
-export type ParkingPanelView = 'details' | 'directions' | 'list';
-export type ParkingPanelReturnView = Exclude<ParkingPanelView, 'directions'>;
-export type ParkingPanelTransition = 'navigate' | 'replace';
+export type ParkingPanelView = 'details' | 'directions' | 'filters' | 'list';
+export type ParkingPanelReturnView = Exclude<
+  ParkingPanelView,
+  'directions' | 'filters'
+>;
+export type ParkingPanelTransition = 'crossfade' | 'navigate' | 'replace';
 export type ParkingSelectionOrigin = 'list' | 'map';
 
 export type ParkingPanelState = {
@@ -19,6 +22,7 @@ export type ParkingPanelEvent =
   | { type: 'CLEAR_SELECTION' }
   | { type: 'CLOSE_DETAILS' }
   | { type: 'EXIT_DIRECTIONS' }
+  | { type: 'CLOSE_FILTERS' }
   | { selectedId: string | null; type: 'INITIALIZE_SELECTION' }
   | {
       origin: ParkingSelectionOrigin;
@@ -26,6 +30,7 @@ export type ParkingPanelEvent =
       type: 'OPEN_DETAILS';
     }
   | { selectedId: string; type: 'OPEN_DIRECTIONS' }
+  | { type: 'OPEN_FILTERS' }
   | { selectedId: string; type: 'SELECT_LIST_POINT' }
   | { selectedId: string | null; type: 'SHOW_NEARBY' }
   | { selectedId: string | null; type: 'SHOW_SAVED' }
@@ -64,6 +69,14 @@ export function reduceParkingPanel(
         transition: 'navigate',
         view: 'list',
       };
+    case 'CLOSE_FILTERS':
+      return {
+        ...state,
+        direction: -1,
+        returnView: 'list',
+        transition: 'crossfade',
+        view: 'list',
+      };
     case 'EXIT_DIRECTIONS':
       return {
         ...state,
@@ -95,13 +108,26 @@ export function reduceParkingPanel(
       return {
         ...state,
         direction: 1,
-        returnView: state.view === 'directions' ? state.returnView : state.view,
+        returnView:
+          state.view === 'directions'
+            ? state.returnView
+            : state.view === 'filters'
+              ? 'list'
+              : state.view,
         selectedId: event.selectedId,
         transition: 'navigate',
         view: 'directions',
       };
+    case 'OPEN_FILTERS':
+      return {
+        ...state,
+        direction: 1,
+        returnView: 'list',
+        transition: 'crossfade',
+        view: 'filters',
+      };
     case 'RESTORE_DESKTOP_LIST':
-      return state.view === 'details'
+      return state.view === 'details' || state.view === 'filters'
         ? {
             ...state,
             direction: -1,

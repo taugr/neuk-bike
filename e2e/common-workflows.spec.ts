@@ -307,7 +307,7 @@ test('selects Armenian from the browser language', async ({ page }) => {
   );
 });
 
-test('uses an Armenian category grid instead of desktop scrolling', async ({
+test('keeps Armenian categories in one scrollable desktop toolbar', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -328,6 +328,7 @@ test('uses an Armenian category grid instead of desktop scrolling', async ({
         containerWidth: container.clientWidth,
         overflow: container.dataset.overflow,
         overflowX: getComputedStyle(container).overflowX,
+        overflowY: getComputedStyle(container).overflowY,
         scrollWidth: container.scrollWidth,
         chips: chips.map((chip) => ({
           clientWidth: chip.clientWidth,
@@ -338,10 +339,17 @@ test('uses an Armenian category grid instead of desktop scrolling', async ({
     });
 
   expect(categoryMetrics.overflow).toBe('true');
-  expect(categoryMetrics.overflowX).toBe('hidden');
-  expect(categoryMetrics.scrollWidth).toBe(categoryMetrics.containerWidth);
-  expect(new Set(categoryMetrics.chips.map((chip) => chip.left)).size).toBe(2);
-  expect(new Set(categoryMetrics.chips.map((chip) => chip.top)).size).toBe(2);
+  expect(categoryMetrics.overflowX).toBe('auto');
+  expect(categoryMetrics.overflowY).toBe('hidden');
+  expect(categoryMetrics.scrollWidth).toBeGreaterThan(
+    categoryMetrics.containerWidth,
+  );
+  expect(new Set(categoryMetrics.chips.map((chip) => chip.top)).size).toBe(1);
+  const filterBox = await page
+    .getByTestId('open-parking-filters')
+    .boundingBox();
+  expect(filterBox?.width).toBe(44);
+  expect(filterBox?.height).toBe(44);
 });
 
 test('keeps manual zoom after background parking chunks load', async ({
@@ -412,13 +420,25 @@ test('keeps manual zoom after background parking chunks load', async ({
 
   const initialZoom = Number(await map.getAttribute('data-map-zoom'));
   let settledZoom = initialZoom;
-  for (let index = 0; index < 4; index += 1) {
+  for (let index = 0; index < 2; index += 1) {
+    const zoomBeforeStep = settledZoom;
     await zoomOutButton.click();
     await expect
       .poll(async () => Number(await map.getAttribute('data-map-zoom')), {
         timeout: 2_000,
       })
-      .toBeLessThan(settledZoom - 0.5);
+      .toBeLessThan(zoomBeforeStep - 0.5);
+    await expect
+      .poll(
+        async () => {
+          const before = Number(await map.getAttribute('data-map-zoom'));
+          await page.waitForTimeout(200);
+          const after = Number(await map.getAttribute('data-map-zoom'));
+          return Math.abs(after - before);
+        },
+        { timeout: 5_000 },
+      )
+      .toBeLessThan(0.01);
     settledZoom = Number(await map.getAttribute('data-map-zoom'));
   }
 

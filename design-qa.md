@@ -322,6 +322,54 @@ final result: blocked
 
 final result: passed
 
+# Compact parking toolbar design QA
+
+## Evidence
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/exec-28fa2f71-1117-43b8-b5f9-6982cc953b2f.png`
+- Browser-rendered implementation: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-toolbar/mobile-armenian-active.png`
+- English default state: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-toolbar/mobile-english-default.png`
+- Full-view comparison: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-toolbar/design-comparison.png`
+- Viewport: 390 x 844 CSS pixels with device scale factor 1.
+- Density normalization: the 852 x 1846 source was normalized to 390 x 844; the implementation is a native 390 x 844 capture. The side-by-side comparison is 780 x 844.
+- State: Eastern Armenian, Parking selected, three active preferences, Best match ranking, real Yerevan data.
+
+## Full-view and focused comparison
+
+The implementation matches the selected one-row hierarchy: natural-width place-type chips scroll within the left track, while the separated 44 x 44 filter action remains fixed on the right with its active-count badge. The persistent sort button and active-summary row are absent, so the first result starts higher than in the previous implementation.
+
+The full-height side-by-side image is also the focused toolbar comparison because the toolbar remains readable at equal scale. Automated browser measurements separately confirmed the toolbar and filter action are each 44 pixels high, every locale remains on one chip row, Armenian uses horizontal overflow rather than truncation, and the filter action does not move when the chip strip scrolls.
+
+## Required fidelity surfaces
+
+- Fonts and typography: the implementation deliberately retains Bike Neuks' production font stack, weights, and localized Armenian shaping rather than copying the generated mock's distorted lettering. Labels remain single-line and untruncated inside natural-width chips.
+- Spacing and layout rhythm: the one-row control is 44 pixels high with the app's existing chip gaps, radii, and panel padding. The result list starts immediately beneath it.
+- Colors and visual tokens: selected, active, muted, border, and separator states use the existing light/dark theme tokens and maintain the product's established green hierarchy.
+- Image quality and assets: the app continues to render the real OpenFreeMap vector map and Lucide icons. No raster substitutes, placeholder art, custom SVGs, or new visual assets were introduced.
+- Copy and content: all visible and accessible labels use the existing English, Scottish Gaelic, Spanish, and Eastern Armenian catalogues. The active count has a dedicated localized accessible label.
+
+## Interaction and resilience checks
+
+- Opened the filter sheet, selected Covered, Public access, 6+ spaces, and Best match, then applied the preferences.
+- Confirmed the fixed button badge and localized accessible count, the absence of the old sort and summary controls, and the Best match label on the first ranked result.
+- Switched among English, Spanish, Scottish Gaelic, and Eastern Armenian at 390 x 844; confirmed a single chip row, no clipped labels or document overflow, and a fixed 44 x 44 filter action.
+- Confirmed the same single-row overflow behaviour in the desktop side panel.
+- Captured the English default and Armenian active states with no browser console errors.
+
+## Findings
+
+- No actionable P0, P1, or P2 differences remain.
+- P3: the source mock shows generated Edinburgh records and malformed Armenian glyphs, while the implementation correctly uses the current localized Yerevan dataset and production type rendering.
+- P3: the exact number of visible category chips varies by language. This is the intended localization behaviour; long labels keep their natural width and the strip scrolls.
+
+## Comparison history
+
+1. The selected combined mock established the one-row structure, fixed filter action, active-count badge, and no persistent sort or summary row.
+2. The first browser capture accidentally included the open settings popover, so it was rejected as invalid comparison evidence.
+3. The clean Armenian active state was recaptured at the same 390 x 844 viewport and combined with the normalized source. No P0/P1/P2 mismatch remained.
+
+final result: passed
+
 ## Saved-route summary modest restyle
 
 The existing Bike Neuks parking fact strip was used as the product reference.
@@ -1766,3 +1814,61 @@ The full mobile viewport is the focused comparison region because the feature sp
 ## Final result
 
 passed
+
+# Parking filters design QA
+
+## Evidence
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/exec-da2552cc-efb6-4d93-9d0d-2cb840c84dca.png`
+- Browser-rendered implementation: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-filters/mobile-applied-dark.png`
+- Full-view comparison: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-filters/design-comparison.png`
+- Additional states: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-filters/mobile-default.png`, `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-filters/mobile-panel.png`, `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-filters/desktop-default.png`, `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-filters/desktop-panel.png`
+- Viewports: mobile 390 x 844 CSS pixels; desktop 1280 x 720 CSS pixels.
+- Density normalization: source 853 x 1844 pixels was normalized to 390 x 844 for comparison; implementation was captured at 390 x 844 with device scale factor 1. The combined comparison is 780 x 844.
+- State: dark theme, Parking selected, Covered + 6+ spaces + Frame-lockable active, Best match sort, real Edinburgh data.
+
+## Full-view comparison
+
+The implementation preserves the source hierarchy: map-first screen, bottom results sheet, one compact sort/filter row, active-filter summary only when needed, Best match marker on the top result, and ranked parking results. It uses the app's existing type, spacing, tokens, Lucide icon family, and parking-result cards instead of replacing the established design system with the concept image's divider-only rows.
+
+The quiet default was also checked separately. It adds only a single Nearest/Filters row, with no filter summary or missing-detail copy until preferences are active.
+
+No focused crop was needed because the equal-size full mobile comparison contains the entire feature surface, including the toolbar, active summary, and first result rows at a readable scale.
+
+## Interaction and resilience checks
+
+- Opened and closed the dedicated filter panel.
+- Selected Covered, Public access, Frame-lockable, Best match, and minimum capacity using semantic buttons.
+- Applied filters and confirmed the badge, localized summary, result reordering, and Best match label.
+- Switched back to Nearest and confirmed records with unknown metadata remained visible with a neutral missing-details line.
+- Confirmed the mobile filter panel exposes every option and the apply action without clipping at 390 x 844.
+- Confirmed desktop default and filter-panel states at 1280 x 720 with no document overflow; the desktop panel required no internal scrolling.
+- Confirmed eight real parking results after filtering and no browser console errors.
+
+## Findings
+
+- No actionable P0, P1, or P2 issues remain.
+- P3: dynamic counts and specific Edinburgh records differ from the concept image because the implementation uses the current generated dataset. This does not alter the intended hierarchy or behavior.
+- P3: result rows retain Bike Neuks' existing subtle card borders rather than the concept's divider-only treatment. This maintains consistency with the rest of the live product and remains visually quiet.
+
+## Comparison history
+
+1. Initial filter-panel inspection found the mobile sheet capped at 52dvh, leaving minimum capacity and the apply action below the initial viewport. This was treated as a P1 usability issue.
+2. The filter panel was given its own 78dvh expanded ratio and content measurement target. Post-fix evidence is `mobile-panel.png`, where all controls, the unknown-values note, and the apply action are visible together at 390 x 844.
+3. The post-fix dark applied state was compared side by side with the selected source in `design-comparison.png`. No further P0/P1/P2 mismatch was found.
+
+final result: passed
+
+## Compact parking toolbar final checkpoint
+
+The detailed `Compact parking toolbar design QA` section above is the latest
+design review. It supersedes the earlier two-row parking-filter layout.
+
+- Source: `/Users/tomauger/.codex/generated_images/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/exec-28fa2f71-1117-43b8-b5f9-6982cc953b2f.png`
+- Implementation: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-toolbar/mobile-armenian-active.png`
+- Comparison: `/Users/tomauger/.codex/visualizations/2026/08/20/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/parking-toolbar/design-comparison.png`
+- Viewport: 390 x 844 CSS pixels at device-pixel ratio 1.
+- Findings: no actionable P0, P1, or P2 differences.
+- Browser console errors: none.
+
+final result: passed

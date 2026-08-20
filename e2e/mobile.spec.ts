@@ -77,6 +77,298 @@ test('keeps the nearby rows stable when the list first loads', async ({
   );
 });
 
+test('applies parking preferences without crowding the default mobile list', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  await expect(page.getByTestId('parking-sort-button')).toHaveCount(0);
+  await expect(page.getByTestId('open-parking-filters')).toHaveAttribute(
+    'aria-label',
+    'Parking filters',
+  );
+  await expect(page.getByTestId('parking-filter-summary')).toHaveCount(0);
+
+  const toolbarMetrics = await page
+    .getByTestId('parking-discovery-toolbar')
+    .evaluate((toolbar) => {
+      const filterButton = toolbar.querySelector<HTMLElement>(
+        '[data-testid="open-parking-filters"]',
+      );
+      return {
+        filterHeight: filterButton?.getBoundingClientRect().height,
+        filterWidth: filterButton?.getBoundingClientRect().width,
+        height: toolbar.getBoundingClientRect().height,
+      };
+    });
+  expect(toolbarMetrics).toEqual({
+    filterHeight: 44,
+    filterWidth: 44,
+    height: 44,
+  });
+
+  await page.getByTestId('open-parking-filters').click();
+  const filters = page.getByRole('region', { name: 'Parking filters' });
+  await expect(filters).toBeVisible();
+  await expect(
+    filters.getByText('Places with missing details still appear.'),
+  ).toBeVisible();
+  await expect(
+    filters.getByRole('button', { name: 'Best match' }),
+  ).toBeDisabled();
+
+  await filters.getByRole('button', { name: 'Covered', exact: true }).click();
+  await filters
+    .getByRole('button', { name: 'Public access', exact: true })
+    .click();
+  await filters.getByRole('button', { name: 'Best match' }).click();
+  await filters
+    .getByRole('button', { name: 'Increase minimum capacity' })
+    .click();
+  await filters
+    .getByRole('button', { name: 'Increase minimum capacity' })
+    .click();
+  await filters
+    .getByRole('button', { name: 'Increase minimum capacity' })
+    .click();
+  await expect(filters.locator('output')).toHaveText('6');
+  await page.getByTestId('apply-parking-filters').click();
+
+  await expect(page.getByTestId('parking-sort-button')).toHaveCount(0);
+  await expect(page.getByTestId('open-parking-filters')).toHaveAttribute(
+    'aria-label',
+    'Active parking filters: 3',
+  );
+  await expect(page.getByTestId('open-parking-filters')).toContainText('3');
+  await expect(page.getByTestId('parking-filter-summary')).toHaveCount(0);
+  await expect(page.getByTestId('open-parking-filters')).toBeFocused();
+  const activeFilterEdgeMetrics = await page
+    .getByTestId('parking-discovery-toolbar')
+    .evaluate((toolbar) => {
+      const count = toolbar.querySelector<HTMLElement>('.parking-filter-count');
+      const toolbarBounds = toolbar.getBoundingClientRect();
+      const countBounds = count?.getBoundingClientRect();
+
+      return {
+        countRight: countBounds?.right ?? Number.POSITIVE_INFINITY,
+        toolbarRight: toolbarBounds.right,
+      };
+    });
+  expect(activeFilterEdgeMetrics.countRight).toBeLessThanOrEqual(
+    activeFilterEdgeMetrics.toolbarRight,
+  );
+  await expect(
+    page
+      .getByTestId('parking-list')
+      .locator('.parking-list-item')
+      .first()
+      .getByText('Best match', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByTestId('parking-list').locator('.parking-list-item'),
+  ).toHaveCount(8);
+
+  await page.getByTestId('open-parking-filters').click();
+  await expect(
+    page
+      .getByRole('region', { name: 'Parking filters' })
+      .getByRole('button', { name: 'Best match' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+
+  await filters.getByRole('button', { name: 'Clear' }).click();
+  await expect(
+    filters.getByRole('button', { name: 'Nearest' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(
+    filters.getByRole('button', { name: 'Best match' }),
+  ).toBeDisabled();
+});
+
+test('keeps the mobile sheet height stable when opening and closing filters', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  const sheet = page.locator('.control-pane');
+  const finder = page.locator('.finder-panel-content');
+  await page.evaluate(() => {
+    Object.defineProperty(window, '__parkingFinderBeforeFilters', {
+      configurable: true,
+      value: document.querySelector('.finder-panel-content'),
+    });
+  });
+  const listBounds = await sheet.boundingBox();
+  await page.getByTestId('open-parking-filters').click();
+  const filters = page.getByRole('region', { name: 'Parking filters' });
+  await expect(filters).toBeVisible();
+  await expect(finder).toHaveAttribute('aria-hidden', 'true');
+  await expect
+    .poll(() => filters.evaluate((panel) => getComputedStyle(panel).opacity))
+    .toBe('1');
+  await expect(page.getByTestId('apply-parking-filters')).toBeVisible();
+  const filterBounds = await sheet.boundingBox();
+
+  expect(
+    Math.abs((filterBounds?.height ?? 0) - (listBounds?.height ?? 0)),
+  ).toBeLessThan(2);
+  expect(Math.abs((filterBounds?.y ?? 0) - (listBounds?.y ?? 0))).toBeLessThan(
+    2,
+  );
+
+  await page.evaluate(() => {
+    const samples: Array<{
+      height: number;
+      firstRowTop: number | null;
+      listHeadingTop: number | null;
+      listOpacity: number | null;
+      listTranslateX: number | null;
+      top: number;
+    }> = [];
+    Object.defineProperty(window, '__parkingFilterSheetSamples', {
+      configurable: true,
+      value: samples,
+    });
+    const startedAt = performance.now();
+
+    function sampleSheet(timestamp: number) {
+      const sheet = document.querySelector<HTMLElement>('.control-pane');
+      if (sheet) {
+        const bounds = sheet.getBoundingClientRect();
+        const finder = document.querySelector<HTMLElement>(
+          '.finder-panel-content',
+        );
+        const finderStyles = finder ? getComputedStyle(finder) : null;
+        const firstRow =
+          document.querySelector<HTMLElement>('.parking-list-item');
+        const listHeading =
+          document.querySelector<HTMLElement>('.list-heading');
+        const finderTransform = finderStyles?.transform;
+        const transformMatrix =
+          finderTransform && finderTransform !== 'none'
+            ? new DOMMatrixReadOnly(finderTransform)
+            : null;
+        samples.push({
+          height: bounds.height,
+          firstRowTop: firstRow?.getBoundingClientRect().top ?? null,
+          listHeadingTop: listHeading?.getBoundingClientRect().top ?? null,
+          listOpacity: finderStyles ? Number(finderStyles.opacity) : null,
+          listTranslateX: transformMatrix?.m41 ?? (finder ? 0 : null),
+          top: bounds.top,
+        });
+      }
+      if (timestamp - startedAt < 450) {
+        window.requestAnimationFrame(sampleSheet);
+      }
+    }
+
+    window.requestAnimationFrame(sampleSheet);
+  });
+  await filters.getByRole('button', { name: 'Back' }).click();
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await expect(finder).not.toHaveAttribute('aria-hidden', 'true');
+  await page.waitForTimeout(500);
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __parkingFinderBeforeFilters?: Element | null;
+            }
+          ).__parkingFinderBeforeFilters ===
+          document.querySelector('.finder-panel-content'),
+      ),
+    )
+    .toBe(true);
+
+  const samples = await page.evaluate(
+    () =>
+      (
+        window as Window & {
+          __parkingFilterSheetSamples?: Array<{
+            height: number;
+            firstRowTop: number | null;
+            listHeadingTop: number | null;
+            listOpacity: number | null;
+            listTranslateX: number | null;
+            top: number;
+          }>;
+        }
+      ).__parkingFilterSheetSamples ?? [],
+  );
+  expect(samples.length).toBeGreaterThan(10);
+  expect(
+    Math.max(...samples.map((sample) => sample.height)) -
+      Math.min(...samples.map((sample) => sample.height)),
+  ).toBeLessThan(2);
+  expect(
+    Math.max(...samples.map((sample) => sample.top)) -
+      Math.min(...samples.map((sample) => sample.top)),
+  ).toBeLessThan(2);
+  const listSamples = samples.filter(
+    (
+      sample,
+    ): sample is typeof sample & {
+      listOpacity: number;
+      listTranslateX: number;
+    } => sample.listOpacity !== null && sample.listTranslateX !== null,
+  );
+  expect(listSamples.length).toBeGreaterThan(5);
+  expect(
+    Math.max(...listSamples.map((sample) => Math.abs(sample.listTranslateX))),
+  ).toBeLessThan(1);
+  const headingTops = listSamples.flatMap((sample) =>
+    sample.listHeadingTop === null ? [] : [sample.listHeadingTop],
+  );
+  const firstRowTops = listSamples.flatMap((sample) =>
+    sample.firstRowTop === null ? [] : [sample.firstRowTop],
+  );
+  expect(Math.max(...headingTops) - Math.min(...headingTops)).toBeLessThan(2);
+  expect(Math.max(...firstRowTops) - Math.min(...firstRowTops)).toBeLessThan(2);
+  expect(
+    Math.max(
+      ...listSamples
+        .slice(1)
+        .map((sample, index) =>
+          Math.abs(sample.listOpacity - listSamples[index].listOpacity),
+        ),
+    ),
+  ).toBeLessThan(0.4);
+});
+
+test('removes a selected parking place that is a known filter mismatch', async ({
+  page,
+}) => {
+  const privateParkingId = 'osm:node:1831584962';
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=50.8487093,-1.0719054,5');
+
+  const privateParkingRow = page.getByTestId(`parking-row-${privateParkingId}`);
+  await expect(privateParkingRow).toBeVisible();
+  await privateParkingRow.locator('.parking-row-selection').click();
+  await expect(
+    page.getByTestId(`parking-marker-${privateParkingId}`),
+  ).toHaveClass(/parking-marker-selected/);
+
+  await page.getByTestId('open-parking-filters').click();
+  const filters = page.getByRole('region', { name: 'Parking filters' });
+  await filters
+    .getByRole('button', { name: 'Public access', exact: true })
+    .click();
+  await page.getByTestId('apply-parking-filters').click();
+
+  await expect(privateParkingRow).toHaveCount(0);
+  await expect(
+    page.getByTestId(`parking-marker-${privateParkingId}`),
+  ).toHaveCount(0);
+  await expect(page.getByTestId('open-parking-filters')).toBeFocused();
+});
+
 test('changes language from the mobile menu and keeps the choice', async ({
   page,
 }) => {
@@ -488,7 +780,7 @@ test('adds map route points continuously and calculates while editing', async ({
   );
 });
 
-test('keeps short category translations fitted and scrolls Armenian at 390 pixels', async ({
+test('keeps localized categories in one row and fits English without scrolling', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -522,31 +814,38 @@ test('keeps short category translations fitted and scrolls Armenian at 390 pixel
       };
     });
 
-  const expectFittedCategoryRow = async () => {
-    const fittedMetrics = await getCategoryMetrics();
-    expect(fittedMetrics.overflow).toBe('false');
-    expect(fittedMetrics.overflowX).toBe('hidden');
-    expect(fittedMetrics.scrollWidth).toBe(fittedMetrics.containerWidth);
-    expect(new Set(fittedMetrics.chips.map((chip) => chip.top)).size).toBe(1);
+  const expectLocalizedCategoryRow = async () => {
+    const metrics = await getCategoryMetrics();
+    expect(['false', 'true']).toContain(metrics.overflow);
+    if (metrics.overflow === 'true') {
+      expect(metrics.overflowX).toBe('auto');
+      expect(metrics.scrollWidth).toBeGreaterThan(metrics.containerWidth);
+    } else {
+      expect(metrics.overflowX).toBe('hidden');
+      expect(metrics.scrollWidth).toBe(metrics.containerWidth);
+    }
+    expect(new Set(metrics.chips.map((chip) => chip.top)).size).toBe(1);
     expect(
-      fittedMetrics.chips.every((chip) => chip.scrollWidth <= chip.clientWidth),
+      metrics.chips.every((chip) => chip.scrollWidth <= chip.clientWidth),
     ).toBe(true);
-    await categoryChips.evaluate((container) =>
-      container.scrollTo({ left: 40, top: 40 }),
-    );
-    const fixedMetrics = await getCategoryMetrics();
-    expect(fixedMetrics.scrollLeft).toBe(0);
-    expect(fixedMetrics.scrollTop).toBe(0);
+    const filterBox = await page
+      .getByTestId('open-parking-filters')
+      .boundingBox();
+    expect(filterBox?.width).toBe(44);
+    expect(filterBox?.height).toBe(44);
   };
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expectFittedCategoryRow();
+  await expectLocalizedCategoryRow();
+  const englishMetrics = await getCategoryMetrics();
+  expect(englishMetrics.overflow).toBe('false');
+  expect(englishMetrics.scrollWidth).toBe(englishMetrics.containerWidth);
 
   for (const locale of ['es', 'gd']) {
     await page.locator('.settings-menu--mobile .settings-trigger').click();
     await languageSelect.selectOption(locale);
     await expect(page.locator('html')).toHaveAttribute('lang', locale);
-    await expectFittedCategoryRow();
+    await expectLocalizedCategoryRow();
   }
 
   await page.locator('.settings-menu--mobile .settings-trigger').click();
@@ -593,19 +892,33 @@ test('keeps short category translations fitted and scrolls Armenian at 390 pixel
   ).toBe(true);
   expect(new Set(categoryMetrics.chips.map((chip) => chip.top)).size).toBe(1);
 
+  const filterButton = page.getByTestId('open-parking-filters');
+  const initialFilterLeft = (await filterButton.boundingBox())?.x;
+
   await categoryChips.evaluate((container) =>
-    container.scrollTo({ left: 60, top: 40 }),
+    container.scrollTo({ left: container.scrollWidth, top: 40 }),
   );
+  await page.waitForTimeout(100);
   const scrolledMetrics = await getCategoryMetrics();
   expect(scrolledMetrics.scrollLeft).toBeGreaterThan(0);
   expect(scrolledMetrics.scrollTop).toBe(0);
+  expect((await filterButton.boundingBox())?.x).toBeLessThan(
+    initialFilterLeft ?? Number.POSITIVE_INFINITY,
+  );
 
   await page.getByTestId('category-chip-shop').click();
+  await expect(filterButton).toHaveCount(0);
   await expect(
     page
       .getByTestId('parking-list')
       .getByText('Հեծանիվների խանութ', { exact: true }),
   ).toHaveCount(2);
+
+  await page.getByTestId('category-chip-parking').click();
+  await expect(page.getByTestId('open-parking-filters')).toHaveAttribute(
+    'aria-label',
+    'Կայանատեղերի զտիչներ',
+  );
 });
 
 test('keeps the mobile directions panel usable', async ({ page }) => {

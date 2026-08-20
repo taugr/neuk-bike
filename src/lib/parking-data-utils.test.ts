@@ -116,6 +116,8 @@ describe('parking data generation utilities', () => {
         access: 'customers',
         bicycle_parking: 'stands',
         capacity: '12',
+        'capacity:cargo_bike': '2',
+        cargo_bike: 'designated',
         covered: 'yes',
         name: 'not copied into properties',
       }),
@@ -123,10 +125,19 @@ describe('parking data generation utilities', () => {
       access: 'customers',
       bicycle_pa: 'stands',
       capacity: 12,
+      capacity_cargo_bike: 2,
+      cargo_bike: 'designated',
       covered: 'yes',
       fee: '',
       operator: '',
     });
+  });
+
+  it('omits cargo-bike properties when OSM does not provide them', () => {
+    const properties = normalizeOsmProperties({ capacity: '4' });
+
+    expect(properties).not.toHaveProperty('cargo_bike');
+    expect(properties).not.toHaveProperty('capacity_cargo_bike');
   });
 
   it('rejects generic source labels but preserves descriptive names', () => {

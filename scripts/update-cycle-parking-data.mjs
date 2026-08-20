@@ -49,6 +49,8 @@ const selectedOsmTagKeys = [
   'amenity',
   'bicycle_parking',
   'capacity',
+  'capacity:cargo_bike',
+  'cargo_bike',
   'covered',
   'fee',
   'name',
@@ -617,7 +619,15 @@ async function extractOsmNamingContext(pbfPath, parkingPoints, label) {
 }
 
 function summarizeCompleteness(points) {
-  const fields = ['name', 'capacity', 'covered', 'access', 'bicycle_pa'];
+  const fields = [
+    'name',
+    'capacity',
+    'covered',
+    'access',
+    'bicycle_pa',
+    'cargo_bike',
+    'capacity_cargo_bike',
+  ];
   return Object.fromEntries(
     fields.map((field) => {
       const count = points.filter((point) => {
@@ -905,6 +915,7 @@ async function writeSpatialOutput({
       inputs: osmInputsReport,
       recordCount: osmPoints.length,
     },
+    releaseId: manifest.releaseId,
     refreshedAt,
     resourceUsage,
     schemaVersion: PARKING_SCHEMA_VERSION,
