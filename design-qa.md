@@ -322,6 +322,41 @@ final result: blocked
 
 final result: passed
 
+# Compact filtered-result grouping QA
+
+## Evidence
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/01a01dd2-7fbf-7652-9029-0fa9f6542ac3/exec-5cea23c2-b957-4b6b-969f-e8a48eebc7de.png`
+- Browser-rendered implementation: `/private/tmp/neuk-bike-filter-grouping-implementation.png`
+- Same-state comparison: `/private/tmp/neuk-bike-filter-grouping-comparison.png`
+- Viewport: 390 x 844 CSS pixels at device-pixel ratio 1.
+- Density normalization: the 853 x 1844 source was normalized to 390 x 844; the implementation was captured at 390 x 844. The comparison is 780 x 844.
+- State: light theme, Cargo-bike suitable active, Best match selected, no confirmed Edinburgh matches, eight nearby results retained as uncertain.
+
+## Visible comparison
+
+- The result hierarchy matches the selected source: the filter-count badge remains in the existing compact toolbar, one slim divider explains the uncertain group, and neutral rank circles distinguish uncertain results without repeating warnings on every row.
+- The implementation retains Bike Neuks' established card height, typography, detail strip, spacing, and map-first sheet rather than copying the generated source's artificially condensed rows.
+- Removing the per-row warning allows the third complete result card to remain visible at 390 x 844 while the results sheet stays at its existing height.
+- The divider occupies 14.65 CSS pixels in English, Gaelic, Spanish, and Armenian. Its `scrollWidth` equals its 356-pixel `clientWidth` in every checked locale, and the document remains 390 pixels wide with no horizontal overflow.
+
+## Behavior and regression checks
+
+- Known filter failures are excluded.
+- Confirmed matches are grouped before uncertain matches in both Nearest and Best match modes; distance remains the tie-breaker within each group for Nearest.
+- When confirmed and uncertain results are both present, the divider copy is `More nearby · details unknown` (localized in all supported languages).
+- When every retained result is uncertain, the divider moves above rank 1 and reads `No confirmed matches · showing nearby` (localized in all supported languages).
+- The legacy `filter detail not listed` warning is absent from every result row.
+- The focused mobile browser regression, full unit suite, lint, formatting, and production build pass.
+- Browser console warnings and errors: none.
+
+## Findings
+
+- No actionable P0, P1, or P2 issues remain.
+- P3 accepted: the live implementation shows three full result cards at this viewport while the denser generated reference shows four. This preserves the app's existing 78-pixel touch-friendly result rows and still improves visible density by removing the repeated warning line.
+
+final result: passed
+
 # Compact parking toolbar design QA
 
 ## Evidence

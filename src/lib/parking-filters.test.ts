@@ -4,6 +4,7 @@ import {
   defaultParkingFilters,
   evaluateParkingFilters,
   filterAndSortParkingPoints,
+  firstUncertainParkingResultIndex,
   summarizeParkingFilterResults,
   type ParkingFilters,
 } from '@/lib/parking-filters';
@@ -39,7 +40,7 @@ describe('parking filters', () => {
     ).toBe(3);
   });
 
-  it('keeps unknown values but excludes known failures', () => {
+  it('keeps unknown values after confirmed matches and excludes known failures', () => {
     const selected = filters({ covered: true, minimumCapacity: 6 });
     const matches = filterAndSortParkingPoints(
       [
@@ -52,12 +53,34 @@ describe('parking filters', () => {
       'nearest',
     );
 
-    expect(matches.map(({ id }) => id)).toEqual(['unknown', 'match']);
+    expect(matches.map(({ id }) => id)).toEqual(['match', 'unknown']);
     expect(summarizeParkingFilterResults(matches, selected)).toEqual({
       completeMatchCount: 1,
       eligibleCount: 2,
       unknownMatchCount: 1,
     });
+  });
+
+  it('keeps distance order within confirmed and uncertain groups', () => {
+    const selected = filters({ covered: true });
+    const result = filterAndSortParkingPoints(
+      [
+        point('unknown-far', 80),
+        point('match-far', 100, { covered: 'yes' }),
+        point('unknown-near', 20),
+        point('match-near', 50, { covered: 'yes' }),
+      ],
+      selected,
+      'nearest',
+    );
+
+    expect(result.map(({ id }) => id)).toEqual([
+      'match-near',
+      'match-far',
+      'unknown-near',
+      'unknown-far',
+    ]);
+    expect(firstUncertainParkingResultIndex(result, selected)).toBe(2);
   });
 
   it('treats only unrestricted or permissive access as public', () => {

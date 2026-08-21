@@ -67,11 +67,16 @@ describe('language support', () => {
     expect(getMessageCatalogue('gd').startRoute).toBe('Tòisich');
   });
 
-  it('provides singular filter-result copy and count-safe filter labels', () => {
+  it('provides singular and compact filter-result copy', () => {
     for (const locale of supportedLocales) {
       expect(translate(locale, 'eligibleNeuk')).not.toContain('{count}');
       expect(translate(locale, 'showEligibleNeuk')).not.toContain('{count}');
-      expect(translate(locale, 'filterDetailMissing')).not.toContain('{count}');
+      expect(translate(locale, 'moreNearbyDetailsUnknown')).not.toContain(
+        '{count}',
+      );
+      expect(
+        translate(locale, 'noConfirmedMatchesShowingNearby'),
+      ).not.toContain('{count}');
       expect(
         translate(locale, 'parkingFiltersActiveCount', { count: 1 }),
       ).toContain('1');

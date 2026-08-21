@@ -69,8 +69,8 @@ const en = {
   showEligibleNeuks: 'Show {count} neuks',
   unknownValuesRemainVisible: 'Places with missing details still appear.',
   filterMatchSummary: '{matches} matches · {unknown} with details missing',
-  filterDetailMissing: '1 filter detail not listed',
-  filterDetailsMissing: '{count} filter details not listed',
+  moreNearbyDetailsUnknown: 'More nearby · details unknown',
+  noConfirmedMatchesShowingNearby: 'No confirmed matches · showing nearby',
   loadingCyclingPlaces: 'Loading nearby cycling places...',
   loadingDrinkingWater: 'Loading drinking-water points...',
   noCyclingPlacesNearby: 'No nearby places in this category.',
@@ -421,8 +421,9 @@ const gd: MessageCatalogue = {
   unknownValuesRemainVisible:
     'Nochdaidh àiteachan le fiosrachadh a dhìth fhathast.',
   filterMatchSummary: '{matches} maids · {unknown} le fiosrachadh a dhìth',
-  filterDetailMissing: '1 mhion-fhiosrachadh criathraidh gun liostadh',
-  filterDetailsMissing: '{count} mion-fhiosrachadh criathraidh gun liostadh',
+  moreNearbyDetailsUnknown: 'Barrachd faisg ort · fiosrachadh a dhìth',
+  noConfirmedMatchesShowingNearby:
+    'Gun mhaidsichean dearbhte · feadhainn faisg ort',
   loadingCyclingPlaces: 'A’ luchdadh àiteachan baidhsagal faisg ort...',
   loadingDrinkingWater: 'A’ luchdadh puingean uisge-òil...',
   noCyclingPlacesNearby: 'Chan eil àite faisg ort san roinn seo.',
@@ -784,8 +785,9 @@ const es: MessageCatalogue = {
   unknownValuesRemainVisible:
     'Los lugares sin todos los datos también aparecen.',
   filterMatchSummary: '{matches} coinciden · {unknown} con datos sin indicar',
-  filterDetailMissing: '1 dato de filtro sin indicar',
-  filterDetailsMissing: '{count} datos de filtro sin indicar',
+  moreNearbyDetailsUnknown: 'Más lugares · faltan datos',
+  noConfirmedMatchesShowingNearby:
+    'Sin coincidencias confirmadas · lugares cercanos',
   loadingCyclingPlaces: 'Cargando lugares ciclistas cercanos...',
   loadingDrinkingWater: 'Cargando puntos de agua potable...',
   noCyclingPlacesNearby: 'No hay lugares cercanos en esta categoría.',
@@ -1137,8 +1139,8 @@ const hy: MessageCatalogue = {
   unknownValuesRemainVisible:
     'Թերի տվյալներով վայրերը նույնպես ցուցադրվում են։',
   filterMatchSummary: '{matches} համընկնում · {unknown}՝ թերի տվյալներով',
-  filterDetailMissing: 'Զտիչի 1 տվյալ նշված չէ',
-  filterDetailsMissing: 'Զտիչի {count} տվյալ նշված չէ',
+  moreNearbyDetailsUnknown: 'Այլ մոտակա վայրեր · տվյալները թերի են',
+  noConfirmedMatchesShowingNearby: 'Հաստատված համընկնում չկա · մոտակա վայրեր',
   loadingCyclingPlaces: 'Բեռնվում են մոտակա հեծանվային վայրերը...',
   loadingDrinkingWater: 'Բեռնվում են պուլպուլակները...',
   noCyclingPlacesNearby: 'Այս կատեգորիայում մոտակա վայրեր չկան։',

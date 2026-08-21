@@ -184,6 +184,26 @@ test('applies parking preferences without crowding the default mobile list', asy
   await expect(
     filters.getByRole('button', { name: 'Best match' }),
   ).toBeDisabled();
+
+  await filters
+    .getByRole('button', { name: 'Cargo-bike suitable', exact: true })
+    .click();
+  await filters.getByRole('button', { name: 'Best match' }).click();
+  await page.getByTestId('apply-parking-filters').click();
+
+  const filteredList = page.getByTestId('parking-list');
+  await expect(page.getByTestId('parking-filter-boundary')).toHaveText(
+    'No confirmed matches · showing nearby',
+  );
+  await expect(
+    filteredList.locator('.parking-list-item--uncertain'),
+  ).toHaveCount(8);
+  await expect(filteredList.locator('.parking-filter-missing')).toHaveCount(0);
+  await expect
+    .poll(() =>
+      filteredList.locator(':scope > *').first().getAttribute('class'),
+    )
+    .toBe('parking-filter-boundary');
 });
 
 test('keeps the mobile sheet height stable when opening and closing filters', async ({

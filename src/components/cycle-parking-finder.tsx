@@ -183,6 +183,7 @@ import {
   defaultParkingFilters,
   evaluateParkingFilters,
   filterAndSortParkingPoints,
+  firstUncertainParkingResultIndex,
   hasActiveParkingFilters,
   parkingCapacitySteps,
   summarizeParkingFilterResults,
@@ -2370,6 +2371,12 @@ export default function CycleParkingFinder() {
   const nearestPoint = nearbyPoints[0] ?? null;
   const activeListPoints =
     parkingView === 'saved' ? savedPoints : closestPoints;
+  const uncertainParkingResultIndex =
+    parkingView === 'nearby' &&
+    discoverCategory === 'parking' &&
+    parkingFiltersActive
+      ? firstUncertainParkingResultIndex(activeListPoints, parkingFilters)
+      : -1;
   const selectedPointFromMap =
     selectedId !== null
       ? (mapPoints.find((point) => point.id === selectedId) ?? null)
@@ -6226,17 +6233,39 @@ export default function CycleParkingFinder() {
                                     parkingFiltersActive &&
                                     index === 0 &&
                                     filterEvaluation?.unknownCount === 0;
-                                  return (
+                                  const isUncertainParkingMatch =
+                                    filterEvaluation !== null &&
+                                    filterEvaluation.unknownCount > 0;
+                                  return [
+                                    index === uncertainParkingResultIndex ? (
+                                      <li
+                                        className="parking-filter-boundary"
+                                        data-testid="parking-filter-boundary"
+                                        key={`${getPointSavedNeukKey(point)}-filter-boundary`}
+                                        role="separator"
+                                      >
+                                        <span>
+                                          {t(
+                                            index === 0
+                                              ? 'noConfirmedMatchesShowingNearby'
+                                              : 'moreNearbyDetailsUnknown',
+                                          )}
+                                        </span>
+                                      </li>
+                                    ) : null,
                                     <motion.li
+                                      key={getPointSavedNeukKey(point)}
                                       className={[
                                         'parking-list-item',
                                         parkingView === 'saved'
                                           ? 'saved-list-item'
                                           : null,
+                                        isUncertainParkingMatch
+                                          ? 'parking-list-item--uncertain'
+                                          : null,
                                       ]
                                         .filter(Boolean)
                                         .join(' ')}
-                                      key={getPointSavedNeukKey(point)}
                                       transition={rowLayoutTransition}
                                       ref={(item) => {
                                         if (item) {
@@ -6436,22 +6465,6 @@ export default function CycleParkingFinder() {
                                               ) : null}
                                             </span>
                                           )}
-                                          {filterEvaluation &&
-                                          filterEvaluation.unknownCount > 0 ? (
-                                            <span className="parking-filter-missing">
-                                              <CircleHelp
-                                                size={12}
-                                                aria-hidden="true"
-                                              />
-                                              {filterEvaluation.unknownCount ===
-                                              1
-                                                ? t('filterDetailMissing')
-                                                : t('filterDetailsMissing', {
-                                                    count:
-                                                      filterEvaluation.unknownCount,
-                                                  })}
-                                            </span>
-                                          ) : null}
                                         </span>
                                         {parkingView === 'nearby' &&
                                         isSaved &&
@@ -6639,7 +6652,9 @@ export default function CycleParkingFinder() {
                                                           isSaved
                                                             ? 'removeFromMyNeuks'
                                                             : 'saveToMyNeuks',
-                                                          { name: point.name },
+                                                          {
+                                                            name: point.name,
+                                                          },
                                                         )}
                                                         className="parking-more-menu-item parking-save-button"
                                                         data-testid={`parking-save-${point.id}`}
@@ -6715,8 +6730,8 @@ export default function CycleParkingFinder() {
                                           ) : null}
                                         </motion.div>
                                       ) : null}
-                                    </motion.li>
-                                  );
+                                    </motion.li>,
+                                  ];
                                 })}
                                 {parkingView === 'saved'
                                   ? missingSavedRecords.map((record) => (

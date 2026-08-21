@@ -165,13 +165,23 @@ export function filterAndSortParkingPoints<T extends ParkingPoint>(
     return evaluation.failCount === 0;
   });
 
-  if (sortMode === 'nearest' || !hasActiveParkingFilters(filters)) {
+  if (!hasActiveParkingFilters(filters)) {
     return eligible.sort(compareDistance);
   }
 
   return eligible.sort((left, right) => {
     const leftEvaluation = evaluations.get(left.id)!;
     const rightEvaluation = evaluations.get(right.id)!;
+
+    if (sortMode === 'nearest') {
+      const certaintyDifference =
+        Number(leftEvaluation.unknownCount > 0) -
+        Number(rightEvaluation.unknownCount > 0);
+      if (certaintyDifference !== 0) return certaintyDifference;
+
+      return compareDistance(left, right);
+    }
+
     const unknownDifference =
       leftEvaluation.unknownCount - rightEvaluation.unknownCount;
     if (unknownDifference !== 0) return unknownDifference;
@@ -182,6 +192,15 @@ export function filterAndSortParkingPoints<T extends ParkingPoint>(
 
     return compareDistance(left, right);
   });
+}
+
+export function firstUncertainParkingResultIndex(
+  points: ParkingPoint[],
+  filters: ParkingFilters,
+) {
+  return points.findIndex(
+    (point) => evaluateParkingFilters(point, filters).unknownCount > 0,
+  );
 }
 
 export function summarizeParkingFilterResults(

@@ -2043,14 +2043,32 @@ a {
   padding: 0.18rem 0.38rem;
 }
 
-.parking-filter-missing {
+.parking-filter-boundary {
   align-items: center;
   color: var(--muted);
-  display: flex;
+  display: grid;
   font-size: 0.68rem;
-  gap: 0.25rem;
+  font-weight: 720;
+  gap: 0.55rem;
+  grid-template-columns: minmax(0.75rem, 1fr) minmax(0, auto) minmax(
+      0.75rem,
+      1fr
+    );
   line-height: 1.2;
-  margin-top: 0.22rem;
+  padding: 0.05rem 0.15rem;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.parking-filter-boundary::before,
+.parking-filter-boundary::after {
+  background: var(--separator);
+  content: '';
+  height: 1px;
+}
+
+.parking-filter-boundary > span {
+  min-width: 0;
 }
 
 :root[data-theme='dark'] .category-chip {
@@ -2429,6 +2447,12 @@ a {
   box-shadow:
     0 0 0 3px var(--rank-list-bg),
     0 0 0 5px var(--marker-border);
+}
+
+.parking-list-item--uncertain .rank {
+  background: var(--surface-strong);
+  box-shadow: 0 0 0 1px var(--subtle);
+  color: var(--muted);
 }
 
 .parking-row-copy {
