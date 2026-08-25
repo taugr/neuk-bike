@@ -352,6 +352,30 @@ test('keeps Armenian categories in one scrollable desktop toolbar', async ({
   expect(filterBox?.height).toBe(44);
 });
 
+test('replaces the desktop finder with parking filters', async ({ page }) => {
+  await page.goto('/?mockGps=55.9533,-3.1883');
+  await expectFinderReady(page);
+
+  const desktopSearch = page.locator('.reference-panel--desktop');
+  await expect(desktopSearch).toBeVisible();
+
+  await page.getByTestId('open-parking-filters').click();
+
+  const filters = page.getByRole('region', { name: 'Parking filters' });
+  await expect(filters).toBeVisible();
+  await expect(desktopSearch).toBeHidden();
+  await expect(
+    filters.getByRole('button', { name: 'Nearest', exact: true }),
+  ).toBeVisible();
+  await expect(
+    filters.getByRole('button', { name: 'Best match', exact: true }),
+  ).toBeVisible();
+
+  await filters.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(filters).toBeHidden();
+  await expect(desktopSearch).toBeVisible();
+});
+
 test('keeps manual zoom after background parking chunks load', async ({
   page,
 }) => {

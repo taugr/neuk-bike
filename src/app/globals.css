@@ -5894,6 +5894,10 @@ a {
 }
 
 @media (min-width: 821px) {
+  .control-pane[data-panel-view='filters'] .finder-panel-content {
+    visibility: hidden;
+  }
+
   .directions-header-actions {
     align-items: stretch;
     flex-direction: column;
