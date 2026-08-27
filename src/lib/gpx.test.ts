@@ -57,6 +57,34 @@ describe('GPX export', () => {
     expect(routeNameToGpxFilename('')).toBe('neuk-route.gpx');
   });
 
+  it('preserves separate track segments when re-exporting an imported route', () => {
+    const xml = serializeRouteToGpx({
+      name: 'Two parts',
+      route: {
+        ...route,
+        points: [
+          [55.95, -3.2],
+          [55.96, -3.18],
+          [55.97, -3.16],
+          [55.98, -3.14],
+        ],
+        segments: [
+          [
+            [55.95, -3.2],
+            [55.96, -3.18],
+          ],
+          [
+            [55.97, -3.16],
+            [55.98, -3.14],
+          ],
+        ],
+      },
+      waypoints,
+    });
+
+    expect(xml.match(/<trkseg>/g)).toHaveLength(2);
+  });
+
   it('rejects an empty route', () => {
     expect(() =>
       serializeRouteToGpx({

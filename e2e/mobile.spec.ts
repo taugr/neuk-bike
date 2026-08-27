@@ -486,6 +486,69 @@ test('keeps route planning in the mobile Bike Neuks menu', async ({ page }) => {
   await expect(mobileMenu.locator('.settings-popover')).toHaveCount(0);
 });
 
+test('reviews and saves an imported GPX track locally', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+
+  const mobileMenu = page.locator('.settings-menu--mobile');
+  await mobileMenu.locator('.settings-trigger').click();
+  await mobileMenu.getByTestId('open-my-routes').click();
+
+  const routes = page.locator('.saved-routes-panel');
+  await expect(
+    routes.getByRole('button', { name: /Import GPX/ }),
+  ).toBeVisible();
+  await routes.locator('input[type="file"]').setInputFiles({
+    name: 'canal-ride.gpx',
+    mimeType: 'application/gpx+xml',
+    buffer: Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+      <gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+        <metadata><name>Canal ride</name></metadata>
+        <trk><name>Canal ride</name>
+          <trkseg>
+            <trkpt lat="55.9533" lon="-3.1883"><time>2026-08-27T08:00:00Z</time></trkpt>
+            <trkpt lat="55.9500" lon="-3.1950"><time>2026-08-27T08:05:00Z</time></trkpt>
+          </trkseg>
+          <trkseg>
+            <trkpt lat="55.9450" lon="-3.2050"><time>2026-08-27T08:10:00Z</time></trkpt>
+            <trkpt lat="55.9400" lon="-3.2150"><time>2026-08-27T08:15:00Z</time></trkpt>
+          </trkseg>
+        </trk>
+      </gpx>`),
+  });
+
+  const review = page.locator('.gpx-import-review');
+  await expect(review).toBeVisible();
+  await expect(
+    review.getByRole('heading', { name: 'Canal ride' }),
+  ).toBeVisible();
+  await expect(review).toContainText('Imported GPX');
+  await expect(review).toContainText(
+    'Exact track preserved. No turn-by-turn directions.',
+  );
+  await expect(page.getByTestId('parking-map')).toHaveAttribute(
+    'data-route-source',
+    'local',
+  );
+
+  await review.getByRole('button', { name: 'Add to My routes' }).click();
+  const detail = page.locator('.saved-route-detail');
+  await expect(detail).toBeVisible();
+  await expect(detail).toContainText('Imported GPX');
+  await expect(
+    detail.getByRole('button', { name: 'Edit route', exact: true }),
+  ).toHaveCount(0);
+  await expect(detail).not.toContainText('Route directions');
+  await detail.getByRole('button', { name: 'Share route' }).click();
+  await expect(
+    detail.getByRole('button', { name: /Share GPX file/ }),
+  ).toBeVisible();
+  await expect(
+    detail.getByRole('button', { name: /Share route link/ }),
+  ).toHaveCount(0);
+});
+
 test('adds map route points continuously and calculates while editing', async ({
   page,
 }) => {

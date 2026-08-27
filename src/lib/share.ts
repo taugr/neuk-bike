@@ -7,6 +7,7 @@ export type ShareParkingLinkResult =
   | 'shared';
 
 type ShareNavigator = {
+  canShare?: (data: ShareData) => boolean;
   share?: (data: ShareData) => Promise<void>;
 };
 
@@ -20,13 +21,58 @@ type ParkingLinkShareData = {
   url: string;
 };
 
-function isShareCancellation(error: unknown) {
+export function isShareCancellation(error: unknown) {
   return (
     typeof error === 'object' &&
     error !== null &&
     'name' in error &&
     error.name === 'AbortError'
   );
+}
+
+export type ShareRouteFileResult =
+  | 'cancelled'
+  | 'downloaded'
+  | 'failed'
+  | 'shared';
+
+export async function shareRouteFile(
+  file: File,
+  title: string,
+  options: {
+    download?: (file: File) => void;
+    navigator?: ShareNavigator | null;
+  } = {},
+): Promise<ShareRouteFileResult> {
+  const shareNavigator =
+    options.navigator === undefined
+      ? typeof navigator === 'undefined'
+        ? null
+        : navigator
+      : options.navigator;
+  const data: ShareData = { files: [file], title };
+
+  if (
+    typeof shareNavigator?.share === 'function' &&
+    (typeof shareNavigator.canShare !== 'function' ||
+      shareNavigator.canShare(data))
+  ) {
+    try {
+      await shareNavigator.share(data);
+      return 'shared';
+    } catch (error) {
+      if (isShareCancellation(error)) {
+        return 'cancelled';
+      }
+    }
+  }
+
+  try {
+    options.download?.(file);
+    return options.download ? 'downloaded' : 'failed';
+  } catch {
+    return 'failed';
+  }
 }
 
 export async function shareParkingLink(

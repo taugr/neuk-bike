@@ -1,5 +1,5 @@
 const runtimeCachePrefix = 'neuk-bike-';
-const cacheName = `${runtimeCachePrefix}v11`;
+const cacheName = `${runtimeCachePrefix}v12`;
 // Explicit offline-area downloads deliberately use a separate, stable cache.
 // It must outlive routine app-shell upgrades so a completed area remains ready
 // after a new service worker activates.

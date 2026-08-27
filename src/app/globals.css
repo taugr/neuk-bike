@@ -3601,7 +3601,8 @@ a {
 .route-workspace-view,
 .route-planner,
 .saved-routes-panel,
-.saved-route-detail {
+.saved-route-detail,
+.gpx-import-review {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -3617,6 +3618,27 @@ a {
   flex: 0 0 auto;
   gap: 0.55rem;
   grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.gpx-import-review-header {
+  align-items: center;
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.55rem;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.gpx-import-review-header > button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-weight: 760;
+  gap: 0.25rem;
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0 0.25rem;
 }
 
 .saved-route-detail-toolbar {
@@ -3672,7 +3694,8 @@ a {
 
 .route-planner-scroll,
 .saved-routes-scroll,
-.saved-route-scroll {
+.saved-route-scroll,
+.gpx-import-review-scroll {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -3687,7 +3710,8 @@ a {
 
 .route-planner-scroll::-webkit-scrollbar,
 .saved-routes-scroll::-webkit-scrollbar,
-.saved-route-scroll::-webkit-scrollbar {
+.saved-route-scroll::-webkit-scrollbar,
+.gpx-import-review-scroll::-webkit-scrollbar {
   display: none;
 }
 
@@ -3816,6 +3840,13 @@ a {
 
 .saved-route-error {
   color: #b91c1c;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.saved-route-message {
+  color: var(--accent-strong);
   font-size: 0.82rem;
   line-height: 1.35;
   margin: 0;
@@ -4054,8 +4085,61 @@ a {
 }
 
 .saved-routes-new {
-  background: var(--accent) !important;
-  color: #ffffff !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--accent-strong) !important;
+}
+
+.saved-routes-header > button:first-child {
+  background: transparent;
+  border-color: transparent;
+}
+
+.saved-routes-import {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--subtle);
+  border-radius: 8px;
+  color: var(--text);
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 4.5rem;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  width: 100%;
+}
+
+.saved-routes-import {
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
+}
+
+.saved-routes-import > svg:first-child {
+  color: var(--accent-strong);
+}
+
+.saved-routes-import > span {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.saved-routes-import small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.saved-routes-footer {
+  border-top: 1px solid var(--separator);
+  color: var(--muted);
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin-top: 0.35rem;
+  padding: 0.7rem 0.25rem 0;
+  text-align: center;
 }
 
 .saved-routes-list li > button {
@@ -4207,6 +4291,106 @@ a {
 .saved-route-actions button.is-danger {
   border-color: #b91c1c;
   color: #b91c1c;
+}
+
+.saved-route-share-sheet {
+  background: var(--surface);
+  border: 1px solid var(--subtle);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgb(15 23 42 / 12%);
+  display: grid;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.saved-route-share-sheet h2 {
+  padding: 0.8rem 0.85rem 0.35rem;
+}
+
+.saved-route-share-sheet > button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--separator);
+  color: var(--text);
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 3.75rem;
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+}
+
+.saved-route-share-sheet > button > span {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.saved-route-share-sheet small,
+.saved-route-share-sheet p,
+.gpx-import-note {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.saved-route-share-sheet p {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+}
+
+.gpx-import-title {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.gpx-import-title h1 {
+  font-size: 1.16rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.gpx-import-title small {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.gpx-import-note {
+  align-items: center;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  display: flex;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.gpx-import-actions {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: 1fr;
+}
+
+.gpx-import-actions button {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-weight: 760;
+  gap: 0.35rem;
+  justify-content: center;
+  min-height: 2.75rem;
+}
+
+.gpx-import-actions button.is-primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.gpx-import-actions button:not(.is-primary) {
+  border-color: transparent;
 }
 
 .saved-route-mobile-actions,
@@ -5067,6 +5251,20 @@ a {
     max-height: 52dvh;
   }
 
+  .control-pane:has(.saved-routes-panel) {
+    --mobile-sheet-expanded-height: 40dvh;
+    max-height: 40vh;
+    max-height: 40svh;
+    max-height: 40dvh;
+  }
+
+  .control-pane:has(.saved-route-detail) {
+    --mobile-sheet-expanded-height: 58dvh;
+    max-height: 58vh;
+    max-height: 58svh;
+    max-height: 58dvh;
+  }
+
   .route-planner-header,
   .saved-routes-header {
     gap: 0.35rem;
@@ -5077,6 +5275,16 @@ a {
   .saved-route-detail-back {
     min-height: 2.5rem;
     padding: 0.35rem 0.45rem;
+  }
+
+  .saved-routes-header > button:first-child {
+    font-size: 0;
+    padding: 0;
+    width: 2.5rem;
+  }
+
+  .saved-routes-new svg {
+    display: none;
   }
 
   .route-planner-title strong,
@@ -5149,12 +5357,16 @@ a {
   .saved-route-mobile-actions {
     display: grid;
     gap: 0.45rem;
-    grid-template-columns: minmax(0, 1fr) 2.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 2.75rem;
   }
 
   .saved-route-mobile-actions button.is-primary {
     background: var(--accent);
     color: #ffffff;
+  }
+
+  .saved-route-mobile-actions > .is-primary:first-child:nth-last-child(2) {
+    grid-column: 1 / 3;
   }
 
   .saved-route-mobile-actions .saved-route-more-actions {

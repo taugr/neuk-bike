@@ -1,7 +1,7 @@
 import { isResolvedLocation } from '@/lib/geo';
 import type { UserLocation } from '@/lib/types';
 
-function getAppBasePath(pathname: string) {
+export function getAppBasePath(pathname: string) {
   const parkingSegment = '/parking/';
   const parkingSegmentIndex = pathname.indexOf(parkingSegment);
 

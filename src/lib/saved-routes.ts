@@ -12,18 +12,21 @@ const databaseVersion = 1;
 const storeName = 'saved-routes';
 
 export type SavedRouteRecord = {
-  version: 1;
+  version: 2;
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
-  plan: CycleRoutePlan;
+  kind: 'planned' | 'imported-gpx';
+  plan: CycleRoutePlan | null;
   waypoints: CycleRouteWaypoint[];
   distanceMeters: number;
-  durationSeconds: number;
+  durationSeconds: number | null;
   points: CycleRoutePoint[];
+  segments?: CycleRoutePoint[][];
   instructions: CycleRouteInstruction[];
-  source: 'cyclestreets' | 'local';
+  source: 'cyclestreets' | 'local' | 'gpx';
+  importFileName?: string;
   providerItineraryId?: string;
   providerRouteUrl?: string;
 };
@@ -45,9 +48,14 @@ function isWaypoint(value: unknown): value is CycleRouteWaypoint {
     typeof waypoint.label === 'string' &&
     isFiniteCoordinate(waypoint.latitude, -90, 90) &&
     isFiniteCoordinate(waypoint.longitude, -180, 180) &&
-    ['current-location', 'map', 'parking', 'saved-route', 'search'].includes(
-      waypoint.source ?? '',
-    ),
+    [
+      'current-location',
+      'gpx',
+      'map',
+      'parking',
+      'saved-route',
+      'search',
+    ].includes(waypoint.source ?? ''),
   );
 }
 
@@ -60,11 +68,11 @@ function isRoutePoint(value: unknown): value is CycleRoutePoint {
   );
 }
 
-export function isSavedRouteRecord(value: unknown): value is SavedRouteRecord {
+function isSavedRouteRecordV2(value: unknown): value is SavedRouteRecord {
   const record = value as Partial<SavedRouteRecord> | null;
   return Boolean(
     record &&
-    record.version === 1 &&
+    record.version === 2 &&
     typeof record.id === 'string' &&
     record.id.length > 0 &&
     typeof record.name === 'string' &&
@@ -73,30 +81,74 @@ export function isSavedRouteRecord(value: unknown): value is SavedRouteRecord {
     Number.isFinite(Date.parse(record.createdAt)) &&
     typeof record.updatedAt === 'string' &&
     Number.isFinite(Date.parse(record.updatedAt)) &&
-    ['quietest', 'balanced', 'fastest'].includes(record.plan ?? '') &&
+    (record.kind === 'imported-gpx'
+      ? record.plan === null && record.source === 'gpx'
+      : record.kind === 'planned' &&
+        ['quietest', 'balanced', 'fastest'].includes(record.plan ?? '')) &&
     Array.isArray(record.waypoints) &&
     record.waypoints.length >= 2 &&
     record.waypoints.every(isWaypoint) &&
     typeof record.distanceMeters === 'number' &&
     record.distanceMeters >= 0 &&
-    typeof record.durationSeconds === 'number' &&
-    record.durationSeconds >= 0 &&
+    (record.durationSeconds === null ||
+      (typeof record.durationSeconds === 'number' &&
+        record.durationSeconds >= 0)) &&
     Array.isArray(record.points) &&
     record.points.length >= 2 &&
     record.points.every(isRoutePoint) &&
+    (!record.segments ||
+      (Array.isArray(record.segments) &&
+        record.segments.length > 0 &&
+        record.segments.every(
+          (segment) =>
+            Array.isArray(segment) &&
+            segment.length >= 2 &&
+            segment.every(isRoutePoint),
+        ))) &&
     Array.isArray(record.instructions) &&
-    (record.source === 'cyclestreets' || record.source === 'local'),
+    ['cyclestreets', 'local', 'gpx'].includes(record.source ?? ''),
   );
+}
+
+type LegacySavedRouteRecord = Omit<
+  SavedRouteRecord,
+  'durationSeconds' | 'kind' | 'plan' | 'segments' | 'source' | 'version'
+> & {
+  version: 1;
+  plan: CycleRoutePlan;
+  durationSeconds: number;
+  source: 'cyclestreets' | 'local';
+};
+
+function normalizeSavedRouteRecord(value: unknown): SavedRouteRecord | null {
+  if (isSavedRouteRecordV2(value)) {
+    return value;
+  }
+  const legacy = value as Partial<LegacySavedRouteRecord> | null;
+  if (!legacy || legacy.version !== 1) {
+    return null;
+  }
+  const upgraded = {
+    ...legacy,
+    version: 2,
+    kind: 'planned',
+  } as SavedRouteRecord;
+  return isSavedRouteRecordV2(upgraded) ? upgraded : null;
+}
+
+export function isSavedRouteRecord(value: unknown): value is SavedRouteRecord {
+  return isSavedRouteRecordV2(value);
 }
 
 export function savedRouteToCycleRoute(record: SavedRouteRecord): CycleRoute {
   return {
-    plan: record.plan,
+    plan: record.plan ?? 'balanced',
     distanceMeters: record.distanceMeters,
-    durationSeconds: record.durationSeconds,
+    durationSeconds: record.durationSeconds ?? 0,
     points: record.points,
+    ...(record.segments ? { segments: record.segments } : {}),
     instructions: record.instructions,
-    source: record.source,
+    source: record.source === 'gpx' ? 'local' : record.source,
     ...(record.providerItineraryId
       ? { itineraryId: record.providerItineraryId }
       : {}),
@@ -163,11 +215,12 @@ export function createSavedRouteRecord({
   createdAt?: string;
 }): SavedRouteRecord {
   return {
-    version: 1,
+    version: 2,
     id,
     name: name.trim(),
     createdAt,
     updatedAt: createdAt,
+    kind: 'planned',
     plan: route.plan,
     waypoints,
     distanceMeters: route.distanceMeters,
@@ -177,6 +230,46 @@ export function createSavedRouteRecord({
     source: route.source,
     ...(route.itineraryId ? { providerItineraryId: route.itineraryId } : {}),
     ...(route.routeUrl ? { providerRouteUrl: route.routeUrl } : {}),
+  };
+}
+
+export function createImportedGpxRouteRecord({
+  id,
+  name,
+  fileName,
+  distanceMeters,
+  durationSeconds,
+  points,
+  segments,
+  waypoints,
+  createdAt = new Date().toISOString(),
+}: {
+  id: string;
+  name: string;
+  fileName: string;
+  distanceMeters: number;
+  durationSeconds: number | null;
+  points: CycleRoutePoint[];
+  segments: CycleRoutePoint[][];
+  waypoints: CycleRouteWaypoint[];
+  createdAt?: string;
+}): SavedRouteRecord {
+  return {
+    version: 2,
+    id,
+    name: name.trim(),
+    createdAt,
+    updatedAt: createdAt,
+    kind: 'imported-gpx',
+    plan: null,
+    waypoints,
+    distanceMeters,
+    durationSeconds,
+    points,
+    segments,
+    instructions: [],
+    source: 'gpx',
+    importFileName: fileName,
   };
 }
 
@@ -226,7 +319,8 @@ export async function listSavedRoutes() {
     requestResult(store.getAll()),
   );
   return values
-    .filter(isSavedRouteRecord)
+    .map(normalizeSavedRouteRecord)
+    .filter((record): record is SavedRouteRecord => record !== null)
     .sort(
       (left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt),
     );
@@ -236,7 +330,7 @@ export async function getSavedRoute(id: string) {
   const value = await withStore('readonly', (store) =>
     requestResult(store.get(id)),
   );
-  return isSavedRouteRecord(value) ? value : null;
+  return normalizeSavedRouteRecord(value);
 }
 
 export async function putSavedRoute(record: SavedRouteRecord) {

@@ -25,6 +25,7 @@ export type CycleRoutePoint = [latitude: number, longitude: number];
 
 export type CycleRouteWaypointSource =
   | 'current-location'
+  | 'gpx'
   | 'map'
   | 'parking'
   | 'saved-route'
@@ -53,6 +54,7 @@ export type CycleRoute = {
   distanceMeters: number;
   durationSeconds: number;
   points: CycleRoutePoint[];
+  segments?: CycleRoutePoint[][];
   instructions: CycleRouteInstruction[];
   source: 'cyclestreets' | 'local';
   itineraryId?: string;

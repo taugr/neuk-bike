@@ -113,13 +113,17 @@ for local development:
 NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 ```
 
-The route planner extends that integration to ordered routes of up to eight
+The route planner extends that integration to ordered routes of up to 30
 stops. Stops can come from place search or a deliberate tap-on-map mode. The
 selected route, including its stops, geometry, instructions, distance, and
 duration, is saved to IndexedDB on the current device. Saved routes can be
-reopened and exported as GPX without recalculation. Route calculation and place
-search still require a connection, and clearing browser site data removes the
-local route library.
+reopened and exported or shared as GPX without recalculation. GPX files can also
+be reviewed and imported locally; their exact track segments are preserved, but
+they do not gain invented route preferences or turn-by-turn directions. Planned
+routes can be shared as compact links containing only their stops and route
+preference in the URL fragment. Route calculation and place search still
+require a connection, and clearing browser site data removes the local route
+library.
 
 Open the Bike Neuks menu and use **Plan a route** to start a draft or **My
 routes** to reopen routes saved on the current device. The normal Nearby sheet

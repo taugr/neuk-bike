@@ -147,10 +147,11 @@ import { Bollard } from '@/components/icons/bollard';
 import { useLanguage } from '@/components/language-provider';
 import { RoutePlanner } from '@/components/route-planner';
 import { SavedRoutesPanel } from '@/components/saved-routes-panel';
+import { GpxImportReview } from '@/components/gpx-import-review';
 import { OfflineAreasPanel } from '@/components/offline-areas-panel';
 import { OfflineAreaSelection } from '@/components/offline-area-selection';
 import { captureAnalyticsEvent } from '@/lib/analytics';
-import { shareParkingLink } from '@/lib/share';
+import { shareParkingLink, shareRouteFile } from '@/lib/share';
 import {
   getParkingDataBaseUrl,
   getParkingTileKeysForDownloadBounds,
@@ -222,13 +223,21 @@ import {
 } from '@/lib/route-draft';
 import {
   createSavedRouteRecord,
+  createImportedGpxRouteRecord,
   deleteSavedRoute,
   listSavedRoutes,
   putSavedRoute,
   savedRouteToCycleRoute,
   type SavedRouteRecord,
 } from '@/lib/saved-routes';
-import { downloadRouteGpx } from '@/lib/gpx';
+import {
+  createRouteGpxFile,
+  downloadGpxFile,
+  downloadRouteGpx,
+  parseGpxFile,
+  type ParsedGpx,
+} from '@/lib/gpx';
+import { buildRouteShareUrl, parseRouteShareHash } from '@/lib/route-links';
 import {
   downloadOfflineArea,
   estimateMissingOfflineAreaBytes,
@@ -740,7 +749,7 @@ type ResolvedTheme = 'light' | 'dark';
 type MobileSheetState = 'expanded' | 'collapsed';
 type ParkingDataStatus = 'loading' | 'ready' | 'error';
 type SavedNeuksStatus = 'loading' | 'ready' | 'storage-error';
-type RouteWorkspaceView = 'detail' | 'library' | 'planner';
+type RouteWorkspaceView = 'detail' | 'import' | 'library' | 'planner';
 type RoutePlannerStatus =
   | 'error'
   | 'idle'
@@ -965,8 +974,15 @@ export default function CycleParkingFinder() {
     'error' | 'loading' | 'ready'
   >('loading');
   const [savedRoutesError, setSavedRoutesError] = useState<string | null>(null);
+  const [savedRoutesMessage, setSavedRoutesMessage] = useState<string | null>(
+    null,
+  );
   const [selectedSavedRoute, setSelectedSavedRoute] =
     useState<SavedRouteRecord | null>(null);
+  const [pendingGpxImport, setPendingGpxImport] = useState<ParsedGpx | null>(
+    null,
+  );
+  const sharedRouteOpened = useRef(false);
   const [liveRouteTracking, setLiveRouteTracking] =
     useState<LiveRouteTrackingState>({
       status: 'idle',
@@ -2432,18 +2448,45 @@ export default function CycleParkingFinder() {
       selectedSavedRoute ? savedRouteToCycleRoute(selectedSavedRoute) : null,
     [selectedSavedRoute],
   );
+  const pendingGpxCycleRoute = useMemo<CycleRoute | null>(
+    () =>
+      pendingGpxImport
+        ? {
+            plan: 'balanced',
+            distanceMeters: pendingGpxImport.distanceMeters,
+            durationSeconds: pendingGpxImport.durationSeconds ?? 0,
+            points: pendingGpxImport.points,
+            segments: pendingGpxImport.segments,
+            instructions: [],
+            source: 'local',
+          }
+        : null,
+    [pendingGpxImport],
+  );
+  const libraryPreviewRoute = useMemo(
+    () => (savedRoutes[0] ? savedRouteToCycleRoute(savedRoutes[0]) : null),
+    [savedRoutes],
+  );
   const routeWorkspaceRoute =
     routeWorkspaceView === 'planner' && routeDraft
       ? (routePlannerRoutes[routeDraft.plan] ?? routeDraftPreview ?? null)
       : routeWorkspaceView === 'detail'
         ? selectedSavedCycleRoute
-        : null;
+        : routeWorkspaceView === 'import'
+          ? pendingGpxCycleRoute
+          : routeWorkspaceView === 'library'
+            ? libraryPreviewRoute
+            : null;
   const routeWorkspaceWaypoints =
     routeWorkspaceView === 'planner'
       ? (routeDraft?.waypoints ?? [])
       : routeWorkspaceView === 'detail'
         ? (selectedSavedRoute?.waypoints ?? [])
-        : [];
+        : routeWorkspaceView === 'import'
+          ? (pendingGpxImport?.waypoints ?? [])
+          : routeWorkspaceView === 'library'
+            ? (savedRoutes[0]?.waypoints ?? [])
+            : [];
   const activeRouteWaypointId =
     routeWorkspaceView === 'planner' &&
     routeDraft &&
@@ -3935,6 +3978,8 @@ export default function CycleParkingFinder() {
     }
     setRouteLibraryReturnView(preservePlanner ? 'planner' : null);
     setSelectedSavedRoute(null);
+    setPendingGpxImport(null);
+    setSavedRoutesMessage(null);
     setRouteWaypointPlacementSnapshot(null);
     setRouteWorkspaceView('library');
     setMobileSheetState('expanded');
@@ -3974,6 +4019,7 @@ export default function CycleParkingFinder() {
     setRoutePlannerMessage(null);
     setRouteWaypointPlacementSnapshot(null);
     setSelectedSavedRoute(null);
+    setPendingGpxImport(null);
   }
 
   async function calculateRouteDraft(nextDraft: RouteDraft) {
@@ -4044,6 +4090,41 @@ export default function CycleParkingFinder() {
       setRoutePlannerMessage(t('directionsError'));
     }
   }
+
+  useEffect(() => {
+    if (!isClientReady || sharedRouteOpened.current) {
+      return;
+    }
+    sharedRouteOpened.current = true;
+    const shared = parseRouteShareHash(window.location.hash);
+    if (!shared) {
+      return;
+    }
+    const draft: RouteDraft = {
+      ...createRouteDraft(createLocalId()),
+      plan: shared.plan,
+      waypoints: shared.waypoints.map((point, index) => ({
+        id: createLocalId(),
+        label:
+          index === 0
+            ? t('routeStart')
+            : index === shared.waypoints.length - 1
+              ? t('routeFinish')
+              : t('routeMapStop', { count: index + 1 }),
+        ...point,
+        source: 'map',
+      })),
+    };
+    stopLiveRouteTracking();
+    setSelectedSavedRoute(null);
+    setRouteDraft(draft);
+    setRouteWorkspaceView('planner');
+    setMobileSheetState('expanded');
+    void calculateRouteDraft(draft);
+    captureAnalyticsEvent('route_link_opened', {
+      stop_count: draft.waypoints.length,
+    });
+  }, [isClientReady]);
 
   function commitRouteDraft(nextDraft: RouteDraft) {
     if (routePlannerCalculationTimeout.current !== null) {
@@ -4261,6 +4342,9 @@ export default function CycleParkingFinder() {
   }
 
   function editSavedRoute(record: SavedRouteRecord) {
+    if (record.kind !== 'planned' || record.plan === null) {
+      return;
+    }
     if (
       routeLibraryReturnView === 'planner' &&
       routeDraft &&
@@ -4344,9 +4428,107 @@ export default function CycleParkingFinder() {
       waypoints: record.waypoints,
     });
     captureAnalyticsEvent('route_gpx_exported', {
-      plan: record.plan,
+      route_kind: record.kind,
       stop_count: record.waypoints.length,
     });
+  }
+
+  async function reviewGpxFile(file: File) {
+    setSavedRoutesError(null);
+    setSavedRoutesMessage(null);
+    try {
+      const parsed = await parseGpxFile(file);
+      setPendingGpxImport(parsed);
+      setSelectedSavedRoute(null);
+      setRouteWorkspaceView('import');
+      setMobileSheetState('expanded');
+      captureAnalyticsEvent('route_gpx_reviewed', {
+        point_count: parsed.points.length,
+      });
+    } catch {
+      setSavedRoutesError(t('gpxImportError'));
+      setPendingGpxImport(null);
+      setRouteWorkspaceView('library');
+    }
+  }
+
+  async function addImportedGpx(name: string) {
+    if (!pendingGpxImport) {
+      return;
+    }
+    const record = createImportedGpxRouteRecord({
+      id: createLocalId(),
+      name,
+      fileName: pendingGpxImport.fileName,
+      distanceMeters: pendingGpxImport.distanceMeters,
+      durationSeconds: pendingGpxImport.durationSeconds,
+      points: pendingGpxImport.points,
+      segments: pendingGpxImport.segments,
+      waypoints: pendingGpxImport.waypoints,
+    });
+    setSavedRoutesError(null);
+    try {
+      await putSavedRoute(record);
+      await refreshSavedRoutes();
+      setPendingGpxImport(null);
+      setSelectedSavedRoute(record);
+      setRouteWorkspaceView('detail');
+      captureAnalyticsEvent('route_gpx_imported', {
+        point_count: record.points.length,
+      });
+    } catch {
+      setSavedRoutesError(t('routeStorageError'));
+    }
+  }
+
+  async function shareSavedRouteLink(record: SavedRouteRecord) {
+    if (record.kind !== 'planned' || record.plan === null) {
+      return;
+    }
+    setSavedRoutesError(null);
+    setSavedRoutesMessage(null);
+    const result = await shareParkingLink({
+      title: record.name,
+      url: buildRouteShareUrl(
+        window.location.origin,
+        window.location.pathname,
+        record.plan,
+        record.waypoints,
+      ),
+    });
+    if (result === 'copied') {
+      setSavedRoutesMessage(t('routeLinkCopied'));
+    } else if (result === 'failed') {
+      setSavedRoutesError(t('routeShareError'));
+    }
+    if (result === 'shared' || result === 'copied') {
+      captureAnalyticsEvent('route_link_shared', {
+        method: result,
+        stop_count: record.waypoints.length,
+      });
+    }
+  }
+
+  async function shareSavedRouteGpx(record: SavedRouteRecord) {
+    setSavedRoutesError(null);
+    setSavedRoutesMessage(null);
+    const file = createRouteGpxFile({
+      name: record.name,
+      route: savedRouteToCycleRoute(record),
+      waypoints: record.waypoints,
+    });
+    const result = await shareRouteFile(file, record.name, {
+      download: downloadGpxFile,
+    });
+    if (result === 'failed') {
+      setSavedRoutesError(t('routeShareError'));
+    }
+    if (result === 'shared' || result === 'downloaded') {
+      captureAnalyticsEvent('route_gpx_shared', {
+        method: result,
+        route_kind: record.kind,
+      });
+    }
   }
 
   async function shareParkingLinkForPoint(
@@ -5149,45 +5331,65 @@ export default function CycleParkingFinder() {
                     className="route-workspace-view"
                     variants={panelMotionVariants}
                   >
-                    <SavedRoutesPanel
-                      error={savedRoutesError}
-                      loading={savedRoutesStatus === 'loading'}
-                      routes={savedRoutes}
-                      selectedRoute={
-                        routeWorkspaceView === 'detail'
-                          ? selectedSavedRoute
-                          : null
-                      }
-                      onBack={() => {
-                        if (routeWorkspaceView === 'detail') {
-                          setSelectedSavedRoute(null);
+                    {routeWorkspaceView === 'import' && pendingGpxImport ? (
+                      <GpxImportReview
+                        gpx={pendingGpxImport}
+                        onAdd={(name) => void addImportedGpx(name)}
+                        onBack={() => {
+                          setPendingGpxImport(null);
                           setRouteWorkspaceView('library');
-                        } else if (!returnToPreservedRouteDraft()) {
-                          closeRouteWorkspace();
+                        }}
+                        onChooseFile={(file) => void reviewGpxFile(file)}
+                      />
+                    ) : (
+                      <SavedRoutesPanel
+                        error={savedRoutesError}
+                        loading={savedRoutesStatus === 'loading'}
+                        message={savedRoutesMessage}
+                        routes={savedRoutes}
+                        selectedRoute={
+                          routeWorkspaceView === 'detail'
+                            ? selectedSavedRoute
+                            : null
                         }
-                      }}
-                      onDelete={(record) => void removeSavedRoute(record)}
-                      onDuplicate={(record) => void duplicateSavedRoute(record)}
-                      onEdit={editSavedRoute}
-                      onExport={exportSavedRoute}
-                      onNewRoute={() => {
-                        if (!returnToPreservedRouteDraft()) {
-                          openNewRoutePlanner('saved-routes');
+                        onBack={() => {
+                          if (routeWorkspaceView === 'detail') {
+                            setSelectedSavedRoute(null);
+                            setRouteWorkspaceView('library');
+                          } else if (!returnToPreservedRouteDraft()) {
+                            closeRouteWorkspace();
+                          }
+                        }}
+                        onDelete={(record) => void removeSavedRoute(record)}
+                        onDuplicate={(record) =>
+                          void duplicateSavedRoute(record)
                         }
-                      }}
-                      onRename={(record, name) =>
-                        void renameSavedRoute(record, name)
-                      }
-                      onSelect={(record) => {
-                        setSavedRoutesError(null);
-                        setSelectedSavedRoute(record);
-                        setRouteWorkspaceView('detail');
-                        captureAnalyticsEvent('saved_route_opened', {
-                          plan: record.plan,
-                          stop_count: record.waypoints.length,
-                        });
-                      }}
-                    />
+                        onEdit={editSavedRoute}
+                        onExport={exportSavedRoute}
+                        onImportFile={(file) => void reviewGpxFile(file)}
+                        onNewRoute={() => {
+                          if (!returnToPreservedRouteDraft()) {
+                            openNewRoutePlanner('saved-routes');
+                          }
+                        }}
+                        onRename={(record, name) =>
+                          void renameSavedRoute(record, name)
+                        }
+                        onShareGpx={(record) => void shareSavedRouteGpx(record)}
+                        onShareLink={(record) =>
+                          void shareSavedRouteLink(record)
+                        }
+                        onSelect={(record) => {
+                          setSavedRoutesError(null);
+                          setSelectedSavedRoute(record);
+                          setRouteWorkspaceView('detail');
+                          captureAnalyticsEvent('saved_route_opened', {
+                            route_kind: record.kind,
+                            stop_count: record.waypoints.length,
+                          });
+                        }}
+                      />
+                    )}
                   </motion.div>
                 ) : isDirectionsMode ? (
                   <motion.section

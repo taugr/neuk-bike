@@ -7,10 +7,13 @@ import {
   Copy,
   Download,
   Ellipsis,
+  Link,
   Pencil,
   Plus,
   Route,
+  Share2,
   Trash2,
+  Upload,
 } from 'lucide-react';
 import { useLanguage } from '@/components/language-provider';
 import {
@@ -27,6 +30,7 @@ import {
 export function SavedRoutesPanel({
   error,
   loading,
+  message,
   routes,
   selectedRoute,
   onBack,
@@ -34,12 +38,16 @@ export function SavedRoutesPanel({
   onDuplicate,
   onEdit,
   onExport,
+  onImportFile,
   onNewRoute,
   onRename,
   onSelect,
+  onShareGpx,
+  onShareLink,
 }: {
   error: string | null;
   loading: boolean;
+  message: string | null;
   routes: SavedRouteRecord[];
   selectedRoute: SavedRouteRecord | null;
   onBack: () => void;
@@ -47,14 +55,18 @@ export function SavedRoutesPanel({
   onDuplicate: (route: SavedRouteRecord) => void;
   onEdit: (route: SavedRouteRecord) => void;
   onExport: (route: SavedRouteRecord) => void;
+  onImportFile: (file: File) => void;
   onNewRoute: () => void;
   onRename: (route: SavedRouteRecord, name: string) => void;
   onSelect: (route: SavedRouteRecord) => void;
+  onShareGpx: (route: SavedRouteRecord) => void;
+  onShareLink: (route: SavedRouteRecord) => void;
 }) {
   const { locale, t } = useLanguage();
   const [name, setName] = useState(selectedRoute?.name ?? '');
   const [isRenaming, setIsRenaming] = useState(false);
   const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [mobileActionsPosition, setMobileActionsPosition] = useState<{
     left: number;
     top: number;
@@ -62,11 +74,13 @@ export function SavedRoutesPanel({
   } | null>(null);
   const mobileActionsButtonRef = useRef<HTMLButtonElement>(null);
   const mobileActionsMenuRef = useRef<HTMLDivElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setName(selectedRoute?.name ?? '');
     setIsRenaming(false);
     setMobileActionsOpen(false);
+    setShareOpen(false);
     setMobileActionsPosition(null);
   }, [selectedRoute]);
 
@@ -241,36 +255,47 @@ export function SavedRoutesPanel({
               {error}
             </p>
           ) : null}
+          {message ? (
+            <p className="saved-route-message" role="status">
+              {message}
+            </p>
+          ) : null}
           <div className="saved-route-summary">
             <strong>
               {formatLocalizedDistance(route.distanceMeters, locale)}
             </strong>
             <strong>
-              {formatCycleRouteDuration(route.durationSeconds, locale)}
+              {selectedRoute.durationSeconds === null
+                ? t('durationUnknown')
+                : formatCycleRouteDuration(route.durationSeconds, locale)}
             </strong>
             <strong>
-              {t(
-                route.plan === 'quietest'
-                  ? 'routeQuietest'
-                  : route.plan === 'balanced'
-                    ? 'routeBalanced'
-                    : 'routeFastest',
-              )}
+              {selectedRoute.kind === 'imported-gpx'
+                ? t('importedGpx')
+                : t(
+                    route.plan === 'quietest'
+                      ? 'routeQuietest'
+                      : route.plan === 'balanced'
+                        ? 'routeBalanced'
+                        : 'routeFastest',
+                  )}
             </strong>
           </div>
 
           <div className="saved-route-actions saved-route-actions-desktop">
-            <button
-              type="button"
-              className="is-primary"
-              onClick={() => onEdit(selectedRoute)}
-            >
-              <Pencil size={17} aria-hidden="true" />
-              {t('editRoute')}
-            </button>
-            <button type="button" onClick={() => onExport(selectedRoute)}>
-              <Download size={17} aria-hidden="true" />
-              {t('exportGpx')}
+            {selectedRoute.kind === 'planned' ? (
+              <button
+                type="button"
+                className="is-primary"
+                onClick={() => onEdit(selectedRoute)}
+              >
+                <Pencil size={17} aria-hidden="true" />
+                {t('editRoute')}
+              </button>
+            ) : null}
+            <button type="button" onClick={() => setShareOpen((open) => !open)}>
+              <Share2 size={17} aria-hidden="true" />
+              {t('shareRoute')}
             </button>
             <button type="button" onClick={() => onDuplicate(selectedRoute)}>
               <Copy size={17} aria-hidden="true" />
@@ -287,13 +312,19 @@ export function SavedRoutesPanel({
           </div>
 
           <div className="saved-route-mobile-actions">
+            {selectedRoute.kind === 'planned' ? (
+              <button type="button" onClick={() => onEdit(selectedRoute)}>
+                <Pencil size={17} aria-hidden="true" />
+                {t('editRoute')}
+              </button>
+            ) : null}
             <button
               type="button"
               className="is-primary"
-              onClick={() => onEdit(selectedRoute)}
+              onClick={() => setShareOpen((open) => !open)}
             >
-              <Pencil size={17} aria-hidden="true" />
-              {t('editRoute')}
+              <Share2 size={17} aria-hidden="true" />
+              {t('shareRoute')}
             </button>
             <button
               ref={mobileActionsButtonRef}
@@ -307,6 +338,44 @@ export function SavedRoutesPanel({
               <Ellipsis size={19} aria-hidden="true" />
             </button>
           </div>
+
+          {shareOpen ? (
+            <div className="saved-route-share-sheet">
+              <h2>{t('shareRoute')}</h2>
+              {selectedRoute.kind === 'planned' ? (
+                <button
+                  type="button"
+                  onClick={() => onShareLink(selectedRoute)}
+                >
+                  <Link size={20} aria-hidden="true" />
+                  <span>
+                    <strong>{t('shareRouteLink')}</strong>
+                    <small>{t('shareRouteLinkHelp')}</small>
+                  </span>
+                </button>
+              ) : null}
+              <button type="button" onClick={() => onShareGpx(selectedRoute)}>
+                <Share2 size={20} aria-hidden="true" />
+                <span>
+                  <strong>{t('shareGpxFile')}</strong>
+                  <small>{t('shareGpxFileHelp')}</small>
+                </span>
+              </button>
+              <button type="button" onClick={() => onExport(selectedRoute)}>
+                <Download size={20} aria-hidden="true" />
+                <span>
+                  <strong>{t('downloadGpx')}</strong>
+                </span>
+              </button>
+              <p>
+                {t(
+                  selectedRoute.kind === 'planned'
+                    ? 'routeSharePrivacy'
+                    : 'routeSharePrivacyGpx',
+                )}
+              </p>
+            </div>
+          ) : null}
 
           {mobileActionsOpen && mobileActionsPosition
             ? createPortal(
@@ -362,42 +431,51 @@ export function SavedRoutesPanel({
               )
             : null}
 
-          <h2>{t('routeDirections')}</h2>
-          <ol className="saved-route-instructions">
-            {route.instructions.map((instruction, instructionIndex) => (
-              <li key={instruction.id}>
-                <span className="saved-route-instruction-points">
-                  {waypointNumbersByInstruction[instructionIndex]!.map(
-                    (waypointNumber) => (
-                      <span
-                        aria-label={t('routePointNumber', {
-                          count: waypointNumber,
-                        })}
-                        className={[
-                          'saved-route-instruction-point',
-                          waypointNumber === selectedRoute.waypoints.length
-                            ? 'saved-route-instruction-point-finish'
-                            : '',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                        data-testid={`route-instruction-point-${waypointNumber}`}
-                        key={waypointNumber}
-                      >
-                        {waypointNumber}
-                      </span>
-                    ),
-                  )}
-                </span>
-                <span className="saved-route-instruction-copy">
-                  {describeCycleRouteInstruction(instruction, locale)}
-                </span>
-                <small>
-                  {formatLocalizedDistance(instruction.distanceMeters, locale)}
-                </small>
-              </li>
-            ))}
-          </ol>
+          {selectedRoute.kind === 'imported-gpx' ? (
+            <p className="gpx-import-note">{t('gpxExactTrackNote')}</p>
+          ) : (
+            <>
+              <h2>{t('routeDirections')}</h2>
+              <ol className="saved-route-instructions">
+                {route.instructions.map((instruction, instructionIndex) => (
+                  <li key={instruction.id}>
+                    <span className="saved-route-instruction-points">
+                      {waypointNumbersByInstruction[instructionIndex]!.map(
+                        (waypointNumber) => (
+                          <span
+                            aria-label={t('routePointNumber', {
+                              count: waypointNumber,
+                            })}
+                            className={[
+                              'saved-route-instruction-point',
+                              waypointNumber === selectedRoute.waypoints.length
+                                ? 'saved-route-instruction-point-finish'
+                                : '',
+                            ]
+                              .filter(Boolean)
+                              .join(' ')}
+                            data-testid={`route-instruction-point-${waypointNumber}`}
+                            key={waypointNumber}
+                          >
+                            {waypointNumber}
+                          </span>
+                        ),
+                      )}
+                    </span>
+                    <span className="saved-route-instruction-copy">
+                      {describeCycleRouteInstruction(instruction, locale)}
+                    </span>
+                    <small>
+                      {formatLocalizedDistance(
+                        instruction.distanceMeters,
+                        locale,
+                      )}
+                    </small>
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
         </div>
       </section>
     );
@@ -430,6 +508,38 @@ export function SavedRoutesPanel({
             {error}
           </p>
         ) : null}
+        {message ? (
+          <p className="saved-route-message" role="status">
+            {message}
+          </p>
+        ) : null}
+        <button
+          type="button"
+          className="saved-routes-import"
+          onClick={() => importInputRef.current?.click()}
+        >
+          <Upload size={22} aria-hidden="true" />
+          <span>
+            <strong>{t('importGpx')}</strong>
+            <small>{t('importGpxHelp')}</small>
+          </span>
+          <ChevronLeft
+            className="saved-route-chevron"
+            size={17}
+            aria-hidden="true"
+          />
+        </button>
+        <input
+          ref={importInputRef}
+          className="sr-only"
+          type="file"
+          accept=".gpx,application/gpx+xml,application/xml,text/xml"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) onImportFile(file);
+            event.currentTarget.value = '';
+          }}
+        />
         {!loading && !error && routes.length === 0 ? (
           <div className="saved-routes-empty">
             <Route size={28} aria-hidden="true" />
@@ -451,15 +561,22 @@ export function SavedRoutesPanel({
                     <strong>{route.name}</strong>
                     <small>
                       {formatLocalizedDistance(route.distanceMeters, locale)} ·{' '}
-                      {formatCycleRouteDuration(route.durationSeconds, locale)}{' '}
+                      {route.durationSeconds === null
+                        ? t('durationUnknown')
+                        : formatCycleRouteDuration(
+                            route.durationSeconds,
+                            locale,
+                          )}{' '}
                       ·{' '}
-                      {t(
-                        route.plan === 'quietest'
-                          ? 'routeQuietest'
-                          : route.plan === 'balanced'
-                            ? 'routeBalanced'
-                            : 'routeFastest',
-                      )}
+                      {route.kind === 'imported-gpx'
+                        ? t('importedGpx')
+                        : t(
+                            route.plan === 'quietest'
+                              ? 'routeQuietest'
+                              : route.plan === 'balanced'
+                                ? 'routeBalanced'
+                                : 'routeFastest',
+                          )}
                     </small>
                   </span>
                   <ChevronLeft
@@ -473,6 +590,7 @@ export function SavedRoutesPanel({
           </ol>
         ) : null}
       </div>
+      <footer className="saved-routes-footer">{t('routesStayLocal')}</footer>
     </section>
   );
 }

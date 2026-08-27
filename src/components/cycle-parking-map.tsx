@@ -1420,20 +1420,24 @@ function getInitialApproachPositions(
   return [start, routeStart];
 }
 
-function createLineData(positions: CycleRoutePoint[] | null): RouteLineData {
+function createLineData(
+  positions: CycleRoutePoint[] | null,
+  segments?: CycleRoutePoint[][],
+): RouteLineData {
+  const lineSegments = segments?.length
+    ? segments
+    : positions
+      ? [positions]
+      : [];
   return {
-    features: positions
-      ? [
-          {
-            geometry: {
-              coordinates: positions.map(toLngLat),
-              type: 'LineString',
-            },
-            properties: {},
-            type: 'Feature',
-          },
-        ]
-      : [],
+    features: lineSegments.map((segment) => ({
+      geometry: {
+        coordinates: segment.map(toLngLat),
+        type: 'LineString',
+      },
+      properties: {},
+      type: 'Feature',
+    })),
     type: 'FeatureCollection',
   };
 }
@@ -2751,7 +2755,7 @@ export default function CycleParkingMap({
     }
 
     syncLineLayer({
-      data: createLineData(route?.points ?? null),
+      data: createLineData(route?.points ?? null, route?.segments),
       id: 'route-line',
       map,
       style:

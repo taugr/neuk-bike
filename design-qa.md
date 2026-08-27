@@ -1907,3 +1907,76 @@ design review. It supersedes the earlier two-row parking-filter layout.
 - Browser console errors: none.
 
 final result: passed
+
+---
+
+# Route sharing and GPX import design QA
+
+## Evidence
+
+- Source visual truth:
+  - Route library: `/Users/tomauger/.codex/generated_images/01a0417d-92c0-7103-a5b1-130915c0fd7a/exec-22715bbc-ecef-4b4f-b1cb-c500cdb3332e.png`
+  - Share choices: `/Users/tomauger/.codex/generated_images/01a0417d-92c0-7103-a5b1-130915c0fd7a/exec-0f9ca660-0ccd-4b38-aeb5-b39ec0424f9f.png`
+  - GPX review: `/Users/tomauger/.codex/generated_images/01a0417d-92c0-7103-a5b1-130915c0fd7a/exec-4b59bfac-dad4-47ff-a25c-b8ae5ebaca91.png`
+- Browser-rendered implementation:
+  - `/Users/tomauger/.codex/visualizations/2026/08/27/01a0417d-92c0-7103-a5b1-130915c0fd7a/design-qa-library-final.png`
+  - `/Users/tomauger/.codex/visualizations/2026/08/27/01a0417d-92c0-7103-a5b1-130915c0fd7a/design-qa-share-sheet.png`
+  - `/Users/tomauger/.codex/visualizations/2026/08/27/01a0417d-92c0-7103-a5b1-130915c0fd7a/design-qa-import-review.png`
+- Combined comparisons:
+  - `/Users/tomauger/.codex/visualizations/2026/08/27/01a0417d-92c0-7103-a5b1-130915c0fd7a/design-qa-comparison-final.png`
+  - `/Users/tomauger/.codex/visualizations/2026/08/27/01a0417d-92c0-7103-a5b1-130915c0fd7a/design-qa-share-comparison.png`
+  - `/Users/tomauger/.codex/visualizations/2026/08/27/01a0417d-92c0-7103-a5b1-130915c0fd7a/design-qa-import-comparison.png`
+- Viewport: 390 x 844 CSS px at device pixel ratio 1.
+- Source pixels: library and import 853 x 1844; share 850 x 1851.
+- Implementation pixels: 390 x 844 for each state.
+- Density normalization: source visuals were downsampled to 390 x 844 before side-by-side comparison.
+- States: populated route library, planned-route share choices, and parsed GPX review before local save.
+
+## Full-view comparison evidence
+
+The mobile sheet hierarchy, map-first proportion, route-library ordering, import entry point, route metadata, primary actions, and persistent local-storage disclosure now align closely with the selected visual direction. The in-app preview surface did not paint the external WebGL basemap tiles, so map-cartography fidelity was excluded from scoring; route markers, bounds, and workspace state remained visible, and the focused UI under review rendered without console errors.
+
+## Focused region comparison evidence
+
+Focused comparisons were required because the route sheet contains the feature's essential typography, spacing, icons, disclosure copy, and actions. The library, share choices, and GPX review regions were each compared at the same CSS viewport. The implementation deliberately retains the app's existing typography, tokens, Lucide icons, compact route-detail toolbar, and overflow behavior instead of copying generated map assets or inventing a separate visual system.
+
+## Required fidelity surfaces
+
+- Fonts and typography: existing app font family and optical weights are retained; title, metadata, and action hierarchy match the mock without clipping or unintended wrapping.
+- Spacing and layout rhythm: the library sheet was reduced to a map-first 40dvh; detail uses 58dvh; dividers, summary cells, actions, and footer follow the mock's vertical rhythm.
+- Colors and visual tokens: existing surface, separator, accent, muted text, selected surface, radius, and shadow tokens are used consistently.
+- Image quality and asset fidelity: no new raster product assets were required. Standard controls use the existing Lucide icon system. The generated basemap was not recreated or approximated.
+- Copy and content: import, exact-track, link visibility, GPX geometry, local-storage, and no-turn-by-turn disclosures are concise and explicit.
+
+## Findings
+
+No actionable P0, P1, or P2 visual differences remain in the feature UI. The remaining differences are expected: live route values differ from mock data, the app retains its existing compact detail toolbar, and the local in-app preview could not paint external WebGL basemap tiles.
+
+## Comparison history
+
+1. Initial library pass — P2: the 52dvh sheet crowded the map, header actions were visually heavy, and the import entry looked like a detached card. Fixed by using a 40dvh library sheet, plain header actions, separator-based import row, and a library route preview. Post-fix evidence: `design-qa-comparison-final.png`.
+2. Initial share pass — P1: the share choices flex item collapsed to 2 px on mobile and was not usable. Fixed by making the share sheet non-shrinking, placing it after the primary actions, and expanding route detail to 58dvh. Post-fix evidence: `design-qa-share-comparison.png`.
+3. Initial GPX review pass — P2: the editable field and file card drifted from the selected review hierarchy. Fixed by promoting the parsed route name, putting the filename/local disclosure beneath it, stacking the actions, and adding the information icon. Post-fix evidence: `design-qa-import-comparison.png`.
+4. Browser verification — P1: the configured external MapLibre worker produced deserialization errors with the current bundled runtime. Fixed by using MapLibre's bundled worker path. The final three feature states report no console errors.
+
+## Primary interactions tested
+
+- Open My routes and preview a planned route.
+- Open a compact shared-route fragment and calculate/save it as an unsaved draft.
+- Open the route sharing choices.
+- Select, parse, review, and save a multi-segment GPX file locally.
+- Confirm imported GPX routes omit invented route preference, edit-routing action, and turn-by-turn directions.
+
+## Implementation checklist
+
+- [x] Route library matches selected hierarchy.
+- [x] GPX review matches selected hierarchy and disclosure.
+- [x] Share choices remain visible and scroll safely on mobile.
+- [x] No feature-state console errors.
+- [x] Focused automated tests and production static build pass.
+
+## Follow-up polish
+
+- P3: the generated mock uses decorative circular icon backgrounds; the implementation intentionally keeps the app's existing line-icon treatment.
+
+final result: passed

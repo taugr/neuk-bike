@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { shareParkingLink } from '@/lib/share';
+import { shareParkingLink, shareRouteFile } from '@/lib/share';
 
 const shareData = {
   title: 'Picardy Place cycle parking',
@@ -70,5 +70,35 @@ describe('shareParkingLink', () => {
     await expect(
       shareParkingLink(shareData, { copyText, navigator: null }),
     ).resolves.toBe('failed');
+  });
+});
+
+describe('shareRouteFile', () => {
+  it('uses native file sharing when supported', async () => {
+    const file = new File(['gpx'], 'route.gpx', {
+      type: 'application/gpx+xml',
+    });
+    const share = vi.fn(async () => undefined);
+    const canShare = vi.fn(() => true);
+    const download = vi.fn();
+
+    await expect(
+      shareRouteFile(file, 'Route', {
+        download,
+        navigator: { canShare, share },
+      }),
+    ).resolves.toBe('shared');
+    expect(share).toHaveBeenCalledWith({ files: [file], title: 'Route' });
+    expect(download).not.toHaveBeenCalled();
+  });
+
+  it('downloads when file sharing is unavailable', async () => {
+    const file = new File(['gpx'], 'route.gpx');
+    const download = vi.fn();
+
+    await expect(
+      shareRouteFile(file, 'Route', { download, navigator: null }),
+    ).resolves.toBe('downloaded');
+    expect(download).toHaveBeenCalledWith(file);
   });
 });

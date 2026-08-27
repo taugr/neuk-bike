@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   createSavedRouteRecord,
+  createImportedGpxRouteRecord,
   groupRouteWaypointNumbersByInstruction,
   isSavedRouteRecord,
   savedRouteToCycleRoute,
@@ -68,6 +69,29 @@ describe('saved routes', () => {
       }),
     ).toBe(false);
     expect(isSavedRouteRecord({ ...record, points: [[55.95]] })).toBe(false);
+  });
+
+  it('stores imported GPX without inventing a route preference or directions', () => {
+    const record = createImportedGpxRouteRecord({
+      id: 'import-1',
+      name: 'Coastal track',
+      fileName: 'coast.gpx',
+      distanceMeters: 2100,
+      durationSeconds: null,
+      points: route.points,
+      segments: [route.points],
+      waypoints: waypoints.map((waypoint) => ({
+        ...waypoint,
+        source: 'gpx',
+      })),
+      createdAt: '2026-08-27T08:00:00.000Z',
+    });
+
+    expect(record.plan).toBeNull();
+    expect(record.kind).toBe('imported-gpx');
+    expect(record.instructions).toEqual([]);
+    expect(isSavedRouteRecord(record)).toBe(true);
+    expect(savedRouteToCycleRoute(record).segments).toEqual([route.points]);
   });
 
   it('matches numbered waypoints to ordered route instructions', () => {
