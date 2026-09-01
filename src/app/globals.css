@@ -3600,6 +3600,7 @@ a {
 
 .route-workspace-view,
 .route-planner,
+.destination-parking-chooser,
 .saved-routes-panel,
 .saved-route-detail,
 .gpx-import-review {
@@ -3862,6 +3863,677 @@ a {
 .route-stop-toolbar button.is-active {
   background: var(--accent);
   color: #ffffff;
+}
+
+.route-destination-parking-trigger {
+  align-items: center;
+  background: var(--selected-surface);
+  border: 1px solid var(--selected-border);
+  border-radius: 10px;
+  color: var(--selected-text);
+  display: flex;
+  gap: 0.65rem;
+  min-height: 3.5rem;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  width: 100%;
+}
+
+.route-destination-parking-trigger > span {
+  display: grid;
+  gap: 0.08rem;
+}
+
+.route-destination-parking-trigger strong {
+  font-size: 0.86rem;
+}
+
+.route-destination-parking-trigger small {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.destination-parking-chooser {
+  gap: 0.7rem;
+}
+
+.destination-parking-header {
+  align-items: center;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.destination-parking-header > button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-size: 0.8rem;
+  font-weight: 760;
+  gap: 0.2rem;
+  min-height: 2.5rem;
+  padding: 0 0.25rem;
+}
+
+.destination-parking-header > span {
+  align-items: center;
+  display: flex;
+  gap: 0.45rem;
+  justify-content: center;
+  min-width: 0;
+}
+
+.destination-parking-header > span > span {
+  display: grid;
+  min-width: 0;
+}
+
+.destination-parking-header strong {
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-parking-header > span small {
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 560;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-parking-header > small {
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  font-size: 0.68rem;
+  font-weight: 780;
+  padding: 0.3rem 0.45rem;
+}
+
+.destination-parking-target {
+  align-items: center;
+  background: var(--surface-neutral);
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  display: flex;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+}
+
+.destination-parking-target > svg {
+  color: var(--accent-strong);
+  flex: 0 0 auto;
+}
+
+.destination-parking-target > span {
+  display: grid;
+  min-width: 0;
+}
+
+.destination-parking-target small,
+.destination-parking-selected small {
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 780;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.destination-parking-target strong {
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-parking-selected {
+  align-items: center;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+}
+
+.destination-parking-rank,
+.destination-parking-list-rank {
+  align-items: center;
+  background: var(--accent);
+  border: 3px solid var(--surface);
+  border-radius: 999px;
+  box-shadow: 0 3px 10px var(--marker-shadow);
+  color: var(--primary-button-text);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 850;
+  height: 2.25rem;
+  justify-content: center;
+  width: 2.25rem;
+}
+
+.destination-parking-copy {
+  min-width: 0;
+}
+
+.destination-parking-selected-heading {
+  align-items: center;
+  display: flex;
+  gap: 0.4rem;
+  justify-content: space-between;
+}
+
+.destination-parking-best-badge {
+  align-items: center;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-size: 0.64rem;
+  font-weight: 780;
+  gap: 0.2rem;
+  padding: 0.27rem 0.42rem;
+  text-transform: none;
+}
+
+.destination-parking-copy h2 {
+  font-size: 1rem;
+  line-height: 1.2;
+  margin: 0.08rem 0 0.18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-parking-summary {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  gap: 0.28rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.destination-parking-summary svg {
+  color: var(--accent-strong);
+  flex: 0 0 auto;
+}
+
+.destination-parking-details {
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  overflow: hidden;
+}
+
+.destination-parking-details > div {
+  border-right: 1px solid var(--separator);
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+  padding: 0.48rem 0.35rem;
+  text-align: center;
+}
+
+.destination-parking-details > div:last-child {
+  border-right: 0;
+}
+
+.destination-parking-details dt {
+  color: var(--muted);
+  font-size: 0.6rem;
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
+.destination-parking-details dd {
+  font-size: 0.68rem;
+  font-weight: 760;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-parking-list {
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  flex: 0 0 auto;
+  list-style: none;
+  margin: 0;
+  max-height: 13rem;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.destination-parking-list li + li {
+  border-top: 1px solid var(--separator);
+}
+
+.destination-parking-list button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  min-height: 6.6rem;
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  width: 100%;
+}
+
+.destination-parking-list button.is-selected {
+  background: var(--selected-surface);
+}
+
+.destination-parking-list-rank {
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: none;
+  color: var(--accent-strong);
+  height: 1.8rem;
+  width: 1.8rem;
+}
+
+.destination-parking-list strong {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-parking-list-copy {
+  display: grid;
+  gap: 0.28rem;
+  min-width: 0;
+}
+
+.destination-parking-list-heading {
+  align-items: center;
+  display: flex;
+  gap: 0.45rem;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.destination-parking-list-heading > strong {
+  min-width: 0;
+}
+
+.destination-parking-list-heading > small {
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  flex: 0 0 auto;
+  font-size: 0.58rem;
+  font-weight: 780;
+  padding: 0.22rem 0.35rem;
+}
+
+.destination-parking-list-details {
+  border-top: 1px solid var(--separator);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-top: 0.35rem;
+}
+
+.destination-parking-list-details > span {
+  display: grid;
+  gap: 0.08rem;
+  min-width: 0;
+  padding: 0 0.3rem;
+  text-align: center;
+}
+
+.destination-parking-list-details > span + span {
+  border-left: 1px solid var(--separator);
+}
+
+.destination-parking-list-details small {
+  color: var(--muted);
+  font-size: 0.54rem;
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
+.destination-parking-list-details strong {
+  font-size: 0.62rem;
+  margin: 0;
+}
+
+.destination-parking-actions {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.destination-parking-actions button,
+.destination-parking-restore {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 9px;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-size: 0.76rem;
+  font-weight: 780;
+  gap: 0.3rem;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.65rem;
+}
+
+.destination-parking-actions .destination-parking-confirm {
+  background: var(--primary-button-bg);
+  color: var(--primary-button-text);
+  grid-column: 1 / -1;
+}
+
+.destination-parking-actions button:last-child {
+  grid-column: 1 / -1;
+}
+
+.destination-parking-actions > button {
+  grid-column: 1 / -1;
+}
+
+.destination-parking-map-bar {
+  display: none;
+}
+
+.route-destination-map-bar {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--subtle);
+  border-radius: 13px;
+  box-shadow: var(--shadow);
+  color: var(--text);
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+  left: 50%;
+  max-width: calc(100% - 8rem);
+  padding: 0.42rem;
+  position: absolute;
+  text-align: left;
+  top: 1rem;
+  transform: translateX(-50%);
+  width: min(28rem, calc(100% - 8rem));
+  z-index: 560;
+}
+
+.route-destination-map-bike,
+.route-destination-map-status {
+  align-items: center;
+  border: 1px solid var(--subtle);
+  border-radius: 9px;
+  color: var(--accent-strong);
+  display: inline-flex;
+  height: 2.5rem;
+  justify-content: center;
+  width: 2.5rem;
+}
+
+.route-destination-map-copy {
+  display: grid;
+  gap: 0.06rem;
+  min-width: 0;
+}
+
+.route-destination-map-copy small {
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 780;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.route-destination-map-copy strong {
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.route-destination-search {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.route-destination-search-header {
+  align-items: center;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: minmax(4.5rem, 1fr) auto minmax(4.5rem, 1fr);
+}
+
+.route-destination-search-header h2 {
+  font-size: 1.05rem;
+  line-height: 1.2;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.route-destination-search-header > button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 760;
+  gap: 0.2rem;
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0 0.15rem;
+}
+
+.route-destination-search-form {
+  align-items: center;
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin-top: 0.65rem;
+  min-height: 3.25rem;
+  padding: 0 0.65rem;
+}
+
+.route-destination-search-form > svg {
+  color: var(--accent-strong);
+}
+
+.route-destination-search-form input {
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.92rem;
+  min-width: 0;
+  outline: 0;
+  width: 100%;
+}
+
+.route-destination-search-form input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.route-destination-search-clear {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: var(--text);
+  display: inline-flex;
+  height: 2.5rem;
+  justify-content: center;
+  padding: 0;
+  width: 2.5rem;
+}
+
+.route-destination-results {
+  flex: 1;
+  list-style: none;
+  margin: 0.55rem 0 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+  scrollbar-width: none;
+}
+
+.route-destination-results::-webkit-scrollbar {
+  display: none;
+}
+
+.route-destination-results li + li {
+  border-top: 1px solid var(--separator);
+}
+
+.route-destination-results button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: 2.65rem minmax(0, 1fr) auto;
+  min-height: 4.5rem;
+  padding: 0.65rem 0.35rem;
+  text-align: left;
+  width: 100%;
+}
+
+.route-destination-results button.is-selected {
+  background: var(--selected-surface);
+}
+
+.route-destination-results button.is-active:not(.is-selected) {
+  background: var(--hover-soft);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.route-destination-result-icon {
+  align-items: center;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  display: inline-flex;
+  height: 2.65rem;
+  justify-content: center;
+  width: 2.65rem;
+}
+
+.route-destination-result-copy {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.route-destination-result-copy strong,
+.route-destination-result-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.route-destination-result-copy strong {
+  font-size: 0.88rem;
+}
+
+.route-destination-result-copy small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.route-destination-result-status,
+.route-destination-search-message {
+  align-items: center;
+  color: var(--accent-strong);
+  display: flex;
+  font-size: 0.75rem;
+  gap: 0.35rem;
+}
+
+.route-destination-result-status svg,
+.route-destination-search-message svg,
+.route-destination-map-status .is-spinning {
+  animation: destination-parking-spin 0.9s linear infinite;
+}
+
+.route-destination-search-message {
+  margin: 0.7rem 0 0;
+}
+
+.route-destination-retry {
+  align-items: center;
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent-strong);
+  display: inline-flex;
+  font-weight: 760;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  min-height: 2.5rem;
+  padding: 0 0.7rem;
+}
+
+.route-destination-comparing {
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin: 0.7rem 0 0;
+  text-align: center;
+}
+
+.destination-parking-message {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.destination-parking-loading {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  gap: 0.65rem;
+  justify-content: center;
+  min-height: 8rem;
+}
+
+.destination-parking-loading > span {
+  animation: destination-parking-spin 0.9s linear infinite;
+  border: 3px solid var(--subtle);
+  border-radius: 999px;
+  border-top-color: var(--accent);
+  height: 1.7rem;
+  width: 1.7rem;
+}
+
+.destination-parking-loading p {
+  font-size: 0.8rem;
+}
+
+@keyframes destination-parking-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .route-place-search {
@@ -5265,6 +5937,142 @@ a {
     max-height: 58dvh;
   }
 
+  .control-pane[data-panel-view='destination-parking'] {
+    --mobile-sheet-expanded-height: 46dvh;
+    max-height: 46vh;
+    max-height: 46svh;
+    max-height: 46dvh;
+  }
+
+  .control-pane[data-panel-view='destination-parking']:has(
+      .destination-parking-list
+    ) {
+    --mobile-sheet-expanded-height: 66dvh;
+    max-height: 66vh;
+    max-height: 66svh;
+    max-height: 66dvh;
+  }
+
+  .control-pane[data-panel-view='route-destination-search'] {
+    --mobile-sheet-expanded-height: 46dvh;
+    max-height: 46vh;
+    max-height: 46svh;
+    max-height: 46dvh;
+  }
+
+  .destination-parking-chooser {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .destination-parking-list {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .destination-parking-chooser::-webkit-scrollbar {
+    display: none;
+  }
+
+  .destination-parking-map-bar {
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--subtle);
+    border-radius: 13px;
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 0.45rem;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+    left: 0.75rem;
+    max-width: none;
+    padding: 0.42rem;
+    position: absolute;
+    right: 0.75rem;
+    top: max(0.75rem, env(safe-area-inset-top));
+    z-index: 560;
+  }
+
+  .route-destination-map-bar {
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--subtle);
+    border-radius: 13px;
+    box-shadow: var(--shadow);
+    color: var(--text);
+    display: grid;
+    gap: 0.45rem;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+    left: 0.75rem;
+    max-width: none;
+    padding: 0.42rem;
+    position: absolute;
+    right: 0.75rem;
+    text-align: left;
+    top: max(0.75rem, env(safe-area-inset-top));
+    transform: none;
+    width: auto;
+    z-index: 560;
+  }
+
+  .route-destination-map-bike,
+  .route-destination-map-status {
+    align-items: center;
+    border: 1px solid var(--subtle);
+    border-radius: 9px;
+    color: var(--accent-strong);
+    display: inline-flex;
+    height: 2.5rem;
+    justify-content: center;
+    width: 2.5rem;
+  }
+
+  .route-destination-map-copy {
+    display: grid;
+    gap: 0.06rem;
+    min-width: 0;
+  }
+
+  .route-destination-map-copy small {
+    color: var(--muted);
+    font-size: 0.62rem;
+    font-weight: 780;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+  }
+
+  .route-destination-map-copy strong {
+    font-size: 0.82rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .destination-parking-map-bike,
+  .destination-parking-map-locate {
+    align-items: center;
+    border: 1px solid var(--subtle);
+    border-radius: 9px;
+    color: var(--accent-strong);
+    display: inline-flex;
+    height: 2.5rem;
+    justify-content: center;
+    width: 2.5rem;
+  }
+
+  .destination-parking-map-copy {
+    align-items: center;
+    display: flex;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .destination-parking-map-copy strong {
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .route-planner-header,
   .saved-routes-header {
     gap: 0.35rem;
@@ -5982,6 +6790,11 @@ a {
     top: max(0.65rem, env(safe-area-inset-top));
   }
 
+  .app-shell:has(.route-destination-map-bar) .maplibregl-ctrl-top-left,
+  .app-shell:has(.destination-parking-map-bar) .maplibregl-ctrl-top-left {
+    top: max(5rem, calc(env(safe-area-inset-top) + 5rem));
+  }
+
   .app-header {
     gap: 0.65rem;
   }
@@ -6034,7 +6847,54 @@ a {
   }
 }
 
+@media (max-width: 820px) and (max-height: 640px) {
+  .control-pane[data-panel-view='destination-parking'] {
+    --mobile-sheet-expanded-height: 62dvh;
+    max-height: 62vh;
+    max-height: 62svh;
+    max-height: 62dvh;
+  }
+
+  .control-pane[data-panel-view='destination-parking']:has(
+      .destination-parking-list
+    ) {
+    --mobile-sheet-expanded-height: 82dvh;
+    max-height: 82vh;
+    max-height: 82svh;
+    max-height: 82dvh;
+  }
+}
+
 @media (max-width: 460px) {
+  .destination-parking-list button {
+    min-height: 8.4rem;
+  }
+
+  .destination-parking-list-heading {
+    align-items: flex-start;
+  }
+
+  .destination-parking-list-heading > strong {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    white-space: normal;
+  }
+
+  .destination-parking-list-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 0.3rem;
+  }
+
+  .destination-parking-list-details > span:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .destination-parking-list-details > span:nth-child(n + 3) {
+    border-top: 1px solid var(--separator);
+    padding-top: 0.3rem;
+  }
+
   .list-heading h2 .list-heading-count {
     display: block;
     margin-top: 0.1rem;

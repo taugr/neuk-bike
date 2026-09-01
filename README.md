@@ -25,6 +25,8 @@
 - Show cycle directions to a selected parking place with CycleStreets
 - Build multi-stop cycle routes and compare Quietest, Balanced, and Fastest
   options
+- Compare the best three neuks near a route destination, then finish the route
+  at the chosen parking place
 - Save routes on the current device and export them as GPX files
 - See capacity, access, cover, and stand type when mapped
 - Share parking places with source-qualified `?parking=` links
@@ -114,9 +116,17 @@ NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 ```
 
 The route planner extends that integration to ordered routes of up to 30
-stops. Stops can come from place search or a deliberate tap-on-map mode. The
-selected route, including its stops, geometry, instructions, distance, and
-duration, is saved to IndexedDB on the current device. Saved routes can be
+stops. Stops can come from place search or a deliberate tap-on-map mode. After
+adding a start, the destination control on the map opens a focused search sheet;
+selecting a result preserves start and via points while showing search and route
+loading feedback. **Finish at bike parking** appears once the route is ready and
+compares up to three neuks near the current destination using route time and
+distance, distance from the destination, capacity, cover, access, and stand
+type. The original destination remains unchanged until a neuk is confirmed, and
+remains available as a one-tap fallback. When route comparison is unavailable,
+nearby parking and mapped details still remain selectable. The selected route,
+including its stops, geometry, instructions, distance, and duration, is saved
+to IndexedDB on the current device. Saved routes can be
 reopened and exported or shared as GPX without recalculation. GPX files can also
 be reviewed and imported locally; their exact track segments are preserved, but
 they do not gain invented route preferences or turn-by-turn directions. Planned

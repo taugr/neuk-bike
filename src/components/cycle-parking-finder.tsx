@@ -36,6 +36,7 @@ import {
   Globe2,
   Hammer,
   Layers,
+  LoaderCircle,
   LocateFixed,
   MapPin,
   Maximize2,
@@ -146,6 +147,8 @@ import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { Bollard } from '@/components/icons/bollard';
 import { useLanguage } from '@/components/language-provider';
 import { RoutePlanner } from '@/components/route-planner';
+import { RouteDestinationSearch } from '@/components/route-destination-search';
+import { DestinationParkingChooser } from '@/components/destination-parking-chooser';
 import { SavedRoutesPanel } from '@/components/saved-routes-panel';
 import { GpxImportReview } from '@/components/gpx-import-review';
 import { OfflineAreasPanel } from '@/components/offline-areas-panel';
@@ -210,6 +213,12 @@ import {
 import { translate, type MessageKey } from '@/lib/i18n/messages';
 import { createLocalId } from '@/lib/local-id';
 import {
+  getDestinationParkingShortlist,
+  rankDestinationParkingCandidates,
+  replaceRouteFinishWithParking,
+  type DestinationParkingCandidate,
+} from '@/lib/destination-parking';
+import {
   addRouteWaypoint,
   buildRouteDraftPreview,
   canCalculateRoute,
@@ -218,6 +227,7 @@ import {
   isRouteDraftMeaningful,
   moveRouteWaypoint,
   removeRouteWaypoint,
+  setRouteDestination,
   swapRouteEndpoints,
   type RouteDraft,
 } from '@/lib/route-draft';
@@ -749,7 +759,12 @@ type ResolvedTheme = 'light' | 'dark';
 type MobileSheetState = 'expanded' | 'collapsed';
 type ParkingDataStatus = 'loading' | 'ready' | 'error';
 type SavedNeuksStatus = 'loading' | 'ready' | 'storage-error';
-type RouteWorkspaceView = 'detail' | 'import' | 'library' | 'planner';
+type RouteWorkspaceView =
+  | 'destination-parking'
+  | 'detail'
+  | 'import'
+  | 'library'
+  | 'planner';
 type RoutePlannerStatus =
   | 'error'
   | 'idle'
@@ -762,6 +777,34 @@ type RouteWaypointPlacementSnapshot = {
   message: string | null;
   routes: CycleRoutesByPlan;
   status: RoutePlannerStatus;
+};
+
+type DestinationParkingState = {
+  candidates: DestinationParkingCandidate[];
+  expanded: boolean;
+  originalDestination: CycleRouteWaypoint;
+  selectedId: string | null;
+  status: 'error' | 'loading' | 'ready';
+};
+
+type RouteDestinationSearchState = {
+  activeResultIndex: number;
+  isOpen: boolean;
+  message: string | null;
+  query: string;
+  results: PlaceSearchResult[];
+  searchStatus: 'error' | 'idle' | 'loading';
+  selectedId: string | null;
+};
+
+const initialRouteDestinationSearchState: RouteDestinationSearchState = {
+  activeResultIndex: 0,
+  isOpen: false,
+  message: null,
+  query: '',
+  results: [],
+  searchStatus: 'idle',
+  selectedId: null,
 };
 
 type ParkingMoreMenuPosition = {
@@ -967,6 +1010,10 @@ export default function CycleParkingFinder() {
   const [routePlannerMessage, setRoutePlannerMessage] = useState<string | null>(
     null,
   );
+  const [destinationParkingState, setDestinationParkingState] =
+    useState<DestinationParkingState | null>(null);
+  const [routeDestinationSearch, setRouteDestinationSearch] =
+    useState<RouteDestinationSearchState>(initialRouteDestinationSearchState);
   const [routeWaypointPlacementSnapshot, setRouteWaypointPlacementSnapshot] =
     useState<RouteWaypointPlacementSnapshot | null>(null);
   const [savedRoutes, setSavedRoutes] = useState<SavedRouteRecord[]>([]);
@@ -1061,6 +1108,12 @@ export default function CycleParkingFinder() {
   const placeSearchRequestId = useRef(0);
   const directionsRequestId = useRef(0);
   const routePlannerRequestId = useRef(0);
+  const destinationParkingRequestId = useRef(0);
+  const routeDestinationSearchAbortController = useRef<AbortController | null>(
+    null,
+  );
+  const routeDestinationSearchDebounceTimeout = useRef<number | null>(null);
+  const routeDestinationSearchRequestId = useRef(0);
   const routePlannerCalculationTimeout = useRef<number | null>(null);
   const liveRouteWatchId = useRef<number | null>(null);
   const previousLiveRouteMarkerPosition = useRef<CycleRoutePoint | null>(null);
@@ -1536,11 +1589,19 @@ export default function CycleParkingFinder() {
     placeSearchAbortController.current?.abort();
     placeSearchAbortController.current = null;
     placeSearchRequestId.current += 1;
+    if (routeDestinationSearchDebounceTimeout.current !== null) {
+      window.clearTimeout(routeDestinationSearchDebounceTimeout.current);
+      routeDestinationSearchDebounceTimeout.current = null;
+    }
+    routeDestinationSearchAbortController.current?.abort();
+    routeDestinationSearchAbortController.current = null;
+    routeDestinationSearchRequestId.current += 1;
     placeSearchCache.current.clear();
     setIsPlaceSearching(false);
     setActivePlaceResultIndex(0);
     setPlaceResults([]);
     setPlaceSearchMessage(null);
+    setRouteDestinationSearch(initialRouteDestinationSearchState);
   }, [locale]);
 
   useEffect(() => {
@@ -2111,7 +2172,11 @@ export default function CycleParkingFinder() {
       if (routePlannerCalculationTimeout.current !== null) {
         window.clearTimeout(routePlannerCalculationTimeout.current);
       }
+      if (routeDestinationSearchDebounceTimeout.current !== null) {
+        window.clearTimeout(routeDestinationSearchDebounceTimeout.current);
+      }
       placeSearchAbortController.current?.abort();
+      routeDestinationSearchAbortController.current?.abort();
     };
   }, []);
 
@@ -2427,6 +2492,13 @@ export default function CycleParkingFinder() {
       ? (directionsState.routes[directionsState.selectedPlan] ?? null)
       : null;
   const isRouteWorkspace = routeWorkspaceView !== null;
+  const isDestinationParkingMode =
+    routeWorkspaceView === 'destination-parking' &&
+    destinationParkingState !== null;
+  const isRouteDestinationSearchMode =
+    routeWorkspaceView === 'planner' &&
+    routeDraft !== null &&
+    routeDestinationSearch.isOpen;
   const isRouteWaypointPlacementActive =
     routeWaypointPlacementSnapshot !== null;
   const routePlacementStartWaypointCount =
@@ -2467,18 +2539,31 @@ export default function CycleParkingFinder() {
     () => (savedRoutes[0] ? savedRouteToCycleRoute(savedRoutes[0]) : null),
     [savedRoutes],
   );
+  const selectedDestinationParkingCandidate =
+    destinationParkingState?.candidates.find(
+      ({ point }) => point.id === destinationParkingState.selectedId,
+    ) ??
+    destinationParkingState?.candidates[0] ??
+    null;
   const routeWorkspaceRoute =
     routeWorkspaceView === 'planner' && routeDraft
       ? (routePlannerRoutes[routeDraft.plan] ?? routeDraftPreview ?? null)
-      : routeWorkspaceView === 'detail'
-        ? selectedSavedCycleRoute
-        : routeWorkspaceView === 'import'
-          ? pendingGpxCycleRoute
-          : routeWorkspaceView === 'library'
-            ? libraryPreviewRoute
-            : null;
+      : routeWorkspaceView === 'destination-parking'
+        ? (selectedDestinationParkingCandidate?.route ??
+          (routeDraft
+            ? (routePlannerRoutes[routeDraft.plan] ??
+              buildRouteDraftPreview(routeDraft))
+            : null))
+        : routeWorkspaceView === 'detail'
+          ? selectedSavedCycleRoute
+          : routeWorkspaceView === 'import'
+            ? pendingGpxCycleRoute
+            : routeWorkspaceView === 'library'
+              ? libraryPreviewRoute
+              : null;
   const routeWorkspaceWaypoints =
-    routeWorkspaceView === 'planner'
+    routeWorkspaceView === 'planner' ||
+    routeWorkspaceView === 'destination-parking'
       ? (routeDraft?.waypoints ?? [])
       : routeWorkspaceView === 'detail'
         ? (selectedSavedRoute?.waypoints ?? [])
@@ -3558,6 +3643,176 @@ export default function CycleParkingFinder() {
     );
   }
 
+  function cancelRouteDestinationSearchWork() {
+    if (routeDestinationSearchDebounceTimeout.current !== null) {
+      window.clearTimeout(routeDestinationSearchDebounceTimeout.current);
+      routeDestinationSearchDebounceTimeout.current = null;
+    }
+    routeDestinationSearchAbortController.current?.abort();
+    routeDestinationSearchAbortController.current = null;
+    routeDestinationSearchRequestId.current += 1;
+  }
+
+  async function runRouteDestinationSearch(query: string) {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length < placeSearchMinimumCharacters) {
+      return;
+    }
+
+    cancelRouteDestinationSearchWork();
+    const cacheKey = `${locale}:${trimmedQuery.toLowerCase()}`;
+    const cachedResults = placeSearchCache.current.get(cacheKey);
+    const requestId = routeDestinationSearchRequestId.current + 1;
+    routeDestinationSearchRequestId.current = requestId;
+
+    if (cachedResults) {
+      setRouteDestinationSearch((current) => ({
+        ...current,
+        activeResultIndex: 0,
+        message: cachedResults.length === 0 ? t('noPlaceResults') : null,
+        results: cachedResults,
+        searchStatus: 'idle',
+      }));
+      return;
+    }
+
+    const controller = new AbortController();
+    routeDestinationSearchAbortController.current = controller;
+    setRouteDestinationSearch((current) => ({
+      ...current,
+      activeResultIndex: 0,
+      message: null,
+      results: [],
+      searchStatus: 'loading',
+    }));
+
+    try {
+      const focus = routeDraft?.waypoints.at(-1) ?? locationState.location;
+      const response = await fetch(
+        buildPlaceSearchUrl(trimmedQuery, locale, focus),
+        {
+          headers: { Accept: 'application/json' },
+          signal: controller.signal,
+        },
+      );
+      if (!response.ok) {
+        throw new Error('Destination search failed');
+      }
+
+      const manifest = parkingDataClient.current?.getManifest();
+      const results = parsePlaceSearchResults(await response.json()).filter(
+        (result) =>
+          !manifest || isLocationInParkingCoverage(result.location, manifest),
+      );
+      placeSearchCache.current.set(cacheKey, results);
+      if (placeSearchCache.current.size > maxPlaceSearchCacheEntries) {
+        const oldestKey = placeSearchCache.current.keys().next().value;
+        if (oldestKey) {
+          placeSearchCache.current.delete(oldestKey);
+        }
+      }
+      if (requestId !== routeDestinationSearchRequestId.current) {
+        return;
+      }
+      setRouteDestinationSearch((current) => ({
+        ...current,
+        activeResultIndex: 0,
+        message: results.length === 0 ? t('noPlaceResults') : null,
+        results,
+        searchStatus: 'idle',
+      }));
+      captureAnalyticsEvent('route_destination_searched', {
+        result_count: results.length,
+      });
+    } catch {
+      if (
+        controller.signal.aborted ||
+        requestId !== routeDestinationSearchRequestId.current
+      ) {
+        return;
+      }
+      setRouteDestinationSearch((current) => ({
+        ...current,
+        activeResultIndex: 0,
+        message: t('placeSearchError'),
+        results: [],
+        searchStatus: 'error',
+      }));
+      captureAnalyticsEvent('route_destination_searched', { error: true });
+    } finally {
+      if (requestId === routeDestinationSearchRequestId.current) {
+        routeDestinationSearchAbortController.current = null;
+      }
+    }
+  }
+
+  function updateRouteDestinationQuery(query: string) {
+    cancelRouteDestinationSearchWork();
+    setRouteDestinationSearch((current) => ({
+      ...current,
+      activeResultIndex: 0,
+      message: null,
+      query,
+      results: [],
+      searchStatus: 'idle',
+      selectedId: null,
+    }));
+    if (query.trim().length < placeSearchMinimumCharacters) {
+      return;
+    }
+    routeDestinationSearchDebounceTimeout.current = window.setTimeout(() => {
+      routeDestinationSearchDebounceTimeout.current = null;
+      void runRouteDestinationSearch(query);
+    }, placeSearchDebounceMs);
+  }
+
+  function openRouteDestinationSearch() {
+    if (!routeDraft || routeDraft.waypoints.length === 0) {
+      return;
+    }
+    cancelRouteDestinationSearchWork();
+    setRouteDestinationSearch({
+      ...initialRouteDestinationSearchState,
+      isOpen: true,
+    });
+    setMobileSheetState('expanded');
+  }
+
+  function closeRouteDestinationSearch() {
+    cancelRouteDestinationSearchWork();
+    setRouteDestinationSearch(initialRouteDestinationSearchState);
+    setMobileSheetState('expanded');
+  }
+
+  function selectRouteDestination(result: PlaceSearchResult, index: number) {
+    const draft = routeDraft;
+    if (!draft || draft.waypoints.length === 0) {
+      return;
+    }
+    cancelRouteDestinationSearchWork();
+    const label = result.name.split(',')[0]?.trim() || result.name;
+    setRouteDestinationSearch((current) => ({
+      ...current,
+      activeResultIndex: index,
+      message: null,
+      query: label,
+      searchStatus: 'idle',
+      selectedId: result.id,
+    }));
+    commitRouteDraft(
+      setRouteDestination(draft, {
+        id: createLocalId(),
+        label,
+        latitude: result.location.latitude,
+        longitude: result.location.longitude,
+        source: 'search',
+      }),
+    );
+    captureAnalyticsEvent('route_destination_selected', {
+      result_rank: index + 1,
+    });
+  }
+
   function selectParkingPoint(id: string) {
     captureAnalyticsEvent('parking_selected', { parking_id: id });
     restoringParkingViewScroll.current = null;
@@ -3951,6 +4206,8 @@ export default function CycleParkingFinder() {
     setRoutePlannerRoutes({});
     setRoutePlannerStatus('idle');
     setRoutePlannerMessage(null);
+    setDestinationParkingState(null);
+    setRouteDestinationSearch(initialRouteDestinationSearchState);
     setRouteWaypointPlacementSnapshot({
       draft: {
         ...draft,
@@ -3980,6 +4237,7 @@ export default function CycleParkingFinder() {
     setSelectedSavedRoute(null);
     setPendingGpxImport(null);
     setSavedRoutesMessage(null);
+    setRouteDestinationSearch(initialRouteDestinationSearchState);
     setRouteWaypointPlacementSnapshot(null);
     setRouteWorkspaceView('library');
     setMobileSheetState('expanded');
@@ -4011,12 +4269,15 @@ export default function CycleParkingFinder() {
       routePlannerCalculationTimeout.current = null;
     }
     routePlannerRequestId.current += 1;
+    destinationParkingRequestId.current += 1;
     setRouteLibraryReturnView(null);
     setRouteWorkspaceView(null);
     setRouteDraft(null);
     setRoutePlannerRoutes({});
     setRoutePlannerStatus('idle');
     setRoutePlannerMessage(null);
+    setDestinationParkingState(null);
+    setRouteDestinationSearch(initialRouteDestinationSearchState);
     setRouteWaypointPlacementSnapshot(null);
     setSelectedSavedRoute(null);
     setPendingGpxImport(null);
@@ -4091,6 +4352,158 @@ export default function CycleParkingFinder() {
     }
   }
 
+  async function openDestinationParkingChooser() {
+    const draft = routeDraft;
+    const originalDestination = draft?.waypoints.at(-1);
+    const client = parkingDataClient.current;
+    if (
+      !draft ||
+      !originalDestination ||
+      draft.waypoints.length < 2 ||
+      !client
+    ) {
+      return;
+    }
+
+    const requestId = ++destinationParkingRequestId.current;
+    cancelRouteDestinationSearchWork();
+    setRouteDestinationSearch(initialRouteDestinationSearchState);
+    setDestinationParkingState({
+      candidates: [],
+      expanded: false,
+      originalDestination,
+      selectedId: null,
+      status: 'loading',
+    });
+    setRouteWorkspaceView('destination-parking');
+    setMobileSheetState('expanded');
+
+    try {
+      await client.loadLocation(originalDestination);
+      if (destinationParkingRequestId.current !== requestId) {
+        return;
+      }
+
+      const shortlist = getDestinationParkingShortlist(
+        prepareDisplayPoints(client.getLoadedPoints(), locale),
+        originalDestination,
+      );
+      const baselineRoute = routePlannerRoutes[draft.plan] ?? null;
+      const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
+      const outcomes = await Promise.allSettled(
+        shortlist.map(async (point) => {
+          if (!apiKey || !baselineRoute) {
+            return {
+              destinationDistanceMeters: point.distanceMeters ?? 0,
+              point,
+              route: null,
+              routeDurationDeltaSeconds: null,
+            } satisfies DestinationParkingCandidate;
+          }
+
+          const candidateDraft = replaceRouteFinishWithParking(draft, point);
+          const cacheKey = buildCycleRouteWaypointsCacheKey(
+            candidateDraft.waypoints,
+          );
+          let routes = routePlannerCache.current.get(cacheKey);
+          if (!routes) {
+            const request = buildCycleStreetsRouteRequest({
+              apiKey,
+              waypoints: candidateDraft.waypoints,
+            });
+            routes = parseCycleStreetsRoutes(
+              await fetchCycleStreetsDirections(request),
+              point,
+            );
+            routePlannerCache.current.set(cacheKey, routes);
+          }
+          const route = routes[draft.plan] ?? null;
+
+          return {
+            destinationDistanceMeters: point.distanceMeters ?? 0,
+            point,
+            route,
+            routeDurationDeltaSeconds: route
+              ? route.durationSeconds - baselineRoute.durationSeconds
+              : null,
+          } satisfies DestinationParkingCandidate;
+        }),
+      );
+      if (destinationParkingRequestId.current !== requestId) {
+        return;
+      }
+
+      const candidates = rankDestinationParkingCandidates(
+        outcomes.map((outcome, index) =>
+          outcome.status === 'fulfilled'
+            ? outcome.value
+            : {
+                destinationDistanceMeters:
+                  shortlist[index]?.distanceMeters ?? 0,
+                point: shortlist[index]!,
+                route: null,
+                routeDurationDeltaSeconds: null,
+              },
+        ),
+      );
+      setDestinationParkingState({
+        candidates,
+        expanded: false,
+        originalDestination,
+        selectedId: candidates[0]?.point.id ?? null,
+        status: 'ready',
+      });
+      captureAnalyticsEvent('destination_parking_opened', {
+        candidate_count: candidates.length,
+        route_comparisons: candidates.filter(({ route }) => route !== null)
+          .length,
+      });
+    } catch {
+      if (destinationParkingRequestId.current !== requestId) {
+        return;
+      }
+      setDestinationParkingState({
+        candidates: [],
+        expanded: false,
+        originalDestination,
+        selectedId: null,
+        status: 'error',
+      });
+    }
+  }
+
+  function closeDestinationParkingChooser() {
+    destinationParkingRequestId.current += 1;
+    setDestinationParkingState(null);
+    setRouteWorkspaceView('planner');
+    setMobileSheetState('expanded');
+  }
+
+  function confirmDestinationParking() {
+    if (!routeDraft || !selectedDestinationParkingCandidate) {
+      return;
+    }
+    const rank =
+      destinationParkingState?.candidates.findIndex(
+        ({ point }) =>
+          point.id === selectedDestinationParkingCandidate.point.id,
+      ) ?? -1;
+    const nextDraft = replaceRouteFinishWithParking(
+      routeDraft,
+      selectedDestinationParkingCandidate.point,
+    );
+    destinationParkingRequestId.current += 1;
+    setDestinationParkingState(null);
+    setRouteWorkspaceView('planner');
+    setMobileSheetState('expanded');
+    commitRouteDraft(nextDraft);
+    captureAnalyticsEvent('destination_parking_confirmed', {
+      rank: rank + 1,
+      route_comparison_available:
+        selectedDestinationParkingCandidate.route !== null,
+    });
+  }
+
   useEffect(() => {
     if (!isClientReady || sharedRouteOpened.current) {
       return;
@@ -4125,6 +4538,25 @@ export default function CycleParkingFinder() {
       stop_count: draft.waypoints.length,
     });
   }, [isClientReady]);
+
+  useEffect(() => {
+    if (
+      !routeDestinationSearch.isOpen ||
+      routeDestinationSearch.selectedId === null ||
+      routePlannerStatus !== 'loaded'
+    ) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setRouteDestinationSearch(initialRouteDestinationSearchState);
+    }, 220);
+    return () => window.clearTimeout(timeout);
+  }, [
+    routeDestinationSearch.isOpen,
+    routeDestinationSearch.selectedId,
+    routePlannerStatus,
+  ]);
 
   function commitRouteDraft(nextDraft: RouteDraft) {
     if (routePlannerCalculationTimeout.current !== null) {
@@ -5035,18 +5467,38 @@ export default function CycleParkingFinder() {
         <section className="map-pane" aria-label={t('map')}>
           <CycleParkingMap
             locale={locale}
-            points={mapPoints}
+            points={
+              isDestinationParkingMode
+                ? destinationParkingState.candidates.map(({ point }) => point)
+                : mapPoints
+            }
             userLocation={mapUserLocation}
             currentLocationFocusRequestId={currentLocationFocusRequestId}
-            selectedPointId={isRouteWorkspace ? null : selectedId}
-            selectedPoint={isRouteWorkspace ? null : explicitSelectedPoint}
+            selectedPointId={
+              isDestinationParkingMode
+                ? destinationParkingState.selectedId
+                : isRouteWorkspace
+                  ? null
+                  : selectedId
+            }
+            selectedPoint={
+              isDestinationParkingMode
+                ? (selectedDestinationParkingCandidate?.point ?? null)
+                : isRouteWorkspace
+                  ? null
+                  : explicitSelectedPoint
+            }
             nearestPoint={
               !isRouteWorkspace && parkingView === 'nearby'
                 ? nearestPoint
                 : null
             }
             rankedPoints={
-              !isRouteWorkspace && parkingView === 'nearby' ? nearbyPoints : []
+              isDestinationParkingMode
+                ? destinationParkingState.candidates.map(({ point }) => point)
+                : !isRouteWorkspace && parkingView === 'nearby'
+                  ? nearbyPoints
+                  : []
             }
             parkingView={parkingView}
             savedPointKeys={[...savedKeys]}
@@ -5071,6 +5523,11 @@ export default function CycleParkingFinder() {
             }
             shouldFollowLiveRoute={liveRouteTracking.status === 'tracking'}
             isDirectionsMode={isDirectionsMode || isRouteWorkspace}
+            isDestinationParkingMode={isDestinationParkingMode}
+            isRouteCalculationLoading={
+              routeWorkspaceView === 'planner' &&
+              routePlannerStatus === 'loading'
+            }
             isRoutePlanningMode={isRouteWorkspace}
             showCurrentLocationMarker={showRouteCurrentLocation}
             mobileSheetState={mobileSheetState}
@@ -5079,7 +5536,20 @@ export default function CycleParkingFinder() {
             canRequestDirections={isClientReady}
             canShowStreetView={googleStreetViewApiKey.length > 0}
             onClearSelection={clearSelectedParkingPoint}
-            onSelectPoint={selectParkingPoint}
+            onSelectPoint={(id) => {
+              if (isDestinationParkingMode) {
+                setDestinationParkingState((current) =>
+                  current
+                    ? {
+                        ...current,
+                        selectedId: id,
+                      }
+                    : current,
+                );
+                return;
+              }
+              selectParkingPoint(id);
+            }}
             onRequestDirections={(point) => {
               void requestDirectionsToPoint(point);
             }}
@@ -5103,6 +5573,59 @@ export default function CycleParkingFinder() {
             cycleNetworkFeatures={cycleNetworkFeatures}
             isCycleNetworkVisible={isCycleNetworkVisible}
           />
+          {isDestinationParkingMode ? (
+            <div
+              className="destination-parking-map-bar"
+              aria-label={t('originalDestination')}
+            >
+              <span className="destination-parking-map-bike" aria-hidden="true">
+                <Bike size={21} />
+              </span>
+              <span className="destination-parking-map-copy">
+                <Search size={17} aria-hidden="true" />
+                <strong>
+                  {destinationParkingState.originalDestination.label}
+                </strong>
+              </span>
+              <span
+                className="destination-parking-map-locate"
+                aria-hidden="true"
+              >
+                <LocateFixed size={20} />
+              </span>
+            </div>
+          ) : null}
+          {routeWorkspaceView === 'planner' &&
+          routeDraft &&
+          routeDraft.waypoints.length > 0 &&
+          !isRouteWaypointPlacementActive ? (
+            <button
+              className="route-destination-map-bar"
+              data-testid="route-destination-map-search"
+              type="button"
+              onClick={openRouteDestinationSearch}
+            >
+              <span className="route-destination-map-bike" aria-hidden="true">
+                <Bike size={21} />
+              </span>
+              <span className="route-destination-map-copy">
+                <small>{t('destination')}</small>
+                <strong>
+                  {routeDestinationSearch.query ||
+                    (routeDraft.waypoints.length > 1
+                      ? routeDraft.waypoints.at(-1)?.label
+                      : t('searchDestination'))}
+                </strong>
+              </span>
+              <span className="route-destination-map-status" aria-hidden="true">
+                {routePlannerStatus === 'loading' ? (
+                  <LoaderCircle className="is-spinning" size={22} />
+                ) : (
+                  <Search size={20} />
+                )}
+              </span>
+            </button>
+          ) : null}
           {offlineAreaSelectionBounds ? (
             <OfflineAreaSelection
               error={offlineAreaError}
@@ -5209,15 +5732,17 @@ export default function CycleParkingFinder() {
           data-panel-view={
             isRouteWaypointPlacementActive
               ? 'route-editing'
-              : isRouteWorkspace
-                ? routeWorkspaceView
-                : isDirectionsMode
-                  ? 'directions'
-                  : isParkingDetailsMode
-                    ? 'details'
-                    : isParkingFiltersMode
-                      ? 'filters'
-                      : 'list'
+              : isRouteDestinationSearchMode
+                ? 'route-destination-search'
+                : isRouteWorkspace
+                  ? routeWorkspaceView
+                  : isDirectionsMode
+                    ? 'directions'
+                    : isParkingDetailsMode
+                      ? 'details'
+                      : isParkingFiltersMode
+                        ? 'filters'
+                        : 'list'
           }
           data-parking-view={parkingView}
           data-panel-transition={parkingPanelState.transition}
@@ -5273,9 +5798,58 @@ export default function CycleParkingFinder() {
                 initial={false}
                 mode="popLayout"
               >
-                {isRouteWorkspace &&
-                routeWorkspaceView === 'planner' &&
-                routeDraft ? (
+                {isRouteDestinationSearchMode ? (
+                  <motion.div
+                    animate="center"
+                    custom={panelMotionContext}
+                    exit="exit"
+                    initial="enter"
+                    key="route-destination-search"
+                    className="route-workspace-view"
+                    variants={panelMotionVariants}
+                  >
+                    <RouteDestinationSearch
+                      activeResultIndex={
+                        routeDestinationSearch.activeResultIndex
+                      }
+                      message={
+                        routeDestinationSearch.message ??
+                        (routePlannerStatus === 'missing-key'
+                          ? t('directionsNeedKey')
+                          : routePlannerStatus === 'error'
+                            ? routePlannerMessage
+                            : null)
+                      }
+                      query={routeDestinationSearch.query}
+                      results={routeDestinationSearch.results}
+                      routeStatus={routePlannerStatus}
+                      searchStatus={routeDestinationSearch.searchStatus}
+                      selectedId={routeDestinationSearch.selectedId}
+                      onBack={closeRouteDestinationSearch}
+                      onClear={() => updateRouteDestinationQuery('')}
+                      onQueryChange={updateRouteDestinationQuery}
+                      onRetry={() => {
+                        if (routeDraft) {
+                          void calculateRouteDraft(routeDraft);
+                        }
+                      }}
+                      onSearch={() =>
+                        void runRouteDestinationSearch(
+                          routeDestinationSearch.query,
+                        )
+                      }
+                      onSelect={selectRouteDestination}
+                      onSetActiveResultIndex={(activeResultIndex) =>
+                        setRouteDestinationSearch((current) => ({
+                          ...current,
+                          activeResultIndex,
+                        }))
+                      }
+                    />
+                  </motion.div>
+                ) : isRouteWorkspace &&
+                  routeWorkspaceView === 'planner' &&
+                  routeDraft ? (
                   <motion.div
                     animate="center"
                     custom={panelMotionContext}
@@ -5303,6 +5877,9 @@ export default function CycleParkingFinder() {
                           moveRouteWaypoint(routeDraft, fromIndex, toIndex),
                         )
                       }
+                      onOpenDestinationParking={() =>
+                        void openDestinationParkingChooser()
+                      }
                       onOpenLibrary={openSavedRoutes}
                       onRemoveWaypoint={(id) =>
                         commitRouteDraft(removeRouteWaypoint(routeDraft, id))
@@ -5319,6 +5896,49 @@ export default function CycleParkingFinder() {
                         commitRouteDraft(swapRouteEndpoints(routeDraft))
                       }
                       onUndoMapPlacement={undoRouteWaypointPlacement}
+                    />
+                  </motion.div>
+                ) : isDestinationParkingMode ? (
+                  <motion.div
+                    animate="center"
+                    custom={panelMotionContext}
+                    exit="exit"
+                    initial="enter"
+                    key="destination-parking"
+                    className="route-workspace-view"
+                    variants={panelMotionVariants}
+                  >
+                    <DestinationParkingChooser
+                      candidates={destinationParkingState.candidates}
+                      expanded={destinationParkingState.expanded}
+                      originalDestination={
+                        destinationParkingState.originalDestination
+                      }
+                      selectedId={destinationParkingState.selectedId}
+                      status={destinationParkingState.status}
+                      onBack={closeDestinationParkingChooser}
+                      onConfirm={confirmDestinationParking}
+                      onRestoreDestination={closeDestinationParkingChooser}
+                      onSelect={(id) =>
+                        setDestinationParkingState((current) =>
+                          current
+                            ? {
+                                ...current,
+                                selectedId: id,
+                              }
+                            : current,
+                        )
+                      }
+                      onToggleExpanded={() =>
+                        setDestinationParkingState((current) =>
+                          current
+                            ? {
+                                ...current,
+                                expanded: !current.expanded,
+                              }
+                            : current,
+                        )
+                      }
                     />
                   </motion.div>
                 ) : isRouteWorkspace ? (

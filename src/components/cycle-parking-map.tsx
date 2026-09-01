@@ -122,6 +122,8 @@ type CycleParkingMapProps = {
   } | null;
   shouldFollowLiveRoute: boolean;
   isDirectionsMode: boolean;
+  isDestinationParkingMode?: boolean;
+  isRouteCalculationLoading?: boolean;
   isRoutePlanningMode?: boolean;
   showCurrentLocationMarker?: boolean;
   mobileSheetState: 'collapsed' | 'expanded';
@@ -1947,6 +1949,8 @@ export default function CycleParkingMap({
   liveRouteMarker,
   shouldFollowLiveRoute,
   isDirectionsMode,
+  isDestinationParkingMode = false,
+  isRouteCalculationLoading = false,
   isRoutePlanningMode = false,
   showCurrentLocationMarker = false,
   mobileSheetState,
@@ -2157,19 +2161,22 @@ export default function CycleParkingMap({
   ]);
   const visiblePoints = useMemo(
     () =>
-      isRoutePlanningMode
-        ? []
-        : isDirectionsMode && selectedPoint
-          ? [selectedPoint]
-          : getRenderableParkingPoints({
-              bounds: viewport.bounds,
-              pinnedPoints: rankedPoints,
-              points,
-              selectedPoint,
-              zoom: viewport.zoom,
-            }),
+      isDestinationParkingMode
+        ? points
+        : isRoutePlanningMode
+          ? []
+          : isDirectionsMode && selectedPoint
+            ? [selectedPoint]
+            : getRenderableParkingPoints({
+                bounds: viewport.bounds,
+                pinnedPoints: rankedPoints,
+                points,
+                selectedPoint,
+                zoom: viewport.zoom,
+              }),
     [
       isDirectionsMode,
+      isDestinationParkingMode,
       isRoutePlanningMode,
       points,
       rankedPoints,
@@ -2760,12 +2767,19 @@ export default function CycleParkingMap({
       map,
       style:
         route?.source === 'local'
-          ? {
-              color: '#f97316',
-              dashArray: [1.5, 2],
-              opacity: 0.9,
-              width: 4,
-            }
+          ? isRouteCalculationLoading
+            ? {
+                color: '#0f766e',
+                dashArray: [1.2, 1.8],
+                opacity: 0.76,
+                width: 5,
+              }
+            : {
+                color: '#f97316',
+                dashArray: [1.5, 2],
+                opacity: 0.9,
+                width: 4,
+              }
           : {
               color: '#2563eb',
               opacity: 0.82,
@@ -2798,6 +2812,7 @@ export default function CycleParkingMap({
     finalApproachPositions,
     initialApproachPositions,
     isMapLoaded,
+    isRouteCalculationLoading,
     map,
     route,
     styleRevision,
@@ -2982,7 +2997,7 @@ export default function CycleParkingMap({
     }
 
     const reconciledVisiblePoints =
-      !isRoutePlanningMode &&
+      (!isRoutePlanningMode || isDestinationParkingMode) &&
       selectedPoint &&
       !visiblePoints.some((point) => point.id === selectedPoint.id)
         ? [selectedPoint, ...visiblePoints]
@@ -3008,7 +3023,7 @@ export default function CycleParkingMap({
       const isSaved = savedPointKeySet.has(getPointSavedNeukKey(point));
       const isSelected = point.id === selectedPoint?.id;
       const presentation = getParkingMarkerPresentation({
-        isDirectionsMode,
+        isDirectionsMode: isDirectionsMode && !isDestinationParkingMode,
         isSaved,
         isSelected,
         parkingView,
@@ -3123,12 +3138,17 @@ export default function CycleParkingMap({
       } else {
         delete markerElement.dataset.saved;
       }
-      markerElement.tabIndex = isDirectionsMode ? -1 : 0;
+      const interactionDisabled = isDirectionsMode && !isDestinationParkingMode;
+      markerElement.tabIndex = interactionDisabled ? -1 : 0;
 
-      markerElement.onclick = isDirectionsMode
+      markerElement.onclick = interactionDisabled
         ? null
         : (event) => {
             event.stopImmediatePropagation();
+            if (isDestinationParkingMode) {
+              onSelectPoint(point.id);
+              return;
+            }
             closeCycleNetworkPopup();
             closeMarkerPopups(point.id);
             renderedMarker.popup
@@ -3143,7 +3163,7 @@ export default function CycleParkingMap({
               onSelectPoint(point.id);
             }
           };
-      markerElement.onkeydown = isDirectionsMode
+      markerElement.onkeydown = interactionDisabled
         ? null
         : (event) => {
             if (event.key !== 'Enter' && event.key !== ' ') {
@@ -3152,6 +3172,10 @@ export default function CycleParkingMap({
 
             event.preventDefault();
             event.stopImmediatePropagation();
+            if (isDestinationParkingMode) {
+              onSelectPoint(point.id);
+              return;
+            }
             closeCycleNetworkPopup();
             closeMarkerPopups(point.id);
             renderedMarker.popup
@@ -3183,7 +3207,12 @@ export default function CycleParkingMap({
       ? parkingMarkerRefs.current.get(currentSelectedPoint.id)
       : null;
 
-    if (currentSelectedPoint && selectedEntry?.popup && !route) {
+    if (
+      currentSelectedPoint &&
+      selectedEntry?.popup &&
+      !route &&
+      !isDestinationParkingMode
+    ) {
       closeCycleNetworkPopup();
       closeMarkerPopups(currentSelectedPoint.id);
       selectedEntry.popup
@@ -3200,6 +3229,7 @@ export default function CycleParkingMap({
     closeMarkerPopups,
     copiedShareButton,
     isDirectionsMode,
+    isDestinationParkingMode,
     isRoutePlanningMode,
     locale,
     map,
@@ -3218,7 +3248,7 @@ export default function CycleParkingMap({
   ]);
 
   useEffect(() => {
-    if (!map || !selectedPoint || route) {
+    if (!map || !selectedPoint || route || isDestinationParkingMode) {
       return;
     }
 
@@ -3251,7 +3281,7 @@ export default function CycleParkingMap({
     );
 
     return () => window.clearTimeout(timeoutId);
-  }, [map, mobileSheetState, route, selectedPoint]);
+  }, [isDestinationParkingMode, map, mobileSheetState, route, selectedPoint]);
 
   useEffect(() => {
     if (!map) {
@@ -3311,6 +3341,7 @@ export default function CycleParkingMap({
       map.off('click', handleMapClick);
     };
   }, [
+    isDestinationParkingMode,
     isRouteWaypointPlacementActive,
     map,
     onClearSelection,

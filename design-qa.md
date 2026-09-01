@@ -322,6 +322,75 @@ final result: blocked
 
 final result: passed
 
+---
+
+## Route destination search and loading design QA
+
+### Evidence
+
+- Source visual truth: `/Users/tomauger/.codex/generated_images/01a046df-e7e5-7350-96d3-bc490972ffe5/exec-6f894b76-e5d3-447b-8871-f102424c9974.png`
+- Browser-rendered implementation: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-route-loading-qa-exact.png`
+- Normalized source: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-search-reference-normalized.png`
+- Combined comparison: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-search-comparison-exact.png`
+- Viewport: 390 x 844 CSS pixels at device-pixel ratio 1.
+- Source pixels: 853 x 1844.
+- Implementation pixels: 390 x 844.
+- Density normalization: the source was proportionally downsampled and centered on a 390 x 844 canvas before the equal-size side-by-side comparison.
+- State: a destination result is selected while CycleStreets compares Quietest, Balanced, and Fastest routes.
+
+### Full-view comparison evidence
+
+The final comparison matches the selected map-first composition: a compact destination control remains over the map, the map occupies 54% of the viewport, the route preview is dashed teal, and the dedicated search sheet uses the same breakpoint, hierarchy, selected-result tint, loading cue, three-row result list, and quiet comparison footer as the target. Live Photon results and map framing differ from the illustrative mock, but the interaction hierarchy and density remain equivalent.
+
+### Focused region comparison evidence
+
+The lower sheet and floating destination bar were inspected at full 390 x 844 resolution because they contain the feature's essential typography, spacing, controls, and loading feedback. No separate crop was needed: the normalized comparison keeps the smallest copy legible and both regions visible at 1:1 scale.
+
+### Required fidelity surfaces
+
+- Fonts and typography: the existing Bike Neuks system font and optical weights are retained. Destination, title, result names, addresses, and status copy preserve the target hierarchy without unintended wrapping; long live addresses truncate cleanly.
+- Spacing and layout rhythm: the search sheet was reduced to 46dvh to match the target map/sheet proportion. Header, input, three divider-based rows, selected tint, and footer all fit without clipping or squashing.
+- Colors and visual tokens: the implementation uses the existing cream surface, teal accent, muted text, selected surface, separators, radii, and restrained shadow tokens. Loading previews use the target's dashed teal treatment.
+- Image quality and asset fidelity: the basemap is the real OpenFreeMap surface rather than a generated substitute. Standard UI controls use the existing Lucide icon system; no placeholder, handcrafted SVG, CSS illustration, or rasterized UI asset was introduced.
+- Copy and content: Destination, Choose destination, Finding a cycle route, and the Quietest/Balanced/Fastest comparison copy match the intended task. Live Photon address details are longer than the mock data but remain truthful and readable.
+
+### Findings
+
+No actionable P0, P1, or P2 visual differences remain.
+
+- P3: the loading preview is a dashed straight-line connection between the new waypoints until CycleStreets returns, while the concept depicts a curved partial street route. This is an honest transient representation and is replaced by the calculated route within the same state transition.
+- P3: live Photon results contain current full addresses and may not reproduce the concept's exact three museum names.
+
+### Comparison history
+
+1. Initial pass - P2: the search sheet used 52dvh, leaving less map visible than the target; the draft route was orange; and the map bar said Finish. Fixed by using a 46dvh search sheet, a dashed teal loading preview, and the explicit Destination label.
+2. Route-ready pass - P2: Finish at bike parking existed below the initial route-sheet viewport. Fixed by moving it directly after the stop list and showing it only when route calculation has completed. Post-fix evidence: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-route-ready-qa-final.png`.
+3. Final pass: the equal-size comparison found no remaining P0/P1/P2 mismatch. The selected result, spinner, compact destination control, map/sheet split, teal preview, and three result rows are all visible without overflow.
+
+### Primary interactions tested
+
+- Open a new route and add a searched start point.
+- Open destination search from the map control.
+- Search live Photon results and select a destination.
+- Confirm the selected-result and map-level loading indicators appear immediately.
+- Confirm the start remains unchanged and the destination becomes the final waypoint.
+- Confirm Quietest, Balanced, and Fastest load and the parking action is revealed.
+- Open the destination parking chooser and confirm three ranked candidates appear, then return to the route.
+- Check the same route-ready surface at 1280 x 800 without panel or map-control overlap.
+- Check the final 4182 browser console: no warnings or errors.
+
+### Implementation checklist
+
+- [x] Destination search is accessible from the map while planning a route.
+- [x] Search and route calculation have distinct visible progress states.
+- [x] Start and via points are preserved when replacing the destination.
+- [x] Errors retain the selected destination and expose Retry.
+- [x] Finish at bike parking appears after route calculation.
+- [x] Mobile and desktop layouts remain usable.
+- [x] Unit suite, lint, formatting, TypeScript, static build, and browser checks pass.
+
+final result: passed
+
 # Compact filtered-result grouping QA
 
 ## Evidence
@@ -1978,5 +2047,75 @@ No actionable P0, P1, or P2 visual differences remain in the feature UI. The rem
 ## Follow-up polish
 
 - P3: the generated mock uses decorative circular icon backgrounds; the implementation intentionally keeps the app's existing line-icon treatment.
+
+final result: passed
+
+## Destination parking chooser design QA
+
+### Comparison
+
+- Reference: `/Users/tomauger/.codex/generated_images/01a046df-e7e5-7350-96d3-bc490972ffe5/exec-5707aa6d-62aa-43e0-8ef2-0625e99d459f.png`
+- Implementation: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-parking-refined.png`
+- Combined comparison: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-parking-comparison-final.png`
+- Comparison viewport: 390 × 844 CSS pixels.
+
+### Pass 1
+
+- P1 layout: the original destination was repeated in a bordered card inside
+  the sheet, pushing comparison details below the mobile fold. The reference
+  keeps this context in the floating map bar and a short subtitle.
+- P2 actions: Compare and restore actions did not follow the full-width visual
+  hierarchy of the reference.
+- P2 content hierarchy: the selected candidate did not have the compact
+  Best match badge used by the reference.
+
+Fixes:
+
+- Added the compact floating destination bar over the map.
+- Replaced the redundant destination card with a one-line “Near …” subtitle.
+- Added the Best match badge and made all action rows full-width.
+
+### Final pass
+
+- Typography: existing Bike Neuks system type, weights, and truncation remain
+  consistent; the destination and candidate names fit at mobile width.
+- Layout and spacing: map-first composition, rounded bottom sheet, candidate
+  hierarchy, metadata strip, and action order match the reference intent.
+- Colors and surfaces: existing teal tokens, white surfaces, restrained
+  borders, and marker styling are used throughout.
+- Icons: Lucide icons use one consistent stroke family; no replacement image
+  assets, inline SVGs, or decorative CSS illustrations were introduced.
+- Copy: cycling distance, relative cycling time, and straight-line distance
+  from the destination are distinguished truthfully.
+- States and interactions: loading, empty, error, collapsed comparison,
+  expanded comparison, candidate selection, confirm, back, and restore paths
+  are implemented. The original destination is unchanged until confirmation.
+- Accessibility: semantic buttons and regions, visible focus behavior, mobile
+  tap targets, labels, reduced-motion inheritance, and keyboard candidate
+  selection are retained.
+- Responsiveness: checked at 390 × 844, 768 × 900, and 1280 × 720. No
+  horizontal overflow or panel overlap was found.
+
+Verification:
+
+- Unit suite: 34 files, 252 tests passed.
+- Focused mobile Playwright flow: passed.
+- Lint, formatting, TypeScript, and static production build: passed.
+
+final result: passed
+
+---
+
+## Route destination search final checkpoint
+
+The full `Route destination search and loading design QA` section above is the latest comparison review and supersedes the earlier route-workspace checkpoints.
+
+- Source: `/Users/tomauger/.codex/generated_images/01a046df-e7e5-7350-96d3-bc490972ffe5/exec-6f894b76-e5d3-447b-8871-f102424c9974.png`
+- Implementation: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-route-loading-qa-exact.png`
+- Equal-size comparison: `/Users/tomauger/.codex/visualizations/2026/08/28/01a046df-e7e5-7350-96d3-bc490972ffe5/destination-search-comparison-exact.png`
+- Viewport: 390 x 844 CSS pixels at device-pixel ratio 1.
+- Findings: no actionable P0, P1, or P2 differences.
+- Browser verification: destination search, immediate loading feedback, route completion, three route styles, parking handoff, responsive desktop containment, and a clean final 4182 console all passed.
+- Automated verification: 34 test files and 253 tests passed; lint, formatting, TypeScript, and static production build passed.
 
 final result: passed

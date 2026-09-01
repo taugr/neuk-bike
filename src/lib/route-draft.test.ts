@@ -8,6 +8,7 @@ import {
   isRouteDraftMeaningful,
   moveRouteWaypoint,
   removeRouteWaypoint,
+  setRouteDestination,
   swapRouteEndpoints,
   updateRouteWaypoint,
 } from '@/lib/route-draft';
@@ -68,6 +69,31 @@ describe('route drafts', () => {
       'via',
       'start',
     ]);
+  });
+
+  it('adds or replaces only the route destination', () => {
+    const start = waypoint('start', 55.95);
+    const via = waypoint('via', 55.96);
+    const originalFinish = waypoint('finish', 55.97);
+    const destination = waypoint('museum', 55.98);
+
+    const onePoint = createRouteDraft('one-point', start);
+    expect(
+      setRouteDestination(onePoint, destination).waypoints.map(({ id }) => id),
+    ).toEqual(['start', 'museum']);
+
+    const multiPoint = [start, via, originalFinish].reduce(
+      (draft, point) => addRouteWaypoint(draft, point),
+      createRouteDraft('multi-point'),
+    );
+    expect(
+      setRouteDestination(multiPoint, destination).waypoints.map(
+        ({ id }) => id,
+      ),
+    ).toEqual(['start', 'via', 'museum']);
+    expect(multiPoint.waypoints.at(-1)?.id).toBe('finish');
+    const empty = createRouteDraft('empty');
+    expect(setRouteDestination(empty, destination)).toBe(empty);
   });
 
   it('validates distinct endpoints and derives a useful default name', () => {

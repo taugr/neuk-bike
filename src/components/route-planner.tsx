@@ -7,6 +7,7 @@ import {
   ArrowUpDown,
   CheckCircle2,
   ChevronLeft,
+  CircleParking,
   MapPinPlus,
   Pencil,
   Plus,
@@ -50,6 +51,7 @@ export type RoutePlannerProps = {
   onDoneMapPlacement: () => void;
   onMoveWaypoint: (fromIndex: number, toIndex: number) => void;
   onOpenLibrary: () => void;
+  onOpenDestinationParking: () => void;
   onRemoveWaypoint: (id: string) => void;
   onRename: (name: string) => void;
   onRequestMapPlacement: () => void;
@@ -72,6 +74,7 @@ export function RoutePlanner({
   onDoneMapPlacement,
   onMoveWaypoint,
   onOpenLibrary,
+  onOpenDestinationParking,
   onRemoveWaypoint,
   onRename,
   onRequestMapPlacement,
@@ -270,6 +273,21 @@ export function RoutePlanner({
             </div>
           ))}
         </div>
+
+        {draft.waypoints.length >= 2 && status === 'loaded' ? (
+          <button
+            className="route-destination-parking-trigger"
+            data-testid="finish-at-bike-parking"
+            type="button"
+            onClick={onOpenDestinationParking}
+          >
+            <CircleParking size={19} aria-hidden="true" />
+            <span>
+              <strong>{t('finishAtBikeParking')}</strong>
+              <small>{t('finishAtBikeParkingHelp')}</small>
+            </span>
+          </button>
+        ) : null}
 
         <div className="route-stop-toolbar">
           <button

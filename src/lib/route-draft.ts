@@ -36,6 +36,24 @@ export function addRouteWaypoint(
   return { ...draft, waypoints: [...draft.waypoints, waypoint] };
 }
 
+export function setRouteDestination(
+  draft: RouteDraft,
+  destination: CycleRouteWaypoint,
+) {
+  if (draft.waypoints.length === 0) {
+    return draft;
+  }
+
+  if (draft.waypoints.length === 1) {
+    return addRouteWaypoint(draft, destination);
+  }
+
+  return {
+    ...draft,
+    waypoints: [...draft.waypoints.slice(0, -1), destination],
+  };
+}
+
 export function updateRouteWaypoint(
   draft: RouteDraft,
   id: string,
