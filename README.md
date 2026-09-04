@@ -105,6 +105,9 @@ places need no extra status line; the selected search name stays in the search
 field. Permission errors appear only after requesting location explicitly.
 Only confirmed GPS uses the blue location marker. The dark basemap increases street, path, and label contrast
 while preserving route overlays and path patterns.
+The map's “Plan a route” button opens the route planner directly. The sliders
+icon beside Parking opens parking preferences. Route planning is also available
+from the existing menu.
 Place search uses Photon and OpenStreetMap data. After three characters it
 loads suggestions automatically, while Enter and the desktop Search button
 remain available as explicit fallbacks. Results are filtered through the same

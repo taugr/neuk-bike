@@ -4224,7 +4224,7 @@ export default function CycleParkingFinder() {
   }
 
   function openNewRoutePlanner(
-    source: 'menu' | 'saved-routes' = 'saved-routes',
+    source: 'menu' | 'saved-routes' | 'map' = 'saved-routes',
   ) {
     const draft = createRouteDraft(createLocalId());
     stopLiveRouteTracking();
@@ -5713,6 +5713,20 @@ export default function CycleParkingFinder() {
           ) : null}
           {!isDirectionsMode && !isRouteWorkspace ? (
             <div className="map-layers-control">
+              <motion.button
+                className="map-plan-route-button"
+                data-testid="map-plan-route"
+                type="button"
+                whileTap={subtleTap}
+                onClick={() => {
+                  setIsSettingsMenuOpen(false);
+                  setIsMapLayersOpen(false);
+                  openNewRoutePlanner('map');
+                }}
+              >
+                <Route size={17} aria-hidden="true" />
+                <span>{t('planRoute')}</span>
+              </motion.button>
               <motion.button
                 aria-expanded={isMapLayersOpen}
                 aria-label={t('mapLayers')}
