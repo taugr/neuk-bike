@@ -720,7 +720,7 @@ function ParkingFiltersPanel({
 
 type LocationState =
   | { status: 'fallback'; location: UserLocation }
-  | { status: 'locating'; location: UserLocation }
+  | { status: 'locating'; location: UserLocation; label?: string }
   | { status: 'located'; location: UserLocation }
   | { status: 'searched'; location: UserLocation; label: string }
   | { status: 'too-far'; location: UserLocation }
@@ -986,6 +986,7 @@ export default function CycleParkingFinder() {
     null,
   );
   const [placeQuery, setPlaceQuery] = useState('');
+  const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
   const [activePlaceResultIndex, setActivePlaceResultIndex] = useState(0);
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(
@@ -1377,7 +1378,8 @@ export default function CycleParkingFinder() {
               type: 'INITIALIZE_SELECTION',
             });
             setLocationState({
-              status: 'located',
+              status: 'searched',
+              label: translate(localeRef.current, 'sharedReference'),
               location: referenceLocation,
             });
           } else {
@@ -1399,7 +1401,8 @@ export default function CycleParkingFinder() {
             type: 'INITIALIZE_SELECTION',
           });
           setLocationState({
-            status: 'located',
+            status: 'searched',
+            label: selectedPoint.name,
             location: {
               latitude: selectedPoint.latitude,
               longitude: selectedPoint.longitude,
@@ -2607,6 +2610,22 @@ export default function CycleParkingFinder() {
     parkingPanelState.view === 'directions' &&
     directionsState.status !== 'idle' &&
     directionsParkingPoint !== null;
+  const mobileHeaderRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const header = mobileHeaderRef.current;
+    const toolbar = header?.parentElement;
+    const shell = header?.closest<HTMLElement>('.app-shell');
+    if (!toolbar || !shell) return;
+    const observer = new ResizeObserver(() => {
+      shell.style.setProperty(
+        '--finder-header-height',
+        `${toolbar.getBoundingClientRect().height}px`,
+      );
+    });
+    observer.observe(toolbar);
+    return () => observer.disconnect();
+  }, [isDirectionsMode, isRouteWorkspace]);
+
   const isParkingDetailsMode =
     parkingPanelState.view === 'details' &&
     explicitSelectedPoint !== null &&
@@ -3427,7 +3446,8 @@ export default function CycleParkingFinder() {
     return true;
   }
 
-  function requestLocation(selectedParkingId?: string) {
+  function requestLocation(selectedParkingId?: string, userInitiated = false) {
+    setHasRequestedLocation(userInitiated);
     if (parkingView === 'saved') {
       showNearby();
     }
@@ -3445,6 +3465,14 @@ export default function CycleParkingFinder() {
     setLocationState((current) => ({
       status: 'locating',
       location: current.location,
+      label:
+        current.status === 'searched'
+          ? current.label
+          : current.status === 'located'
+            ? t('currentLocation')
+            : current.status === 'locating'
+              ? current.label
+              : t('edinburghReference'),
     }));
 
     getCurrentPosition(
@@ -5342,7 +5370,7 @@ export default function CycleParkingFinder() {
             type="button"
             onClick={() => {
               captureAnalyticsEvent('location_requested');
-              requestLocation();
+              requestLocation(undefined, true);
             }}
             disabled={locationState.status === 'locating'}
             whileTap={
@@ -5382,6 +5410,40 @@ export default function CycleParkingFinder() {
           </motion.button>
         </form>
 
+        {locationState.status !== 'located' &&
+        locationState.status !== 'searched' &&
+        locationState.status !== 'locating' ? (
+          <div
+            className="location-context"
+            aria-live="polite"
+            data-testid={`location-context-${surface}`}
+          >
+            <div className="location-context-row">
+              <span>{t('showingEdinburgh')}</span>
+              <span aria-hidden="true">·</span>
+              <button
+                type="button"
+                onClick={() => {
+                  captureAnalyticsEvent('location_requested');
+                  requestLocation(undefined, true);
+                }}
+              >
+                {t('useMyLocation')}
+              </button>
+            </div>
+            {hasRequestedLocation ? (
+              <small>
+                {t(
+                  locationState.status === 'denied'
+                    ? 'locationPermissionNeeded'
+                    : locationState.status === 'too-far'
+                      ? 'locationOutsideCoverage'
+                      : 'locationNotAvailable',
+                )}
+              </small>
+            ) : null}
+          </div>
+        ) : null}
         <AnimatePresence initial={false}>
           {placeResults.length > 0 ? (
             <motion.ol
@@ -5473,6 +5535,16 @@ export default function CycleParkingFinder() {
                 : mapPoints
             }
             userLocation={mapUserLocation}
+            referenceLocationLabel={
+              locationState.status === 'located'
+                ? t('currentLocation')
+                : locationState.status === 'searched'
+                  ? locationState.label
+                  : locationState.status === 'locating'
+                    ? (locationState.label ?? t('edinburghReference'))
+                    : t('edinburghReference')
+            }
+            isReferenceCurrentLocation={locationState.status === 'located'}
             currentLocationFocusRequestId={currentLocationFocusRequestId}
             selectedPointId={
               isDestinationParkingMode
@@ -5707,7 +5779,10 @@ export default function CycleParkingFinder() {
 
         {!isDirectionsMode && !isRouteWorkspace ? (
           <section className="mobile-map-toolbar" aria-label={t('findNearby')}>
-            <header className="app-header app-header--mobile">
+            <header
+              ref={mobileHeaderRef}
+              className="app-header app-header--mobile"
+            >
               {renderThemeSettings('settings-menu--mobile', 'brand')}
               <h1 className="sr-only">Bike Neuks</h1>
               {renderPlaceSearchPanel('mobile')}

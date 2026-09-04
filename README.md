@@ -100,7 +100,11 @@ parking list. The layer choice is stored only in the current browser.
 
 If geolocation is unavailable or the requested location is outside the UK,
 Ireland, Spain, and Armenia, the app falls back to central Edinburgh and
-explains what happened.
+shows a compact “Showing Edinburgh · Use my location” prompt. GPS and searched
+places need no extra status line; the selected search name stays in the search
+field. Permission errors appear only after requesting location explicitly.
+Only confirmed GPS uses the blue location marker. The dark basemap increases street, path, and label contrast
+while preserving route overlays and path patterns.
 Place search uses Photon and OpenStreetMap data. After three characters it
 loads suggestions automatically, while Enter and the desktop Search button
 remain available as explicit fallbacks. Results are filtered through the same

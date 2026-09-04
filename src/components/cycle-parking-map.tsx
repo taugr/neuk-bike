@@ -1,5 +1,7 @@
 'use client';
 
+import { improveDarkMapReadability } from '@/lib/map-readability';
+
 import * as maplibregl from 'maplibre-gl';
 import type {
   FilterSpecification,
@@ -99,6 +101,8 @@ type CycleParkingMapProps = {
   cycleNetworkFeatures: CycleNetworkFeature[];
   isCycleNetworkVisible: boolean;
   userLocation: UserLocation;
+  referenceLocationLabel: string;
+  isReferenceCurrentLocation: boolean;
   currentLocationFocusRequestId: number;
   selectedPointId: string | null;
   selectedPoint: ParkingPoint | null;
@@ -362,7 +366,9 @@ async function loadMapLibreBasemapStyle(
 
   const style = (await response.json()) as StyleSpecification;
 
-  return theme === 'light' ? patchOpenFreeMapLibertyStyle(style) : style;
+  return theme === 'light'
+    ? patchOpenFreeMapLibertyStyle(style)
+    : improveDarkMapReadability(style);
 }
 
 function userLocationToPoint(userLocation: UserLocation): CycleRoutePoint {
@@ -1343,11 +1349,17 @@ function ParkingPopupContent({
   );
 }
 
-function StartPopupContent({ locale }: { locale: AppLocale }) {
+function StartPopupContent({
+  locale,
+  label,
+}: {
+  locale: AppLocale;
+  label: string;
+}) {
   return (
     <div className="parking-popup">
       <strong>{translate(locale, 'startPosition')}</strong>
-      <span>{translate(locale, 'currentLocation')}</span>
+      <span>{label}</span>
     </div>
   );
 }
@@ -1934,6 +1946,8 @@ export default function CycleParkingMap({
   cycleNetworkFeatures,
   isCycleNetworkVisible,
   userLocation,
+  referenceLocationLabel,
+  isReferenceCurrentLocation,
   currentLocationFocusRequestId,
   selectedPointId,
   selectedPoint,
@@ -2157,6 +2171,8 @@ export default function CycleParkingMap({
     routeWaypoints,
     selectedPoint,
     showCurrentLocationMarker,
+    referenceLocationLabel,
+    isReferenceCurrentLocation,
     userLocation,
   ]);
   const visiblePoints = useMemo(
@@ -2831,18 +2847,22 @@ export default function CycleParkingMap({
     }
 
     const { popup, root } = createRenderedPopup(
-      <StartPopupContent locale={locale} />,
+      <StartPopupContent locale={locale} label={referenceLocationLabel} />,
       {
         closeButton: true,
         closeOnClick: true,
         offset: [0, -32],
       },
     );
-    const element = createPinMarkerElement('start-marker');
+    const element = createPinMarkerElement(
+      isReferenceCurrentLocation
+        ? 'start-marker'
+        : 'start-marker reference-marker',
+    );
     if (showCurrentLocationMarker) {
       element.style.zIndex = '1250';
     }
-    element.setAttribute('aria-label', translate(locale, 'currentLocation'));
+    element.setAttribute('aria-label', referenceLocationLabel);
     element.setAttribute('role', 'button');
     element.tabIndex = 0;
     const marker = new maplibregl.Marker({
@@ -2891,6 +2911,8 @@ export default function CycleParkingMap({
     locale,
     map,
     showCurrentLocationMarker,
+    referenceLocationLabel,
+    isReferenceCurrentLocation,
     userLocation,
   ]);
 

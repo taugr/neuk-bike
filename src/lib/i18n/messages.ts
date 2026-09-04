@@ -1,6 +1,16 @@
 import type { AppLocale } from '@/lib/i18n/locales';
 
 const en = {
+  showingEdinburgh: 'Showing Edinburgh',
+  useMyLocation: 'Use my location',
+  sharedReference: 'shared location',
+  distancesFrom: 'Distances from {place}',
+  yourLocation: 'your location',
+  edinburghReference: 'Edinburgh Waverley',
+  locationNotAvailable: 'Location unavailable',
+  locationPermissionNeeded: 'Location permission needed',
+  locationOutsideCoverage: 'Outside coverage · choose a place',
+
   access: 'Access',
   accessCustomers: 'Customers',
   accessDestination: 'Destination',
@@ -400,6 +410,16 @@ const en = {
 type MessageCatalogue = { [Key in keyof typeof en]: string };
 
 const gd: MessageCatalogue = {
+  showingEdinburgh: 'A’ sealltainn Dùn Èideann',
+  useMyLocation: 'Cleachd m’ àite',
+  sharedReference: 'àite co-roinnte',
+  distancesFrom: 'Astar bho {place}',
+  yourLocation: 'd’ àite',
+  edinburghReference: 'Waverley, Dùn Èideann',
+  locationNotAvailable: 'Chan eil àite ri fhaighinn',
+  locationPermissionNeeded: 'Tha cead àite a dhìth',
+  locationOutsideCoverage: 'Taobh a-muigh na sgìre · tagh àite',
+
   access: 'Cothrom',
   accessCustomers: 'Luchd-ceannach',
   accessDestination: 'Cothrom don cheann-uidhe',
@@ -821,6 +841,16 @@ const gd: MessageCatalogue = {
 };
 
 const es: MessageCatalogue = {
+  showingEdinburgh: 'Mostrando Edimburgo',
+  useMyLocation: 'Usar mi ubicación',
+  sharedReference: 'ubicación compartida',
+  distancesFrom: 'Distancias desde {place}',
+  yourLocation: 'tu ubicación',
+  edinburghReference: 'Edimburgo Waverley',
+  locationNotAvailable: 'Ubicación no disponible',
+  locationPermissionNeeded: 'Se necesita permiso de ubicación',
+  locationOutsideCoverage: 'Fuera de cobertura · elige un lugar',
+
   access: 'Acceso',
   accessCustomers: 'Clientes',
   accessDestination: 'Acceso al destino',
@@ -1227,6 +1257,16 @@ const es: MessageCatalogue = {
 };
 
 const hy: MessageCatalogue = {
+  showingEdinburgh: 'Ցուցադրվում է Էդինբուրգը',
+  useMyLocation: 'Օգտագործել իմ տեղադրությունը',
+  sharedReference: 'համօգտագործված տեղադրություն',
+  distancesFrom: 'Հեռավորությունները՝ {place}-ից',
+  yourLocation: 'ձեր տեղադրություն',
+  edinburghReference: 'Էդինբուրգ Ուեյվերլի',
+  locationNotAvailable: 'Տեղադրությունն անհասանելի է',
+  locationPermissionNeeded: 'Տեղադրության թույլտվություն է պետք',
+  locationOutsideCoverage: 'Ծածկույթից դուրս է · ընտրեք վայր',
+
   access: 'Մուտք',
   accessCustomers: 'Հաճախորդներ',
   accessDestination: 'Նպատակակետ',
