@@ -105,7 +105,7 @@ places need no extra status line; the selected search name stays in the search
 field. Permission errors appear only after requesting location explicitly.
 Only confirmed GPS uses the blue location marker. The dark basemap increases street, path, and label contrast
 while preserving route overlays and path patterns.
-The map's “Plan a route” button opens the route planner directly. The sliders
+The map's “Plan a route” button opens destination search in the same map and sheet. The sliders
 icon beside Parking opens parking preferences. Route planning is also available
 from the existing menu.
 Place search uses Photon and OpenStreetMap data. After three characters it
@@ -122,11 +122,16 @@ for local development:
 NEXT_PUBLIC_CYCLESTREETS_API_KEY=your_key_here
 ```
 
-The route planner extends that integration to ordered routes of up to 30
-stops. Stops can come from place search or a deliberate tap-on-map mode. After
-adding a start, the destination control on the map opens a focused search sheet;
-selecting a result preserves start and via points while showing search and route
-loading feedback. **Finish at bike parking** appears once the route is ready and
+Parking directions and route planning share a compact journey preview. Choose a
+destination first; confirmed GPS can supply the start. If GPS is unavailable or
+the map is showing a shared/search reference, choose a start or explicitly use
+location. The reference location is never silently used as a route origin.
+The preview offers route styles, live tracking, directions and saving. Back
+returns to parking with the selection and discovery camera preserved; “Resume
+route” restores the draft during the current visit. Save a route to retain it
+across visits. “Edit route” exposes naming, reordering and up to 30 stops, from
+place search or an explicit tap-on-map mode. Changing the destination preserves
+start and via points. **Finish at bike parking** appears once the route is ready and
 compares up to three neuks near the current destination using route time and
 distance, distance from the destination, capacity, cover, access, and stand
 type. The original destination remains unchanged until a neuk is confirmed, and

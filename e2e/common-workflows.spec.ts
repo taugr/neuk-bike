@@ -94,10 +94,18 @@ async function openShortRouteDirections(page: Page) {
       .innerText()
   ).trim();
   await page.getByTestId(`parking-directions-${parkingOne.id}`).click();
-  await expect(
-    page.getByRole('region', { name: 'Cycle directions' }),
-  ).toBeVisible();
-  await expect(page.getByRole('heading', { name: parkingName })).toBeVisible();
+  if (
+    await page
+      .getByRole('button', { name: 'Use my location', exact: true })
+      .isVisible()
+  )
+    await page
+      .getByRole('button', { name: 'Use my location', exact: true })
+      .click();
+  await expect(page.getByTestId('route-journey')).toBeVisible();
+  await expect(page.getByTestId('journey-destination')).toContainText(
+    parkingName,
+  );
   return parkingName;
 }
 
@@ -655,6 +663,7 @@ test('opens short local directions to Spanish parking', async ({ page }) => {
     lat: String(madridParking.latitude),
     lng: String(madridParking.longitude),
     parking: madridParking.id,
+    mockGps: `${madridParking.latitude},${madridParking.longitude},5`,
   });
   await page.goto(`/?${params.toString()}`);
   await expectFinderReady(page);
@@ -662,10 +671,11 @@ test('opens short local directions to Spanish parking', async ({ page }) => {
   const parkingRow = page.getByTestId(`parking-row-${madridParking.id}`);
   await expect(parkingRow).toBeVisible();
   await page.getByTestId(`parking-directions-${madridParking.id}`).click();
+  await page
+    .getByRole('button', { name: 'Use my location', exact: true })
+    .click();
 
-  await expect(
-    page.getByRole('region', { name: 'Cycle directions' }),
-  ).toBeVisible();
+  await expect(page.getByTestId('route-journey')).toBeVisible();
   await expect(page.getByLabel('Route style')).toBeVisible();
   await expect(page.getByTestId('directions-list')).toBeVisible();
 });
@@ -688,8 +698,8 @@ test('opens short local directions from a mocked location', async ({
   await expect(page.locator('.directions-route-option-check')).toHaveCount(0);
   await expect(page.locator('.directions-route-description')).toHaveCount(0);
   await expect(page.getByTestId('directions-list')).toBeVisible();
-  await expect(page.locator('.directions-list-item')).toHaveCount(2);
-  await expect(page.locator('.directions-list-item').last()).toContainText(
+  await expect(page.locator('.journey-instruction')).toHaveCount(2);
+  await expect(page.locator('.journey-instruction').last()).toContainText(
     `Arrive at ${parkingName}`,
   );
 });
@@ -706,9 +716,15 @@ test('tracks a mocked live route through arrival', async ({ page }) => {
   );
   await expectFinderReady(page);
   await page.getByTestId(`parking-directions-${parkingOne.id}`).click();
-  await expect(
-    page.getByRole('region', { name: 'Cycle directions' }),
-  ).toBeVisible();
+  if (
+    await page
+      .getByRole('button', { name: 'Use my location', exact: true })
+      .isVisible()
+  )
+    await page
+      .getByRole('button', { name: 'Use my location', exact: true })
+      .click();
+  await expect(page.getByTestId('route-journey')).toBeVisible();
 
   await page.getByRole('button', { name: 'Start route' }).click();
 
@@ -716,7 +732,9 @@ test('tracks a mocked live route through arrival', async ({ page }) => {
   await expect(page.getByTestId('route-plan-balanced')).toBeDisabled();
   await expect(page.getByTestId('route-plan-quietest')).toBeDisabled();
   await expect(page.getByTestId('route-plan-fastest')).toBeDisabled();
-  await expect(page.getByText('Arrived at bike parking.')).toBeVisible({
+  await expect(
+    page.getByRole('button', { name: 'Done', exact: true }),
+  ).toBeVisible({
     timeout: 5_000,
   });
 });
@@ -725,22 +743,18 @@ for (const [mockGps, message] of [
   ['denied', 'Enable location permissions to start route.'],
   ['unavailable', 'Live location is unavailable.'],
 ] as const) {
-  test(`shows a live-route fallback when mocked GPS is ${mockGps}`, async ({
-    page,
-  }) => {
+  test(`asks for a start when mocked GPS is ${mockGps}`, async ({ page }) => {
     await page.goto(parkingOneReferenceUrl({ mockGps }));
     await expectFinderReady(page);
     await page.getByTestId(`parking-directions-${parkingOne.id}`).click();
     await expect(
-      page.getByRole('region', { name: 'Cycle directions' }),
+      page.getByRole('combobox', { name: 'Choose a starting point' }),
     ).toBeVisible();
-
-    await page.getByRole('button', { name: 'Start route' }).click();
-
+    await page.getByRole('button', { name: 'Use my location' }).click();
     await expect(page.getByRole('status')).toContainText(message);
     await expect(
-      page.getByRole('button', { name: 'Start route' }),
-    ).toBeVisible();
+      page.getByRole('button', { name: 'Start route', exact: true }),
+    ).toHaveCount(0);
   });
 }
 
@@ -915,6 +929,7 @@ test('opens short local directions to Armenian parking', async ({ page }) => {
     lat: String(yerevanParking.latitude),
     lng: String(yerevanParking.longitude),
     parking: yerevanParking.id,
+    mockGps: `${yerevanParking.latitude},${yerevanParking.longitude},5`,
   });
   await page.goto(`/?${params.toString()}`);
   await expectFinderReady(page);
@@ -922,9 +937,10 @@ test('opens short local directions to Armenian parking', async ({ page }) => {
   const parkingRow = page.getByTestId(`parking-row-${yerevanParking.id}`);
   await expect(parkingRow).toBeVisible();
   await page.getByTestId(`parking-directions-${yerevanParking.id}`).click();
-  await expect(
-    page.getByRole('region', { name: 'Cycle directions' }),
-  ).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Use my location', exact: true })
+    .click();
+  await expect(page.getByTestId('route-journey')).toBeVisible();
   await expect(page.getByLabel('Route style')).toBeVisible();
   await expect(page.getByTestId('directions-list')).toBeVisible();
 });

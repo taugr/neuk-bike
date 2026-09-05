@@ -2,6 +2,7 @@
 
 import {
   ChevronLeft,
+  LocateFixed,
   ChevronRight,
   Landmark,
   LoaderCircle,
@@ -13,6 +14,9 @@ import { useLanguage } from '@/components/language-provider';
 import type { PlaceSearchResult } from '@/lib/geocoder';
 
 type RouteDestinationSearchProps = {
+  target?: 'start' | 'destination';
+  startLabel?: string | null;
+  destinationLabel?: string | null;
   activeResultIndex: number;
   message: string | null;
   query: string;
@@ -20,6 +24,7 @@ type RouteDestinationSearchProps = {
   routeStatus: 'error' | 'idle' | 'loaded' | 'loading' | 'missing-key';
   searchStatus: 'error' | 'idle' | 'loading';
   selectedId: string | null;
+  onUseLocation?: () => void;
   onBack: () => void;
   onClear: () => void;
   onQueryChange: (query: string) => void;
@@ -40,6 +45,9 @@ function splitPlaceLabel(name: string) {
 }
 
 export function RouteDestinationSearch({
+  target = 'destination',
+  startLabel,
+  destinationLabel,
   activeResultIndex,
   message,
   query,
@@ -47,6 +55,7 @@ export function RouteDestinationSearch({
   routeStatus,
   searchStatus,
   selectedId,
+  onUseLocation,
   onBack,
   onClear,
   onQueryChange,
@@ -62,7 +71,7 @@ export function RouteDestinationSearch({
   return (
     <section
       className="route-destination-search panel-view"
-      aria-label={t('chooseDestination')}
+      aria-label={t(target === 'start' ? 'chooseStart' : 'chooseDestination')}
       data-testid="route-destination-search"
     >
       <header className="route-destination-search-header">
@@ -70,10 +79,28 @@ export function RouteDestinationSearch({
           <ChevronLeft size={18} aria-hidden="true" />
           {t('back')}
         </button>
-        <h2>{t('chooseDestination')}</h2>
+        <h2>{t(target === 'start' ? 'chooseStart' : 'chooseDestination')}</h2>
         <span aria-hidden="true" />
       </header>
 
+      <div className="journey-search-context">
+        <span>{t(target === 'start' ? 'destination' : 'routeStart')}</span>
+        <strong>
+          {(target === 'start' ? destinationLabel : startLabel) ??
+            t('chooseStart')}
+        </strong>
+      </div>
+      {target === 'start' && onUseLocation ? (
+        <button
+          type="button"
+          className="journey-use-location"
+          disabled={searchStatus === 'loading'}
+          onClick={onUseLocation}
+        >
+          <LocateFixed size={18} />
+          {t('useMyLocation')}
+        </button>
+      ) : null}
       <form
         className="route-destination-search-form"
         role="search"
@@ -84,11 +111,12 @@ export function RouteDestinationSearch({
       >
         <Search size={21} aria-hidden="true" />
         <label className="sr-only" htmlFor="route-destination-query">
-          {t('searchDestination')}
+          {t(target === 'start' ? 'chooseStart' : 'searchDestination')}
         </label>
         <input
           autoComplete="off"
           autoFocus
+          key={target}
           aria-activedescendant={
             visibleResults.length > 0
               ? `route-destination-result-${activeResultIndex}`
@@ -141,6 +169,13 @@ export function RouteDestinationSearch({
         ) : null}
       </form>
 
+      {visibleResults.length === 0 && searchStatus === 'idle' && !query ? (
+        <p className="journey-note">
+          {t(
+            target === 'start' ? 'journeyStartHelp' : 'journeyDestinationHelp',
+          )}
+        </p>
+      ) : null}
       {visibleResults.length > 0 ? (
         <ol
           className="route-destination-results"

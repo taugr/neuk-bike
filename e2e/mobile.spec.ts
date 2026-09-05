@@ -445,6 +445,20 @@ test('keeps route planning in the mobile Bike Neuks menu', async ({ page }) => {
   );
 
   await mobileMenu.getByTestId('plan-route').click();
+  await page
+    .getByTestId('route-destination-search')
+    .getByRole('button', { name: 'Back', exact: true })
+    .click();
+  await page
+    .getByTestId('route-journey')
+    .getByRole('button', { name: 'Edit route', exact: true })
+    .click();
+  const initialStart = page.locator('.route-stop-actions button').last();
+  if (await initialStart.count()) await initialStart.click();
+  await page
+    .locator('.route-planner')
+    .getByRole('button', { name: 'Add stop on map' })
+    .click();
   const editor = page.getByTestId('route-map-editor');
   await expect(editor).toBeVisible();
   await expect(editor).toContainText('0 points');
@@ -624,6 +638,20 @@ test('adds map route points continuously and calculates while editing', async ({
   const mobileMenu = page.locator('.settings-menu--mobile');
   await mobileMenu.locator('.settings-trigger').click();
   await mobileMenu.getByTestId('plan-route').click();
+  await page
+    .getByTestId('route-destination-search')
+    .getByRole('button', { name: 'Back', exact: true })
+    .click();
+  await page
+    .getByTestId('route-journey')
+    .getByRole('button', { name: 'Edit route', exact: true })
+    .click();
+  const initialStart = page.locator('.route-stop-actions button').last();
+  if (await initialStart.count()) await initialStart.click();
+  await page
+    .locator('.route-planner')
+    .getByRole('button', { name: 'Add stop on map' })
+    .click();
 
   const editor = page.getByTestId('route-map-editor');
   await expect(editor).toBeVisible();
@@ -1037,31 +1065,17 @@ test('keeps the mobile directions panel usable', async ({ page }) => {
   await expect(directionsShortcut).toHaveText('Directions');
   await directionsShortcut.click();
 
-  const directions = page.getByRole('region', { name: 'Cycle directions' });
+  await page.getByRole('button', { name: 'Use my location' }).click();
+  const directions = page.getByTestId('route-journey');
   await expect(directions).toBeVisible();
-  await expect(
-    directions.getByRole('heading', { name: parkingName }),
-  ).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Start route' })).toBeVisible();
-  const directionsParkingDetails = page.locator('.directions-parking-details');
-  await expect(
-    directionsParkingDetails.locator('.parking-row-detail'),
-  ).toHaveCount(1);
-  await expect(directionsParkingDetails).not.toContainText('Stands');
-  await expect(directionsParkingDetails).not.toContainText('Not covered');
-  await expect(
-    page.getByRole('button', { exact: true, name: 'Back' }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Exit directions' }),
-  ).toHaveCount(0);
-  await expect(page.locator('.directions-mark')).toBeHidden();
-
-  const routeStyle = page.getByLabel('Route style');
-  await expect(routeStyle).toBeVisible();
-  await expect(page.getByTestId('route-plan-quietest')).toContainText('1 min');
-  await expect(page.getByTestId('route-plan-balanced')).toContainText('1 min');
-  await expect(page.getByTestId('route-plan-fastest')).toContainText('1 min');
+  await expect(page.getByTestId('journey-destination')).toContainText(
+    parkingName,
+  );
+  const startButton = page.getByRole('button', {
+    name: 'Start route',
+    exact: true,
+  });
+  await expect(startButton).toBeVisible();
   await expect(page.getByTestId('route-plan-balanced')).toHaveAttribute(
     'aria-pressed',
     'true',
@@ -1071,45 +1085,23 @@ test('keeps the mobile directions panel usable', async ({ page }) => {
     'aria-pressed',
     'true',
   );
-  await expect(page.locator('.directions-route-option-check')).toHaveCount(0);
-  await expect(page.locator('.directions-route-description')).toHaveCount(0);
-  const routeStyleBounds = await routeStyle.boundingBox();
-  expect(
-    routeStyleBounds?.height ?? Number.POSITIVE_INFINITY,
-  ).toBeLessThanOrEqual(80);
-
-  const directionsMain = page.locator('.directions-header-main');
-  const directionsMainBounds = await directionsMain.boundingBox();
-  const backBounds = await page
-    .getByRole('button', { exact: true, name: 'Back' })
-    .boundingBox();
-  const startBounds = await page
-    .getByRole('button', { name: 'Start route' })
-    .boundingBox();
-  expect(
-    directionsMainBounds?.height ?? Number.POSITIVE_INFINITY,
-  ).toBeLessThanOrEqual(72);
-  expect(backBounds?.x ?? Number.POSITIVE_INFINITY).toBeLessThan(
-    startBounds?.x ?? Number.NEGATIVE_INFINITY,
-  );
-  expect(
-    Math.abs((backBounds?.y ?? 0) - (startBounds?.y ?? 0)),
-  ).toBeLessThanOrEqual(8);
+  await expect(page.getByLabel('Route style')).toBeVisible();
   await expect(page.locator('.mobile-map-toolbar')).toHaveCount(0);
-
   const directionsAttributionTop = await mapAttribution.evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).top),
   );
   expect(directionsAttributionTop).toBeLessThan(resultsAttributionTop);
-  expect(directionsAttributionTop).toBeLessThanOrEqual(6);
-
-  await page.getByRole('button', { name: 'Collapse directions panel' }).click();
-
-  await expect(directions).toBeVisible();
+  const startBounds = await startButton.boundingBox();
+  expect(startBounds!.y + startBounds!.height).toBeLessThanOrEqual(
+    page.viewportSize()!.height,
+  );
+  await page.getByRole('button', { name: 'Collapse results panel' }).click();
+  await expect(page.getByLabel('Route style')).toBeHidden();
   await expect(
-    page.getByRole('button', { name: 'Expand directions panel' }),
+    page.getByRole('button', { name: 'Back to nearby neuks' }),
   ).toBeVisible();
-  await expect(routeStyle).toBeHidden();
+  await page.getByRole('button', { name: 'Expand results panel' }).click();
+  await expect(page.getByLabel('Route style')).toBeVisible();
 });
 
 test('keeps the nearby heading clear after collapsing and expanding', async ({
@@ -2191,10 +2183,13 @@ test('returns directions to the mobile view that launched them', async ({
     })
     .toBe(true);
   await directionsShortcut.click();
-  await expect(
-    page.getByRole('region', { name: 'Cycle directions' }),
-  ).toBeVisible();
-  await page.getByRole('button', { exact: true, name: 'Back' }).click();
+  if (await page.getByRole('button', { name: 'Use my location' }).isVisible())
+    await page.getByRole('button', { name: 'Use my location' }).click();
+  await expect(page.getByTestId('route-journey')).toBeVisible();
+  await page
+    .getByTestId('route-journey')
+    .getByRole('button', { exact: true, name: 'Back to nearby neuks' })
+    .click();
   await expect(page.getByTestId('parking-list')).toBeVisible();
   await expect(firstRow.locator('.parking-row-selection')).toHaveAttribute(
     'aria-pressed',
@@ -2208,10 +2203,13 @@ test('returns directions to the mobile view that launched them', async ({
   const details = page.getByRole('region', { name: 'Parking details' });
   await expect(details).toBeVisible();
   await details.getByRole('button', { name: 'Directions' }).click();
-  await expect(
-    page.getByRole('region', { name: 'Cycle directions' }),
-  ).toBeVisible();
-  await page.getByRole('button', { exact: true, name: 'Back' }).click();
+  if (await page.getByRole('button', { name: 'Use my location' }).isVisible())
+    await page.getByRole('button', { name: 'Use my location' }).click();
+  await expect(page.getByTestId('route-journey')).toBeVisible();
+  await page
+    .getByTestId('route-journey')
+    .getByRole('button', { exact: true, name: 'Back to nearby neuks' })
+    .click();
   await expect(details).toBeVisible();
   await expect(page.locator('.control-pane')).toHaveAttribute(
     'data-panel-transition',

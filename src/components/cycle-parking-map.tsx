@@ -2000,6 +2000,13 @@ export default function CycleParkingMap({
     center: [number, number];
     zoom: number;
   } | null>(null);
+  const previousJourneyModeRef = useRef(isRoutePlanningMode);
+  const discoveryCameraRef = useRef<{
+    center: [number, number];
+    zoom: number;
+    bearing: number;
+    pitch: number;
+  } | null>(null);
   const suppressParkingViewFocusRef = useRef(false);
   const hasAppliedNearbyFocusRef = useRef(false);
   const isAutomaticFocusAnimationRef = useRef(false);
@@ -2597,6 +2604,24 @@ export default function CycleParkingMap({
       window.removeEventListener('resize', resizeMap);
     };
   }, [map, mobileSheetState, updateViewport]);
+
+  useEffect(() => {
+    if (!map || previousJourneyModeRef.current === isRoutePlanningMode) return;
+    previousJourneyModeRef.current = isRoutePlanningMode;
+    if (isRoutePlanningMode) {
+      const center = map.getCenter();
+      discoveryCameraRef.current = {
+        center: [center.lng, center.lat],
+        zoom: map.getZoom(),
+        bearing: map.getBearing(),
+        pitch: map.getPitch(),
+      };
+    } else if (discoveryCameraRef.current) {
+      map.stop();
+      map.jumpTo(discoveryCameraRef.current);
+      suppressParkingViewFocusRef.current = true;
+    }
+  }, [map, isRoutePlanningMode]);
 
   useEffect(() => {
     if (!map) {

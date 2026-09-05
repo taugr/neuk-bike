@@ -1,6 +1,12 @@
 import type { AppLocale } from '@/lib/i18n/locales';
 
 const en = {
+  arrivedDestination: 'You have arrived.',
+  chooseStart: 'Choose a starting point',
+  resumeRoute: 'Resume route',
+  journeyDestinationHelp: 'Find a place, then choose where to park your bike.',
+  journeyStartHelp:
+    'Search for your start. Your destination will stay selected.',
   showingEdinburgh: 'Showing Edinburgh',
   useMyLocation: 'Use my location',
   sharedReference: 'shared location',
@@ -410,6 +416,13 @@ const en = {
 type MessageCatalogue = { [Key in keyof typeof en]: string };
 
 const gd: MessageCatalogue = {
+  arrivedDestination: 'Tha thu air ruighinn.',
+  chooseStart: 'Tagh àite tòiseachaidh',
+  resumeRoute: 'Lean air an t-slighe',
+  journeyDestinationHelp:
+    'Lorg àite, agus tagh càite am pàirc thu do bhaidhsagal.',
+  journeyStartHelp:
+    'Lorg an t-àite tòiseachaidh agad. Cumaidh sinn an ceann-uidhe agad.',
   showingEdinburgh: 'A’ sealltainn Dùn Èideann',
   useMyLocation: 'Cleachd m’ àite',
   sharedReference: 'àite co-roinnte',
@@ -841,6 +854,11 @@ const gd: MessageCatalogue = {
 };
 
 const es: MessageCatalogue = {
+  arrivedDestination: 'Has llegado.',
+  chooseStart: 'Elige un punto de partida',
+  resumeRoute: 'Continuar ruta',
+  journeyDestinationHelp: 'Busca un destino y elige dónde aparcar la bici.',
+  journeyStartHelp: 'Busca el punto de partida. Conservaremos tu destino.',
   showingEdinburgh: 'Mostrando Edimburgo',
   useMyLocation: 'Usar mi ubicación',
   sharedReference: 'ubicación compartida',
@@ -1257,6 +1275,11 @@ const es: MessageCatalogue = {
 };
 
 const hy: MessageCatalogue = {
+  arrivedDestination: 'Դուք հասել եք։',
+  chooseStart: 'Ընտրեք մեկնակետը',
+  resumeRoute: 'Շարունակել երթուղին',
+  journeyDestinationHelp: 'Գտեք վայր և ընտրեք՝ որտեղ կայանել հեծանիվը։',
+  journeyStartHelp: 'Փնտրեք մեկնակետը։ Ձեր նպատակակետը կպահպանվի։',
   showingEdinburgh: 'Ցուցադրվում է Էդինբուրգը',
   useMyLocation: 'Օգտագործել իմ տեղադրությունը',
   sharedReference: 'համօգտագործված տեղադրություն',

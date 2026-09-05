@@ -24,18 +24,15 @@ for (const width of [390, 1440]) {
       page.getByRole('region', { name: 'Parking filters', exact: true }),
     ).toBeVisible();
     await route.click();
-    await expect(page.getByTestId('route-map-editor')).toBeVisible();
+    await expect(page.getByTestId('route-destination-search')).toBeVisible();
     await expect(route).toHaveCount(0);
     await page
-      .getByTestId('route-map-editor')
-      .getByRole('button', { name: 'Cancel', exact: true })
-      .click();
-    await expect(
-      page.getByRole('region', { name: 'Plan a route', exact: true }),
-    ).toBeVisible();
-    await page
-      .getByRole('region', { name: 'Plan a route', exact: true })
+      .getByTestId('route-destination-search')
       .getByRole('button', { name: 'Back', exact: true })
+      .click();
+    await page
+      .getByTestId('route-journey')
+      .getByRole('button', { name: 'Back to nearby neuks' })
       .click();
     await expect(route).toBeVisible();
     await page.getByTestId('map-layers-trigger').click();

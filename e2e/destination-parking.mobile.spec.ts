@@ -110,18 +110,7 @@ test('compares destination parking and replaces only the route finish', async ({
   const mobileMenu = page.locator('.settings-menu--mobile');
   await mobileMenu.locator('.settings-trigger').click();
   await mobileMenu.getByTestId('plan-route').click();
-  await page
-    .getByTestId('route-map-editor')
-    .getByRole('button', { name: 'Cancel' })
-    .click();
-
-  const planner = page.getByRole('region', { name: 'Plan a route' });
-  const placeSearch = planner.getByLabel('Add a place');
-  await placeSearch.fill('Home');
-  await placeSearch.press('Enter');
-  await planner.getByRole('button', { name: 'Home' }).click();
-  await page.getByTestId('route-destination-map-search').click();
-
+  const planner = page.getByTestId('route-journey');
   const destinationSearch = page.getByRole('region', {
     name: 'Choose destination',
   });
@@ -134,18 +123,16 @@ test('compares destination parking and replaces only the route finish', async ({
   await destinationInput.press('ArrowDown');
   await expect(destinationResults.nth(1)).toHaveClass(/is-active/);
   await destinationInput.press('Enter');
-  await expect(
-    destinationSearch.getByText('Finding a cycle route...'),
-  ).toBeVisible();
-  await expect(
-    destinationSearch.getByText('Comparing Quietest, Balanced and Fastest'),
-  ).toBeVisible();
-  await expect(planner.locator('.route-stop-row')).toHaveCount(2);
-  await expect(planner.locator('.route-stop-row').last()).toContainText(
+  await expect(planner.getByTestId('journey-destination')).toContainText(
     'National Museum Annex',
   );
   await expect(planner.getByLabel('Route style')).toBeVisible();
-
+  await planner.getByTestId('journey-start').click();
+  await page
+    .getByRole('combobox', { name: 'Choose a starting point' })
+    .fill('Home');
+  await page.getByRole('option', { name: 'Home' }).click();
+  await expect(planner.getByTestId('journey-start')).toContainText('Home');
   await page.getByTestId('finish-at-bike-parking').click();
   const chooser = page.getByTestId('destination-parking-chooser');
   await expect(chooser).toBeVisible();
@@ -178,14 +165,11 @@ test('compares destination parking and replaces only the route finish', async ({
   await chooser.getByTestId('destination-parking-confirm').click();
 
   await expect(planner).toBeVisible();
-  await expect(planner.locator('.route-stop-row')).toHaveCount(2);
-  await expect(planner.locator('.route-stop-row').first()).toContainText(
-    'Home',
-  );
-  await expect(planner.locator('.route-stop-row').last()).toContainText(
+  await expect(planner.getByTestId('journey-start')).toContainText('Home');
+  await expect(planner.getByTestId('journey-destination')).toContainText(
     chosenName,
   );
-  await expect(planner.locator('.route-stop-row').last()).not.toContainText(
+  await expect(planner.getByTestId('journey-destination')).not.toContainText(
     'National Museum Annex',
   );
 });

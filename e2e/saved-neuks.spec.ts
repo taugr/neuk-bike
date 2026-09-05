@@ -485,10 +485,13 @@ test('loads a distant saved neuk and keeps My neuks behind Directions', async ({
   );
 
   await page.getByTestId(`parking-directions-${madridParking.id}`).click();
-  await expect(
-    page.getByRole('region', { name: 'Cycle directions' }),
-  ).toBeVisible();
-  await page.getByRole('button', { exact: true, name: 'Back' }).click();
+  const search = page.getByTestId('route-destination-search');
+  if (await search.isVisible())
+    await search.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(page.getByTestId('route-journey')).toBeVisible();
+  await page
+    .getByRole('button', { exact: true, name: 'Back to nearby neuks' })
+    .click();
   await expect(page.getByRole('heading', { name: /My neuks/ })).toBeVisible();
   await expect(madridRow).toHaveClass(/selected/);
 });
