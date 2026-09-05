@@ -1,17 +1,8 @@
 # AGENTS.md
 
-## Codex workflow
+## Working in this repository
 
-This project's `.codex/config.toml` selects GPT-6 Astra (`gpt-6-astra`) with medium reasoning. Explicit user model choices take precedence. This configures Codex development work; application model selections remain separate.
-
-- Complete authorized work through implementation and relevant verification. Use existing project patterns for routine, reversible decisions; ask when missing information materially changes scope or outcome.
-- Preserve unrelated working-tree changes and existing application behavior. Follow explicit boundaries on planning, commits, pushes, releases, and deployment.
-- Prepare a concrete, reviewable result before requesting any additional authorization that is actually needed. Continue independent authorized work while awaiting clarification.
-- Follow explicit user instructions over skill guidelines, subject to system and developer requirements. If a skill blocks progress, link to the exact instruction and explain why it applies.
-- Keep progress updates and final reports concise: explain what changed, what was verified, and any remaining blocker.
-- Run checks proportional to the change and complete required project gates. Instruction-only changes need a diff, Markdown formatting, and configuration validation; behavior changes need relevant tests. Do not repeat successful checks without new evidence.
-- Use subagents when requested by the user or required by applicable instructions. Give each a bounded responsibility and preserve other agents' changes.
-- Use `pnpm` and check `package.json` for current scripts. Keep generated files and local artifacts out of the commit unless explicitly requested.
+Preserve unrelated changes and keep local artifacts out of commits. Follow the user's scope for commits, pushes, and deployment; a push to `main` triggers production deployment.
 
 ## Project Shape
 
@@ -55,8 +46,8 @@ This project's `.codex/config.toml` selects GPT-6 Astra (`gpt-6-astra`) with med
 ## Frontend Guidance
 
 - Keep the app mobile-friendly and map-first. Avoid landing-page or marketing-style layouts.
-- Browser-only APIs such as geolocation, `window.location`, and Leaflet must stay behind client-side boundaries.
-- `react-leaflet` map code should remain dynamically loaded or otherwise isolated from server rendering.
+- Browser-only APIs such as geolocation, `window.location`, and MapLibre GL JS must stay behind client-side boundaries.
+- MapLibre map code should remain dynamically loaded or otherwise isolated from server rendering.
 - Keep user-facing copy short, concrete, and non-technical.
 - When touching location, search, map, or responsive UI behavior, verify in a browser when practical.
 
@@ -86,7 +77,7 @@ This project's `.codex/config.toml` selects GPT-6 Astra (`gpt-6-astra`) with med
 ## Dependencies
 
 - Do not install, update, or replace dependencies unless the task requires it or the user asks for it.
-- Keep Leaflet and browser API usage compatible with static export.
+- Keep MapLibre and browser API usage compatible with static export.
 
 ## Documentation
 
