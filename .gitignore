@@ -18,3 +18,4 @@ dist/
 .env.local
 posthog-setup-report.md
 public/vendor/maplibre-gl/
+.vitest/
