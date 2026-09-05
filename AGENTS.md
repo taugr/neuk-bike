@@ -4,6 +4,19 @@
 
 Preserve unrelated changes and keep local artifacts out of commits. Follow the user's scope for commits, pushes, and deployment; a push to `main` triggers production deployment.
 
+## Codex workflow
+
+Codex uses `gpt-6-astra` with medium reasoning in `.codex/config.toml`. Preserve that effort and explicit user model choices. This workflow applies the [Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model#prompting-best-practices).
+
+- Carry action requests through the authorized implementation and verification. Resolve routine choices from the project; ask only when the answer changes the result materially, and continue independent work while waiting. Keep the original goal when the user adds corrections or side questions.
+- Preserve unrelated edits and the user's boundaries for commits, publishing, and deployment. Reuse authorization already given; prepare the reviewable result before requesting any additional permission.
+- Read applicable project skills for the affected area. User instructions take precedence over skill guidelines, subject to system and developer rules. If a skill blocks progress, link to the skill, quote the exact instruction, and explain whether the restriction is explicit or inferred.
+- Report the outcome, evidence, and remaining limits in concise, plain prose. Use lists for steps or comparisons; avoid stock summaries and unnecessary jargon.
+- Run checks proportional to the change and required project gates. Once they pass, repeat or broaden them only for new edits, failures, or unresolved concerns. Add tests for meaningful behavior, not to mirror low-impact documentation or configuration edits.
+- Delegate only when the user or governing instructions authorize it. Then assign independent, bounded work with clear ownership and readable handoffs; avoid duplicate investigation.
+- Preserve the static export, offline caches, saved neuks, route state, and mobile map/list interaction. Changes to maps or data need evidence from the affected user journey, not just a successful build.
+- Follow the Verification section and local testing skills. Reuse a fresh preview build and server; a failing browser check needs investigation before retries are treated as proof. Instruction edits need formatting, link checks, and a diff review.
+
 ## Project Shape
 
 - This is a static, backend-free Next.js app for finding cycle parking across
@@ -67,7 +80,7 @@ Preserve unrelated changes and keep local artifacts out of commits. Follow the u
 
 ## Verification
 
-- Start with the narrowest relevant check for the changed code.
+- Start with the narrowest relevant check for the changed code. Repository verification requirements apply when imported integration skills suggest a narrower set of checks.
 - Add or update focused tests for behavior changes in `src/lib/` and for logic that can be tested without a browser.
 - Run `pnpm build` for changes that affect Next.js config, static export, routing, dynamic imports, or browser/server boundaries.
 - Run `pnpm test:e2e` for Scotland data-loading, location, map, sharing, routing,

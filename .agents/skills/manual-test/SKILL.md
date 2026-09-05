@@ -23,7 +23,7 @@ The script:
 4. Prints the local URL and the mock GPS URL for manual testing.
 5. Keeps a newly started server running in the foreground. Leave that command session active while the user tests.
 
-If port `4181` is already serving `out/`, keep it running; the rebuilt files are picked up from disk. If another process owns the port and the freshness check fails, stop that process or rerun with another port:
+If port `4181` is already serving `out/`, keep it running; the rebuilt files are picked up from disk. If another process owns the port and the freshness check fails, use another port. Stop an existing process only when it belongs to this task or the user asked to replace it:
 
 ```sh
 MANUAL_TEST_PORT=4182 .agents/skills/manual-test/scripts/serve-static-export.sh
