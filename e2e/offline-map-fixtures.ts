@@ -123,6 +123,9 @@ export async function installOfflineMapFixture(
     if (url.pathname === '/planet') {
       await route.fulfill({
         body: JSON.stringify({
+          // Match OpenFreeMap: higher map zooms reuse level-14 vector tiles.
+          minzoom: 0,
+          maxzoom: 14,
           attribution:
             '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
           tiles: [`${providerOrigin}${tileReleasePath}/{z}/{x}/{y}.pbf`],

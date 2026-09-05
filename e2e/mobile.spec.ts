@@ -65,6 +65,15 @@ test('keeps the nearby rows stable when the list first loads', async ({
   const parkingList = page.getByTestId('parking-list');
   await expect(parkingList.locator('.parking-list-item')).toHaveCount(8);
   await page.waitForTimeout(700);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as Window & { __parkingListRowTopSamples?: number[] })
+            .__parkingListRowTopSamples?.length ?? 0,
+      ),
+    )
+    .toBeGreaterThan(10);
 
   const rowTopSamples = await page.evaluate(
     () =>

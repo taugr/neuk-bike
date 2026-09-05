@@ -68,10 +68,11 @@ test('renders both cached themes and bounded tiles after a cold offline reload',
   await expectRenderedBasemap(page);
 
   const map = page.getByTestId('parking-map');
+  const targetZoom = Number(await map.getAttribute('data-map-zoom')) + 1;
   await page.getByLabel('Zoom in').click();
   await expect
     .poll(async () => Number((await map.getAttribute('data-map-zoom')) ?? 0))
-    .toBeGreaterThanOrEqual(14);
+    .toBeGreaterThanOrEqual(targetZoom - 0.01);
   const bounds = await map.boundingBox();
   expect(bounds).not.toBeNull();
   if (bounds) {
@@ -85,6 +86,8 @@ test('renders both cached themes and bounded tiles after a cold offline reload',
       bounds.y + bounds.height * 0.5,
       { steps: 8 },
     );
+    // Release after inertia expires so this stays a bounded pan, not a fling.
+    await page.waitForTimeout(200);
     await page.mouse.up();
   }
   await expectRenderedBasemap(page);
