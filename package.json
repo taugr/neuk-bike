@@ -53,28 +53,28 @@
     "test:analytics": "playwright test --config playwright.analytics.config.ts"
   },
   "dependencies": {
-    "lucide-react": "^1.40.0",
-    "maplibre-gl": "^6.7.0",
+    "lucide-react": "^1.44.0",
+    "maplibre-gl": "^6.9.0",
     "motion": "^13.2.0",
     "next": "^16.3.4",
-    "posthog-js": "^1.426.2",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "posthog-js": "^1.429.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
-    "@types/node": "^26.4.1",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.5.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.4.1",
+    "lint-staged": "^17.5.1",
     "osm-pbf-parser-node": "1.1.4",
-    "oxfmt": "^0.66.0",
-    "oxlint": "^1.81.0",
+    "oxfmt": "^0.67.0",
+    "oxlint": "^1.82.0",
     "oxlint-tsgolint": "^7.0.2001",
     "typescript": "^7.0.2",
     "vitest": "^5.0.0",
-    "wrangler": "4.129.0"
+    "wrangler": "4.131.0"
   },
   "lint-staged": {
     "*": "oxfmt --no-error-on-unmatched-pattern"
