@@ -6,7 +6,10 @@ import { gzipSync } from 'node:zlib';
 import { coverageLabel } from './parking-data-sources.mjs';
 import { createManifestReleaseId } from './parking-data-utils.mjs';
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = process.env.NEUK_DATA_ROOT
+  ? resolve(process.env.NEUK_DATA_ROOT)
+  : sourceRoot;
 const parkingRoot = resolve(repoRoot, 'public/data/parking');
 const manifestPath = resolve(parkingRoot, 'manifest.json');
 const reportPath = resolve(repoRoot, 'src/data/cycle-parking-report.json');
@@ -270,7 +273,7 @@ async function main() {
       report.generatedAssets.parkingDataBytes === parkingDataBytes &&
       report.generatedAssets.pointIndexBytes ===
         Buffer.byteLength(pointIndexContent),
-    'Quality report asset metrics do not match current files.',
+    `Quality report asset metrics do not match current files: ${JSON.stringify({ fileCount: files.length, largestAssetBytes, manifestBytes: Buffer.byteLength(manifestContent), maximumInitialCompressedBytes: maximumInitialBytes, parkingDataBytes, pointIndexBytes: Buffer.byteLength(pointIndexContent) })}`,
   );
 
   console.log(

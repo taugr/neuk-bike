@@ -22,8 +22,13 @@ import {
   osmLicenceUrl,
 } from './parking-data-sources.mjs';
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const cacheRoot = resolve(repoRoot, '.cache');
+const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = process.env.NEUK_DATA_ROOT
+  ? resolve(process.env.NEUK_DATA_ROOT)
+  : sourceRoot;
+const cacheRoot = process.env.NEUK_DATA_CACHE_ROOT
+  ? resolve(process.env.NEUK_DATA_CACHE_ROOT)
+  : resolve(sourceRoot, '.cache');
 const outputRoot = resolve(repoRoot, 'public/data/cycling-pois');
 const temporaryRoot = resolve(repoRoot, 'public/data/cycling-pois.next');
 const reportPath = resolve(repoRoot, 'src/data/cycling-poi-report.json');
@@ -104,7 +109,7 @@ async function downloadFile({ forceDownload, label, outputPath, url }) {
         `Downloading ${label} from ${url}${attempt > 1 ? ` (attempt ${attempt}/${maximumAttempts})` : ''}`,
       );
       const response = await fetch(url, {
-        signal: AbortSignal.timeout(120_000),
+        signal: AbortSignal.timeout(900_000),
       });
       if (!response.ok || !response.body) {
         throw new Error(`${response.status} ${response.statusText}`);
@@ -675,6 +680,7 @@ async function main() {
       id: input.id,
       label: input.label,
       pbfSha256: pbfChecksum,
+      retrievedAt: (await stat(input.pbfPath)).mtime.toISOString(),
       peakRssBytes: inputUsage.peakRssBytes,
       recordCount: result.points.length,
       sourceTimestamp: result.sourceTimestamp,

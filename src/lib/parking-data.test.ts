@@ -444,6 +444,33 @@ describe('ParkingDataClient', () => {
     ).toHaveLength(1);
   });
 
+  it('retains the nearby area when later viewport requests exceed the cache', async () => {
+    const fetcher = vi.fn(async (input: string | URL | Request) => {
+      const path = new URL(input.toString()).pathname;
+      if (path.endsWith('/manifest.json')) return Response.json(manifest);
+      const key = path.endsWith(`/${centerKey}.json`) ? centerKey : eastKey;
+      return Response.json({
+        key,
+        points: [{ ...centerPoint, id: key }],
+        schemaVersion: 2,
+      });
+    });
+    const client = new ParkingDataClient(
+      new URL('https://example.test/data/parking/'),
+      fetcher,
+      1,
+    );
+
+    await client.loadLocation(edinburgh, 0);
+    await client.loadBounds(manifest.chunks[eastKey].bounds);
+    expect(client.getLoadedChunkKeys()).toEqual([centerKey]);
+
+    await client.loadLocation({ ...edinburgh, longitude: -2.9 }, 0);
+    expect(client.getLoadedChunkKeys()).toEqual([eastKey]);
+    await client.loadBounds(manifest.chunks[centerKey].bounds);
+    expect(client.getLoadedChunkKeys()).toEqual([eastKey]);
+  });
+
   it('retries failed chunks and evicts the least recently used chunk', async () => {
     const westKey = `10/${tile.x - 1}/${tile.y}`;
     const threeChunkManifest: ParkingDataManifest = {

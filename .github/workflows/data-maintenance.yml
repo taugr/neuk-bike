@@ -1,0 +1,53 @@
+name: Data maintenance
+
+on:
+  schedule:
+    - cron: '0 8 * * 5'
+    - cron: '0 2 1 * *'
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: Download and build a complete data release for review
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-maintenance
+  cancel-in-progress: false
+
+jobs:
+  sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build monthly or requested release
+        if: github.event.schedule == '0 2 1 * *' || inputs.refresh == true
+        run: pnpm refresh:data
+      - name: Review source age and upstream publications
+        run: pnpm check:data --upstream
+      - name: Package the reviewed changes
+        if: github.event.schedule == '0 2 1 * *' || inputs.refresh == true
+        run: |
+          mkdir -p .cache/review
+          git add --intent-to-add public/data src/data
+          git diff --binary -- public/data src/data > .cache/review/data-refresh.patch
+          tar -czf .cache/review/data-release.tar.gz public/data src/data/cycle-parking.json src/data/cycle-parking-report.json src/data/cycling-poi-report.json src/data/cycle-network-report.json src/data/data-freshness-summary.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: data-review-${{ github.run_id }}
+          include-hidden-files: true
+          path: |
+            .cache/source-status.json
+            .cache/review/
+          retention-days: 30

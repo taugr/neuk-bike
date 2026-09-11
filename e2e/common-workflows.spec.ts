@@ -867,8 +867,8 @@ for (const [place, mockGps, category, pointId, pointName] of [
     'Cardiff',
     '51.4816,-3.1791,5',
     'shop',
-    'osm:node:1050444880',
-    'Cycles Direct',
+    'osm:node:11423338326',
+    'The Electric Bike Shop',
   ],
   [
     'Belfast',

@@ -1,6 +1,15 @@
 import type { AppLocale } from '@/lib/i18n/locales';
 
 const en = {
+  dataFreshness: 'Source dates',
+  dataParking: 'Cycle parking',
+  dataPlaces: 'Cycling places',
+  dataNetwork: 'Cycle network',
+  dataDatesHelp: 'Dates describe the source data, not when the app was built.',
+  dataNeedsRefresh: 'Some source data is older than a month.',
+  dataMixed: 'Sources have different dates or incomplete coverage.',
+  dataDateUnknown: 'Date unavailable',
+
   rideInDistance: 'In {distance}, {instruction}',
   rideOptions: 'Ride options',
   rideContinueToDestination: 'Continue to your destination',
@@ -441,6 +450,17 @@ const en = {
 type MessageCatalogue = { [Key in keyof typeof en]: string };
 
 const gd: MessageCatalogue = {
+  dataFreshness: 'Cinn-latha nan tùsan',
+  dataParking: 'Pàirceadh bhaidhsagalan',
+  dataPlaces: 'Àiteachan rothaireachd',
+  dataNetwork: 'Lìonra rothaireachd',
+  dataDatesHelp:
+    'Tha na cinn-latha a’ sealltainn aois an dàta, chan e cuin a chaidh an aplacaid a thogail.',
+  dataNeedsRefresh: 'Tha cuid den dàta nas sine na mìos.',
+  dataMixed:
+    'Tha cinn-latha eadar-dhealaichte no còmhdach neo-iomlan aig na tùsan.',
+  dataDateUnknown: 'Chan eil ceann-latha ri fhaighinn',
+
   rideInDistance: 'Ann an {distance}, {instruction}',
   rideOptions: 'Roghainnean turais',
   rideContinueToDestination: 'Lean ort chun a’ chinn-uidhe',
@@ -906,6 +926,16 @@ const gd: MessageCatalogue = {
 };
 
 const es: MessageCatalogue = {
+  dataFreshness: 'Fechas de las fuentes',
+  dataParking: 'Aparcamiento de bicicletas',
+  dataPlaces: 'Servicios ciclistas',
+  dataNetwork: 'Red ciclista',
+  dataDatesHelp:
+    'Las fechas corresponden a los datos originales, no a la actualización de la aplicación.',
+  dataNeedsRefresh: 'Algunos datos tienen más de un mes.',
+  dataMixed: 'Las fuentes tienen fechas distintas o cobertura incompleta.',
+  dataDateUnknown: 'Fecha no disponible',
+
   rideInDistance: 'En {distance}, {instruction}',
   rideOptions: 'Opciones del trayecto',
   rideContinueToDestination: 'Continúa hasta tu destino',
@@ -1353,6 +1383,16 @@ const es: MessageCatalogue = {
 };
 
 const hy: MessageCatalogue = {
+  dataFreshness: 'Աղբյուրների ամսաթվերը',
+  dataParking: 'Հեծանիվների կայանատեղեր',
+  dataPlaces: 'Հեծանվային ծառայություններ',
+  dataNetwork: 'Հեծանվային ցանց',
+  dataDatesHelp:
+    'Ամսաթվերը վերաբերում են սկզբնական տվյալներին, ոչ թե հավելվածի թարմացմանը։',
+  dataNeedsRefresh: 'Որոշ տվյալներ մեկ ամսից ավելի հին են։',
+  dataMixed: 'Աղբյուրների ամսաթվերը տարբեր են կամ ծածկույթը թերի է։',
+  dataDateUnknown: 'Ամսաթիվը հասանելի չէ',
+
   rideInDistance: '{distance} հետո՝ {instruction}',
   rideOptions: 'Երթի ընտրանքներ',
   rideContinueToDestination: 'Շարունակեք դեպի նպատակակետ',

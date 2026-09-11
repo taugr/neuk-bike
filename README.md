@@ -223,7 +223,10 @@ These keys are bundled into the static app because there is no backend. Restrict
 the Google key to the Maps Embed API and the app's allowed HTTP referrers.
 
 Production builds use PostHog only when `NEXT_PUBLIC_POSTHOG_KEY` is configured.
-Analytics are disabled on local and loopback hosts by default.
+Analytics are disabled on local and loopback hosts by default. Cookieless
+journey events use temporary random identifiers, with no route coordinates,
+place names, parking IDs, or URL query/fragment data. See
+[the analytics contract](docs/analytics.md) for event definitions and reporting.
 
 ## Language setting
 
@@ -244,6 +247,9 @@ because Photon does not accept `hy` as a response-language value.
 ```bash
 pnpm test          # focused Vitest suite
 pnpm test:e2e      # desktop and mobile workflows against a static export
+pnpm test:analytics # intercepted PostHog payload and journey checks
+pnpm refresh:data  # download, stage, verify and install all three datasets
+pnpm check:data --upstream # source age and upstream publication metadata
 pnpm lint
 pnpm format
 pnpm build         # writes the static site to out/
@@ -271,11 +277,22 @@ OPENFREEMAP_SMOKE=1 pnpm exec playwright test e2e/offline-openfreemap-live.spec.
 
 ## Dataset refresh
 
+Use `pnpm refresh:data` for a consistent release of parking, cycling places,
+and NCN. Fresh acquisition is the default. `--cached` explicitly rebuilds
+OSM data from existing inputs; it does not make their source dates newer.
+Single-dataset commands remain available, and `pnpm check:data` flags
+parking/POI input mismatches. Partial region releases are rejected.
+
+The attribution panel shows underlying source dates;
+`public/data/freshness.json` records per-input dates, hashes and retrieval times.
+See [data maintenance](docs/data-maintenance.md) for scheduled review artifacts,
+refresh recovery and validation.
+
 The cycling-place release keeps bicycle shops, repair facilities, hire
 locations, and drinking-water points in a separate lazy-loaded release under
 `public/data/cycling-pois/`. Run `pnpm update:pois` to rebuild the full UK,
-Ireland, Spain, and Armenia coverage from the same cached Geofabrik extracts
-used by parking. Inputs are processed sequentially, overlapping regional OSM
+Ireland, Spain, and Armenia coverage with fresh Geofabrik extracts. Use
+`pnpm refresh:data` to refresh parking and places from exactly the same inputs. Inputs are processed sequentially, overlapping regional OSM
 IDs are deduplicated, and the generated report records per-input checksums,
 counts, source timestamps, resource usage, and static-asset budgets. Parking
 remains the default and continues to use the independent release described
@@ -285,15 +302,15 @@ below.
 FeatureServer, validates its schema and record count, normalizes route
 classification, status, surface, ride quality, and lighting, then atomically
 replaces
-`public/data/cycle-network/`. The generated release contains 37,209 segments in
+`public/data/cycle-network/`. The generated release contains 37,206 segments in
 423 zoom-10 chunks. Its largest asset is about 450 KiB and the measured maximum
 compressed 3×3 payload is about 559 KiB. Run `pnpm verify:network` after a
 refresh and treat `src/data/cycle-network-report.json` as the current snapshot
 report. Do not hand-edit these generated files.
 
-The current cycling-place release contains 66,960 unique OpenStreetMap places
-in 8,254 chunks: 4,115 shops, 2,590 repair locations, 8,013 hire locations,
-and 53,749 drinking-water points. Its 8,256 generated files contain about 15.3
+The current cycling-place release contains 67,948 unique OpenStreetMap places
+in 8,354 chunks: 4,128 shops, 2,649 repair locations, 8,044 hire locations,
+and 54,645 drinking-water points. Its 8,356 generated files contain about 15.7
 MiB of JSON; the largest possible initial 3×3 chunk payload is about 79 KiB
 compressed. The category totals overlap because one place can explicitly
 support more than one service.
@@ -301,7 +318,7 @@ support more than one service.
 `pnpm update:data` performs the complete release pipeline:
 
 1. fetch the current City of Edinburgh Council public GeoJSON;
-2. download or reuse the Scotland, Wales, Ireland-and-Northern-Ireland, Canary
+2. download fresh Scotland, Wales, Ireland-and-Northern-Ireland, Canary
    Islands, and Armenia PBFs plus 47 England county and 18 Spain regional PBFs
    from Geofabrik;
 3. process each region sequentially so contextual naming stays memory-bounded;
@@ -312,10 +329,12 @@ support more than one service.
 8. download or reuse the England, Scotland, Wales,
    Ireland-and-Northern-Ireland, Spain, Canary Islands, and Armenia Geofabrik
    coverage polygons;
-9. replace `public/data/parking/` with a schema-v2 manifest,
+9. stage `public/data/parking/` with a schema-v2 manifest,
    content-addressed chunks, and point index;
 10. enforce file, asset, initial-payload, and total-data hard budgets;
-11. write the council snapshot and detailed quality report under `src/data/`.
+11. write the council snapshot and detailed quality report under `src/data/`;
+12. verify the complete output, write freshness metadata, and install the staged
+    release with rollback if promotion fails.
 
 The cached inputs currently occupy about 3.9 GB and are ignored by Git. The
 first refresh depends on Geofabrik download speed and bounded retry delays; a
@@ -326,11 +345,11 @@ field completeness, naming-tier counts and samples, discarded features,
 cross-region duplicate IDs, council/OSM matches, peak memory, and output-size
 budgets.
 
-The current generated release contains 87,667 merged parking points in 4,349
-chunks. It includes 1,454 council points and 87,611 unique OSM records, with 216
-cross-region OSM duplicates removed and 1,398 likely Edinburgh duplicates
-suppressed in favour of council records. The parking release is about 26.7 MiB;
-the largest possible initial 3×3 payload is about 483 KiB compressed. Treat
+The current generated release contains 88,681 merged parking points in 4,417
+chunks. It includes 1,454 council points and 88,623 unique OSM records, with 221
+cross-region OSM duplicates removed and 1,396 likely Edinburgh duplicates
+suppressed in favour of council records. The parking release is about 27.1 MiB;
+the largest possible initial 3×3 payload is about 484 KiB compressed. Treat
 these as a snapshot: `public/data/parking/manifest.json` and
 `src/data/cycle-parking-report.json` are the source of truth after a refresh.
 

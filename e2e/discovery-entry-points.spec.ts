@@ -5,16 +5,23 @@ test.beforeEach(async ({ context }) => {
   await installOfflineMapFixture(context);
 });
 
-for (const width of [390, 1440]) {
+for (const width of [320, 390, 1440]) {
   test(`offers route planning and compact filters directly at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/?mockGps=55.9533,-3.1883,5');
     await expect(page.getByTestId('parking-list')).toBeVisible();
-    const route = page.getByTestId('map-plan-route');
+    const route = page.getByRole('button', {
+      name: /^(Plan a route|Resume route)$/,
+    });
     await expect(route).toHaveText('Plan a route');
     await expect(route).toBeVisible();
+    const searchForm = route.locator('..');
+    await expect(searchForm).toHaveClass('place-search-form');
+    const routeBox = await route.boundingBox();
+    expect(routeBox!.width).toBeGreaterThanOrEqual(44);
+    expect(routeBox!.height).toBeGreaterThanOrEqual(44);
     const filters = page.getByTestId('open-parking-filters');
     await expect(filters).toHaveAccessibleName('Parking filters');
     await expect(filters).toHaveText('');
@@ -23,6 +30,10 @@ for (const width of [390, 1440]) {
     await expect(
       page.getByRole('region', { name: 'Parking filters', exact: true }),
     ).toBeVisible();
+    await page
+      .getByRole('region', { name: 'Parking filters', exact: true })
+      .getByRole('button', { name: 'Back', exact: true })
+      .click();
     await route.click();
     await expect(page.getByTestId('route-destination-search')).toBeVisible();
     await expect(route).toHaveCount(0);

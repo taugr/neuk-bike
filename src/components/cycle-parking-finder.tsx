@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { RideGuidance } from '@/components/ride-guidance';
+import { DataFreshness } from '@/components/data-freshness';
 import { useFinderWebMcp } from '@/components/use-finder-webmcp';
 import {
   AnimatePresence,
@@ -167,6 +168,13 @@ import { GpxImportReview } from '@/components/gpx-import-review';
 import { OfflineAreasPanel } from '@/components/offline-areas-panel';
 import { OfflineAreaSelection } from '@/components/offline-area-selection';
 import { captureAnalyticsEvent } from '@/lib/analytics';
+import {
+  createAnalyticsId,
+  createLocationAttempt,
+  createRideAnalytics,
+  createRouteAttempt,
+  locationErrorOutcome,
+} from '@/lib/journey-analytics';
 import { shareParkingLink, shareRouteFile } from '@/lib/share';
 import {
   getParkingDataBaseUrl,
@@ -1005,6 +1013,25 @@ export default function CycleParkingFinder() {
   );
   const [placeQuery, setPlaceQuery] = useState('');
   const locationRequestId = useRef(0);
+  const locationAttempt = useRef<ReturnType<
+    typeof createLocationAttempt
+  > | null>(null);
+  const routeLocationAttempt = useRef<ReturnType<
+    typeof createLocationAttempt
+  > | null>(null);
+  const rideLocationAttempt = useRef<ReturnType<
+    typeof createLocationAttempt
+  > | null>(null);
+  const calculationAttempt = useRef<ReturnType<
+    typeof createRouteAttempt
+  > | null>(null);
+  const rerouteAttempt = useRef<ReturnType<typeof createRouteAttempt> | null>(
+    null,
+  );
+  const rideAnalytics = useRef<ReturnType<typeof createRideAnalytics> | null>(
+    null,
+  );
+  const analyticsJourneyId = useRef<string | null>(null);
   const [placeResults, setPlaceResults] = useState<PlaceSearchResult[]>([]);
   const [activePlaceResultIndex, setActivePlaceResultIndex] = useState(0);
   const [placeSearchMessage, setPlaceSearchMessage] = useState<string | null>(
@@ -1493,6 +1520,7 @@ export default function CycleParkingFinder() {
     void initializeParkingData();
     return () => {
       cancelled = true;
+      locationAttempt.current?.finish('cancelled');
       locationRequestId.current += 1;
     };
   }, []);
@@ -2182,6 +2210,7 @@ export default function CycleParkingFinder() {
   function viewSavedOfflineArea(area: OfflineAreaRecord) {
     if (!area.center) return;
     setIsOfflineAreasOpen(false);
+    locationAttempt.current?.finish('cancelled');
     locationRequestId.current += 1;
     saveLastArea(area.center, area.name);
     setLocationState({
@@ -3124,6 +3153,10 @@ export default function CycleParkingFinder() {
   }, [isParkingDetailsMode, selectedId]);
 
   useEffect(() => {
+    if (liveRouteProgress?.hasArrived) rideAnalytics.current?.arrive();
+  }, [liveRouteProgress?.hasArrived]);
+
+  useEffect(() => {
     if (liveRouteTracking.status === 'idle') {
       return;
     }
@@ -3135,6 +3168,7 @@ export default function CycleParkingFinder() {
 
   useEffect(() => {
     return () => {
+      rerouteAttempt.current?.cancel();
       rerouteRequestId.current += 1;
       if (liveRouteWatchId.current !== null) {
         clearWatch(liveRouteWatchId.current);
@@ -3321,7 +3355,29 @@ export default function CycleParkingFinder() {
     '--mobile-sheet-summary-opacity': mobileSheetSummaryOpacity,
   } as MotionStyle;
 
+  function captureJourneyEvent(
+    event: string,
+    properties?: Record<string, unknown>,
+  ) {
+    captureAnalyticsEvent(event, {
+      ...properties,
+      journey_id: analyticsJourneyId.current,
+    });
+  }
+
+  function beginAnalyticsJourney(
+    source: string,
+    resumed = false,
+    preserve = false,
+  ) {
+    if (!preserve || !analyticsJourneyId.current)
+      analyticsJourneyId.current = createAnalyticsId();
+    captureJourneyEvent('route_planner_opened', { source, resumed });
+  }
+
   function clearLiveRouteWatch() {
+    rideLocationAttempt.current?.finish('cancelled');
+    rerouteAttempt.current?.cancel();
     rerouteRequestId.current += 1;
     setIsRerouting(false);
     if (liveRouteWatchId.current === null) {
@@ -3332,7 +3388,12 @@ export default function CycleParkingFinder() {
     liveRouteWatchId.current = null;
   }
 
-  function stopLiveRouteTracking() {
+  function stopLiveRouteTracking(
+    reason: 'user' | 'context_changed' | 'location_error' = 'context_changed',
+  ) {
+    rideAnalytics.current?.stop(reason);
+    rideAnalytics.current = null;
+    rerouteAttempt.current?.cancel();
     rerouteRequestId.current += 1;
     setIsRerouting(false);
     setRerouteError(null);
@@ -3346,12 +3407,24 @@ export default function CycleParkingFinder() {
       return;
     }
 
+    clearLiveRouteWatch();
+    rideAnalytics.current?.stop('context_changed');
+    const journeyId = analyticsJourneyId.current;
+    const ride = createRideAnalytics((event, properties) =>
+      captureAnalyticsEvent(event, { ...properties, journey_id: journeyId }),
+    );
+    rideAnalytics.current = ride;
+    const trackingAttempt = createLocationAttempt(
+      { trigger: 'manual', purpose: 'ride' },
+      ride.capture,
+    );
+    rideLocationAttempt.current = trackingAttempt;
     if (!canUseGeolocation()) {
+      trackingAttempt.finish('unavailable');
+      ride.stop('location_error');
       setLiveRouteTracking({ status: 'unavailable' });
       return;
     }
-
-    clearLiveRouteWatch();
     previousLiveRouteMarkerPosition.current = null;
     confirmedRouteProgress.current = 0;
     setRerouteError(null);
@@ -3365,6 +3438,8 @@ export default function CycleParkingFinder() {
         };
 
         if (!isResolvedLocation(location)) {
+          trackingAttempt.finish('unavailable');
+          ride.stop('location_error');
           clearLiveRouteWatch();
           previousLiveRouteMarkerPosition.current = null;
           setLiveRouteTracking({ status: 'unavailable' });
@@ -3373,12 +3448,16 @@ export default function CycleParkingFinder() {
 
         const manifest = parkingDataClient.current?.getManifest();
         if (manifest && !isLocationInParkingCoverage(location, manifest)) {
+          trackingAttempt.finish('outside_coverage');
+          ride.stop('location_error');
           clearLiveRouteWatch();
           previousLiveRouteMarkerPosition.current = null;
           setLiveRouteTracking({ status: 'too-far' });
           return;
         }
 
+        trackingAttempt.finish('located');
+        ride.start();
         const accuracyMeters = Number.isFinite(position.coords.accuracy)
           ? position.coords.accuracy
           : null;
@@ -3429,6 +3508,8 @@ export default function CycleParkingFinder() {
         });
       },
       (error) => {
+        trackingAttempt.finish(locationErrorOutcome(error));
+        ride.stop('location_error');
         clearLiveRouteWatch();
         previousLiveRouteMarkerPosition.current = null;
         setLiveRouteTracking({
@@ -3452,12 +3533,21 @@ export default function CycleParkingFinder() {
       !liveRouteProgress?.isOffRoute
     )
       return;
+    rerouteAttempt.current?.cancel();
+    const attempt = createRouteAttempt(
+      {},
+      rideAnalytics.current?.capture ?? captureJourneyEvent,
+      true,
+    );
+    rerouteAttempt.current = attempt;
     const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
     if (!navigator.onLine) {
+      attempt.fail('offline');
       setRerouteError(t('rideRerouteOffline'));
       return;
     }
     if (!apiKey) {
+      attempt.fail('missing_key');
       setRerouteError(t('directionsNeedKey'));
       return;
     }
@@ -3487,7 +3577,10 @@ export default function CycleParkingFinder() {
       waypoints,
       confirmedRouteProgress.current,
     );
-    if (!remaining.length) return;
+    if (!remaining.length) {
+      attempt.fail('no_remaining_waypoints');
+      return;
+    }
     const nextWaypoints: CycleRouteWaypoint[] = [
       {
         id: createLocalId(),
@@ -3536,12 +3629,22 @@ export default function CycleParkingFinder() {
       } else if (directionsState.status === 'loaded') {
         setDirectionsState({ ...directionsState, routes, selectedPlan: plan });
       }
+      attempt.success(
+        nextWaypoints.length === 2 &&
+          distanceMeters(nextWaypoints[0]!, finish) <=
+            SHORT_CYCLE_ROUTE_THRESHOLD_METERS
+          ? 'short_route'
+          : 'api',
+        Object.keys(routes).length,
+      );
       setActiveInstruction(null);
       setRouteInstructionFocusRequest(null);
       previousLiveRouteMarkerPosition.current = null;
     } catch {
-      if (rerouteRequestId.current === requestId)
+      if (rerouteRequestId.current === requestId) {
+        attempt.fail('request_failed');
         setRerouteError(t('rideRerouteFailed'));
+      }
     } finally {
       if (rerouteRequestId.current === requestId) setIsRerouting(false);
     }
@@ -3549,7 +3652,7 @@ export default function CycleParkingFinder() {
 
   function toggleLiveRouteTracking() {
     if (liveRouteTracking.status === 'tracking') {
-      stopLiveRouteTracking();
+      stopLiveRouteTracking('user');
       return;
     }
 
@@ -3588,10 +3691,6 @@ export default function CycleParkingFinder() {
       selectedPlan: plan,
     });
     captureAnalyticsEvent('directions_plan_selected', {
-      parking_id: directionsState.parkingId,
-      parking_name: directionsParkingPoint?.name ?? '',
-      route_distance_metres: route.distanceMeters,
-      route_duration_seconds: route.durationSeconds,
       route_plan: plan,
     });
   }
@@ -3608,6 +3707,7 @@ export default function CycleParkingFinder() {
   }
 
   function cancelLocationRequest() {
+    locationAttempt.current?.finish('cancelled');
     locationRequestId.current += 1;
     setLocationState((current) =>
       current.status === 'locating'
@@ -3676,6 +3776,7 @@ export default function CycleParkingFinder() {
     label?: string,
     selectedParkingId?: string,
   ) {
+    locationAttempt.current?.finish('cancelled');
     locationRequestId.current += 1;
     dispatchParkingPanel({
       selectedId: selectedParkingId ?? null,
@@ -3714,6 +3815,12 @@ export default function CycleParkingFinder() {
       { status: 'searched' }
     > | null = null,
   ) {
+    locationAttempt.current?.finish('cancelled');
+    const attempt = createLocationAttempt({
+      trigger: userInitiated ? 'manual' : 'automatic',
+      purpose: 'finder',
+    });
+    locationAttempt.current = attempt;
     const requestId = ++locationRequestId.current;
     if (userInitiated) rememberLocationRequest();
     setPlaceSearchMessage(null);
@@ -3731,6 +3838,7 @@ export default function CycleParkingFinder() {
           : null);
     const fail = (status: 'denied' | 'unavailable' | 'too-far') => {
       if (requestId !== locationRequestId.current) return;
+      attempt.finish(status === 'too-far' ? 'outside_coverage' : status);
       applyFallbackLocation(status, fallbackReference);
       if (userInitiated) {
         setPlaceSearchMessage(
@@ -3775,10 +3883,10 @@ export default function CycleParkingFinder() {
         const manifest = parkingDataClient.current?.getManifest();
         if (manifest && !isLocationInParkingCoverage(location, manifest)) {
           clearLastLocation();
-          captureAnalyticsEvent('location_denied', { reason: 'too_far' });
           fail('too-far');
           return;
         }
+        attempt.finish('located');
         if (
           applyReferenceLocation(
             location,
@@ -3788,12 +3896,12 @@ export default function CycleParkingFinder() {
           )
         ) {
           saveLastLocation(location, position.timestamp);
-          captureAnalyticsEvent('location_granted');
           requestCurrentLocationFocus();
         }
       },
       (error) => {
         if (requestId !== locationRequestId.current) return;
+        attempt.finish(locationErrorOutcome(error));
         const status =
           error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable';
         if (status === 'denied') {
@@ -3809,7 +3917,6 @@ export default function CycleParkingFinder() {
         } else {
           fail(status);
         }
-        captureAnalyticsEvent('location_denied', { reason: status });
       },
       { enableHighAccuracy: true, maximumAge: 60_000, timeout: 10_000 },
     );
@@ -3960,7 +4067,7 @@ export default function CycleParkingFinder() {
     }
 
     cancelPlaceSearchWork();
-    captureAnalyticsEvent('place_selected', { place_name: result.name });
+    captureAnalyticsEvent('place_selected');
     setActivePlaceResultIndex(0);
     setPlaceResults([]);
     setPlaceSearchMessage(null);
@@ -3974,6 +4081,7 @@ export default function CycleParkingFinder() {
   }
 
   function cancelRouteDestinationSearchWork() {
+    routeLocationAttempt.current?.finish('cancelled');
     if (routeDestinationSearchDebounceTimeout.current !== null) {
       window.clearTimeout(routeDestinationSearchDebounceTimeout.current);
       routeDestinationSearchDebounceTimeout.current = null;
@@ -4051,7 +4159,7 @@ export default function CycleParkingFinder() {
         results,
         searchStatus: 'idle',
       }));
-      captureAnalyticsEvent('route_destination_searched', {
+      captureJourneyEvent('route_destination_searched', {
         result_count: results.length,
       });
     } catch {
@@ -4068,7 +4176,7 @@ export default function CycleParkingFinder() {
         results: [],
         searchStatus: 'error',
       }));
-      captureAnalyticsEvent('route_destination_searched', { error: true });
+      captureJourneyEvent('route_destination_searched', { error: true });
     } finally {
       if (requestId === routeDestinationSearchRequestId.current) {
         routeDestinationSearchAbortController.current = null;
@@ -4120,6 +4228,12 @@ export default function CycleParkingFinder() {
   function selectRouteDestination(result: PlaceSearchResult, index: number) {
     if (!routeDraft) return;
     cancelRouteDestinationSearchWork();
+    captureJourneyEvent(
+      journeySearchTarget === 'start'
+        ? 'route_start_selected'
+        : 'route_destination_selected',
+      { source: 'search', result_rank: index + 1 },
+    );
     const waypoint: CycleRouteWaypoint = {
       id: createLocalId(),
       label: result.name.split(',')[0]?.trim() || result.name,
@@ -4143,13 +4257,10 @@ export default function CycleParkingFinder() {
       commitRouteDraft(setRouteDestination(routeDraft, waypoint));
       setRouteDestinationSearch(initialRouteDestinationSearchState);
     }
-    captureAnalyticsEvent('route_destination_selected', {
-      result_rank: index + 1,
-    });
   }
 
   function selectParkingPoint(id: string) {
-    captureAnalyticsEvent('parking_selected', { parking_id: id });
+    captureAnalyticsEvent('parking_selected');
     restoringParkingViewScroll.current = null;
     setOpenParkingMoreMenuId(null);
     parkingViewState.current[parkingView].selectedId = id;
@@ -4177,19 +4288,14 @@ export default function CycleParkingFinder() {
     });
     setMobileSheetState('expanded');
     animateMobileSheetTo('expanded');
-    captureAnalyticsEvent('parking_details_opened', {
-      parking_id: point.id,
-      parking_name: point.name,
-    });
+    captureAnalyticsEvent('parking_details_opened', {});
   }
 
   function closeParkingDetails(event?: MouseEvent<HTMLButtonElement>) {
     const parkingId = selectedId;
     const detailsOrigin = parkingPanelState.detailsOrigin;
     dispatchParkingPanel({ type: 'CLOSE_DETAILS' });
-    captureAnalyticsEvent('parking_details_closed', {
-      parking_id: parkingId,
-    });
+    captureAnalyticsEvent('parking_details_closed', {});
     if (event && event.detail !== 0) {
       return;
     }
@@ -4391,8 +4497,6 @@ export default function CycleParkingFinder() {
       );
     }
     captureAnalyticsEvent(wasSaved ? 'neuk_removed' : 'neuk_saved', {
-      parking_id: point.id,
-      parking_name: point.name,
       neuk_kind: isCyclingPoiPoint(point) ? 'cycling-place' : 'parking',
       saved_count: nextItems.length,
       source,
@@ -4408,8 +4512,6 @@ export default function CycleParkingFinder() {
       showSavedNeuksConfirmation(t('removedFromMyNeuks'));
     }
     captureAnalyticsEvent('neuk_removed', {
-      parking_id: record.id,
-      parking_name: record.snapshot.name,
       neuk_kind: record.kind,
       saved_count: nextItems.length,
       source: 'list',
@@ -4417,8 +4519,9 @@ export default function CycleParkingFinder() {
   }
 
   function openNewRoutePlanner(
-    source: 'menu' | 'saved-routes' | 'map' = 'saved-routes',
+    source: 'menu' | 'saved-routes' | 'map' | 'webmcp' = 'saved-routes',
   ) {
+    beginAnalyticsJourney(source, routeDraft !== null, routeDraft !== null);
     cancelLocationRequest();
     stopLiveRouteTracking();
     setJourneyEditing(false);
@@ -4452,7 +4555,6 @@ export default function CycleParkingFinder() {
       ...initialRouteDestinationSearchState,
       isOpen: true,
     });
-    captureAnalyticsEvent('route_planner_opened', { source });
   }
 
   function openSavedRoutes() {
@@ -4465,6 +4567,7 @@ export default function CycleParkingFinder() {
         window.clearTimeout(routePlannerCalculationTimeout.current);
         routePlannerCalculationTimeout.current = null;
       }
+      calculationAttempt.current?.cancel();
       routePlannerRequestId.current += 1;
     }
     setRouteLibraryReturnView(preservePlanner ? 'planner' : null);
@@ -4482,6 +4585,7 @@ export default function CycleParkingFinder() {
     if (routeLibraryReturnView !== 'planner' || routeDraft === null) {
       return false;
     }
+    beginAnalyticsJourney('saved-routes', true, true);
     setSelectedSavedRoute(null);
     setSavedRoutesError(null);
     setRouteWorkspaceView('planner');
@@ -4513,11 +4617,13 @@ export default function CycleParkingFinder() {
       return;
     stopLiveRouteTracking();
     cancelRouteDestinationSearchWork();
+    calculationAttempt.current?.cancel();
     routePlannerRequestId.current += 1;
     if (routePlannerCalculationTimeout.current !== null) {
       window.clearTimeout(routePlannerCalculationTimeout.current);
       routePlannerCalculationTimeout.current = null;
     }
+    beginAnalyticsJourney('menu');
     setRouteDraft(createRouteDraft(createLocalId()));
     setPendingJourneyDestination(null);
     setRoutePlannerRoutes({});
@@ -4533,6 +4639,13 @@ export default function CycleParkingFinder() {
   function useJourneyLocation() {
     if (!routeDraft) return;
     cancelRouteDestinationSearchWork();
+    const journeyId = analyticsJourneyId.current;
+    const attempt = createLocationAttempt(
+      { trigger: 'manual', purpose: 'route_start' },
+      (event, properties) =>
+        captureAnalyticsEvent(event, { ...properties, journey_id: journeyId }),
+    );
+    routeLocationAttempt.current = attempt;
     const requestId = routeDestinationSearchRequestId.current;
     setRouteDestinationSearch((current) => ({
       ...current,
@@ -4548,6 +4661,7 @@ export default function CycleParkingFinder() {
       }));
     };
     if (!canUseGeolocation()) {
+      attempt.finish('unavailable');
       fail(t('liveLocationUnavailable'));
       return;
     }
@@ -4560,13 +4674,19 @@ export default function CycleParkingFinder() {
         };
         const manifest = parkingDataClient.current?.getManifest();
         if (!isResolvedLocation(location)) {
+          attempt.finish('unavailable');
           fail(t('liveLocationUnavailable'));
           return;
         }
         if (manifest && !isLocationInParkingCoverage(location, manifest)) {
+          attempt.finish('outside_coverage');
           fail(t('routeOutsideCoverage'));
           return;
         }
+        attempt.finish('located');
+        captureJourneyEvent('route_start_selected', {
+          source: 'current-location',
+        });
         const start: CycleRouteWaypoint = {
           id: createLocalId(),
           label: t('currentLocation'),
@@ -4580,19 +4700,24 @@ export default function CycleParkingFinder() {
         commitRouteDraft({ ...routeDraft, waypoints });
         setRouteDestinationSearch(initialRouteDestinationSearchState);
       },
-      (error) =>
+      (error) => {
+        if (requestId !== routeDestinationSearchRequestId.current) return;
+        attempt.finish(locationErrorOutcome(error));
         fail(
           t(
             error.code === error.PERMISSION_DENIED
               ? 'routeLocationPermission'
               : 'liveLocationUnavailable',
           ),
-        ),
+        );
+      },
       { enableHighAccuracy: true, maximumAge: 60000, timeout: 10000 },
     );
   }
 
   function openJourneyToParking(point: ParkingPoint) {
+    beginAnalyticsJourney('parking');
+    captureJourneyEvent('route_destination_selected', { source: 'parking' });
     cancelLocationRequest();
     cancelRouteDestinationSearchWork();
     stopLiveRouteTracking();
@@ -4636,14 +4761,26 @@ export default function CycleParkingFinder() {
   }
 
   async function calculateRouteDraft(nextDraft: RouteDraft) {
+    calculationAttempt.current?.cancel();
     routePlannerRequestId.current += 1;
     const requestId = routePlannerRequestId.current;
-
-    if (
+    const isShortRoute =
       nextDraft.waypoints.length === 2 &&
       distanceMeters(nextDraft.waypoints[0]!, nextDraft.waypoints[1]!) <=
-        SHORT_CYCLE_ROUTE_THRESHOLD_METERS
-    ) {
+        SHORT_CYCLE_ROUTE_THRESHOLD_METERS;
+    if (!isShortRoute && !canCalculateRoute(nextDraft)) {
+      setRoutePlannerRoutes({});
+      setRoutePlannerStatus('idle');
+      setRoutePlannerMessage(null);
+      return;
+    }
+    const attempt = createRouteAttempt({
+      journey_id: analyticsJourneyId.current,
+      stop_count: nextDraft.waypoints.length,
+    });
+    calculationAttempt.current = attempt;
+
+    if (isShortRoute) {
       const finish = nextDraft.waypoints[1]!;
       setRoutePlannerRoutes(
         buildShortCycleRoutes(nextDraft.waypoints[0]!, {
@@ -4655,19 +4792,14 @@ export default function CycleParkingFinder() {
           sourceId: 'route-planner',
         }),
       );
+      attempt.success('short_route', 3);
       setRoutePlannerStatus('loaded');
       setRoutePlannerMessage(null);
       return;
     }
-    if (!canCalculateRoute(nextDraft)) {
-      setRoutePlannerRoutes({});
-      setRoutePlannerStatus('idle');
-      setRoutePlannerMessage(null);
-      return;
-    }
-
     const apiKey = process.env.NEXT_PUBLIC_CYCLESTREETS_API_KEY;
     if (!apiKey) {
+      attempt.fail('missing_key');
       setRoutePlannerStatus('missing-key');
       setRoutePlannerRoutes({});
       return;
@@ -4679,6 +4811,7 @@ export default function CycleParkingFinder() {
       if (routePlannerRequestId.current !== requestId) {
         return;
       }
+      attempt.success('cache', Object.keys(cached).length);
       setRoutePlannerRoutes(cached);
       setRoutePlannerStatus('loaded');
       setRoutePlannerMessage(null);
@@ -4719,15 +4852,13 @@ export default function CycleParkingFinder() {
       );
       setRoutePlannerRoutes(routes);
       setRoutePlannerStatus('loaded');
-      captureAnalyticsEvent('route_calculated', {
-        plan_count: Object.keys(routes).length,
-        stop_count: nextDraft.waypoints.length,
-      });
+      attempt.success('api', Object.keys(routes).length);
     } catch {
       if (routePlannerRequestId.current !== requestId) {
         return;
       }
       setRoutePlannerRoutes({});
+      attempt.fail(navigator.onLine ? 'request_failed' : 'offline');
       setRoutePlannerStatus('error');
       setRoutePlannerMessage(t('directionsError'));
     }
@@ -4834,7 +4965,7 @@ export default function CycleParkingFinder() {
         selectedId: candidates[0]?.point.id ?? null,
         status: 'ready',
       });
-      captureAnalyticsEvent('destination_parking_opened', {
+      captureJourneyEvent('destination_parking_opened', {
         candidate_count: candidates.length,
         route_comparisons: candidates.filter(({ route }) => route !== null)
           .length,
@@ -4878,7 +5009,7 @@ export default function CycleParkingFinder() {
     setRouteWorkspaceView('planner');
     setMobileSheetState('expanded');
     commitRouteDraft(nextDraft);
-    captureAnalyticsEvent('destination_parking_confirmed', {
+    captureJourneyEvent('destination_parking_confirmed', {
       rank: rank + 1,
       route_comparison_available:
         selectedDestinationParkingCandidate.route !== null,
@@ -4910,12 +5041,13 @@ export default function CycleParkingFinder() {
       })),
     };
     stopLiveRouteTracking();
+    beginAnalyticsJourney('shared', true);
     setSelectedSavedRoute(null);
     setRouteDraft(draft);
     setRouteWorkspaceView('planner');
     setMobileSheetState('expanded');
     void calculateRouteDraft(draft);
-    captureAnalyticsEvent('route_link_opened', {
+    captureJourneyEvent('route_link_opened', {
       stop_count: draft.waypoints.length,
     });
   }, [isClientReady]);
@@ -4957,6 +5089,7 @@ export default function CycleParkingFinder() {
       routePlannerCalculationTimeout.current = null;
     }
 
+    calculationAttempt.current?.cancel();
     routePlannerRequestId.current += 1;
     setRoutePlannerRoutes({});
     setRoutePlannerMessage(null);
@@ -4997,6 +5130,7 @@ export default function CycleParkingFinder() {
       window.clearTimeout(routePlannerCalculationTimeout.current);
       routePlannerCalculationTimeout.current = null;
     }
+    calculationAttempt.current?.cancel();
     routePlannerRequestId.current += 1;
     setRouteWaypointPlacementSnapshot({
       draft: {
@@ -5019,6 +5153,14 @@ export default function CycleParkingFinder() {
       return;
     }
 
+    captureJourneyEvent(
+      routeDraft.waypoints.length === 0
+        ? 'route_start_selected'
+        : routeDraft.waypoints.length === 1
+          ? 'route_destination_selected'
+          : 'route_stop_added',
+      { source: 'map' },
+    );
     const nextDraft = addRouteWaypoint(routeDraft, {
       id: createLocalId(),
       label: t('routeMapStop', { count: routeDraft.waypoints.length + 1 }),
@@ -5054,6 +5196,7 @@ export default function CycleParkingFinder() {
         window.clearTimeout(routePlannerCalculationTimeout.current);
         routePlannerCalculationTimeout.current = null;
       }
+      calculationAttempt.current?.cancel();
       routePlannerRequestId.current += 1;
       setRoutePlannerRoutes(routeWaypointPlacementSnapshot.routes);
       setRoutePlannerStatus(routeWaypointPlacementSnapshot.status);
@@ -5074,6 +5217,7 @@ export default function CycleParkingFinder() {
       window.clearTimeout(routePlannerCalculationTimeout.current);
       routePlannerCalculationTimeout.current = null;
     }
+    calculationAttempt.current?.cancel();
     routePlannerRequestId.current += 1;
     setRouteDraft(snapshot.draft);
     setRoutePlannerRoutes(snapshot.routes);
@@ -5104,6 +5248,7 @@ export default function CycleParkingFinder() {
       window.clearTimeout(routePlannerCalculationTimeout.current);
       routePlannerCalculationTimeout.current = null;
     }
+    calculationAttempt.current?.cancel();
     routePlannerRequestId.current += 1;
     setRoutePlannerRoutes(snapshot.routes);
     setRoutePlannerStatus(snapshot.status);
@@ -5114,6 +5259,7 @@ export default function CycleParkingFinder() {
   }
 
   async function saveRouteDraft() {
+    const journeyId = analyticsJourneyId.current;
     if (!routeDraft) {
       return;
     }
@@ -5145,6 +5291,7 @@ export default function CycleParkingFinder() {
       setRouteWorkspaceView('detail');
       setRoutePlannerMessage(null);
       captureAnalyticsEvent('route_saved', {
+        journey_id: journeyId,
         plan: route.plan,
         stop_count: record.waypoints.length,
       });
@@ -5167,6 +5314,7 @@ export default function CycleParkingFinder() {
       return;
     }
     const route = savedRouteToCycleRoute(record);
+    beginAnalyticsJourney('library', true);
     setRouteLibraryReturnView(null);
     setRouteWaypointPlacementSnapshot(null);
     setRouteDraft({
@@ -5240,7 +5388,7 @@ export default function CycleParkingFinder() {
       route: savedRouteToCycleRoute(record),
       waypoints: record.waypoints,
     });
-    captureAnalyticsEvent('route_gpx_exported', {
+    captureJourneyEvent('route_gpx_exported', {
       route_kind: record.kind,
       stop_count: record.waypoints.length,
     });
@@ -5251,11 +5399,12 @@ export default function CycleParkingFinder() {
     setSavedRoutesMessage(null);
     try {
       const parsed = await parseGpxFile(file);
+      beginAnalyticsJourney('import', true);
       setPendingGpxImport(parsed);
       setSelectedSavedRoute(null);
       setRouteWorkspaceView('import');
       setMobileSheetState('expanded');
-      captureAnalyticsEvent('route_gpx_reviewed', {
+      captureJourneyEvent('route_gpx_reviewed', {
         point_count: parsed.points.length,
       });
     } catch {
@@ -5266,6 +5415,7 @@ export default function CycleParkingFinder() {
   }
 
   async function addImportedGpx(name: string) {
+    const journeyId = analyticsJourneyId.current;
     if (!pendingGpxImport) {
       return;
     }
@@ -5287,6 +5437,7 @@ export default function CycleParkingFinder() {
       setSelectedSavedRoute(record);
       setRouteWorkspaceView('detail');
       captureAnalyticsEvent('route_gpx_imported', {
+        journey_id: journeyId,
         point_count: record.points.length,
       });
     } catch {
@@ -5295,6 +5446,7 @@ export default function CycleParkingFinder() {
   }
 
   async function shareSavedRouteLink(record: SavedRouteRecord) {
+    const journeyId = analyticsJourneyId.current;
     if (record.kind !== 'planned' || record.plan === null) {
       return;
     }
@@ -5316,6 +5468,7 @@ export default function CycleParkingFinder() {
     }
     if (result === 'shared' || result === 'copied') {
       captureAnalyticsEvent('route_link_shared', {
+        journey_id: journeyId,
         method: result,
         stop_count: record.waypoints.length,
       });
@@ -5323,6 +5476,7 @@ export default function CycleParkingFinder() {
   }
 
   async function shareSavedRouteGpx(record: SavedRouteRecord) {
+    const journeyId = analyticsJourneyId.current;
     setSavedRoutesError(null);
     setSavedRoutesMessage(null);
     const file = createRouteGpxFile({
@@ -5338,6 +5492,7 @@ export default function CycleParkingFinder() {
     }
     if (result === 'shared' || result === 'downloaded') {
       captureAnalyticsEvent('route_gpx_shared', {
+        journey_id: journeyId,
         method: result,
         route_kind: record.kind,
       });
@@ -5367,8 +5522,6 @@ export default function CycleParkingFinder() {
 
     if (result === 'shared') {
       captureAnalyticsEvent('parking_link_shared', {
-        parking_id: point.id,
-        parking_name: point.name,
         source,
       });
       setShareError(null);
@@ -5377,8 +5530,6 @@ export default function CycleParkingFinder() {
 
     if (result === 'copied') {
       captureAnalyticsEvent('parking_link_copied', {
-        parking_id: point.id,
-        parking_name: point.name,
         source,
       });
       setShareError(null);
@@ -5563,7 +5714,7 @@ export default function CycleParkingFinder() {
           'Close the open dialog before opening the route planner.',
         );
       }
-      openNewRoutePlanner('map');
+      openNewRoutePlanner('webmcp');
       return {
         status: 'opened',
         routeCalculated: false,
@@ -5823,7 +5974,6 @@ export default function CycleParkingFinder() {
             }
             type="button"
             onClick={() => {
-              captureAnalyticsEvent('location_requested');
               requestLocation(undefined, true);
             }}
             disabled={locationState.status === 'locating'}
@@ -5858,10 +6008,30 @@ export default function CycleParkingFinder() {
             }
           >
             <Search size={18} aria-hidden="true" />
-            <span className="mobile-action-label">
+            <span className="sr-only">
               {isPlaceSearching ? t('searching') : t('search')}
             </span>
           </motion.button>
+          {!isDirectionsMode && !isRouteWorkspace ? (
+            <motion.button
+              className="search-route-button"
+              data-testid={`plan-route-${surface}`}
+              aria-label={t(routeDraft ? 'resumeRoute' : 'planRoute')}
+              title={t(routeDraft ? 'resumeRoute' : 'planRoute')}
+              type="button"
+              whileTap={subtleTap}
+              onClick={() => {
+                setIsSettingsMenuOpen(false);
+                setIsMapLayersOpen(false);
+                openNewRoutePlanner('map');
+              }}
+            >
+              <Route size={20} aria-hidden="true" />
+              <span className="sr-only">
+                {t(routeDraft ? 'resumeRoute' : 'planRoute')}
+              </span>
+            </motion.button>
+          ) : null}
         </form>
 
         <AnimatePresence initial={false}>
@@ -6044,10 +6214,7 @@ export default function CycleParkingFinder() {
             }}
             onOpenStreetView={(point) => {
               setStreetViewPoint(point);
-              captureAnalyticsEvent('street_view_opened', {
-                parking_id: point.id,
-                parking_name: point.name,
-              });
+              captureAnalyticsEvent('street_view_opened', {});
             }}
             onShareParkingLink={(point) => {
               void shareParkingLinkForPoint(point, 'popup');
@@ -6145,20 +6312,6 @@ export default function CycleParkingFinder() {
           ) : null}
           {!isDirectionsMode && !isRouteWorkspace ? (
             <div className="map-layers-control">
-              <motion.button
-                className="map-plan-route-button"
-                data-testid="map-plan-route"
-                type="button"
-                whileTap={subtleTap}
-                onClick={() => {
-                  setIsSettingsMenuOpen(false);
-                  setIsMapLayersOpen(false);
-                  openNewRoutePlanner('map');
-                }}
-              >
-                <Route size={17} aria-hidden="true" />
-                <span>{t(routeDraft ? 'resumeRoute' : 'planRoute')}</span>
-              </motion.button>
               <motion.button
                 aria-expanded={isMapLayersOpen}
                 aria-label={t('mapLayers')}
@@ -6572,10 +6725,11 @@ export default function CycleParkingFinder() {
                           void shareSavedRouteLink(record)
                         }
                         onSelect={(record) => {
+                          beginAnalyticsJourney('library', true);
                           setSavedRoutesError(null);
                           setSelectedSavedRoute(record);
                           setRouteWorkspaceView('detail');
-                          captureAnalyticsEvent('saved_route_opened', {
+                          captureJourneyEvent('saved_route_opened', {
                             route_kind: record.kind,
                             stop_count: record.waypoints.length,
                           });
@@ -7127,8 +7281,6 @@ export default function CycleParkingFinder() {
                               onClick={() => {
                                 setStreetViewPoint(explicitSelectedPoint);
                                 captureAnalyticsEvent('street_view_opened', {
-                                  parking_id: explicitSelectedPoint.id,
-                                  parking_name: explicitSelectedPoint.name,
                                   source: 'details_preview',
                                 });
                               }}
@@ -7184,8 +7336,6 @@ export default function CycleParkingFinder() {
                           whileTap={subtleTap}
                           onClick={() => {
                             captureAnalyticsEvent('google_maps_opened', {
-                              parking_id: explicitSelectedPoint.id,
-                              parking_name: explicitSelectedPoint.name,
                               source: 'details',
                             });
                           }}
@@ -7848,7 +7998,6 @@ export default function CycleParkingFinder() {
                                                           point.categories.join(
                                                             ',',
                                                           ),
-                                                        point_id: point.id,
                                                         source: 'list',
                                                       },
                                                     );
@@ -8258,6 +8407,7 @@ export default function CycleParkingFinder() {
                 <div className="attribution-modal-header">
                   <h2 id="attribution-modal-title">{t('attributions')}</h2>
                 </div>
+                <DataFreshness locale={locale} />
                 <div className="attribution-details">
                   {parkingManifest?.sources.map((source) => (
                     <Fragment key={source.id}>

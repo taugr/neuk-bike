@@ -13,7 +13,10 @@ import {
   getCycleNetworkTileKeys,
 } from './cycle-network-data-utils.mjs';
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = process.env.NEUK_DATA_ROOT
+  ? resolve(process.env.NEUK_DATA_ROOT)
+  : sourceRoot;
 const dataRoot = resolve(repoRoot, 'public/data/cycle-network');
 const reportPath = resolve(repoRoot, 'src/data/cycle-network-report.json');
 const mebibyte = 1_048_576;

@@ -231,6 +231,7 @@ export class ParkingDataClient {
   private readonly maximumCachedChunks: number;
   private manifest: ParkingDataManifest | null = null;
   private readonly chunks = new Map<string, ParkingPoint[]>();
+  private referenceChunkKeys = new Set<string>();
   private readonly inFlightChunks = new Map<string, Promise<void>>();
   private pointIndex: Record<string, string> | null = null;
   private pointIndexRequest: Promise<Record<string, string>> | null = null;
@@ -280,9 +281,10 @@ export class ParkingDataClient {
 
   async loadLocation(location: UserLocation, radius = 1) {
     const manifest = await this.initialize();
-    return this.loadKeys(
-      getParkingTileKeysAroundLocation(location, manifest, radius),
-    );
+    const keys = getParkingTileKeysAroundLocation(location, manifest, radius);
+    // Late viewport requests must not displace the active nearby list.
+    this.referenceChunkKeys = new Set(keys.slice(0, this.maximumCachedChunks));
+    return this.loadKeys(keys);
   }
 
   async loadBounds(bounds: ParkingMapBounds) {
@@ -450,7 +452,9 @@ export class ParkingDataClient {
           this.chunks.set(key, chunk.points);
 
           while (this.chunks.size > this.maximumCachedChunks) {
-            const oldestKey = this.chunks.keys().next().value;
+            const oldestKey = [...this.chunks.keys()].find(
+              (cachedKey) => !this.referenceChunkKeys.has(cachedKey),
+            );
             if (!oldestKey) {
               break;
             }

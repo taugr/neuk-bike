@@ -1564,7 +1564,7 @@ test('resizes details when switching directly between map pins', async ({
   page,
 }) => {
   const shortParkingId = 'cec:1383';
-  const shortParkingName = 'Picardy Place near Leith Street';
+  const shortParkingName = 'Picardy Place near Cathedral Lane';
   const longParkingId = 'cec:902';
   const longParkingName = 'Broughton Street Lane by Oh! Outhouse';
   const latitude = 55.9568041927908;
@@ -1642,7 +1642,7 @@ test('uses at most one camera move when selecting a pin from collapsed details',
   page,
 }) => {
   const firstParkingId = 'cec:1383';
-  const firstParkingName = 'Picardy Place near Leith Street';
+  const firstParkingName = 'Picardy Place near Cathedral Lane';
   const secondParkingId = 'cec:902';
   const secondParkingName = 'Broughton Street Lane by Oh! Outhouse';
   const latitude = 55.9568041927908;

@@ -36,14 +36,19 @@ const councilLicenceUrl =
   'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/';
 const councilAttribution =
   'Copyright City of Edinburgh Council, contains Ordnance Survey data (c) Crown copyright and database right 2026.';
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = process.env.NEUK_DATA_ROOT
+  ? resolve(process.env.NEUK_DATA_ROOT)
+  : sourceRoot;
 const councilOutputPath = resolve(repoRoot, 'src/data/cycle-parking.json');
 const reportOutputPath = resolve(
   repoRoot,
   'src/data/cycle-parking-report.json',
 );
 const parkingOutputRoot = resolve(repoRoot, 'public/data/parking');
-const cacheRoot = resolve(repoRoot, '.cache');
+const cacheRoot = process.env.NEUK_DATA_CACHE_ROOT
+  ? resolve(process.env.NEUK_DATA_CACHE_ROOT)
+  : resolve(sourceRoot, '.cache');
 const selectedOsmTagKeys = [
   'access',
   'amenity',
@@ -247,7 +252,7 @@ async function downloadFile({ forceDownload, label, outputPath, url }) {
         `Downloading ${label} from ${url}${attempt > 1 ? ` (attempt ${attempt}/${maximumAttempts})` : ''}`,
       );
       const response = await fetch(url, {
-        signal: AbortSignal.timeout(120_000),
+        signal: AbortSignal.timeout(900_000),
       });
       if (!response.ok || !response.body) {
         throw new Error(`${response.status} ${response.statusText}`);
@@ -893,6 +898,7 @@ async function writeSpatialOutput({
       samples: duplicateRegionIds.slice(0, 100),
     },
     generatedAssets,
+    assetMetricsRuntime: { node: process.version, zlib: process.versions.zlib },
     mergedRecordCount: merged.points.length,
     naming: {
       counts: namingCounts,
@@ -990,6 +996,7 @@ async function main() {
         counts: naming.counts,
       },
       pbfSha256: pbfChecksum,
+      retrievedAt: (await stat(input.pbfPath)).mtime.toISOString(),
       peakRssBytes: inputUsage.peakRssBytes,
       recordCount: namedOsmPoints.length,
       sourceTimestamp: osm.sourceTimestamp,

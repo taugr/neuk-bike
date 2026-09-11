@@ -189,7 +189,9 @@ async function plan(page: Page) {
   await page.goto('/');
   await expect(page.locator('.location-context')).toHaveCount(0);
   await expect(page.getByTestId('parking-list')).toBeVisible();
-  await page.getByTestId('map-plan-route').click();
+  await page
+    .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+    .click();
   await page.getByRole('combobox').fill('Destination');
   await page.getByRole('option').click();
   await expect(

@@ -84,4 +84,23 @@ describe('analytics enablement', () => {
 
     expect(posthogCapture).not.toHaveBeenCalled();
   });
+
+  it('marks controlled production checks and removes private custom properties', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_KEY', 'phc_test');
+    vi.stubGlobal('window', {
+      location: { hostname: 'neuk.bike', search: '?analyticsTest=1' },
+    });
+    captureAnalyticsEvent('route_calculated', {
+      result_source: 'cache',
+      latitude: 55.95,
+      place_name: 'Private destination',
+    });
+    expect(posthogCapture).toHaveBeenCalledWith('route_calculated', {
+      result_source: 'cache',
+      app: 'neuk-bike',
+      analytics_schema_version: 2,
+      is_test: true,
+    });
+  });
 });

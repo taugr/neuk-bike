@@ -1,0 +1,51 @@
+{
+  "dashboardId": 689478,
+  "retireInsightId": 4234222,
+  "window": "Last seven days UTC; fixed weekly reports end Friday 13:00 UTC",
+  "definitions": [
+    {
+      "id": 4234220,
+      "name": "Location attempts by trigger and purpose",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Unique attempt IDs; automatic and manual requests are separate. Internal/test persons excluded.",
+      "sql": "SELECT properties.trigger AS trigger, properties.purpose AS purpose, uniqExact(properties.attempt_id) AS attempts FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND event = 'location_requested' GROUP BY trigger, purpose ORDER BY attempts DESC LIMIT 100"
+    },
+    {
+      "id": 4234221,
+      "name": "Location outcomes by trigger and purpose",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Unique resolved attempt IDs by outcome. Compare with requests of the same trigger and purpose; incomplete attempts remain unresolved.",
+      "sql": "SELECT properties.trigger AS trigger, properties.purpose AS purpose, properties.outcome AS outcome, uniqExact(properties.attempt_id) AS resolved_attempts FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND event = 'location_resolved' GROUP BY trigger, purpose, outcome ORDER BY resolved_attempts DESC LIMIT 100"
+    },
+    {
+      "id": 4234223,
+      "name": "Parking discovery actions",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Event totals, not a user funnel or conversion rate. Internal/test persons excluded.",
+      "sql": "SELECT event, count() AS actions FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND event IN ('place_searched','place_selected','parking_selected','parking_details_opened','neuk_saved') GROUP BY event ORDER BY actions DESC LIMIT 100"
+    },
+    {
+      "id": 4234224,
+      "name": "Parking links shared and copied",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Completed native shares and clipboard copies; each counted separately.",
+      "sql": "SELECT event, count() AS completed_operations FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND event IN ('parking_link_copied','parking_link_shared') GROUP BY event ORDER BY completed_operations DESC LIMIT 100"
+    },
+    {
+      "name": "New route journeys \u00b7 one-hour funnel",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Same random journey ID; first destination and calculation must follow first non-resumed open within 1 hour. Counts of journeys, not people. Recent journeys may still convert. Internal/test persons excluded.",
+      "sql": "SELECT count() AS opened_journeys, countIf(selected >= opened AND selected <= opened + INTERVAL 1 HOUR) AS destination_selected, countIf(selected >= opened AND calculated >= selected AND calculated <= opened + INTERVAL 1 HOUR) AS calculated_journeys FROM (SELECT properties.journey_id AS journey_id, minIf(timestamp, event = 'route_planner_opened' AND properties.resumed = false) AS opened, minIf(timestamp, event = 'route_destination_selected') AS selected, minIf(timestamp, event = 'route_calculated') AS calculated, countIf(event = 'route_planner_opened' AND properties.resumed = false) AS openings FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND properties.journey_id IS NOT NULL AND event IN ('route_planner_opened','route_destination_selected','route_calculated') GROUP BY journey_id HAVING openings > 0) LIMIT 100"
+    },
+    {
+      "name": "Route entries and restoration",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Entry events by source and resumed status; reopening a draft can repeat its journey ID. Restored routes do not need a new destination.",
+      "sql": "SELECT properties.source AS source, properties.resumed AS resumed, count() AS entry_actions, uniqExact(properties.journey_id) AS journeys FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND event = 'route_planner_opened' GROUP BY source, resumed ORDER BY entry_actions DESC LIMIT 100"
+    },
+    {
+      "name": "Route calculation reliability",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Unique attempt IDs across request/success/failure/cancellation. Result source distinguishes API, cache and short route.",
+      "sql": "SELECT event, properties.result_source AS result_source, properties.reason AS reason, uniqExact(properties.attempt_id) AS attempts FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND event IN ('route_calculation_requested','route_calculated','route_calculation_failed','route_calculation_cancelled','ride_recalculation_requested','ride_recalculated','ride_recalculation_failed','ride_recalculation_cancelled') GROUP BY event,result_source,reason ORDER BY attempts DESC LIMIT 100"
+    },
+    {
+      "name": "Ride reliability and useful route outcomes",
+      "description": "Schema 2 \u00b7 neuk.bike only \u00b7 last 7 days UTC. Ride events counted by unique ride ID; save/share/export by completed operations. Arrival is once per ride, stops are explicit and no abandonment is inferred.",
+      "sql": "SELECT event, count() AS operations, uniqExactIf(properties.ride_id, properties.ride_id IS NOT NULL) AS rides, uniqExactIf(properties.journey_id, properties.journey_id IS NOT NULL) AS journeys FROM events WHERE timestamp >= now() - INTERVAL 7 DAY AND timestamp < now() AND properties.$host = 'neuk.bike' AND properties.app = 'neuk-bike' AND properties.analytics_schema_version = 2 AND coalesce(properties.is_test, false) = false AND coalesce(person.properties.$internal_or_test_user, false) = false AND event IN ('ride_start_requested','ride_started','ride_completed','ride_stopped','route_saved','route_link_shared','route_gpx_shared','route_gpx_exported','route_gpx_imported') GROUP BY event ORDER BY operations DESC LIMIT 100"
+    }
+  ]
+}

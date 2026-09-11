@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-11T16:12:43.725Z",
+  "osmInputsMatch": true,
+  "council": {
+    "sourceUrl": "https://services-eu1.arcgis.com/FgpikkYuSUOuITxp/arcgis/rest/services/Public_Bike_Parking/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson",
+    "retrievedAt": "2026-09-11T15:25:14.638Z",
+    "sourceTimestamp": null,
+    "note": "Council feed retrieval date; underlying edit date is not supplied by the snapshot."
+  },
+  "datasets": [
+    {
+      "id": "parking",
+      "label": "Cycle parking",
+      "releaseId": "sha256-34f6dbb707181eef5a9d54d432d0daeeb3249fba238b2bc8e7481e36bb07c7de",
+      "refreshedAt": "2026-09-11T15:25:14.638Z",
+      "oldestSourceAt": "2026-09-10T20:21:06.000Z",
+      "newestSourceAt": "2026-09-10T20:21:06.000Z",
+      "inputCount": 70,
+      "expectedInputCount": 70,
+      "missingInputs": [],
+      "unknownTimestampInputs": [],
+      "mixedAge": false,
+      "complete": true
+    },
+    {
+      "id": "cycling-pois",
+      "label": "Cycling places",
+      "releaseId": "sha256-c267a6f8ee9dd805dd9e9dd128735260e44f8fe93a5ce076ead3b7e127585d84",
+      "refreshedAt": "2026-09-11T16:00:44.957Z",
+      "oldestSourceAt": "2026-09-10T20:21:06.000Z",
+      "newestSourceAt": "2026-09-10T20:21:06.000Z",
+      "inputCount": 70,
+      "expectedInputCount": 70,
+      "missingInputs": [],
+      "unknownTimestampInputs": [],
+      "mixedAge": false,
+      "complete": true
+    },
+    {
+      "id": "cycle-network",
+      "label": "National Cycle Network",
+      "releaseId": "sha256-8b5d3098da3516116a4d3fed1d2829d3b9da6979cd2849d6e8e056b48587236d",
+      "refreshedAt": "2026-09-11T15:58:40.332Z",
+      "oldestSourceAt": "2026-09-06T00:04:44.087Z",
+      "newestSourceAt": "2026-09-06T00:04:44.087Z",
+      "inputCount": 1,
+      "expectedInputCount": 1,
+      "missingInputs": [],
+      "unknownTimestampInputs": [],
+      "mixedAge": false,
+      "complete": true
+    }
+  ]
+}

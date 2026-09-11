@@ -1,4 +1,5 @@
 import posthog from 'posthog-js';
+import { sanitizeAnalyticsProperties } from '@/lib/analytics-privacy';
 
 type AnalyticsRuntime = {
   forceEnable?: string;
@@ -46,6 +47,13 @@ export function isAnalyticsEnabled() {
   return shouldEnableAnalytics();
 }
 
+export function isAnalyticsTestTraffic() {
+  return (
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('analyticsTest') === '1'
+  );
+}
+
 export function captureAnalyticsEvent(
   eventName: string,
   properties?: Record<string, unknown>,
@@ -54,5 +62,10 @@ export function captureAnalyticsEvent(
     return;
   }
 
-  posthog.capture(eventName, properties);
+  posthog.capture(eventName, {
+    ...sanitizeAnalyticsProperties(properties),
+    app: 'neuk-bike',
+    analytics_schema_version: 2,
+    is_test: isAnalyticsTestTraffic(),
+  });
 }

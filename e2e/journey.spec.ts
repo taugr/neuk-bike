@@ -46,7 +46,9 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/?mockGps=55.9533,-3.1883,5');
     await expect(page.getByTestId('parking-list')).toBeVisible();
-    await page.getByTestId('map-plan-route').click();
+    await page
+      .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+      .click();
     await expect(page.getByTestId('route-map-editor')).toHaveCount(0);
     await page
       .getByRole('combobox', { name: 'Search destination' })
@@ -81,8 +83,12 @@ for (const width of [390, 1440]) {
     await planner.getByRole('button', { name: 'Back', exact: true }).click();
     await journey.getByRole('button', { name: 'Back to nearby neuks' }).click();
     await expect(page.getByTestId('parking-list')).toBeVisible();
-    await expect(page.getByTestId('map-plan-route')).toHaveText('Resume route');
-    await page.getByTestId('map-plan-route').click();
+    await expect(
+      page.getByRole('button', { name: /^(Plan a route|Resume route)$/ }),
+    ).toHaveText('Resume route');
+    await page
+      .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+      .click();
     await expect(journey.getByTestId('journey-destination')).toContainText(
       'National Museum',
     );
@@ -105,7 +111,9 @@ test('denied GPS retains destination and never routes from the default reference
   });
   await page.goto('/?mockGps=denied');
   await expect(page.getByTestId('parking-list')).toBeVisible();
-  await page.getByTestId('map-plan-route').click();
+  await page
+    .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+    .click();
   await page
     .getByRole('combobox', { name: 'Search destination' })
     .fill('Museum');
@@ -171,7 +179,7 @@ for (const locale of ['en', 'gd', 'es', 'hy']) {
     );
     await page.goto('/?mockGps=55.9533,-3.1883,5');
     await expect(page.getByTestId('parking-list')).toBeVisible();
-    await page.getByTestId('map-plan-route').click();
+    await page.getByTestId('plan-route-mobile').click();
     await page.getByRole('combobox').fill('Museum');
     await page.getByRole('option').click();
     await expect(page.getByTestId('route-plan-balanced')).toHaveAttribute(
@@ -215,7 +223,9 @@ test('retry retains both endpoints after a routing failure', async ({
   );
   await page.goto('/?mockGps=55.9533,-3.1883,5');
   await expect(page.getByTestId('parking-list')).toBeVisible();
-  await page.getByTestId('map-plan-route').click();
+  await page
+    .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+    .click();
   await page.getByRole('combobox').fill('Museum');
   await page.getByRole('option').click();
   await expect(
@@ -253,7 +263,9 @@ test('restores the discovery camera after previewing a route', async ({
       ].map(async (attribute) => Number(await map.getAttribute(attribute))),
     );
   const before = await camera();
-  await page.getByTestId('map-plan-route').click();
+  await page
+    .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+    .click();
   await page.getByRole('combobox').fill('Museum');
   await page.getByRole('option').click();
   await expect(
@@ -278,7 +290,9 @@ for (const [width, height] of [
     await page.setViewportSize({ width, height });
     await page.goto('/?mockGps=55.9533,-3.1883,5');
     await expect(page.getByTestId('parking-list')).toBeVisible();
-    await page.getByTestId('map-plan-route').click();
+    await page
+      .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+      .click();
     await page.getByRole('combobox').fill('Museum');
     await page.getByRole('option').click();
     const journey = page.getByTestId('route-journey');

@@ -1,5 +1,6 @@
 import posthog from 'posthog-js';
-import { isAnalyticsEnabled } from '@/lib/analytics';
+import { isAnalyticsEnabled, isAnalyticsTestTraffic } from '@/lib/analytics';
+import { redactAnalyticsUrl } from '@/lib/analytics-privacy';
 
 const urlPropertyNames = [
   '$current_url',
@@ -8,27 +9,6 @@ const urlPropertyNames = [
   '$initial_referrer',
 ] as const;
 
-const locationQueryParamNames = ['lat', 'lng'] as const;
-
-function redactLocationQueryParams(value: unknown) {
-  if (typeof value !== 'string') {
-    return value;
-  }
-
-  try {
-    const url = new URL(value, window.location.origin);
-    for (const paramName of locationQueryParamNames) {
-      if (url.searchParams.has(paramName)) {
-        url.searchParams.set(paramName, '0');
-      }
-    }
-
-    return url.toString();
-  } catch {
-    return value.split(/[?#]/, 1)[0];
-  }
-}
-
 if (isAnalyticsEnabled()) {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
@@ -36,15 +16,21 @@ if (isAnalyticsEnabled()) {
     defaults: '2026-01-30',
     cookieless_mode: 'always',
     autocapture: false,
-    capture_exceptions: true,
+    person_profiles: 'never',
+    disable_session_recording: true,
+    // Route failures are measured with bounded reason codes. Arbitrary error
+    // messages/stack URLs can contain location-bearing request data.
+    capture_exceptions: false,
     before_send: (event) => {
       if (!event) {
         return event;
       }
+      if (event.event === '$exception') return null;
+      event.properties.is_test = isAnalyticsTestTraffic();
 
       for (const propertyName of urlPropertyNames) {
         if (event.properties?.[propertyName]) {
-          event.properties[propertyName] = redactLocationQueryParams(
+          event.properties[propertyName] = redactAnalyticsUrl(
             event.properties[propertyName],
           );
         }

@@ -54,7 +54,8 @@ manual fallback and requires an authenticated Wrangler session.
 
 ## Parking data
 
-`pnpm update:data` downloads the current council feed and downloads or reuses
+`pnpm refresh:data` stages and verifies all three datasets from fresh sources.
+`pnpm update:data` downloads the current council feed and fresh
 the Geofabrik Scotland, Wales, Ireland-and-Northern-Ireland, and Canary Islands
 PBFs, the Armenia PBF, 47 England county PBFs, 18 Spain regional PBFs, and seven
 coverage polygons. The cached inputs currently require about 4 GB. Inputs are
@@ -81,6 +82,13 @@ coverage, chunk duplication, largest asset, and maximum compressed buffered
 payload, then run `pnpm verify:network` before committing a refreshed snapshot.
 
 ## Testing
+
+Run `pnpm test:e2e` for data loading, location, map, sharing, routing or
+responsive UI changes. Run `pnpm test:analytics` when changing event capture;
+its dedicated build uses a fake key and intercepts all PostHog traffic. Restore
+a normal `pnpm build` before release or manual production-like testing.
+See [data maintenance](docs/data-maintenance.md) and
+[analytics definitions](docs/analytics.md) for the relevant review gates.
 
 Tests live next to the app code under `src/`.
 

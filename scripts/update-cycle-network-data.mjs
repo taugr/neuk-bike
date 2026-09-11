@@ -14,7 +14,10 @@ import {
 } from './cycle-network-data-utils.mjs';
 import { getTileBounds } from './parking-data-utils.mjs';
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const sourceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = process.env.NEUK_DATA_ROOT
+  ? resolve(process.env.NEUK_DATA_ROOT)
+  : sourceRoot;
 const outputRoot = resolve(repoRoot, 'public/data/cycle-network');
 const temporaryRoot = resolve(repoRoot, 'public/data/cycle-network.next');
 const previousRoot = resolve(repoRoot, 'public/data/cycle-network.previous');

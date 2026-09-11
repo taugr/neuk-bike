@@ -242,9 +242,9 @@ test('declining a first request stops automatic requests, even after 24 hours', 
   expect(await calls(page)).toBe(0);
   await retry(page);
   await expect.poll(() => calls(page)).toBe(1);
-  await expect(page.getByRole('status')).toContainText(
-    'Location permission needed',
-  );
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Location permission needed' }),
+  ).toBeVisible();
 });
 
 test('browser denial clears GPS but preserves the last browsed area', async ({
@@ -396,7 +396,9 @@ test('a searched area survives reload and is not used as a current-location rout
     'aria-label',
     'Yerevan',
   );
-  await page.getByTestId('map-plan-route').click();
+  await page
+    .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+    .click();
   await page
     .getByRole('combobox', { name: 'Search destination' })
     .fill('Yerevan');
@@ -456,7 +458,9 @@ test('starting a route while GPS is pending ignores a late position', async ({
   await page.goto('/');
   await ready(page);
   await expect.poll(() => calls(page)).toBe(1);
-  await page.getByTestId('map-plan-route').click();
+  await page
+    .getByRole('button', { name: /^(Plan a route|Resume route)$/ })
+    .click();
   await expect(
     page.getByRole('combobox', { name: 'Search destination' }),
   ).toBeVisible();
