@@ -1,6 +1,7 @@
 'use client';
 
 import { improveDarkMapReadability } from '@/lib/map-readability';
+import { createMapRecovery } from '@/lib/map-recovery';
 
 import * as maplibregl from 'maplibre-gl';
 import type {
@@ -93,7 +94,9 @@ import {
   type CycleNetworkRouteIdentity,
 } from '@/lib/cycle-network-presentation';
 
-maplibregl.setWorkerUrl('/vendor/maplibre-gl/maplibre-gl-worker.mjs');
+maplibregl.setWorkerUrl(
+  `/vendor/maplibre-gl/${maplibregl.getVersion()}/maplibre-gl-worker.mjs`,
+);
 
 type CycleParkingMapProps = {
   locale: AppLocale;
@@ -359,17 +362,27 @@ async function loadMapLibreBasemapStyle(
   signal: AbortSignal,
   theme: 'dark' | 'light',
 ) {
-  const response = await fetch(mapLibreBasemapStyleUrls[theme], { signal });
-
-  if (!response.ok) {
-    throw new Error(`Map style request failed with ${response.status}`);
+  // A stalled connection on PWA startup must not block map creation forever.
+  const request = new AbortController();
+  const abort = () => request.abort();
+  signal.addEventListener('abort', abort, { once: true });
+  if (signal.aborted) abort();
+  const timeout = setTimeout(abort, 12_000);
+  try {
+    const response = await fetch(mapLibreBasemapStyleUrls[theme], {
+      signal: request.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Map style request failed with ${response.status}`);
+    }
+    const style = (await response.json()) as StyleSpecification;
+    return theme === 'light'
+      ? patchOpenFreeMapLibertyStyle(style)
+      : improveDarkMapReadability(style);
+  } finally {
+    clearTimeout(timeout);
+    signal.removeEventListener('abort', abort);
   }
-
-  const style = (await response.json()) as StyleSpecification;
-
-  return theme === 'light'
-    ? patchOpenFreeMapLibertyStyle(style)
-    : improveDarkMapReadability(style);
 }
 
 function userLocationToPoint(userLocation: UserLocation): CycleRoutePoint {
@@ -2034,6 +2047,10 @@ export default function CycleParkingMap({
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isOfflineBasemap, setIsOfflineBasemap] = useState(false);
+  const basemapHasErrorsRef = useRef(false);
+  const basemapRecoveryRef = useRef<ReturnType<
+    typeof createMapRecovery
+  > | null>(null);
   const [renderedBasemapFeatureCount, setRenderedBasemapFeatureCount] =
     useState(0);
   const [styleRevision, setStyleRevision] = useState(0);
@@ -2264,6 +2281,7 @@ export default function CycleParkingMap({
         zoom: savedCameraRef.current?.zoom ?? 13,
       });
       nextMap = mapInstance;
+      basemapHasErrorsRef.current = offlineBasemap;
       setIsOfflineBasemap(offlineBasemap);
       mapInstance.touchZoomRotate.disableRotation();
       container.addEventListener(
@@ -2298,13 +2316,37 @@ export default function CycleParkingMap({
           width: 1,
         });
       });
-      mapInstance.on('load', () => {
+      const handleMapReady = () => {
         setIsMapLoaded(true);
         setStyleRevision((revision) => revision + 1);
         handleViewportChange({
           bounds: getVisibleMapBounds(mapInstance),
           zoom: mapInstance.getZoom(),
         });
+      };
+      // Keep initial readiness at load; later style loads also restore our
+      // overlays after recovery, including Safari WebGL context restoration.
+      let initiallyLoaded = false;
+      mapInstance.on('load', () => {
+        initiallyLoaded = true;
+        handleMapReady();
+      });
+      mapInstance.on('style.load', () => {
+        if (initiallyLoaded) handleMapReady();
+      });
+      mapInstance.on('webglcontextlost', () => setIsMapLoaded(false));
+      mapInstance.on('error', (event) => {
+        const sourceId = 'sourceId' in event ? String(event.sourceId) : '';
+        const source = mapInstance.getStyle()?.sources[sourceId];
+        const url = 'url' in event.error ? String(event.error.url) : '';
+        if (
+          source?.type === 'vector' ||
+          source?.type === 'raster' ||
+          url.startsWith('https://tiles.openfreemap.org/')
+        ) {
+          basemapHasErrorsRef.current = true;
+          basemapRecoveryRef.current?.fail();
+        }
       });
       mapInstance.on('idle', () => {
         const count = mapInstance
@@ -2428,39 +2470,56 @@ export default function CycleParkingMap({
       return;
     }
 
-    const abortController = new AbortController();
-    const applyStyle = (style: StyleSpecification, offlineBasemap: boolean) => {
-      setIsMapLoaded(false);
-      setIsOfflineBasemap(offlineBasemap);
-      setRenderedBasemapFeatureCount(0);
-      void map.once('style.load', () => {
-        setIsMapLoaded(true);
-        setStyleRevision((revision) => revision + 1);
-        handleViewportChange({
-          bounds: getVisibleMapBounds(map),
-          zoom: map.getZoom(),
-        });
-      });
-      map.setStyle(style);
+    let contextLost = false;
+    const recovery = createMapRecovery({
+      canRecover: () =>
+        document.visibilityState !== 'hidden' &&
+        navigator.onLine &&
+        !contextLost,
+      recover: async (signal) => {
+        const style = await loadMapLibreBasemapStyle(signal, theme);
+        if (signal.aborted) return;
+        if (contextLost) throw new Error('Map context is still suspended.');
+        setIsMapLoaded(false);
+        setIsOfflineBasemap(false);
+        setRenderedBasemapFeatureCount(0);
+        basemapHasErrorsRef.current = false;
+        // A style diff retains failed sources when their URLs are unchanged.
+        // Rebuild them so TileJSON, sprites, glyphs and tiles are requested again.
+        map.setStyle(style, { diff: false });
+      },
+    });
+    basemapRecoveryRef.current = recovery;
+    if (basemapHasErrorsRef.current) recovery.fail();
+    const resume = () => {
+      if (document.visibilityState === 'hidden' || contextLost) return;
+      map.resize();
+      map.triggerRepaint();
+      recovery.resume();
     };
-    const handleOnline = () => {
-      if (!isOfflineBasemap) {
-        return;
-      }
-      void loadMapLibreBasemapStyle(abortController.signal, theme)
-        .then((style) => applyStyle(style, false))
-        .catch(() => {
-          // Keep the dependable local background until the provider is reachable.
-        });
+    const loseContext = () => {
+      contextLost = true;
     };
-
-    window.addEventListener('online', handleOnline);
+    const restoreContext = () => {
+      contextLost = false;
+      resume();
+    };
+    window.addEventListener('online', resume);
+    window.addEventListener('pageshow', resume);
+    document.addEventListener('visibilitychange', resume);
+    map.on('webglcontextlost', loseContext);
+    map.on('webglcontextrestored', restoreContext);
 
     return () => {
-      abortController.abort();
-      window.removeEventListener('online', handleOnline);
+      recovery.dispose();
+      basemapRecoveryRef.current = null;
+      window.removeEventListener('online', resume);
+      window.removeEventListener('pageshow', resume);
+      document.removeEventListener('visibilitychange', resume);
+      map.off('webglcontextlost', loseContext);
+      map.off('webglcontextrestored', restoreContext);
     };
-  }, [handleViewportChange, isOfflineBasemap, map, theme]);
+  }, [map, theme]);
 
   useEffect(() => {
     if (!map || !isMapLoaded) {
@@ -2562,6 +2621,8 @@ export default function CycleParkingMap({
 
       setIsMapLoaded(false);
       setIsOfflineBasemap(offlineBasemap);
+      basemapHasErrorsRef.current = offlineBasemap;
+      if (offlineBasemap) basemapRecoveryRef.current?.fail();
       void map.once('style.load', handleStyleLoad);
       map.setStyle(style);
     };

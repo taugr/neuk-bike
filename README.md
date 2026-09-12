@@ -148,6 +148,14 @@ The header has no persistent location status row. The location button provides
 manual retry, with concise feedback after an explicit request fails. Only a
 confirmed GPS fix uses the blue location marker. The dark basemap increases
 street, path, and label contrast while preserving route overlays and path patterns.
+Failed map styles and tiles retry up to three times with increasing delays.
+Reopening the PWA or reconnecting restarts recovery for outstanding failures;
+healthy maps only resize and repaint. Recovery preserves the camera and app
+state. A stalled style request falls back to the local background after 12
+seconds. Offline streets still require a downloaded area.
+MapLibre workers and their shared module use versioned URLs generated during
+install and Next.js startup/build, so a PWA update cannot reuse workers from a
+different MapLibre release.
 The map's “Plan a route” button opens destination search in the same map and sheet. The sliders
 icon beside Parking opens parking preferences. Route planning is also available
 from the existing menu.
