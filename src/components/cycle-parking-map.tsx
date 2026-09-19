@@ -3532,6 +3532,9 @@ export default function CycleParkingMap({
         }
         isAutomaticFocusAnimationRef.current = true;
         centeredExpandedPopupPointRef.current = selectedPoint.id;
+        // This explicit popup focus owns the selection camera. Background
+        // nearby results must not replace its flight with an overview fit.
+        hasCompletedNearbySelectionFocusRef.current = true;
         map.flyTo({
           center: getPopupFocusCenter(
             map,

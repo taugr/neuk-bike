@@ -1988,8 +1988,11 @@ test('keeps the first TUMO Center pin popup inside the visible mobile map', asyn
     const observer = new MutationObserver(() => {
       const latitude = map.dataset.mapCenterLatitude;
       const longitude = map.dataset.mapCenterLongitude;
+      const zoom = Number(map.dataset.mapZoom);
 
-      if (latitude && longitude) {
+      // Tray resize notifications can publish intermediate flight positions.
+      // Count completed popup focuses, not those intermediate snapshots.
+      if (latitude && longitude && zoom >= 16) {
         centers.add(`${latitude},${longitude}`);
       }
     });
@@ -1997,6 +2000,7 @@ test('keeps the first TUMO Center pin popup inside the visible mobile map', asyn
       attributeFilter: [
         'data-map-center-latitude',
         'data-map-center-longitude',
+        'data-map-zoom',
       ],
       attributes: true,
     });
@@ -2009,6 +2013,16 @@ test('keeps the first TUMO Center pin popup inside the visible mobile map', asyn
   await expect(
     page.getByRole('region', { name: 'Parking details' }),
   ).toBeVisible();
+
+  // Wait for the popup flight to finish before accepting its geometry. A
+  // nearby-results overview must not interrupt it at an intermediate zoom.
+  await expect
+    .poll(async () =>
+      Number(
+        await page.getByTestId('parking-map').getAttribute('data-map-zoom'),
+      ),
+    )
+    .toBeGreaterThanOrEqual(16);
 
   await expect
     .poll(() =>

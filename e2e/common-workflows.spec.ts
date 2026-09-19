@@ -387,6 +387,9 @@ test('replaces the desktop finder with parking filters', async ({ page }) => {
 test('keeps manual zoom after background parking chunks load', async ({
   page,
 }) => {
+  // Camera attributes update at moveend, so unchanged samples during a flight
+  // do not mean it has settled. Test chunk reconciliation without animations.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   const loadedParkingChunks = new Set<string>();
   const selectedParkingChunkPath = '/chunks/12/1962/1255.';
   let releaseBackgroundChunks: () => void = () => {};
