@@ -46,6 +46,7 @@ export type RoutePlannerProps = {
   routes: CycleRoutesByPlan;
   status: RoutePlannerStatus;
   onAddWaypoint: (waypoint: CycleRouteWaypoint) => void;
+  onEditEndpoint: (target: 'start' | 'destination') => void;
   onBack: () => void;
   onCancelMapPlacement: () => void;
   onDoneMapPlacement: () => void;
@@ -69,6 +70,7 @@ export function RoutePlanner({
   routes,
   status,
   onAddWaypoint,
+  onEditEndpoint,
   onBack,
   onCancelMapPlacement,
   onDoneMapPlacement,
@@ -243,7 +245,21 @@ export function RoutePlanner({
                       ? t('routeFinish')
                       : t('routeVia')}
                 </small>
-                <strong>{waypoint.label}</strong>
+                {index === 0 || index === draft.waypoints.length - 1 ? (
+                  <button
+                    className="route-stop-edit"
+                    type="button"
+                    aria-label={`${t(index === 0 ? 'chooseStart' : 'chooseDestination')}: ${waypoint.label}`}
+                    onClick={() =>
+                      onEditEndpoint(index === 0 ? 'start' : 'destination')
+                    }
+                  >
+                    <strong>{waypoint.label}</strong>
+                    <Pencil size={14} aria-hidden="true" />
+                  </button>
+                ) : (
+                  <strong>{waypoint.label}</strong>
+                )}
               </span>
               <span className="route-stop-actions">
                 <button

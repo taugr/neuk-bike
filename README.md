@@ -180,7 +180,12 @@ location. The reference location is never silently used as a route origin.
 The preview offers route styles, live tracking, directions and saving. Back
 returns to parking with the selection and discovery camera preserved; “Resume
 route” restores the draft during the current visit. Save a route to retain it
-across visits. “Edit route” exposes naming, reordering and up to 30 stops, from
+across visits. Select the labelled Start or Destination row to change that endpoint by place search
+or **Choose on map**, then click or tap the exact point. Each search step edits
+only its named endpoint; the other selected endpoint appears as read-only context.
+Cancel returns without
+changing the route. “Edit route” also lets you replace either endpoint directly,
+and exposes naming, reordering and up to 30 stops, from
 place search or an explicit tap-on-map mode. Changing the destination preserves
 start and via points. **Finish at bike parking** appears once the route is ready and
 compares up to three neuks near the current destination using route time and

@@ -3,6 +3,7 @@
 import {
   ChevronLeft,
   LocateFixed,
+  MapPin,
   ChevronRight,
   Landmark,
   LoaderCircle,
@@ -25,6 +26,7 @@ type RouteDestinationSearchProps = {
   searchStatus: 'error' | 'idle' | 'loading';
   selectedId: string | null;
   onUseLocation?: () => void;
+  onChooseOnMap: () => void;
   onBack: () => void;
   onClear: () => void;
   onQueryChange: (query: string) => void;
@@ -56,6 +58,7 @@ export function RouteDestinationSearch({
   searchStatus,
   selectedId,
   onUseLocation,
+  onChooseOnMap,
   onBack,
   onClear,
   onQueryChange,
@@ -65,6 +68,7 @@ export function RouteDestinationSearch({
   onSetActiveResultIndex,
 }: RouteDestinationSearchProps) {
   const { t } = useLanguage();
+  const otherEndpointLabel = target === 'start' ? destinationLabel : startLabel;
   const visibleResults = results.slice(0, 3);
   const isRouteLoading = routeStatus === 'loading' && selectedId !== null;
 
@@ -83,13 +87,14 @@ export function RouteDestinationSearch({
         <span aria-hidden="true" />
       </header>
 
-      <div className="journey-search-context">
-        <span>{t(target === 'start' ? 'destination' : 'routeStart')}</span>
-        <strong>
-          {(target === 'start' ? destinationLabel : startLabel) ??
-            t('chooseStart')}
-        </strong>
-      </div>
+      <button
+        type="button"
+        className="journey-use-location"
+        onClick={onChooseOnMap}
+      >
+        <MapPin size={18} aria-hidden="true" />
+        {t('chooseOnMap')}
+      </button>
       {target === 'start' && onUseLocation ? (
         <button
           type="button"
@@ -127,7 +132,9 @@ export function RouteDestinationSearch({
           aria-expanded={visibleResults.length > 0}
           id="route-destination-query"
           name="route-destination-query"
-          placeholder={t('placeOrPostcode')}
+          placeholder={t(
+            target === 'start' ? 'chooseStart' : 'searchDestination',
+          )}
           role="combobox"
           type="search"
           value={query}
@@ -169,7 +176,20 @@ export function RouteDestinationSearch({
         ) : null}
       </form>
 
-      {visibleResults.length === 0 && searchStatus === 'idle' && !query ? (
+      {otherEndpointLabel ? (
+        <p
+          className="journey-search-context"
+          data-testid="search-endpoint-context"
+        >
+          <span>{t(target === 'start' ? 'destination' : 'routeStart')}:</span>
+          <strong>{otherEndpointLabel}</strong>
+        </p>
+      ) : null}
+
+      {visibleResults.length === 0 &&
+      searchStatus === 'idle' &&
+      !query &&
+      (target === 'destination' || destinationLabel) ? (
         <p className="journey-note">
           {t(
             target === 'start' ? 'journeyStartHelp' : 'journeyDestinationHelp',
@@ -180,7 +200,11 @@ export function RouteDestinationSearch({
         <ol
           className="route-destination-results"
           id="route-destination-results"
-          aria-label={t('destinationSearchResults')}
+          aria-label={t(
+            target === 'start'
+              ? 'placeSearchResults'
+              : 'destinationSearchResults',
+          )}
           role="listbox"
         >
           {visibleResults.map((result, index) => {

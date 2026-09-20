@@ -54,6 +54,38 @@ export function setRouteDestination(
   };
 }
 
+// A destination chosen before the start stays separate: a one-point draft
+// always represents the start, including when the route is opened for editing.
+export function selectRouteEndpoint(
+  draft: RouteDraft,
+  pendingDestination: CycleRouteWaypoint | null,
+  target: 'start' | 'destination',
+  waypoint: CycleRouteWaypoint,
+) {
+  if (target === 'destination' && draft.waypoints.length === 0) {
+    return { draft, pendingDestination: waypoint };
+  }
+  if (target === 'destination') {
+    return {
+      draft: setRouteDestination(draft, waypoint),
+      pendingDestination: null,
+    };
+  }
+  return {
+    draft: {
+      ...draft,
+      waypoints: [
+        waypoint,
+        ...draft.waypoints.slice(1),
+        ...(draft.waypoints.length < 2 && pendingDestination
+          ? [pendingDestination]
+          : []),
+      ],
+    },
+    pendingDestination: null,
+  };
+}
+
 export function updateRouteWaypoint(
   draft: RouteDraft,
   id: string,

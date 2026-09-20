@@ -4335,13 +4335,18 @@ a {
   flex: 1;
   flex-direction: column;
   min-height: 0;
+  overflow-y: auto;
+}
+
+.route-destination-search > * {
+  flex-shrink: 0;
 }
 
 .route-destination-search-header {
   align-items: center;
   display: grid;
   gap: 0.5rem;
-  grid-template-columns: minmax(4.5rem, 1fr) auto minmax(4.5rem, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) 1rem;
 }
 
 .route-destination-search-header h2 {
@@ -4349,7 +4354,6 @@ a {
   line-height: 1.2;
   margin: 0;
   text-align: center;
-  white-space: nowrap;
 }
 
 .route-destination-search-header > button {
@@ -4411,7 +4415,7 @@ a {
 }
 
 .route-destination-results {
-  flex: 1;
+  flex: 0 0 auto;
   list-style: none;
   margin: 0.55rem 0 0;
   min-height: 0;
@@ -5979,10 +5983,10 @@ a {
   }
 
   .control-pane[data-panel-view='route-destination-search'] {
-    --mobile-sheet-expanded-height: 46dvh;
-    max-height: 46vh;
-    max-height: 46svh;
-    max-height: 46dvh;
+    --mobile-sheet-expanded-height: 66dvh;
+    max-height: 66vh;
+    max-height: 66svh;
+    max-height: 66dvh;
   }
 
   .destination-parking-chooser {
@@ -7332,12 +7336,25 @@ a {
 }
 .journey-search-context {
   align-items: baseline;
-  background: var(--surface-neutral);
-  border-radius: 10px;
+  color: var(--muted);
   display: flex;
-  gap: 0.65rem;
-  margin-bottom: 0.75rem;
-  padding: 0.65rem 0.8rem;
+  gap: 0.4rem;
+  margin: 0.75rem 0 0;
+}
+.route-stop-edit {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  display: flex;
+  gap: 0.4rem;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
+}
+.route-stop-edit svg {
+  flex-shrink: 0;
 }
 .journey-search-context span {
   color: var(--muted);

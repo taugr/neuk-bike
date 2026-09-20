@@ -115,6 +115,7 @@ type CycleParkingMapProps = {
   savedPointKeys: string[];
   route: CycleRoute | null;
   routeWaypoints?: CycleRouteWaypoint[];
+  pendingRouteDestination?: CycleRouteWaypoint | null;
   activeRouteWaypointId?: string | null;
   isRouteWaypointPlacementActive?: boolean;
   routeInstructionFocusRequest: {
@@ -1971,6 +1972,7 @@ export default function CycleParkingMap({
   savedPointKeys,
   route,
   routeWaypoints = [],
+  pendingRouteDestination = null,
   activeRouteWaypointId = null,
   isRouteWaypointPlacementActive = false,
   routeInstructionFocusRequest,
@@ -3022,10 +3024,16 @@ export default function CycleParkingMap({
     routeWaypointMarkerRefs.current.forEach(cleanupRenderedMarker);
     routeWaypointMarkerRefs.current.clear();
 
-    routeWaypoints.forEach((waypoint, index) => {
+    const displayedWaypoints =
+      pendingRouteDestination && routeWaypoints.length === 0
+        ? [pendingRouteDestination]
+        : routeWaypoints;
+    displayedWaypoints.forEach((waypoint, index) => {
+      const markerIndex =
+        pendingRouteDestination && routeWaypoints.length === 0 ? 1 : index;
       const element = createRouteWaypointMarkerElement(
-        index,
-        index === routeWaypoints.length - 1,
+        markerIndex,
+        markerIndex > 0 && index === displayedWaypoints.length - 1,
         waypoint.id === activeRouteWaypointId,
       );
       element.setAttribute('aria-label', waypoint.label);
@@ -3039,7 +3047,7 @@ export default function CycleParkingMap({
       routeWaypointMarkerRefs.current.forEach(cleanupRenderedMarker);
       routeWaypointMarkerRefs.current.clear();
     };
-  }, [activeRouteWaypointId, map, routeWaypoints]);
+  }, [activeRouteWaypointId, map, routeWaypoints, pendingRouteDestination]);
 
   useEffect(() => {
     if (!map) {

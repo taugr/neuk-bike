@@ -9,6 +9,7 @@ import {
   moveRouteWaypoint,
   removeRouteWaypoint,
   setRouteDestination,
+  selectRouteEndpoint,
   swapRouteEndpoints,
   updateRouteWaypoint,
 } from '@/lib/route-draft';
@@ -28,6 +29,66 @@ function waypoint(id: string, latitude: number): CycleRouteWaypoint {
 }
 
 describe('route drafts', () => {
+  it('keeps start-first and destination-first selection in the same order', () => {
+    const empty = createRouteDraft('draft');
+    const start = waypoint('start', 55.95);
+    const finish = waypoint('finish', 55.97);
+    const destinationFirst = selectRouteEndpoint(
+      empty,
+      null,
+      'destination',
+      finish,
+    );
+    expect(destinationFirst.draft.waypoints).toEqual([]);
+    expect(destinationFirst.pendingDestination).toBe(finish);
+    const completed = selectRouteEndpoint(
+      destinationFirst.draft,
+      finish,
+      'start',
+      start,
+    );
+    expect(completed.draft.waypoints).toEqual([start, finish]);
+    expect(completed.pendingDestination).toBeNull();
+    const startFirst = selectRouteEndpoint(empty, null, 'start', start);
+    expect(startFirst.draft.waypoints).toEqual([start]);
+    expect(
+      selectRouteEndpoint(startFirst.draft, null, 'destination', finish),
+    ).toEqual(completed);
+  });
+
+  it('replaces each endpoint without moving the other endpoint or intermediate stops', () => {
+    const draft = {
+      ...createRouteDraft('draft'),
+      waypoints: [
+        waypoint('start', 55.95),
+        waypoint('via', 55.96),
+        waypoint('finish', 55.97),
+      ],
+    };
+    const replacement = waypoint('replacement', 55.98);
+    expect(
+      selectRouteEndpoint(
+        draft,
+        null,
+        'start',
+        replacement,
+      ).draft.waypoints.map(({ id }) => id),
+    ).toEqual(['replacement', 'via', 'finish']);
+    expect(
+      selectRouteEndpoint(
+        draft,
+        null,
+        'destination',
+        replacement,
+      ).draft.waypoints.map(({ id }) => id),
+    ).toEqual(['start', 'via', 'replacement']);
+    expect(draft.waypoints.map(({ id }) => id)).toEqual([
+      'start',
+      'via',
+      'finish',
+    ]);
+  });
+
   it('adds, updates, removes, and reorders stops immutably', () => {
     const start = waypoint('start', 55.95);
     const via = waypoint('via', 55.96);

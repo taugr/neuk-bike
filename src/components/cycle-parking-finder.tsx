@@ -249,6 +249,7 @@ import {
   moveRouteWaypoint,
   removeRouteWaypoint,
   setRouteDestination,
+  selectRouteEndpoint,
   swapRouteEndpoints,
   type RouteDraft,
 } from '@/lib/route-draft';
@@ -1053,6 +1054,12 @@ export default function CycleParkingFinder() {
   const [journeySearchTarget, setJourneySearchTarget] = useState<
     'start' | 'destination'
   >('destination');
+  const [routeEndpointMapTarget, setRouteEndpointMapTarget] = useState<
+    'start' | 'destination' | null
+  >(null);
+  const [routeEndpointMapError, setRouteEndpointMapError] = useState<
+    string | null
+  >(null);
   const [pendingJourneyDestination, setPendingJourneyDestination] =
     useState<CycleRouteWaypoint | null>(null);
   const [routePlannerRoutes, setRoutePlannerRoutes] =
@@ -2621,7 +2628,7 @@ export default function CycleParkingFinder() {
     routeDraft !== null &&
     routeDestinationSearch.isOpen;
   const isRouteWaypointPlacementActive =
-    routeWaypointPlacementSnapshot !== null;
+    routeWaypointPlacementSnapshot !== null || routeEndpointMapTarget !== null;
   const routePlacementStartWaypointCount =
     routeWaypointPlacementSnapshot?.draft.waypoints.length ?? 0;
   const routePlacementHasChanges = Boolean(
@@ -2763,12 +2770,14 @@ export default function CycleParkingFinder() {
     isParkingDetailsMode || isSavedListMode || isRouteWaypointPlacementActive;
   const activeMobileSheetExpandedViewportRatio = isParkingDetailsMode
     ? mobileDetailsSheetExpandedViewportRatio
-    : routeWorkspaceView === 'planner' &&
-        !journeyEditing &&
-        !isRouteDestinationSearchMode &&
-        routePlannerStatus === 'loaded'
-      ? 0.58
-      : mobileSheetExpandedViewportRatio;
+    : isRouteDestinationSearchMode
+      ? 0.66
+      : routeWorkspaceView === 'planner' &&
+          !journeyEditing &&
+          !isRouteDestinationSearchMode &&
+          routePlannerStatus === 'loaded'
+        ? 0.58
+        : mobileSheetExpandedViewportRatio;
   const activeMobileSheetExpandedHeight =
     isContentSizedMobileSheet && mobileContentSheetExpandedHeightPx !== null
       ? `${mobileContentSheetExpandedHeightPx}px`
@@ -2981,7 +2990,11 @@ export default function CycleParkingFinder() {
 
     const controlPane = controlPaneRef.current;
     const contentBody = isRouteWorkspace
-      ? controlPane?.querySelector<HTMLElement>('.route-workspace-view')
+      ? controlPane?.querySelector<HTMLElement>(
+          isRouteWaypointPlacementActive
+            ? '.route-map-editor'
+            : '.route-workspace-view',
+        )
       : isParkingFiltersMode
         ? controlPane?.querySelector<HTMLElement>('.parking-filter-panel-body')
         : isParkingDetailsMode
@@ -4240,23 +4253,48 @@ export default function CycleParkingFinder() {
       ...result.location,
       source: 'search',
     };
-    if (journeySearchTarget === 'start') {
-      const waypoints = [waypoint, ...routeDraft.waypoints.slice(1)];
-      if (pendingJourneyDestination) waypoints.push(pendingJourneyDestination);
-      setPendingJourneyDestination(null);
-      commitRouteDraft({ ...routeDraft, waypoints });
-      setRouteDestinationSearch(initialRouteDestinationSearchState);
-    } else if (routeDraft.waypoints.length === 0) {
-      setPendingJourneyDestination(waypoint);
+    commitJourneyEndpoint(journeySearchTarget, waypoint);
+  }
+
+  function commitJourneyEndpoint(
+    target: 'start' | 'destination',
+    waypoint: CycleRouteWaypoint,
+  ) {
+    if (!routeDraft) return;
+    const selection = selectRouteEndpoint(
+      routeDraft,
+      pendingJourneyDestination,
+      target,
+      waypoint,
+    );
+    setPendingJourneyDestination(selection.pendingDestination);
+    commitRouteDraft(selection.draft);
+    setRouteEndpointMapTarget(null);
+    if (selection.pendingDestination) {
       setJourneySearchTarget('start');
       setRouteDestinationSearch({
         ...initialRouteDestinationSearchState,
         isOpen: true,
       });
     } else {
-      commitRouteDraft(setRouteDestination(routeDraft, waypoint));
       setRouteDestinationSearch(initialRouteDestinationSearchState);
     }
+    setMobileSheetState('expanded');
+  }
+
+  function beginRouteEndpointPlacement() {
+    cancelRouteDestinationSearchWork();
+    stopLiveRouteTracking();
+    setRouteEndpointMapTarget(journeySearchTarget);
+    setRouteEndpointMapError(null);
+    setRouteDestinationSearch(initialRouteDestinationSearchState);
+    setMobileSheetState('expanded');
+  }
+
+  function cancelRouteEndpointPlacement() {
+    const target = routeEndpointMapTarget;
+    setRouteEndpointMapTarget(null);
+    if (target) openRouteDestinationSearch(target);
   }
 
   function selectParkingPoint(id: string) {
@@ -4528,6 +4566,7 @@ export default function CycleParkingFinder() {
     setRouteLibraryReturnView(null);
     setSelectedSavedRoute(null);
     setRouteWaypointPlacementSnapshot(null);
+    setRouteEndpointMapTarget(null);
     setRouteWorkspaceView('planner');
     setMobileSheetState('expanded');
     if (routeDraft) {
@@ -4576,6 +4615,7 @@ export default function CycleParkingFinder() {
     setSavedRoutesMessage(null);
     setRouteDestinationSearch(initialRouteDestinationSearchState);
     setRouteWaypointPlacementSnapshot(null);
+    setRouteEndpointMapTarget(null);
     setRouteWorkspaceView('library');
     setMobileSheetState('expanded');
     void refreshSavedRoutes();
@@ -4604,6 +4644,7 @@ export default function CycleParkingFinder() {
     setDestinationParkingState(null);
     setRouteDestinationSearch(initialRouteDestinationSearchState);
     setRouteWaypointPlacementSnapshot(null);
+    setRouteEndpointMapTarget(null);
     setSelectedSavedRoute(null);
     setPendingGpxImport(null);
   }
@@ -4623,6 +4664,8 @@ export default function CycleParkingFinder() {
       window.clearTimeout(routePlannerCalculationTimeout.current);
       routePlannerCalculationTimeout.current = null;
     }
+    setRouteEndpointMapTarget(null);
+    setJourneyEditing(false);
     beginAnalyticsJourney('menu');
     setRouteDraft(createRouteDraft(createLocalId()));
     setPendingJourneyDestination(null);
@@ -4693,12 +4736,7 @@ export default function CycleParkingFinder() {
           ...location,
           source: 'current-location',
         };
-        const waypoints = [start, ...routeDraft.waypoints.slice(1)];
-        if (pendingJourneyDestination)
-          waypoints.push(pendingJourneyDestination);
-        setPendingJourneyDestination(null);
-        commitRouteDraft({ ...routeDraft, waypoints });
-        setRouteDestinationSearch(initialRouteDestinationSearchState);
+        commitJourneyEndpoint('start', start);
       },
       (error) => {
         if (requestId !== routeDestinationSearchRequestId.current) return;
@@ -4742,6 +4780,7 @@ export default function CycleParkingFinder() {
     );
     setJourneyEditing(false);
     setRouteWaypointPlacementSnapshot(null);
+    setRouteEndpointMapTarget(null);
     setRouteWorkspaceView('planner');
     setMobileSheetState('expanded');
     setDestinationParkingState(null);
@@ -5145,6 +5184,27 @@ export default function CycleParkingFinder() {
   }
 
   function placeRouteWaypoint(location: UserLocation) {
+    if (routeDraft && routeEndpointMapTarget) {
+      const manifest = parkingDataClient.current?.getManifest();
+      if (manifest && !isLocationInParkingCoverage(location, manifest)) {
+        setRouteEndpointMapError(t('routeOutsideCoverage'));
+        return;
+      }
+      captureJourneyEvent(
+        routeEndpointMapTarget === 'start'
+          ? 'route_start_selected'
+          : 'route_destination_selected',
+        { source: 'map' },
+      );
+      commitJourneyEndpoint(routeEndpointMapTarget, {
+        id: createLocalId(),
+        label: `${t('mapPoint')} (${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)})`,
+        ...location,
+        source: 'map',
+      });
+      return;
+    }
+
     if (
       !routeDraft ||
       !isRouteWaypointPlacementActive ||
@@ -5224,6 +5284,7 @@ export default function CycleParkingFinder() {
     setRoutePlannerStatus(snapshot.status);
     setRoutePlannerMessage(snapshot.message);
     setRouteWaypointPlacementSnapshot(null);
+    setRouteEndpointMapTarget(null);
 
     if (snapshot.status === 'loading') {
       void calculateRouteDraft(snapshot.draft);
@@ -5239,6 +5300,7 @@ export default function CycleParkingFinder() {
     const hasChanges =
       routeDraft.waypoints.length !== snapshot.draft.waypoints.length;
     setRouteWaypointPlacementSnapshot(null);
+    setRouteEndpointMapTarget(null);
 
     if (hasChanges) {
       return;
@@ -5317,6 +5379,7 @@ export default function CycleParkingFinder() {
     beginAnalyticsJourney('library', true);
     setRouteLibraryReturnView(null);
     setRouteWaypointPlacementSnapshot(null);
+    setRouteEndpointMapTarget(null);
     setRouteDraft({
       id: record.id,
       name: record.name,
@@ -6166,6 +6229,11 @@ export default function CycleParkingFinder() {
             savedPointKeys={[...savedKeys]}
             route={displayedRoute}
             routeWaypoints={routeWorkspaceWaypoints}
+            pendingRouteDestination={
+              routeWorkspaceView === 'planner'
+                ? pendingJourneyDestination
+                : null
+            }
             activeRouteWaypointId={activeRouteWaypointId}
             isRouteWaypointPlacementActive={
               isRouteWorkspace && isRouteWaypointPlacementActive
@@ -6484,6 +6552,7 @@ export default function CycleParkingFinder() {
                   >
                     <RouteDestinationSearch
                       onUseLocation={useJourneyLocation}
+                      onChooseOnMap={beginRouteEndpointPlacement}
                       target={journeySearchTarget}
                       startLabel={routeDraft?.waypoints[0]?.label ?? null}
                       destinationLabel={
@@ -6542,7 +6611,43 @@ export default function CycleParkingFinder() {
                     className="route-workspace-view"
                     variants={panelMotionVariants}
                   >
-                    {!journeyEditing && !isRouteWaypointPlacementActive ? (
+                    {routeEndpointMapTarget ? (
+                      <section
+                        className="route-map-editor"
+                        data-testid="route-endpoint-map-picker"
+                        aria-label={t(
+                          routeEndpointMapTarget === 'start'
+                            ? 'chooseStart'
+                            : 'chooseDestination',
+                        )}
+                      >
+                        <header className="route-map-editor-header">
+                          <strong>
+                            {t(
+                              routeEndpointMapTarget === 'start'
+                                ? 'chooseStart'
+                                : 'chooseDestination',
+                            )}
+                          </strong>
+                          <button
+                            type="button"
+                            onClick={cancelRouteEndpointPlacement}
+                          >
+                            {t('cancel')}
+                          </button>
+                        </header>
+                        <p className="route-map-editor-help" role="status">
+                          {t(
+                            routeEndpointMapTarget === 'start'
+                              ? 'tapMapForStart'
+                              : 'tapMapForDestination',
+                          )}
+                        </p>
+                        {routeEndpointMapError ? (
+                          <p role="status">{routeEndpointMapError}</p>
+                        ) : null}
+                      </section>
+                    ) : !journeyEditing && !isRouteWaypointPlacementActive ? (
                       <RouteJourney
                         draft={routeDraft}
                         pendingDestination={pendingJourneyDestination}
@@ -6593,6 +6698,7 @@ export default function CycleParkingFinder() {
                         routes={routePlannerRoutes}
                         status={routePlannerStatus}
                         onAddWaypoint={addWaypointToRouteDraft}
+                        onEditEndpoint={openRouteDestinationSearch}
                         onBack={() => setJourneyEditing(false)}
                         onCancelMapPlacement={cancelRouteWaypointPlacement}
                         onDoneMapPlacement={finishRouteWaypointPlacement}
