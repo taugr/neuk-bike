@@ -30,10 +30,20 @@
       matchUpdateTypes: ['pin'],
     },
     {
-      description: 'Group routine non-major package, pnpm, and GitHub Actions updates',
+      description: 'Group routine non-major package and GitHub Actions updates',
       matchUpdateTypes: ['minor', 'patch', 'digest'],
       groupName: 'weekly non-major dependencies',
       groupSlug: 'weekly-non-major',
+    },
+    {
+      // Corepack installs during a packageManager update. Keep application
+      // dependency specs unchanged so its frozen-lockfile install can succeed.
+      description: 'Update pnpm separately from application dependencies',
+      matchManagers: ['npm'],
+      matchDepTypes: ['packageManager'],
+      matchPackageNames: ['pnpm'],
+      groupName: null,
+      groupSlug: null,
     },
     {
       description: 'Create major update PRs only after dashboard approval',

@@ -40,6 +40,14 @@ SDK payloads through ordinary UI journeys. It does not send events to the
 production project. Helper tests cover duplicate callbacks, cancellation,
 location error classification and bounded properties.
 
+Parking sharing has two successful outcomes: `parking_link_shared` means the
+native share API completed, while `parking_link_copied` means a link was copied.
+Count both; an unobserved native-share event alone is not an instrumentation
+failure. Cancellation and failed operations must not count as successful shares.
+Saved routes emit `route_saved` only after local persistence succeeds; route
+sharing records `route_link_shared.method=copied|shared` and GPX sharing records
+`route_gpx_shared.method=downloaded|shared`.
+
 ## Weekly report contract
 
 Use a half-open seven-day window ending Friday 17:00 Asia/Yerevan (13:00 UTC),
@@ -53,3 +61,9 @@ the original report were event totals, not a measured 25% conversion rate.
 
 Keep recommendations proportionate to the small sample. The existing recurring
 ChatGPT report is not changed by this repository contract.
+Separate production QA evidence from ordinary usage totals: controlled test
+events are intentionally excluded from the dashboard. Cite the date and scope
+of the last verified journey rather than treating zero organic events as a
+failed or untested feature. Distinguish mocked native-share API tests from a
+real device share-sheet check. Verify the latest maintenance run before calling
+a scheduled check missing; the 25 September check started late and passed.

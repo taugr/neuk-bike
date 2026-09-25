@@ -255,3 +255,119 @@ test('separates manual permission denial from automatic startup', async ({
       .outcome,
   ).toBe('denied');
 });
+
+for (const outcome of ['shared', 'copied', 'cancelled', 'failed'] as const) {
+  test(`parking sharing records only successful ${outcome} outcomes`, async ({
+    page,
+  }) => {
+    const events = await recordEvents(page);
+    await page.addInitScript((result) => {
+      Object.defineProperty(navigator, 'share', {
+        configurable: true,
+        value:
+          result === 'copied' || result === 'failed'
+            ? undefined
+            : async () => {
+                if (result === 'cancelled')
+                  throw new DOMException('Cancelled', 'AbortError');
+              },
+      });
+      Object.defineProperty(document, 'execCommand', {
+        configurable: true,
+        value: () => result === 'copied',
+      });
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: {
+          writeText: async () => {
+            throw new Error('Unavailable');
+          },
+        },
+      });
+    }, outcome);
+    await page.goto('/?analyticsTest=1&parking=1');
+    const share = page
+      .getByRole('button', { name: /^Share Gylemuir Road/ })
+      .first();
+    await share.click();
+    // Flush the same SDK batch via a subsequent UI event before testing absence.
+    await page
+      .getByRole('button', { name: 'Plan a route', exact: true })
+      .click();
+    await expect
+      .poll(
+        () => events.some(({ event }) => event === 'route_planner_opened'),
+        { timeout: 15_000 },
+      )
+      .toBe(true);
+    const shares = events.filter(
+      ({ event }) =>
+        event === 'parking_link_shared' || event === 'parking_link_copied',
+    );
+    if (outcome === 'shared' || outcome === 'copied') {
+      expect(shares).toHaveLength(1);
+      expect(shares[0]!.event).toBe(`parking_link_${outcome}`);
+      expect(shares[0]!.properties).toMatchObject({
+        is_test: true,
+        analytics_schema_version: 2,
+      });
+      expect(JSON.stringify(shares[0]!.properties)).not.toMatch(
+        /Gylemuir|parking=|55\.940/,
+      );
+    } else {
+      expect(shares).toHaveLength(0);
+    }
+  });
+}
+
+test('saving and sharing a route records completed outcomes without private route data', async ({
+  page,
+}) => {
+  const events = await recordEvents(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: undefined,
+    });
+  });
+  await page.goto('/?analyticsTest=1&mockGps=55.9533,-3.1883,5');
+  await page.getByRole('button', { name: 'Plan a route', exact: true }).click();
+  await page
+    .getByRole('combobox', { name: 'Search destination' })
+    .fill('Private');
+  await page.getByRole('option').click();
+  await page.getByRole('button', { name: 'Save route', exact: true }).click();
+  const detail = page.locator('.saved-route-detail');
+  await expect(detail).toBeVisible();
+  await detail
+    .getByRole('button', { name: 'Share route', exact: true })
+    .click();
+  await detail.getByRole('button', { name: /Share route link/ }).click();
+  await detail.getByRole('button', { name: /Share GPX file/ }).click();
+  await expect
+    .poll(
+      () =>
+        events.filter(({ event }) =>
+          ['route_saved', 'route_link_shared', 'route_gpx_shared'].includes(
+            event,
+          ),
+        ).length,
+      { timeout: 15_000 },
+    )
+    .toBe(3);
+  const saved = events.find(({ event }) => event === 'route_saved')!;
+  const linked = events.find(({ event }) => event === 'route_link_shared')!;
+  const gpx = events.find(({ event }) => event === 'route_gpx_shared')!;
+  expect(linked.properties.method).toBe('copied');
+  expect(gpx.properties.method).toBe('downloaded');
+  expect(linked.properties.journey_id).toBe(saved.properties.journey_id);
+  for (const event of [saved, linked, gpx]) {
+    expect(event.properties).toMatchObject({
+      is_test: true,
+      analytics_schema_version: 2,
+    });
+    expect(JSON.stringify(event.properties)).not.toMatch(
+      /Private test destination|mockGps=|55\.9533|route=/,
+    );
+  }
+});

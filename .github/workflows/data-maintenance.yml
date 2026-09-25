@@ -2,8 +2,9 @@ name: Data maintenance
 
 on:
   schedule:
-    - cron: '0 8 * * 5'
-    - cron: '0 2 1 * *'
+    # Avoid the busy start of the hour; GitHub schedules are best-effort.
+    - cron: '23 6 * * 5'
+    - cron: '23 2 1 * *'
   workflow_dispatch:
     inputs:
       refresh:
@@ -31,12 +32,24 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Build monthly or requested release
-        if: github.event.schedule == '0 2 1 * *' || inputs.refresh == true
+        if: github.event.schedule == '23 2 1 * *' || inputs.refresh == true
         run: pnpm refresh:data
       - name: Review source age and upstream publications
         run: pnpm check:data --upstream
+      - name: Summarize source check
+        if: always()
+        run: |
+          if [ -f .cache/source-status.json ]; then
+            {
+              echo '## Source freshness check'
+              echo 'New upstream publications require review; this workflow does not deploy.'
+              echo '```json'
+              cat .cache/source-status.json
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Package the reviewed changes
-        if: github.event.schedule == '0 2 1 * *' || inputs.refresh == true
+        if: github.event.schedule == '23 2 1 * *' || inputs.refresh == true
         run: |
           mkdir -p .cache/review
           git add --intent-to-add public/data src/data

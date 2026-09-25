@@ -32,7 +32,10 @@ are separate in `public/data/freshness.json`; cached files are accepted as
 retrieval evidence only when their hash matches the report.
 
 The **Data maintenance** GitHub workflow runs metadata checks every Friday at
-08:00 UTC and a complete refresh on the first of each month at 02:00 UTC.
+06:23 UTC and a complete refresh on the first of each month at 02:23 UTC.
+The earlier Friday check leaves more time before the weekly report. GitHub
+schedules are best-effort and may be delayed; check the actual run before
+reporting a missed check. Each run includes its source report in the job summary.
 Manual dispatch can request either. It has read-only repository permissions
 and never deploys. Refresh runs upload a binary Git patch, release archive,
 and status report retained for 30 days. A failed check leaves diagnostic

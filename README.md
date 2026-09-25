@@ -300,6 +300,9 @@ The attribution panel shows underlying source dates;
 `public/data/freshness.json` records per-input dates, hashes and retrieval times.
 See [data maintenance](docs/data-maintenance.md) for scheduled review artifacts,
 refresh recovery and validation.
+The weekly source check runs Friday at 06:23 UTC; GitHub may delay scheduled
+runs. See the [25 September review](docs/weekly-review-action-plan-2026-09-25.md)
+for maintenance changes, analytics verification and the next-sprint recommendation.
 
 The cycling-place release keeps bicycle shops, repair facilities, hire
 locations, and drinking-water points in a separate lazy-loaded release under
