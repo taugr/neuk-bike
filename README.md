@@ -318,15 +318,15 @@ below.
 FeatureServer, validates its schema and record count, normalizes route
 classification, status, surface, ride quality, and lighting, then atomically
 replaces
-`public/data/cycle-network/`. The generated release contains 37,206 segments in
-423 zoom-10 chunks. Its largest asset is about 450 KiB and the measured maximum
-compressed 3×3 payload is about 559 KiB. Run `pnpm verify:network` after a
+`public/data/cycle-network/`. The generated release contains 37,207 segments in
+423 zoom-10 chunks. Its largest asset is about 448 KiB and the measured maximum
+compressed 3×3 payload is about 557 KiB. Run `pnpm verify:network` after a
 refresh and treat `src/data/cycle-network-report.json` as the current snapshot
 report. Do not hand-edit these generated files.
 
-The current cycling-place release contains 67,948 unique OpenStreetMap places
-in 8,354 chunks: 4,128 shops, 2,649 repair locations, 8,044 hire locations,
-and 54,645 drinking-water points. Its 8,356 generated files contain about 15.7
+The current cycling-place release contains 68,229 unique OpenStreetMap places
+in 8,395 chunks: 4,131 shops, 2,667 repair locations, 8,059 hire locations,
+and 54,897 drinking-water points. Its 8,397 generated files contain about 15.8
 MiB of JSON; the largest possible initial 3×3 chunk payload is about 79 KiB
 compressed. The category totals overlap because one place can explicitly
 support more than one service.
@@ -361,10 +361,10 @@ field completeness, naming-tier counts and samples, discarded features,
 cross-region duplicate IDs, council/OSM matches, peak memory, and output-size
 budgets.
 
-The current generated release contains 88,681 merged parking points in 4,417
-chunks. It includes 1,454 council points and 88,623 unique OSM records, with 221
+The current generated release contains 88,879 merged parking points in 4,426
+chunks. It includes 1,454 council points and 88,821 unique OSM records, with 221
 cross-region OSM duplicates removed and 1,396 likely Edinburgh duplicates
-suppressed in favour of council records. The parking release is about 27.1 MiB;
+suppressed in favour of council records. The parking release is about 27.2 MiB;
 the largest possible initial 3×3 payload is about 484 KiB compressed. Treat
 these as a snapshot: `public/data/parking/manifest.json` and
 `src/data/cycle-parking-report.json` are the source of truth after a refresh.

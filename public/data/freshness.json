@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T16:12:43.725Z",
+  "generatedAt": "2026-09-25T14:01:15.692Z",
   "osmInputsMatch": true,
   "council": {
     "sourceUrl": "https://services-eu1.arcgis.com/FgpikkYuSUOuITxp/arcgis/rest/services/Public_Bike_Parking/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson",
-    "retrievedAt": "2026-09-11T15:25:14.638Z",
+    "retrievedAt": "2026-09-25T13:15:11.527Z",
     "sourceTimestamp": null,
     "note": "Council feed retrieval date; underlying edit date is not supplied by the snapshot."
   },
@@ -12,10 +12,10 @@
     {
       "id": "parking",
       "label": "Cycle parking",
-      "releaseId": "sha256-34f6dbb707181eef5a9d54d432d0daeeb3249fba238b2bc8e7481e36bb07c7de",
-      "refreshedAt": "2026-09-11T15:25:14.638Z",
-      "oldestSourceAt": "2026-09-10T20:21:06.000Z",
-      "newestSourceAt": "2026-09-10T20:21:06.000Z",
+      "releaseId": "sha256-3f55b2725d9043512e70190f2769570d9ae2253b03df432d9d82a30c038f8bbd",
+      "refreshedAt": "2026-09-25T13:15:11.527Z",
+      "oldestSourceAt": "2026-09-24T20:21:20.000Z",
+      "newestSourceAt": "2026-09-24T20:21:20.000Z",
       "inputCount": 70,
       "expectedInputCount": 70,
       "missingInputs": [],
@@ -26,502 +26,502 @@
         {
           "id": "scotland",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b9a043a0faca4160d0277388524206cf237513643e256e3589c03ff95993189c",
-          "retrievedAt": "2026-09-11T15:26:09.268Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d30db3a64baa8de504ece95b22552763662699e28d1404290eefc9d9c2ef044e",
+          "retrievedAt": "2026-09-25T13:15:47.091Z"
         },
         {
           "id": "bedfordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b587e2d496be54cdd816c9dcafebe2896625fefa7beee664cd33bc7234588e1e",
-          "retrievedAt": "2026-09-11T15:28:26.465Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "9151401df6299e3db751819c674791f6a312d6ff3d2bbe3e101dc558e5a68bc4",
+          "retrievedAt": "2026-09-25T13:18:09.204Z"
         },
         {
           "id": "berkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "75c792d850207f34beed39d11519d77ec7a53bb5f2a8ff803893e7444bf625f1",
-          "retrievedAt": "2026-09-11T15:28:34.766Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1464c48b37e28b3103e34cad5fd69018979471eac12fd75bd0ac3111b99baff3",
+          "retrievedAt": "2026-09-25T13:18:15.348Z"
         },
         {
           "id": "bristol",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "e84f59a620c3c1a068791edf79c351f010e630abe25e9e8c4c135849959722bb",
-          "retrievedAt": "2026-09-11T15:28:42.654Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c98c6a7af394bc83215d72a0aaa7141d5866225008bf768203fc1bf38e89ce22",
+          "retrievedAt": "2026-09-25T13:18:24.057Z"
         },
         {
           "id": "buckinghamshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "efc3c1ddcf775b734570af5fb1f45b13d1af20eff81aea5f2f66a08faa07a384",
-          "retrievedAt": "2026-09-11T15:28:51.141Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "f9ee2970927040964a1aa70d92c883c0e412ca3a7353268c6d3408305d1504a4",
+          "retrievedAt": "2026-09-25T13:18:32.821Z"
         },
         {
           "id": "cambridgeshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "5133a677934ecfb959e1c6b06ccdf7c9f337d423e6d301db170a62f0447a9898",
-          "retrievedAt": "2026-09-11T15:28:59.532Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6c599c2310751575b703eafa6a6adc9f078d7fcb89fdcd64a5c17d837ecb4cd8",
+          "retrievedAt": "2026-09-25T13:18:41.106Z"
         },
         {
           "id": "cheshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b027517d669fa2b805a936aee5238c524b4ae73daa397657b2df85cb9220b7cd",
-          "retrievedAt": "2026-09-11T15:29:13.603Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1ee3dabbbb1c54ac3d533ecd3b6142a3152d01353a2d535ee0164fa274a341b0",
+          "retrievedAt": "2026-09-25T13:18:55.795Z"
         },
         {
           "id": "cornwall",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "fa12e9dedd2b1c96bfd02362e2d6b486074f624182df73f876ba2ebe39b2fd17",
-          "retrievedAt": "2026-09-11T15:29:27.276Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c05b4233a4343a04eeded8b25c1747a0e2191ca52270f49e41893ecbe7095975",
+          "retrievedAt": "2026-09-25T13:19:11.191Z"
         },
         {
           "id": "cumbria",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bfa3e1c8dd61931e93f65c74428c89f9bcc3be270a16a4de5897f24bfb1eba82",
-          "retrievedAt": "2026-09-11T15:29:39.629Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "ef6cefa01be47750c8f420fdfde32d66a21b1908ad3713bb676cb07105b650ee",
+          "retrievedAt": "2026-09-25T13:19:25.458Z"
         },
         {
           "id": "derbyshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "0600d544b314248bac52493ccd8d70de6e52230c74ebaf564bd9f6f9649ac8de",
-          "retrievedAt": "2026-09-11T15:29:55.949Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b1594f28093b5d547c1da983620d749d90d71ffb04ff83e8c79930ddc49be7da",
+          "retrievedAt": "2026-09-25T13:19:42.207Z"
         },
         {
           "id": "devon",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "909569679b73a6af1a1f63cfc1c48d281b0184a898e711845a030b6e8c7ccb5b",
-          "retrievedAt": "2026-09-11T15:30:11.039Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6a45e9072110733d00b624a0ad3c558d2e571c404813543773d7377c32b943c2",
+          "retrievedAt": "2026-09-25T13:19:58.218Z"
         },
         {
           "id": "dorset",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "fa39fb4d5cf0cb2465144134da711e4a5bc90cae11a04b4340c968afb022f070",
-          "retrievedAt": "2026-09-11T15:30:30.822Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "5b3353bd855f0eebe8ceb2d8c50a6fa7d1c60368a98630deb4ad02e6068c3aa8",
+          "retrievedAt": "2026-09-25T13:20:19.998Z"
         },
         {
           "id": "durham",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "e85f220eba7693ccb0c673044c43946eba588d97085a58973fbd435e4920eb19",
-          "retrievedAt": "2026-09-11T15:30:41.407Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "00fd39861b44a832706579a8283ba18dd3ce29b433dd27210cb34e7d0fe79453",
+          "retrievedAt": "2026-09-25T13:20:31.681Z"
         },
         {
           "id": "east-sussex",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "093fb4dbd96b2aa53a03936162c9a15fbda5a6dc91d3a0df3b3f7f1dcccd2d76",
-          "retrievedAt": "2026-09-11T15:30:49.234Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d819df9fe4d35daf3342934f60b94baa01b5133583cebf38a8704830f9d10118",
+          "retrievedAt": "2026-09-25T13:20:40.046Z"
         },
         {
           "id": "east-yorkshire-with-hull",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bc55c2621ff5a3801a4bcc7dd19fea7c881c1521a3db278d993087b42d4741ff",
-          "retrievedAt": "2026-09-11T15:30:56.634Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "e097cd085ddcc223fdd2c14bc2e39cfa0b364bd9884aa67b18e0c0b1ce861c8c",
+          "retrievedAt": "2026-09-25T13:20:47.799Z"
         },
         {
           "id": "essex",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "9772dc685f620ef5f3672d908158d6b494326f1817c408d57637b9f28067a053",
-          "retrievedAt": "2026-09-11T15:31:04.652Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6751cdf7bff704230225eccf7949cd3e4ce7644607319fd9fae10e242e102931",
+          "retrievedAt": "2026-09-25T13:20:56.238Z"
         },
         {
           "id": "gloucestershire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "935e3245fddee4340c19e7cd6607a4275dad4ee369190b31a57db87da31d4b31",
-          "retrievedAt": "2026-09-11T15:31:20.629Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "dbf10f18f83543e41c3904743b72b624d9e111df9c8145ecebe827a1d4d4cadd",
+          "retrievedAt": "2026-09-25T13:21:13.797Z"
         },
         {
           "id": "greater-london",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "a5a7e5702cd209dab422f45f5de290695b713cfe4ca9b9bbc00ef63f08ad71a1",
-          "retrievedAt": "2026-09-11T15:31:39.209Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "7ec6bfc796775320eeccc617bcdf6eb8870c4cad091a743c91ec4ed49f121096",
+          "retrievedAt": "2026-09-25T13:21:37.801Z"
         },
         {
           "id": "greater-manchester",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "cb6e89e910e9f81b8ebde80446504b487dbdd1bcb7a14e8b7e50d1f655151ff5",
-          "retrievedAt": "2026-09-11T15:33:32.458Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "3dbac8ef082feec2c8185ce0b453d872ce0221806db83f521cbef1d3e2204648",
+          "retrievedAt": "2026-09-25T13:23:23.676Z"
         },
         {
           "id": "hampshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "1040cd7bb39eb7bd953d04e3e884188f770fec77228c73aa6f2e2bd5e5d70d79",
-          "retrievedAt": "2026-09-11T15:33:52.126Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1a5bf8e0431815ee905f01763e5f054a1a47e9304e8e98dc553d6d614c11db0e",
+          "retrievedAt": "2026-09-25T13:23:46.502Z"
         },
         {
           "id": "herefordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "63bd22fa774a3ef78ed814ad87e52e2890048c244459f0f14ec63d71620d4283",
-          "retrievedAt": "2026-09-11T15:34:12.909Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0b9d3e730b570b17ac6665ea5ebdb1c20534c36a46a9cfa4f9245206d8fb98df",
+          "retrievedAt": "2026-09-25T13:24:08.479Z"
         },
         {
           "id": "hertfordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "7fd8c5d69eebfd2febd0921f69689c0c133d26cc0b97a5fb8f26e40d4bc66064",
-          "retrievedAt": "2026-09-11T15:34:17.992Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "45252c230e51270c519e7b18dfd9b1bb77b609670bfa3886fcb2f5873e103697",
+          "retrievedAt": "2026-09-25T13:24:14.296Z"
         },
         {
           "id": "isle-of-wight",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "9e80d038d9b427976cb58ddd789a4083a2170269f7f8071cbb2a1a7690e57215",
-          "retrievedAt": "2026-09-11T15:34:30.730Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b283de41b2d28889e3c26e699288a745c055a031ffb7778d153748feafb676b4",
+          "retrievedAt": "2026-09-25T13:24:27.551Z"
         },
         {
           "id": "kent",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "74d4feae4373c6031a24c11e1e56ae380c4ea8ceead7ddb09028582d181090f0",
-          "retrievedAt": "2026-09-11T15:34:35.408Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1943c25cb4a8a358e2d11d7e65199248b06cdc77c98bce2fe9f78917ca37f8c9",
+          "retrievedAt": "2026-09-25T13:24:32.788Z"
         },
         {
           "id": "lancashire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "fb1fa44592d834f1adf95d07d018639ee6cffb861d68de813790d18f349e6dfb",
-          "retrievedAt": "2026-09-11T15:34:53.758Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "41cb083d6da35982c493f15592a8c8f8d15e3fe0226c7d5125a32a6375dd4f30",
+          "retrievedAt": "2026-09-25T13:24:51.873Z"
         },
         {
           "id": "leicestershire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "4628ff9ebc48708f40337725fe6398e6cd22c1ba50777bc4e84c19bf42b6d554",
-          "retrievedAt": "2026-09-11T15:35:07.144Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "225b8a630a35b89f8fe210da9b2bb47ea09e840457dd6bba60499768c1249659",
+          "retrievedAt": "2026-09-25T13:25:06.315Z"
         },
         {
           "id": "lincolnshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "dfa21ef3978b2f6d236a1460f902f98013104ac79022019fd9fe04e9c4f53063",
-          "retrievedAt": "2026-09-11T15:35:17.839Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "135fee4cd38b8c69c30ba77d74bda0f2a92bb31799291bb88eace98007a6af5d",
+          "retrievedAt": "2026-09-25T13:25:15.361Z"
         },
         {
           "id": "merseyside",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "322e4e5ea16a4eb920be27628f9d368c65eac3ba359d5aec441b5da04556d30c",
-          "retrievedAt": "2026-09-11T15:35:31.576Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d97d441a6458400dc810195549b048d98decf72c614e76f12540c311e0759eae",
+          "retrievedAt": "2026-09-25T13:25:29.602Z"
         },
         {
           "id": "norfolk",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "84a94fae3d0de003736d111e3d40727fc479a06fc786af36feb60f84d08e1b8b",
-          "retrievedAt": "2026-09-11T15:35:43.886Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "acf11355b2843509efc633d9c1b9094814fc7a5a059fd6de37a8ed784a32d531",
+          "retrievedAt": "2026-09-25T13:25:43.185Z"
         },
         {
           "id": "north-yorkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "07e0268185386bc461e4f6ec5e3556777ae70abcf9d1aaf0a9ebb7a55967e04f",
-          "retrievedAt": "2026-09-11T15:36:00.068Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "5e1e04a342c133477e93bf966db2f35d032d59f77339a4e0f0e3635ee75dd295",
+          "retrievedAt": "2026-09-25T13:25:59.873Z"
         },
         {
           "id": "northamptonshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "1679425ebc66ae0f4828359d3976579e06e81075cb84164c73f0008bfabc0034",
-          "retrievedAt": "2026-09-11T15:36:19.867Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0d7e680d8a14fc405432b03f848bac49a7b0e82e29f1fa17768147801fa538bb",
+          "retrievedAt": "2026-09-25T13:26:20.149Z"
         },
         {
           "id": "northumberland",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "207c7418c4d31c8ce8000310ab33879c555d97b42d8815d982caf731c6d2b985",
-          "retrievedAt": "2026-09-11T15:36:29.024Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b65e79e1bb730768397ee87fa301c77826aa20ec6b857af11f1fe0043dbf5a57",
+          "retrievedAt": "2026-09-25T13:26:30.501Z"
         },
         {
           "id": "nottinghamshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b64df05c52a2d97b7ac0a0d5cb91859c1adf82f4530a504df6c5e6877437372a",
-          "retrievedAt": "2026-09-11T15:36:38.275Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "510beb9841b9a05368fb81dc95a9f32dd8494a1d421667b87ff8b60dc984c76d",
+          "retrievedAt": "2026-09-25T13:26:40.201Z"
         },
         {
           "id": "oxfordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "c1bf3c16884864def9f0d2781b1bc908119859c1dbcd0aa7da750954bd9d2bce",
-          "retrievedAt": "2026-09-11T15:36:53.064Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "8e9fde5cbe06927dcd9f18baae2cd893eb36b88b18020c1201e537a43c947422",
+          "retrievedAt": "2026-09-25T13:26:54.712Z"
         },
         {
           "id": "rutland",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2f1adcbfbf9783af2ce27a85d42d9ccc8325ef296f781b80bdda237e9bc3be2f",
-          "retrievedAt": "2026-09-11T15:37:03.234Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c2032e21e8569e6bf3f5a018e10e750c71aa90f3e53e17c4716b48bbf60257b6",
+          "retrievedAt": "2026-09-25T13:27:05.486Z"
         },
         {
           "id": "shropshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "23d3bd8fedb19950c0e750cc61dd4b387ae7159986d79c85cb12af3dc3ba69a2",
-          "retrievedAt": "2026-09-11T15:37:04.781Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1818d8089a905514add56932f6474d9e5675ae19308e30603e06f392fef54e14",
+          "retrievedAt": "2026-09-25T13:27:06.839Z"
         },
         {
           "id": "somerset",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "dd317b3f0074dcd1bf46942be4c30c7df2db58416a2a492fe7f29827b5560ef9",
-          "retrievedAt": "2026-09-11T15:37:14.459Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "f13f616139fce8d0ac6ee74f43973b3ab2504ea185d7ab62728031b0ae18d39f",
+          "retrievedAt": "2026-09-25T13:27:16.827Z"
         },
         {
           "id": "south-yorkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "30ce0b1ed36f74e5d9c0bdd1c2ffdb5d4b13880d1b9a192d1c54aacc60674389",
-          "retrievedAt": "2026-09-11T15:37:31.415Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "ba1f18bb12e339d91c70d5e4408be08810b879b6803c054f071b0627dcc72f69",
+          "retrievedAt": "2026-09-25T13:27:34.611Z"
         },
         {
           "id": "staffordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "678aa88348d16c7f2601f0a2230f1e0f17c5a991c0f185e96856b5d184312bb7",
-          "retrievedAt": "2026-09-11T15:37:42.336Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "2012cbc2e32234dc741e06d536ee074592f7f43979c59c9329244b030d22601d",
+          "retrievedAt": "2026-09-25T13:27:57.532Z"
         },
         {
           "id": "suffolk",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "3da69ed48ad5225c27674eb1ecbfb4aceb2683b1b91f079890ea4a071a02076a",
-          "retrievedAt": "2026-09-11T15:37:52.967Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "99a90d9ff8a4550e740f67a4ae49e8c11266aa7362beddc07809e1f6c715b0fa",
+          "retrievedAt": "2026-09-25T13:28:08.380Z"
         },
         {
           "id": "surrey",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "cedb90a18becfd5d1ea3ae69634d14d1a414b1969c5a2dd1095e32a69336c922",
-          "retrievedAt": "2026-09-11T15:38:04.786Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "661bacb7e1a87d75f412df9c2881fe72dbb4a7de52a48731327d36242638bdd0",
+          "retrievedAt": "2026-09-25T13:28:27.561Z"
         },
         {
           "id": "tyne-and-wear",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "4ea291ea8d70b723d9b217bc2e9eedf5e15ea1ea7a21242cc49a3c11a464e12b",
-          "retrievedAt": "2026-09-11T15:38:18.545Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "29e76c57dc052b2559af7e504607b2c90f2d5f2d39d3226179f86d3b23155e6f",
+          "retrievedAt": "2026-09-25T13:28:41.837Z"
         },
         {
           "id": "warwickshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "c0a462622fb2b66d04d106e41d037c7056b92f71c6e13545da7fd3f598e5241c",
-          "retrievedAt": "2026-09-11T15:38:26.412Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0371d62584cc0166c9db8406016b58ea7773063f2b05ff55c15033a90cf3224d",
+          "retrievedAt": "2026-09-25T13:28:49.583Z"
         },
         {
           "id": "west-midlands",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "ff0bbcdcdc8fadcea90ed9b0845afc3da05385c71fba14024d8469b8edf98d9c",
-          "retrievedAt": "2026-09-11T15:38:37.354Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6b28dcb6a6798a03d95ea4fbb856f0aa25d4e7129e83155cafe6c60d9a31b8e9",
+          "retrievedAt": "2026-09-25T13:29:00.562Z"
         },
         {
           "id": "west-sussex",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "e8d18f93444372397dd2cbfe5fe8483b98d28f225a1c8a16eaeee7187bb5adbf",
-          "retrievedAt": "2026-09-11T15:38:58.533Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "fd4358817028f698c50f29823927fedc7c6d16c706f4613f83b8b5cc0df38016",
+          "retrievedAt": "2026-09-25T13:29:21.918Z"
         },
         {
           "id": "west-yorkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2fd767ff94e2e2bbd198e634695bfd39d2f938378331210d0c5f9022282abbf9",
-          "retrievedAt": "2026-09-11T15:39:17.628Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "3e5c5cd84d8bd5fec6517f25ee58c458bd69a511cdabb574b1554c2cdb658b4b",
+          "retrievedAt": "2026-09-25T13:29:41.828Z"
         },
         {
           "id": "wiltshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "ea762cf4c2ad40f304c710e98cbe761afabc385f3257f123b643f071402cf897",
-          "retrievedAt": "2026-09-11T15:39:38.132Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "7d44e3a0be04d34ca4cf781dd7a17c7c42d14469d12d0c51ece546c3a6b69de8",
+          "retrievedAt": "2026-09-25T13:30:02.785Z"
         },
         {
           "id": "worcestershire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "7240f8829347f70da23f2a0541d0125517cbc2f4d07962965afc158abd603c07",
-          "retrievedAt": "2026-09-11T15:39:57.966Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "02c64fffa5f7c40c5425bdd3a182f5791518fb69916fd963f5c6acb8297df01d",
+          "retrievedAt": "2026-09-25T13:30:15.817Z"
         },
         {
           "id": "wales",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "69f5a6bd38f7f4208b0ffb983c0965a599d2aa52ec5cba2e920a024dcbfe4755",
-          "retrievedAt": "2026-09-11T15:40:12.949Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "eedeb42f2253788d289a4d6b7eb9faec0332c63045208f8204da0ddc7ee7fa01",
+          "retrievedAt": "2026-09-25T13:30:29.783Z"
         },
         {
           "id": "ireland-and-northern-ireland",
           "sourceUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b1bab1e811b560e5fcd589139db8c49c6104da4ba276e24078107ea7f3adad37",
-          "retrievedAt": "2026-09-11T15:45:08.274Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "ac89d91322d2e1301035dee47d97b6a544d9c336a6b19daa4a91b8413b3e52b7",
+          "retrievedAt": "2026-09-25T13:32:58.861Z"
         },
         {
           "id": "spain-andalucia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/andalucia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "8c200e0c029b26699220148daf4d9b2cbef727f6de6945420681d66b622d5e31",
-          "retrievedAt": "2026-09-11T15:47:44.786Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "bd5168ca797d62dc728fdbed68fbb43ba0419325925f434f376397594b82657f",
+          "retrievedAt": "2026-09-25T13:36:35.211Z"
         },
         {
           "id": "spain-aragon",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/aragon-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2c98a83afafcae764206eaa3b7ab0bc783b96fc82f6f1ea5b09e24127e08c8c6",
-          "retrievedAt": "2026-09-11T15:48:52.715Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "cffcf295d8c3a08cf77ce3880053e3eca38d3bad0dedcd990dbe62d9e5165d1c",
+          "retrievedAt": "2026-09-25T13:37:46.533Z"
         },
         {
           "id": "spain-asturias",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/asturias-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b6dab7293e85354110088ae3237b9948724df9040cb8af579c6d4afee19fb649",
-          "retrievedAt": "2026-09-11T15:49:25.369Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "2893706a20b129966f86d8d3215a8371c48921a7ae58f2b9feb7bd085a089ac3",
+          "retrievedAt": "2026-09-25T13:38:19.886Z"
         },
         {
           "id": "spain-cantabria",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/cantabria-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b7e36183cfc0e4f97bb5febffeea76bc2fdee03b91ee05399f8d91efee69c971",
-          "retrievedAt": "2026-09-11T15:49:38.026Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "3f09e79011741e2c3642d48b83513ed259e8ec7db139f96779dcbfa0521d47de",
+          "retrievedAt": "2026-09-25T13:38:34.408Z"
         },
         {
           "id": "spain-castilla-la-mancha",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b4b85472cfd3cf81f7c84cc2dd5a4495c65521c50f02d459b83f13f5a8d0b018",
-          "retrievedAt": "2026-09-11T15:50:27.982Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "acd60542871913141f4121fbcb6c188db682a14e8b4a10cadd013b21d489479a",
+          "retrievedAt": "2026-09-25T13:38:49.889Z"
         },
         {
           "id": "spain-castilla-y-leon",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "4ed0fa3f6d10dbf2c380dcab4297edc127b0a4d374d233a4d7f750d07e4a31d6",
-          "retrievedAt": "2026-09-11T15:51:32.691Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0c88c91efa0e75163097d3879d72614f25fa7720a89d47800e1850097d8cc7f5",
+          "retrievedAt": "2026-09-25T13:39:45.104Z"
         },
         {
           "id": "spain-cataluna",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/cataluna-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2f7d301e7db6f709e5d3ff753d0e6343ca77d4fe990353dfa86fd58cf4bee242",
-          "retrievedAt": "2026-09-11T15:53:59.244Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "225af021a4a5561e009d9c6ec71a2fdbd6826e99c56c648c0bcfa72a428e44e0",
+          "retrievedAt": "2026-09-25T13:41:39.125Z"
         },
         {
           "id": "spain-ceuta",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/ceuta-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b435024cda51930c62148ce0055063c586bf3ad409b84883a924dbbc9bbe1320",
-          "retrievedAt": "2026-09-11T15:56:02.405Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b8f21b38c427fdd1c7c9553155ce1e2ccc0c4597b8cd0764c9eb598326f8a18b",
+          "retrievedAt": "2026-09-25T13:43:49.376Z"
         },
         {
           "id": "spain-extremadura",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/extremadura-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "13624ecd9bce3a359e72c4397cba1b6ebca67e32691bf1b529bb4135501f5860",
-          "retrievedAt": "2026-09-11T15:56:04.284Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "4f9512bfaf7fb2f57bae6e0c88f587be4ce5be2268f81e13269ac96c907eae70",
+          "retrievedAt": "2026-09-25T13:43:51.175Z"
         },
         {
           "id": "spain-galicia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "3e9bbb5eb84215d5c71829957aa24b576ddb00659ef9c969e95c4c21d99ffa86",
-          "retrievedAt": "2026-09-11T15:56:24.239Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "8b15ee48148e2c3a12f4c34698fb6cded5ec153184ee518fa5c692287b3923cb",
+          "retrievedAt": "2026-09-25T13:44:15.597Z"
         },
         {
           "id": "spain-islas-baleares",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/islas-baleares-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "401a02c4544336a68541dd6574d6a23f2eee9853a3be420e4f67900b7141c405",
-          "retrievedAt": "2026-09-11T15:56:59.939Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "48857b53d0dfa6329d649fbb7ec89ad744669c639443004ad1dd82fe606bf04e",
+          "retrievedAt": "2026-09-25T13:44:55.239Z"
         },
         {
           "id": "spain-la-rioja",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bd5423957ad86f4ddc692f7d75c57763758bb1a3ce86ed5817c77341841cd707",
-          "retrievedAt": "2026-09-11T15:57:14.574Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1bf28726ed7dab8e0d16f42ec002697348f9344994f7ac72cfa60fba31edafd7",
+          "retrievedAt": "2026-09-25T13:45:12.107Z"
         },
         {
           "id": "spain-madrid",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/madrid-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "ff7151ecb420e7abfd4f58136bbeea4bdb152f7894c0195cd9231be433066a98",
-          "retrievedAt": "2026-09-11T15:57:33.166Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "784988130306c497a3fe1658bfd32cc6255bcfc212a337eecd77eb74d0b0a376",
+          "retrievedAt": "2026-09-25T13:45:20.222Z"
         },
         {
           "id": "spain-melilla",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/melilla-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b70ad59d469d85d893410c28a61e0d296a57627c922e2f1de92637b399b85b92",
-          "retrievedAt": "2026-09-11T15:58:01.506Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d5d50de9effe8e5abb23a7ee4dea7885ae7d32f09bcada1a304b8944d9329902",
+          "retrievedAt": "2026-09-25T13:45:52.063Z"
         },
         {
           "id": "spain-murcia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/murcia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b3d0ad8ac85dd3bb47064633591b71258f72b4ee724381641b396fcbe5f48255",
-          "retrievedAt": "2026-09-11T15:58:12.359Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "e59005b1bfe6dbed0db4fff36079a70ce4463b14ce11f95bdface3b7cf2de7a5",
+          "retrievedAt": "2026-09-25T13:45:53.601Z"
         },
         {
           "id": "spain-navarra",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "528c197e9dc95cb80505026fbd1e6c0c834fdba554fe3167c0a2296de2e0380f",
-          "retrievedAt": "2026-09-11T15:58:26.031Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "e1789df1081424d6161d812cee13c72b3c6c3c342ce999112725b720a33fbac1",
+          "retrievedAt": "2026-09-25T13:46:18.023Z"
         },
         {
           "id": "spain-pais-vasco",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/pais-vasco-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2615b58232232e30f01d144c0ba1949ea7e8e92fc2aee9a5159741fc647713fe",
-          "retrievedAt": "2026-09-11T15:58:40.482Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6b9758a373fcade8bbdbf527be6ee9ac4cf06a2ee2c491391e7edfd030655f84",
+          "retrievedAt": "2026-09-25T13:46:38.233Z"
         },
         {
           "id": "spain-valencia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/valencia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bbfc1edfde3e163491756f9d5390c78f02c0cb6fc34ff7d4f1966b2d9d5a7b7f",
-          "retrievedAt": "2026-09-11T15:59:08.387Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "add6cd39abfb57e7b37a5fce8876307a8c93743b9c598f09033e9dd65a7d1969",
+          "retrievedAt": "2026-09-25T13:47:15.446Z"
         },
         {
           "id": "canary-islands",
           "sourceUrl": "https://download.geofabrik.de/africa/canary-islands-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "92ad708f600e1fb85ac807caa98fdac621e0d96ec81faf1bd93e0821eb2be3d0",
-          "retrievedAt": "2026-09-11T15:59:54.770Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c6c8d3e6cd769265bac750249bde8f11617f3c7c120fbe5d46e2155c5d07720b",
+          "retrievedAt": "2026-09-25T13:48:05.962Z"
         },
         {
           "id": "armenia",
           "sourceUrl": "https://download.geofabrik.de/asia/armenia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "8320a76b6e64735c9bb91a4690f6786f6fc186a9abb934a8fe8e25436008a758",
-          "retrievedAt": "2026-09-11T16:00:19.714Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "5e30233859f393049d2892e4158c8d2d913c1bfd9d7adbb52d1e7bb1d31ef14a",
+          "retrievedAt": "2026-09-25T13:48:29.287Z"
         }
       ]
     },
     {
       "id": "cycling-pois",
       "label": "Cycling places",
-      "releaseId": "sha256-c267a6f8ee9dd805dd9e9dd128735260e44f8fe93a5ce076ead3b7e127585d84",
-      "refreshedAt": "2026-09-11T16:00:44.957Z",
-      "oldestSourceAt": "2026-09-10T20:21:06.000Z",
-      "newestSourceAt": "2026-09-10T20:21:06.000Z",
+      "releaseId": "sha256-1d9cffa70600de2e5751f9e411af94245870f3bdcf0df4b953e98c3a59741af8",
+      "refreshedAt": "2026-09-25T13:48:50.730Z",
+      "oldestSourceAt": "2026-09-24T20:21:20.000Z",
+      "newestSourceAt": "2026-09-24T20:21:20.000Z",
       "inputCount": 70,
       "expectedInputCount": 70,
       "missingInputs": [],
@@ -532,502 +532,502 @@
         {
           "id": "scotland",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b9a043a0faca4160d0277388524206cf237513643e256e3589c03ff95993189c",
-          "retrievedAt": "2026-09-11T15:26:09.268Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d30db3a64baa8de504ece95b22552763662699e28d1404290eefc9d9c2ef044e",
+          "retrievedAt": "2026-09-25T13:15:47.091Z"
         },
         {
           "id": "bedfordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b587e2d496be54cdd816c9dcafebe2896625fefa7beee664cd33bc7234588e1e",
-          "retrievedAt": "2026-09-11T15:28:26.465Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "9151401df6299e3db751819c674791f6a312d6ff3d2bbe3e101dc558e5a68bc4",
+          "retrievedAt": "2026-09-25T13:18:09.204Z"
         },
         {
           "id": "berkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "75c792d850207f34beed39d11519d77ec7a53bb5f2a8ff803893e7444bf625f1",
-          "retrievedAt": "2026-09-11T15:28:34.766Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1464c48b37e28b3103e34cad5fd69018979471eac12fd75bd0ac3111b99baff3",
+          "retrievedAt": "2026-09-25T13:18:15.348Z"
         },
         {
           "id": "bristol",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "e84f59a620c3c1a068791edf79c351f010e630abe25e9e8c4c135849959722bb",
-          "retrievedAt": "2026-09-11T15:28:42.654Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c98c6a7af394bc83215d72a0aaa7141d5866225008bf768203fc1bf38e89ce22",
+          "retrievedAt": "2026-09-25T13:18:24.057Z"
         },
         {
           "id": "buckinghamshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "efc3c1ddcf775b734570af5fb1f45b13d1af20eff81aea5f2f66a08faa07a384",
-          "retrievedAt": "2026-09-11T15:28:51.141Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "f9ee2970927040964a1aa70d92c883c0e412ca3a7353268c6d3408305d1504a4",
+          "retrievedAt": "2026-09-25T13:18:32.821Z"
         },
         {
           "id": "cambridgeshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "5133a677934ecfb959e1c6b06ccdf7c9f337d423e6d301db170a62f0447a9898",
-          "retrievedAt": "2026-09-11T15:28:59.532Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6c599c2310751575b703eafa6a6adc9f078d7fcb89fdcd64a5c17d837ecb4cd8",
+          "retrievedAt": "2026-09-25T13:18:41.106Z"
         },
         {
           "id": "cheshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b027517d669fa2b805a936aee5238c524b4ae73daa397657b2df85cb9220b7cd",
-          "retrievedAt": "2026-09-11T15:29:13.603Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1ee3dabbbb1c54ac3d533ecd3b6142a3152d01353a2d535ee0164fa274a341b0",
+          "retrievedAt": "2026-09-25T13:18:55.795Z"
         },
         {
           "id": "cornwall",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "fa12e9dedd2b1c96bfd02362e2d6b486074f624182df73f876ba2ebe39b2fd17",
-          "retrievedAt": "2026-09-11T15:29:27.276Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c05b4233a4343a04eeded8b25c1747a0e2191ca52270f49e41893ecbe7095975",
+          "retrievedAt": "2026-09-25T13:19:11.191Z"
         },
         {
           "id": "cumbria",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bfa3e1c8dd61931e93f65c74428c89f9bcc3be270a16a4de5897f24bfb1eba82",
-          "retrievedAt": "2026-09-11T15:29:39.629Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "ef6cefa01be47750c8f420fdfde32d66a21b1908ad3713bb676cb07105b650ee",
+          "retrievedAt": "2026-09-25T13:19:25.458Z"
         },
         {
           "id": "derbyshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "0600d544b314248bac52493ccd8d70de6e52230c74ebaf564bd9f6f9649ac8de",
-          "retrievedAt": "2026-09-11T15:29:55.949Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b1594f28093b5d547c1da983620d749d90d71ffb04ff83e8c79930ddc49be7da",
+          "retrievedAt": "2026-09-25T13:19:42.207Z"
         },
         {
           "id": "devon",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "909569679b73a6af1a1f63cfc1c48d281b0184a898e711845a030b6e8c7ccb5b",
-          "retrievedAt": "2026-09-11T15:30:11.039Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6a45e9072110733d00b624a0ad3c558d2e571c404813543773d7377c32b943c2",
+          "retrievedAt": "2026-09-25T13:19:58.218Z"
         },
         {
           "id": "dorset",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "fa39fb4d5cf0cb2465144134da711e4a5bc90cae11a04b4340c968afb022f070",
-          "retrievedAt": "2026-09-11T15:30:30.822Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "5b3353bd855f0eebe8ceb2d8c50a6fa7d1c60368a98630deb4ad02e6068c3aa8",
+          "retrievedAt": "2026-09-25T13:20:19.998Z"
         },
         {
           "id": "durham",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "e85f220eba7693ccb0c673044c43946eba588d97085a58973fbd435e4920eb19",
-          "retrievedAt": "2026-09-11T15:30:41.407Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "00fd39861b44a832706579a8283ba18dd3ce29b433dd27210cb34e7d0fe79453",
+          "retrievedAt": "2026-09-25T13:20:31.681Z"
         },
         {
           "id": "east-sussex",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "093fb4dbd96b2aa53a03936162c9a15fbda5a6dc91d3a0df3b3f7f1dcccd2d76",
-          "retrievedAt": "2026-09-11T15:30:49.234Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d819df9fe4d35daf3342934f60b94baa01b5133583cebf38a8704830f9d10118",
+          "retrievedAt": "2026-09-25T13:20:40.046Z"
         },
         {
           "id": "east-yorkshire-with-hull",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bc55c2621ff5a3801a4bcc7dd19fea7c881c1521a3db278d993087b42d4741ff",
-          "retrievedAt": "2026-09-11T15:30:56.634Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "e097cd085ddcc223fdd2c14bc2e39cfa0b364bd9884aa67b18e0c0b1ce861c8c",
+          "retrievedAt": "2026-09-25T13:20:47.799Z"
         },
         {
           "id": "essex",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "9772dc685f620ef5f3672d908158d6b494326f1817c408d57637b9f28067a053",
-          "retrievedAt": "2026-09-11T15:31:04.652Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6751cdf7bff704230225eccf7949cd3e4ce7644607319fd9fae10e242e102931",
+          "retrievedAt": "2026-09-25T13:20:56.238Z"
         },
         {
           "id": "gloucestershire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "935e3245fddee4340c19e7cd6607a4275dad4ee369190b31a57db87da31d4b31",
-          "retrievedAt": "2026-09-11T15:31:20.629Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "dbf10f18f83543e41c3904743b72b624d9e111df9c8145ecebe827a1d4d4cadd",
+          "retrievedAt": "2026-09-25T13:21:13.797Z"
         },
         {
           "id": "greater-london",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "a5a7e5702cd209dab422f45f5de290695b713cfe4ca9b9bbc00ef63f08ad71a1",
-          "retrievedAt": "2026-09-11T15:31:39.209Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "7ec6bfc796775320eeccc617bcdf6eb8870c4cad091a743c91ec4ed49f121096",
+          "retrievedAt": "2026-09-25T13:21:37.801Z"
         },
         {
           "id": "greater-manchester",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "cb6e89e910e9f81b8ebde80446504b487dbdd1bcb7a14e8b7e50d1f655151ff5",
-          "retrievedAt": "2026-09-11T15:33:32.458Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "3dbac8ef082feec2c8185ce0b453d872ce0221806db83f521cbef1d3e2204648",
+          "retrievedAt": "2026-09-25T13:23:23.676Z"
         },
         {
           "id": "hampshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "1040cd7bb39eb7bd953d04e3e884188f770fec77228c73aa6f2e2bd5e5d70d79",
-          "retrievedAt": "2026-09-11T15:33:52.126Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1a5bf8e0431815ee905f01763e5f054a1a47e9304e8e98dc553d6d614c11db0e",
+          "retrievedAt": "2026-09-25T13:23:46.502Z"
         },
         {
           "id": "herefordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "63bd22fa774a3ef78ed814ad87e52e2890048c244459f0f14ec63d71620d4283",
-          "retrievedAt": "2026-09-11T15:34:12.909Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0b9d3e730b570b17ac6665ea5ebdb1c20534c36a46a9cfa4f9245206d8fb98df",
+          "retrievedAt": "2026-09-25T13:24:08.479Z"
         },
         {
           "id": "hertfordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "7fd8c5d69eebfd2febd0921f69689c0c133d26cc0b97a5fb8f26e40d4bc66064",
-          "retrievedAt": "2026-09-11T15:34:17.992Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "45252c230e51270c519e7b18dfd9b1bb77b609670bfa3886fcb2f5873e103697",
+          "retrievedAt": "2026-09-25T13:24:14.296Z"
         },
         {
           "id": "isle-of-wight",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "9e80d038d9b427976cb58ddd789a4083a2170269f7f8071cbb2a1a7690e57215",
-          "retrievedAt": "2026-09-11T15:34:30.730Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b283de41b2d28889e3c26e699288a745c055a031ffb7778d153748feafb676b4",
+          "retrievedAt": "2026-09-25T13:24:27.551Z"
         },
         {
           "id": "kent",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "74d4feae4373c6031a24c11e1e56ae380c4ea8ceead7ddb09028582d181090f0",
-          "retrievedAt": "2026-09-11T15:34:35.408Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1943c25cb4a8a358e2d11d7e65199248b06cdc77c98bce2fe9f78917ca37f8c9",
+          "retrievedAt": "2026-09-25T13:24:32.788Z"
         },
         {
           "id": "lancashire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "fb1fa44592d834f1adf95d07d018639ee6cffb861d68de813790d18f349e6dfb",
-          "retrievedAt": "2026-09-11T15:34:53.758Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "41cb083d6da35982c493f15592a8c8f8d15e3fe0226c7d5125a32a6375dd4f30",
+          "retrievedAt": "2026-09-25T13:24:51.873Z"
         },
         {
           "id": "leicestershire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "4628ff9ebc48708f40337725fe6398e6cd22c1ba50777bc4e84c19bf42b6d554",
-          "retrievedAt": "2026-09-11T15:35:07.144Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "225b8a630a35b89f8fe210da9b2bb47ea09e840457dd6bba60499768c1249659",
+          "retrievedAt": "2026-09-25T13:25:06.315Z"
         },
         {
           "id": "lincolnshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "dfa21ef3978b2f6d236a1460f902f98013104ac79022019fd9fe04e9c4f53063",
-          "retrievedAt": "2026-09-11T15:35:17.839Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "135fee4cd38b8c69c30ba77d74bda0f2a92bb31799291bb88eace98007a6af5d",
+          "retrievedAt": "2026-09-25T13:25:15.361Z"
         },
         {
           "id": "merseyside",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "322e4e5ea16a4eb920be27628f9d368c65eac3ba359d5aec441b5da04556d30c",
-          "retrievedAt": "2026-09-11T15:35:31.576Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d97d441a6458400dc810195549b048d98decf72c614e76f12540c311e0759eae",
+          "retrievedAt": "2026-09-25T13:25:29.602Z"
         },
         {
           "id": "norfolk",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "84a94fae3d0de003736d111e3d40727fc479a06fc786af36feb60f84d08e1b8b",
-          "retrievedAt": "2026-09-11T15:35:43.886Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "acf11355b2843509efc633d9c1b9094814fc7a5a059fd6de37a8ed784a32d531",
+          "retrievedAt": "2026-09-25T13:25:43.185Z"
         },
         {
           "id": "north-yorkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "07e0268185386bc461e4f6ec5e3556777ae70abcf9d1aaf0a9ebb7a55967e04f",
-          "retrievedAt": "2026-09-11T15:36:00.068Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "5e1e04a342c133477e93bf966db2f35d032d59f77339a4e0f0e3635ee75dd295",
+          "retrievedAt": "2026-09-25T13:25:59.873Z"
         },
         {
           "id": "northamptonshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "1679425ebc66ae0f4828359d3976579e06e81075cb84164c73f0008bfabc0034",
-          "retrievedAt": "2026-09-11T15:36:19.867Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0d7e680d8a14fc405432b03f848bac49a7b0e82e29f1fa17768147801fa538bb",
+          "retrievedAt": "2026-09-25T13:26:20.149Z"
         },
         {
           "id": "northumberland",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "207c7418c4d31c8ce8000310ab33879c555d97b42d8815d982caf731c6d2b985",
-          "retrievedAt": "2026-09-11T15:36:29.024Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b65e79e1bb730768397ee87fa301c77826aa20ec6b857af11f1fe0043dbf5a57",
+          "retrievedAt": "2026-09-25T13:26:30.501Z"
         },
         {
           "id": "nottinghamshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b64df05c52a2d97b7ac0a0d5cb91859c1adf82f4530a504df6c5e6877437372a",
-          "retrievedAt": "2026-09-11T15:36:38.275Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "510beb9841b9a05368fb81dc95a9f32dd8494a1d421667b87ff8b60dc984c76d",
+          "retrievedAt": "2026-09-25T13:26:40.201Z"
         },
         {
           "id": "oxfordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "c1bf3c16884864def9f0d2781b1bc908119859c1dbcd0aa7da750954bd9d2bce",
-          "retrievedAt": "2026-09-11T15:36:53.064Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "8e9fde5cbe06927dcd9f18baae2cd893eb36b88b18020c1201e537a43c947422",
+          "retrievedAt": "2026-09-25T13:26:54.712Z"
         },
         {
           "id": "rutland",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2f1adcbfbf9783af2ce27a85d42d9ccc8325ef296f781b80bdda237e9bc3be2f",
-          "retrievedAt": "2026-09-11T15:37:03.234Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c2032e21e8569e6bf3f5a018e10e750c71aa90f3e53e17c4716b48bbf60257b6",
+          "retrievedAt": "2026-09-25T13:27:05.486Z"
         },
         {
           "id": "shropshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "23d3bd8fedb19950c0e750cc61dd4b387ae7159986d79c85cb12af3dc3ba69a2",
-          "retrievedAt": "2026-09-11T15:37:04.781Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1818d8089a905514add56932f6474d9e5675ae19308e30603e06f392fef54e14",
+          "retrievedAt": "2026-09-25T13:27:06.839Z"
         },
         {
           "id": "somerset",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "dd317b3f0074dcd1bf46942be4c30c7df2db58416a2a492fe7f29827b5560ef9",
-          "retrievedAt": "2026-09-11T15:37:14.459Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "f13f616139fce8d0ac6ee74f43973b3ab2504ea185d7ab62728031b0ae18d39f",
+          "retrievedAt": "2026-09-25T13:27:16.827Z"
         },
         {
           "id": "south-yorkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "30ce0b1ed36f74e5d9c0bdd1c2ffdb5d4b13880d1b9a192d1c54aacc60674389",
-          "retrievedAt": "2026-09-11T15:37:31.415Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "ba1f18bb12e339d91c70d5e4408be08810b879b6803c054f071b0627dcc72f69",
+          "retrievedAt": "2026-09-25T13:27:34.611Z"
         },
         {
           "id": "staffordshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "678aa88348d16c7f2601f0a2230f1e0f17c5a991c0f185e96856b5d184312bb7",
-          "retrievedAt": "2026-09-11T15:37:42.336Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "2012cbc2e32234dc741e06d536ee074592f7f43979c59c9329244b030d22601d",
+          "retrievedAt": "2026-09-25T13:27:57.532Z"
         },
         {
           "id": "suffolk",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "3da69ed48ad5225c27674eb1ecbfb4aceb2683b1b91f079890ea4a071a02076a",
-          "retrievedAt": "2026-09-11T15:37:52.967Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "99a90d9ff8a4550e740f67a4ae49e8c11266aa7362beddc07809e1f6c715b0fa",
+          "retrievedAt": "2026-09-25T13:28:08.380Z"
         },
         {
           "id": "surrey",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "cedb90a18becfd5d1ea3ae69634d14d1a414b1969c5a2dd1095e32a69336c922",
-          "retrievedAt": "2026-09-11T15:38:04.786Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "661bacb7e1a87d75f412df9c2881fe72dbb4a7de52a48731327d36242638bdd0",
+          "retrievedAt": "2026-09-25T13:28:27.561Z"
         },
         {
           "id": "tyne-and-wear",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "4ea291ea8d70b723d9b217bc2e9eedf5e15ea1ea7a21242cc49a3c11a464e12b",
-          "retrievedAt": "2026-09-11T15:38:18.545Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "29e76c57dc052b2559af7e504607b2c90f2d5f2d39d3226179f86d3b23155e6f",
+          "retrievedAt": "2026-09-25T13:28:41.837Z"
         },
         {
           "id": "warwickshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "c0a462622fb2b66d04d106e41d037c7056b92f71c6e13545da7fd3f598e5241c",
-          "retrievedAt": "2026-09-11T15:38:26.412Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0371d62584cc0166c9db8406016b58ea7773063f2b05ff55c15033a90cf3224d",
+          "retrievedAt": "2026-09-25T13:28:49.583Z"
         },
         {
           "id": "west-midlands",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "ff0bbcdcdc8fadcea90ed9b0845afc3da05385c71fba14024d8469b8edf98d9c",
-          "retrievedAt": "2026-09-11T15:38:37.354Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6b28dcb6a6798a03d95ea4fbb856f0aa25d4e7129e83155cafe6c60d9a31b8e9",
+          "retrievedAt": "2026-09-25T13:29:00.562Z"
         },
         {
           "id": "west-sussex",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "e8d18f93444372397dd2cbfe5fe8483b98d28f225a1c8a16eaeee7187bb5adbf",
-          "retrievedAt": "2026-09-11T15:38:58.533Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "fd4358817028f698c50f29823927fedc7c6d16c706f4613f83b8b5cc0df38016",
+          "retrievedAt": "2026-09-25T13:29:21.918Z"
         },
         {
           "id": "west-yorkshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2fd767ff94e2e2bbd198e634695bfd39d2f938378331210d0c5f9022282abbf9",
-          "retrievedAt": "2026-09-11T15:39:17.628Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "3e5c5cd84d8bd5fec6517f25ee58c458bd69a511cdabb574b1554c2cdb658b4b",
+          "retrievedAt": "2026-09-25T13:29:41.828Z"
         },
         {
           "id": "wiltshire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "ea762cf4c2ad40f304c710e98cbe761afabc385f3257f123b643f071402cf897",
-          "retrievedAt": "2026-09-11T15:39:38.132Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "7d44e3a0be04d34ca4cf781dd7a17c7c42d14469d12d0c51ece546c3a6b69de8",
+          "retrievedAt": "2026-09-25T13:30:02.785Z"
         },
         {
           "id": "worcestershire",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "7240f8829347f70da23f2a0541d0125517cbc2f4d07962965afc158abd603c07",
-          "retrievedAt": "2026-09-11T15:39:57.966Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "02c64fffa5f7c40c5425bdd3a182f5791518fb69916fd963f5c6acb8297df01d",
+          "retrievedAt": "2026-09-25T13:30:15.817Z"
         },
         {
           "id": "wales",
           "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "69f5a6bd38f7f4208b0ffb983c0965a599d2aa52ec5cba2e920a024dcbfe4755",
-          "retrievedAt": "2026-09-11T15:40:12.949Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "eedeb42f2253788d289a4d6b7eb9faec0332c63045208f8204da0ddc7ee7fa01",
+          "retrievedAt": "2026-09-25T13:30:29.783Z"
         },
         {
           "id": "ireland-and-northern-ireland",
           "sourceUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b1bab1e811b560e5fcd589139db8c49c6104da4ba276e24078107ea7f3adad37",
-          "retrievedAt": "2026-09-11T15:45:08.274Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "ac89d91322d2e1301035dee47d97b6a544d9c336a6b19daa4a91b8413b3e52b7",
+          "retrievedAt": "2026-09-25T13:32:58.861Z"
         },
         {
           "id": "spain-andalucia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/andalucia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "8c200e0c029b26699220148daf4d9b2cbef727f6de6945420681d66b622d5e31",
-          "retrievedAt": "2026-09-11T15:47:44.786Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "bd5168ca797d62dc728fdbed68fbb43ba0419325925f434f376397594b82657f",
+          "retrievedAt": "2026-09-25T13:36:35.211Z"
         },
         {
           "id": "spain-aragon",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/aragon-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2c98a83afafcae764206eaa3b7ab0bc783b96fc82f6f1ea5b09e24127e08c8c6",
-          "retrievedAt": "2026-09-11T15:48:52.715Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "cffcf295d8c3a08cf77ce3880053e3eca38d3bad0dedcd990dbe62d9e5165d1c",
+          "retrievedAt": "2026-09-25T13:37:46.533Z"
         },
         {
           "id": "spain-asturias",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/asturias-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b6dab7293e85354110088ae3237b9948724df9040cb8af579c6d4afee19fb649",
-          "retrievedAt": "2026-09-11T15:49:25.369Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "2893706a20b129966f86d8d3215a8371c48921a7ae58f2b9feb7bd085a089ac3",
+          "retrievedAt": "2026-09-25T13:38:19.886Z"
         },
         {
           "id": "spain-cantabria",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/cantabria-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b7e36183cfc0e4f97bb5febffeea76bc2fdee03b91ee05399f8d91efee69c971",
-          "retrievedAt": "2026-09-11T15:49:38.026Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "3f09e79011741e2c3642d48b83513ed259e8ec7db139f96779dcbfa0521d47de",
+          "retrievedAt": "2026-09-25T13:38:34.408Z"
         },
         {
           "id": "spain-castilla-la-mancha",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b4b85472cfd3cf81f7c84cc2dd5a4495c65521c50f02d459b83f13f5a8d0b018",
-          "retrievedAt": "2026-09-11T15:50:27.982Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "acd60542871913141f4121fbcb6c188db682a14e8b4a10cadd013b21d489479a",
+          "retrievedAt": "2026-09-25T13:38:49.889Z"
         },
         {
           "id": "spain-castilla-y-leon",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "4ed0fa3f6d10dbf2c380dcab4297edc127b0a4d374d233a4d7f750d07e4a31d6",
-          "retrievedAt": "2026-09-11T15:51:32.691Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "0c88c91efa0e75163097d3879d72614f25fa7720a89d47800e1850097d8cc7f5",
+          "retrievedAt": "2026-09-25T13:39:45.104Z"
         },
         {
           "id": "spain-cataluna",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/cataluna-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2f7d301e7db6f709e5d3ff753d0e6343ca77d4fe990353dfa86fd58cf4bee242",
-          "retrievedAt": "2026-09-11T15:53:59.244Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "225af021a4a5561e009d9c6ec71a2fdbd6826e99c56c648c0bcfa72a428e44e0",
+          "retrievedAt": "2026-09-25T13:41:39.125Z"
         },
         {
           "id": "spain-ceuta",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/ceuta-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b435024cda51930c62148ce0055063c586bf3ad409b84883a924dbbc9bbe1320",
-          "retrievedAt": "2026-09-11T15:56:02.405Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "b8f21b38c427fdd1c7c9553155ce1e2ccc0c4597b8cd0764c9eb598326f8a18b",
+          "retrievedAt": "2026-09-25T13:43:49.376Z"
         },
         {
           "id": "spain-extremadura",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/extremadura-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "13624ecd9bce3a359e72c4397cba1b6ebca67e32691bf1b529bb4135501f5860",
-          "retrievedAt": "2026-09-11T15:56:04.284Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "4f9512bfaf7fb2f57bae6e0c88f587be4ce5be2268f81e13269ac96c907eae70",
+          "retrievedAt": "2026-09-25T13:43:51.175Z"
         },
         {
           "id": "spain-galicia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "3e9bbb5eb84215d5c71829957aa24b576ddb00659ef9c969e95c4c21d99ffa86",
-          "retrievedAt": "2026-09-11T15:56:24.239Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "8b15ee48148e2c3a12f4c34698fb6cded5ec153184ee518fa5c692287b3923cb",
+          "retrievedAt": "2026-09-25T13:44:15.597Z"
         },
         {
           "id": "spain-islas-baleares",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/islas-baleares-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "401a02c4544336a68541dd6574d6a23f2eee9853a3be420e4f67900b7141c405",
-          "retrievedAt": "2026-09-11T15:56:59.939Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "48857b53d0dfa6329d649fbb7ec89ad744669c639443004ad1dd82fe606bf04e",
+          "retrievedAt": "2026-09-25T13:44:55.239Z"
         },
         {
           "id": "spain-la-rioja",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bd5423957ad86f4ddc692f7d75c57763758bb1a3ce86ed5817c77341841cd707",
-          "retrievedAt": "2026-09-11T15:57:14.574Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "1bf28726ed7dab8e0d16f42ec002697348f9344994f7ac72cfa60fba31edafd7",
+          "retrievedAt": "2026-09-25T13:45:12.107Z"
         },
         {
           "id": "spain-madrid",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/madrid-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "ff7151ecb420e7abfd4f58136bbeea4bdb152f7894c0195cd9231be433066a98",
-          "retrievedAt": "2026-09-11T15:57:33.166Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "784988130306c497a3fe1658bfd32cc6255bcfc212a337eecd77eb74d0b0a376",
+          "retrievedAt": "2026-09-25T13:45:20.222Z"
         },
         {
           "id": "spain-melilla",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/melilla-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b70ad59d469d85d893410c28a61e0d296a57627c922e2f1de92637b399b85b92",
-          "retrievedAt": "2026-09-11T15:58:01.506Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "d5d50de9effe8e5abb23a7ee4dea7885ae7d32f09bcada1a304b8944d9329902",
+          "retrievedAt": "2026-09-25T13:45:52.063Z"
         },
         {
           "id": "spain-murcia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/murcia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "b3d0ad8ac85dd3bb47064633591b71258f72b4ee724381641b396fcbe5f48255",
-          "retrievedAt": "2026-09-11T15:58:12.359Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "e59005b1bfe6dbed0db4fff36079a70ce4463b14ce11f95bdface3b7cf2de7a5",
+          "retrievedAt": "2026-09-25T13:45:53.601Z"
         },
         {
           "id": "spain-navarra",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "528c197e9dc95cb80505026fbd1e6c0c834fdba554fe3167c0a2296de2e0380f",
-          "retrievedAt": "2026-09-11T15:58:26.031Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "e1789df1081424d6161d812cee13c72b3c6c3c342ce999112725b720a33fbac1",
+          "retrievedAt": "2026-09-25T13:46:18.023Z"
         },
         {
           "id": "spain-pais-vasco",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/pais-vasco-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "2615b58232232e30f01d144c0ba1949ea7e8e92fc2aee9a5159741fc647713fe",
-          "retrievedAt": "2026-09-11T15:58:40.482Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "6b9758a373fcade8bbdbf527be6ee9ac4cf06a2ee2c491391e7edfd030655f84",
+          "retrievedAt": "2026-09-25T13:46:38.233Z"
         },
         {
           "id": "spain-valencia",
           "sourceUrl": "https://download.geofabrik.de/europe/spain/valencia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "bbfc1edfde3e163491756f9d5390c78f02c0cb6fc34ff7d4f1966b2d9d5a7b7f",
-          "retrievedAt": "2026-09-11T15:59:08.387Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "add6cd39abfb57e7b37a5fce8876307a8c93743b9c598f09033e9dd65a7d1969",
+          "retrievedAt": "2026-09-25T13:47:15.446Z"
         },
         {
           "id": "canary-islands",
           "sourceUrl": "https://download.geofabrik.de/africa/canary-islands-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "92ad708f600e1fb85ac807caa98fdac621e0d96ec81faf1bd93e0821eb2be3d0",
-          "retrievedAt": "2026-09-11T15:59:54.770Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "c6c8d3e6cd769265bac750249bde8f11617f3c7c120fbe5d46e2155c5d07720b",
+          "retrievedAt": "2026-09-25T13:48:05.962Z"
         },
         {
           "id": "armenia",
           "sourceUrl": "https://download.geofabrik.de/asia/armenia-latest.osm.pbf",
-          "sourceTimestamp": "2026-09-10T20:21:06.000Z",
-          "sha256": "8320a76b6e64735c9bb91a4690f6786f6fc186a9abb934a8fe8e25436008a758",
-          "retrievedAt": "2026-09-11T16:00:19.714Z"
+          "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+          "sha256": "5e30233859f393049d2892e4158c8d2d913c1bfd9d7adbb52d1e7bb1d31ef14a",
+          "retrievedAt": "2026-09-25T13:48:29.287Z"
         }
       ]
     },
     {
       "id": "cycle-network",
       "label": "National Cycle Network",
-      "releaseId": "sha256-8b5d3098da3516116a4d3fed1d2829d3b9da6979cd2849d6e8e056b48587236d",
-      "refreshedAt": "2026-09-11T15:58:40.332Z",
-      "oldestSourceAt": "2026-09-06T00:04:44.087Z",
-      "newestSourceAt": "2026-09-06T00:04:44.087Z",
+      "releaseId": "sha256-c7e98b6762ce94e30f327550334905809b9218f5cf17865f404cfb93e2cbe98a",
+      "refreshedAt": "2026-09-25T14:00:47.255Z",
+      "oldestSourceAt": "2026-09-20T00:06:52.005Z",
+      "newestSourceAt": "2026-09-20T00:06:52.005Z",
       "inputCount": 1,
       "expectedInputCount": 1,
       "missingInputs": [],
@@ -1037,10 +1037,10 @@
       "inputs": [
         {
           "id": "ncn",
-          "sourceTimestamp": "2026-09-06T00:04:44.087Z",
+          "sourceTimestamp": "2026-09-20T00:06:52.005Z",
           "sourceUrl": "https://services5.arcgis.com/1ZHcUS1lwPTg4ms0/arcgis/rest/services/National_Cycle_Network_Public/FeatureServer/0",
-          "sha256": "4a5fcd79ffd94194ea83f36c303f55fcc8df5c08de9e616822fa8f48af1d4497",
-          "retrievedAt": "2026-09-11T15:58:40.332Z"
+          "sha256": "6841c9ea47eadb95a0c79971d253aab55d0d49d36485cf3fce8b87761022037c",
+          "retrievedAt": "2026-09-25T14:00:47.255Z"
         }
       ]
     }

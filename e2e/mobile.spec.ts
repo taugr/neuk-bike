@@ -89,6 +89,17 @@ test('keeps the nearby rows stable when the list first loads', async ({
 test('applies parking preferences without crowding the default mobile list', async ({
   page,
 }) => {
+  // This scenario checks the unknown-details fallback, independent of new
+  // cargo-bike tags appearing in later source-data releases.
+  await page.route('**/data/parking/chunks/**/*.json', async (route) => {
+    const response = await route.fetch();
+    const chunk = await response.json();
+    for (const point of chunk.points) {
+      delete point.properties.cargo_bike;
+      delete point.properties.capacity_cargo_bike;
+    }
+    await route.fulfill({ response, json: chunk });
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?mockGps=55.9533,-3.1883,5');
   await expect(page.getByTestId('parking-list')).toBeVisible();
