@@ -1041,8 +1041,8 @@ a {
 
 .brand-mark img {
   display: block;
-  height: 36px;
-  width: 36px;
+  height: 44px;
+  width: 44px;
 }
 
 .app-header h1 {
@@ -5823,8 +5823,8 @@ a {
 
   .settings-menu--mobile .settings-trigger--brand img {
     display: block;
-    height: 28px;
-    width: 28px;
+    height: 42px;
+    width: 42px;
   }
 
   .settings-menu--mobile .settings-popover {
@@ -6834,8 +6834,8 @@ a {
   }
 
   .brand-mark img {
-    height: 30px;
-    width: 30px;
+    height: 36px;
+    width: 36px;
   }
 
   .app-header h1 {

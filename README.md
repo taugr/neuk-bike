@@ -1,7 +1,7 @@
-# Bike Neuks
+# Bike Neuk
 
 <p align="center">
-  <img src="./public/icon-192.png" alt="Bike Neuks icon" width="140" />
+  <img src="./public/icon-192.png" alt="Bike Neuk icon" width="140" />
   <br />
   <a href="https://neuk.bike/">
     <img src="https://img.shields.io/badge/live-Cloudflare%20Pages-0f766e" alt="live app" />
@@ -218,7 +218,7 @@ uses a device-local voice for the selected language when one is available. It
 announces instruction changes, off-route status and arrival, without sending
 instructions to a speech service. These options are off by default.
 
-Open the Bike Neuks menu and use **Plan a route** to start a draft or **My
+Open the Bike Neuk menu and use **Plan a route** to start a draft or **My
 routes** to reopen routes saved on the current device. The normal Nearby sheet
 remains dedicated to finding cycle parking and other cycling places.
 
@@ -387,7 +387,7 @@ Sources:
 ## Offline behaviour
 
 The service worker caches the app shell and previously visited data. For a
-predictable trip download, open **Offline areas** from the Bike Neuks menu,
+predictable trip download, open **Offline areas** from the Bike Neuk menu,
 choose **Download this area**, then pan and zoom the highlighted map selection.
 The confirmation shows the estimated size and refresh date for each available
 dataset. Completed areas are kept in a dedicated cache that survives routine
@@ -396,20 +396,20 @@ app updates and can be viewed, updated, or removed from the same panel.
 Explicit areas include the bounded OpenFreeMap background through zoom 14,
 cycle parking, cycling shops, repair, hire and drinking water, plus National
 Cycle Network geometry where that dataset has coverage. The current
-OpenFreeMap support is deliberately experimental while Bike Neuks is small and
+OpenFreeMap support is deliberately experimental while Bike Neuk is small and
 unpublished; review the provider policy before a public launch or higher-volume
 use.
 
 Downloads are stored by the browser on the current device. Each area is capped
-at 100 MB, with up to five areas and 500 MB in total. Bike Neuks keeps 20% of
+at 100 MB, with up to five areas and 500 MB in total. Bike Neuk keeps 20% of
 the browser-reported quota free, downloads at most two OpenFreeMap resources at
 a time, and limits request starts to about five per second. Downloads never
-start or update automatically. Bike Neuks requests persistent storage when
+start or update automatically. Bike Neuk requests persistent storage when
 supported, but the browser may still remove site data under storage pressure or
 when site data is cleared. It recommends refreshing an area after 30 days and
 marks it stale after 90 days, without deleting or disabling it.
 
-If a downloaded background is unavailable, Bike Neuks switches to a simple
+If a downloaded background is unavailable, Bike Neuk switches to a simple
 local background while continuing to show downloaded cycling data. Live place
 search, new CycleStreets route calculation, Street View, and areas that were
 not downloaded still need a network connection. Saved routes retain their
@@ -523,3 +523,9 @@ Cycle directions:
 ## License
 
 This project is released under the [MIT License](./LICENSE).
+
+## Brand assets
+
+The approved cream bicycle on teal is used by the desktop and mobile menus,
+favicons, installed app icons and social previews. See [the artwork notes](assets/brand/README.md)
+for the original reference, vector source and regeneration command.

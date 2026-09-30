@@ -7,10 +7,10 @@ import './globals.css';
 
 const siteUrl = 'https://neuk.bike';
 const sitePath = '/';
-const siteTitle = 'Bike Neuks';
+const siteTitle = 'Bike Neuk';
 const siteDescription =
   'Find nearby cycle parking across the UK, Ireland, Spain and Armenia.';
-const socialImage = '/og-image.png';
+const socialImage = '/og-image.png?v=bicycle-1';
 const lightThemeColor = '#0f766e';
 const darkThemeColor = '#0f1715';
 
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
         url: socialImage,
         width: 1200,
         height: 630,
-        alt: 'UK, Ireland, Spain and Armenia cycle parking map preview',
+        alt: 'Bike Neuk cream bicycle on a teal tile — find nearby cycle parking',
       },
     ],
     locale: 'en_GB',
@@ -42,7 +42,12 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: siteTitle,
     description: siteDescription,
-    images: [socialImage],
+    images: [
+      {
+        url: socialImage,
+        alt: 'Bike Neuk cream bicycle on a teal tile — find nearby cycle parking',
+      },
+    ],
   },
 };
 
@@ -70,39 +75,42 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="manifest" href={assetPath('/site.webmanifest')} />
+        <link
+          rel="manifest"
+          href={assetPath('/site.webmanifest?v=bicycle-1')}
+        />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Bike Neuks" />
+        <meta name="apple-mobile-web-app-title" content="Bike Neuk" />
         <meta
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
         <link
           rel="icon"
-          href={assetPath('/favicon.ico?v=white-pin-1')}
+          href={assetPath('/favicon.ico?v=bicycle-1')}
           sizes="any"
         />
         <link
           rel="icon"
-          href={assetPath('/favicon.svg?v=white-pin-1')}
+          href={assetPath('/favicon.svg?v=bicycle-1')}
           type="image/svg+xml"
         />
         <link
           rel="icon"
-          href={assetPath('/icon-192.png?v=white-pin-1')}
+          href={assetPath('/icon-192.png?v=bicycle-1')}
           sizes="192x192"
           type="image/png"
         />
         <link
           rel="icon"
-          href={assetPath('/icon-512.png?v=white-pin-1')}
+          href={assetPath('/icon-512.png?v=bicycle-1')}
           sizes="512x512"
           type="image/png"
         />
         <link
           rel="apple-touch-icon"
-          href={assetPath('/apple-touch-icon.png?v=white-pin-1')}
+          href={assetPath('/apple-touch-icon.png?v=bicycle-1')}
           sizes="180x180"
           type="image/png"
         />

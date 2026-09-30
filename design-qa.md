@@ -2119,3 +2119,92 @@ The full `Route destination search and loading design QA` section above is the l
 - Automated verification: 34 test files and 253 tests passed; lint, formatting, TypeScript, and static production build passed.
 
 final result: passed
+
+---
+
+## Bike Neuk approved bicycle branding QA
+
+final result: passed
+
+Source: `/Users/tomauger/Documents/Codex/2026-09-30/task-6/reference/Bike-Neuk-Bicycle-Concept-v2.png`, materialized locally from
+Library `libfile_6c24ac7f64ec81919342e133b0e56618`, version 0. The same original is
+retained in the repository at `assets/brand/approved-original.png`.
+
+The 1254 × 1254 concept was inspected before editing. Its 974 × 974 tile crop
+(x=140, y=132) was normalized to 512 × 512 for comparison with the production SVG.
+`fidelity-comparison.png` combines that source crop, the rendered vector, and
+enlarged actual desktop/mobile logo screenshot crops in a single comparison.
+`../reference-comparison.png` is the equal-size source/vector comparison.
+
+Implementation evidence: `/Users/tomauger/Documents/Codex/2026-09-30/task-6/qa/`. Files below are local review artifacts and are not committed:
+
+- `desktop-light.jpg`, `desktop-dark.jpg`: 1440 × 900 CSS pixels, DPR 1.
+- `mobile-light.jpg`, `mobile-dark.jpg`, `mobile-menu-light.jpg`: 390 × 844, DPR 1.
+- `mobile-320.jpg`: 320 × 740, DPR 1.
+- `assets-browser.jpg`: browser-rendered SVG, install icons, maskable circle,
+  actual 16/32/48px favicon sizes and social card.
+- `../asset-review.png`: full asset sheet, including maskable circle and ICO sizes.
+
+Findings and fidelity checks:
+
+- No remaining P0/P1/P2 visual findings. The accepted bicycle, seat, handlebar,
+  wheels, frame, proportions and teal tile shape are retained.
+- Production artwork intentionally removes the concept's surrounding canvas,
+  texture and external presentation shadow. This is a clean icon reproduction,
+  not a new logo direction. The source palette is sampled as teal `#027973`
+  and cream `#fef8ef`.
+- Typography: existing app fonts and hierarchy remain; brand labels use
+  “Bike Neuk”. The social card retains its existing layout and typography.
+- Spacing: desktop logo is 44px inside its existing 46px wrapper; mobile logo
+  is 42px inside the existing 44px accessible menu button. No viewport overflow
+  was found at 320px or 390px. Desktop and mobile navigation remain usable.
+- Image quality: SVG and ICO retain alpha outside the rounded tile; Apple
+  and maskable PNGs are opaque. ICO has genuine 16, 32 and 48px PNG frames.
+- The maskable bicycle's farthest cream pixel is 172.76px from the 512px canvas
+  centre, within the 204.8px safe-circle radius. Circular masking preserves it.
+- Copy/accessibility: visible and screen-reader headings, application/PWA names,
+  translated brand menu labels, GPX creator and WebMCP description use Bike Neuk.
+  Decorative images remain hidden to assistive technology; menu labels and
+  expanded states remain semantic. OG and Twitter images have descriptive alt text.
+- All rendered image resources loaded. The final preview's console had no errors
+  or warnings. Light/dark theme switches and mobile menu open/close were checked.
+
+Comparison history:
+
+1. Initial pixel trace exposed antialias gaps around the bicycle, and the maskable
+   PNG retained an alpha channel after compositing. The tile was reduced to its
+   external contour, traced edges were smoothed, and the composite was flattened
+   in a second raster pass.
+2. The final source/vector comparison and asset sheet were inspected again.
+   No remaining edge halos or mask clipping were found. Actual app screenshots
+   confirmed the logo is clear at desktop and mobile sizes.
+3. The desktop light screenshot was recaptured after confirming the viewport
+   had completed its responsive resize to 1440 × 900.
+
+Verification:
+
+- `pnpm lint`, `pnpm format`, `pnpm exec tsc --noEmit`: passed.
+- `pnpm test`: 42 files, 331 tests passed.
+- `pnpm build`: static export passed; final manual preview freshness check passed.
+- `pnpm test:e2e`: 157 passed, one optional live-provider smoke test skipped,
+  one map-worker cache test failed at the 5s basemap-render counter after reload.
+  The failure did not report an obsolete-worker exception. The same cache test
+  passed against the final production export in isolation, then passed three
+  consecutive isolated runs (3.5s, 2.6s, 2.3s). This supports a transient suite
+  timing issue; the original full-suite failure is retained in `../e2e.log`.
+- Generated assets are byte-stable on regeneration and match the exported assets.
+- No old `white-pin-1` version or “Bike Neuks” branding remains in runtime source,
+  manifest or exported HTML. Historical planning documents retain their old wording.
+- Browser cache inspection found `neuk-bike-v16` with `bicycle-1` icon URLs and
+  the preserved separate `neuk-bike-offline-areas-v1` cache.
+
+Remaining limits:
+
+- No physical iOS/Android install was performed. Existing installed launchers
+  and social networks may refresh their cached icons/cards on their own schedule.
+- Production was not changed; post-deploy verification of `neuk.bike` and
+  `neuk-bike.pages.dev` remains a publishing step.
+- A final in-app browser metadata/cleanup call took nearly ten minutes before
+  returning successfully. Screenshot files and returned cache metadata are present.
+
+Implementation checklist: complete. No visual follow-up polish is required.

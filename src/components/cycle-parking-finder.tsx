@@ -5811,7 +5811,7 @@ export default function CycleParkingFinder() {
           }}
         >
           {isBrandTrigger ? (
-            <img src="favicon.svg?v=white-pin-1" alt="" aria-hidden="true" />
+            <img src="favicon.svg?v=bicycle-1" alt="" aria-hidden="true" />
           ) : (
             <Settings size={18} aria-hidden="true" />
           )}
@@ -6451,7 +6451,7 @@ export default function CycleParkingFinder() {
               className="app-header app-header--mobile"
             >
               {renderThemeSettings('settings-menu--mobile', 'brand')}
-              <h1 className="sr-only">Bike Neuks</h1>
+              <h1 className="sr-only">Bike Neuk</h1>
               {renderPlaceSearchPanel('mobile')}
             </header>
           </section>
@@ -7490,10 +7490,10 @@ export default function CycleParkingFinder() {
                       key="finder-header"
                     >
                       <div className="brand-mark" aria-hidden="true">
-                        <img src="favicon.svg?v=white-pin-1" alt="" />
+                        <img src="favicon.svg?v=bicycle-1" alt="" />
                       </div>
                       <div>
-                        <h1>Bike Neuks</h1>
+                        <h1>Bike Neuk</h1>
                         <p>
                           {t('spotsAcrossCoverage', {
                             count: formattedParkingLocationCount,

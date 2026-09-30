@@ -1,6 +1,6 @@
 {
-  "name": "Bike Neuks",
-  "short_name": "Bike Neuks",
+  "name": "Bike Neuk",
+  "short_name": "Bike Neuk",
   "description": "Find nearby cycle parking across the UK, Ireland, Spain and Armenia.",
   "id": ".",
   "start_url": ".",
@@ -8,19 +8,19 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon-192.png?v=white-pin-1",
+      "src": "icon-192.png?v=bicycle-1",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png?v=white-pin-1",
+      "src": "icon-512.png?v=bicycle-1",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-maskable-512.png?v=white-pin-1",
+      "src": "icon-maskable-512.png?v=bicycle-1",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
