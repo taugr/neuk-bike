@@ -40,7 +40,7 @@ function parkingOneReferenceUrl(extraParams: Record<string, string> = {}) {
 
 async function expectFinderReady(page: Page) {
   await expect(
-    page.getByRole('heading', { name: 'Bike Neuks', exact: true }),
+    page.getByRole('heading', { name: 'Bike Neuk', exact: true }),
   ).toBeVisible();
   await expect(
     page.getByRole('region', { name: 'Cycle parking map' }),

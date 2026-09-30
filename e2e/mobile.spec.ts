@@ -433,7 +433,7 @@ test('changes language from the mobile menu and keeps the choice', async ({
   );
 });
 
-test('keeps route planning in the mobile Bike Neuks menu', async ({ page }) => {
+test('keeps route planning in the mobile Bike Neuk menu', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?mockGps=55.9533,-3.1883,5');
   await expect(page.getByTestId('parking-list')).toBeVisible();
@@ -2408,7 +2408,7 @@ test('shows distance in cycling-place popups and keeps the website in details', 
     )
     .toBe(true);
 
-  await page.getByRole('button', { name: 'Bike Neuks menu' }).click();
+  await page.getByRole('button', { name: 'Bike Neuk menu' }).click();
   const languageSelect = page.locator(
     '.settings-menu--mobile .language-select',
   );
@@ -2418,14 +2418,14 @@ test('shows distance in cycling-place popups and keeps the website in details', 
   await expect(website).toHaveAccessibleName(
     'Abrir el sitio web de Cycle Scotland',
   );
-  await page.getByRole('button', { name: 'Menú de Bike Neuks' }).click();
+  await page.getByRole('button', { name: 'Menú de Bike Neuk' }).click();
   await languageSelect.selectOption('gd');
   await expect(weeSpokeServices).toHaveText('Càradh');
   await expect(website).toContainText('Làrach-lìn');
   await expect(website).toHaveAccessibleName(
     'Fosgail an làrach-lìn airson Cycle Scotland',
   );
-  await page.getByRole('button', { name: 'Clàr-taice Bike Neuks' }).click();
+  await page.getByRole('button', { name: 'Clàr-taice Bike Neuk' }).click();
   await languageSelect.selectOption('hy');
   await expect(weeSpokeServices).toHaveText('Վերանորոգում');
   const armenianDistance = row.locator('.cycling-poi-meta-item').first();

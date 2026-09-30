@@ -30,6 +30,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "generate:brand": "node scripts/generate-brand-assets.mjs",
     "build": "next build",
     "deploy:cloudflare": "pnpm build && wrangler pages deploy out --project-name neuk-bike --branch main",
     "start": "next start",

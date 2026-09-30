@@ -212,7 +212,7 @@ function createOfflineBasemapStyle(
 ): StyleSpecification {
   return {
     version: 8,
-    name: 'Bike Neuks offline background',
+    name: 'Bike Neuk offline background',
     sources: {},
     layers: [
       {
