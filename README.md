@@ -296,6 +296,14 @@ OSM data from existing inputs; it does not make their source dates newer.
 Single-dataset commands remain available, and `pnpm check:data` flags
 parking/POI input mismatches. Partial region releases are rejected.
 
+Geofabrik downloads and upstream checks share a validated dated-file fallback
+when a `-latest.osm.pbf` alias fails or redirects incorrectly. The region's
+official publication page supplies the current dated filename, exact byte count
+and OSM cutoff; the date is never guessed from the current day. Bounded header
+probes verify that cutoff, and full downloads must pass size, PBF framing and
+compressed-block validation before replacing a cached input. Stale, future,
+mixed-age or incomplete OSM releases cannot replace the current release.
+
 The attribution panel shows underlying source dates;
 `public/data/freshness.json` records per-input dates, hashes and retrieval times.
 See [data maintenance](docs/data-maintenance.md) for scheduled review artifacts,

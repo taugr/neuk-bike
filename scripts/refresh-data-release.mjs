@@ -2,7 +2,10 @@ import { spawn } from 'node:child_process';
 import { cp, mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { promoteStagedPaths } from './data-release-utils.mjs';
+import {
+  assertFreshOsmRelease,
+  promoteStagedPaths,
+} from './data-release-utils.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const definitions = {
@@ -86,6 +89,13 @@ try {
     throw new Error(
       'Parking and POI input hashes differ: release was not promoted.',
     );
+  assertFreshOsmRelease(
+    freshness.datasets.filter(
+      (dataset) =>
+        ['parking', 'cycling-pois'].includes(dataset.id) &&
+        selected.includes(dataset.id === 'cycling-pois' ? 'pois' : dataset.id),
+    ),
+  );
   await promoteStagedPaths(staging, root, [
     'public/data',
     'src/data/cycle-parking.json',
