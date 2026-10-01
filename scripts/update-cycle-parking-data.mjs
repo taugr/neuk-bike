@@ -7,6 +7,7 @@ import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createOSMStream } from 'osm-pbf-parser-node';
+import { downloadGeofabrikExtract } from './geofabrik-download.mjs';
 import {
   createManifestReleaseId,
   deduplicateParkingPoints,
@@ -948,7 +949,7 @@ async function main() {
   const osmInputsReport = [];
 
   for (const input of inputs) {
-    await downloadFile({
+    const download = await downloadGeofabrikExtract({
       forceDownload,
       label: `${input.label} OSM extract`,
       outputPath: input.pbfPath,
@@ -959,6 +960,13 @@ async function main() {
       extractOsmParking(input.pbfPath, input.label),
       sha256File(input.pbfPath),
     ]);
+    if (
+      osm.sourceTimestamp !== download.sourceTimestamp ||
+      (download.sha256 && pbfChecksum !== download.sha256)
+    )
+      throw new Error(
+        `Validated ${input.label} source changed during extraction.`,
+      );
     const pointsForNaming =
       input.countryId === 'scotland'
         ? [...osm.points, ...rawCouncilPoints]
@@ -1001,6 +1009,7 @@ async function main() {
       recordCount: namedOsmPoints.length,
       sourceTimestamp: osm.sourceTimestamp,
       sourceUrl: input.url,
+      ...(download.downloadUrl ? { downloadUrl: download.downloadUrl } : {}),
     });
     console.log(
       `Processed ${namedOsmPoints.length.toLocaleString()} ${input.label} parking records in ${inputUsage.elapsedSeconds.toLocaleString()}s.`,

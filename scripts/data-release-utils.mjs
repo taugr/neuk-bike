@@ -1,6 +1,24 @@
 import { mkdir, rename, stat } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
+export const maximumSourceAgeDays = 35;
+
+export function assertFreshOsmRelease(datasets, now = Date.now()) {
+  for (const dataset of datasets) {
+    const oldest = Date.parse(dataset.oldestSourceAt);
+    if (
+      !dataset.complete ||
+      dataset.mixedAge ||
+      !Number.isFinite(oldest) ||
+      oldest > now ||
+      now - oldest > maximumSourceAgeDays * 86_400_000
+    )
+      throw new Error(
+        `Stale, mixed-age or incomplete ${dataset.id} sources: release was not promoted.`,
+      );
+  }
+}
+
 async function exists(path) {
   try {
     await stat(path);

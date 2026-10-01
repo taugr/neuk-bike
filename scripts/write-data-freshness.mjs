@@ -52,6 +52,7 @@ export async function writeDataFreshness() {
       inputs.push({
         id: input.id,
         sourceUrl: input.sourceUrl,
+        ...(input.downloadUrl ? { downloadUrl: input.downloadUrl } : {}),
         sourceTimestamp: input.sourceTimestamp,
         sha256: input.pbfSha256,
         retrievedAt: await verifiedRetrievalDate(input),

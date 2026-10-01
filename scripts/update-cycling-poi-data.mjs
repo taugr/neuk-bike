@@ -7,6 +7,7 @@ import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createOSMStream } from 'osm-pbf-parser-node';
+import { downloadGeofabrikExtract } from './geofabrik-download.mjs';
 import {
   createManifestReleaseId,
   getTileBounds,
@@ -643,7 +644,7 @@ async function main() {
   const inputsReport = [];
 
   for (const input of inputs) {
-    await downloadFile({
+    const download = await downloadGeofabrikExtract({
       forceDownload,
       label: `${input.label} OSM extract`,
       outputPath: input.pbfPath,
@@ -654,6 +655,13 @@ async function main() {
       extractPoints(input.pbfPath),
       sha256File(input.pbfPath),
     ]);
+    if (
+      result.sourceTimestamp !== download.sourceTimestamp ||
+      (download.sha256 && pbfChecksum !== download.sha256)
+    )
+      throw new Error(
+        `Validated ${input.label} source changed during extraction.`,
+      );
     for (const point of result.points) {
       const existing = mergedPoints.get(point.id);
       if (existing) duplicateRegionIds.add(point.id);
@@ -685,6 +693,7 @@ async function main() {
       recordCount: result.points.length,
       sourceTimestamp: result.sourceTimestamp,
       sourceUrl: input.url,
+      ...(download.downloadUrl ? { downloadUrl: download.downloadUrl } : {}),
     });
     console.log(
       `Processed ${result.points.length.toLocaleString()} ${input.label} cycling places in ${inputUsage.elapsedSeconds.toLocaleString()}s.`,

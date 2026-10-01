@@ -25,11 +25,32 @@ The wrapper runs both with the same Node executable.
 
 `pnpm check:data` fails for missing/unknown inputs, an oldest source date more
 than 35 days old, OSM date spreads exceeding two days, or parking/POI hash
-mismatch. `--upstream` also requests Geofabrik HTTP metadata and NCN's edit
-timestamp. A newer PBF publication indicates availability, not changed features.
+mismatch. `--upstream` also requests official Geofabrik publication pages,
+HEAD metadata and at most 64 KiB of each PBF to verify its actual OSM cutoff,
+plus NCN's edit timestamp. A newer cutoff indicates availability, not changed
+features; a later retrieval or file modification time does not make data newer.
 The report is `.cache/source-status.json`. Source dates and retrieval dates
 are separate in `public/data/freshness.json`; cached files are accepted as
 retrieval evidence only when their hash matches the report.
+
+Both parking and cycling-place downloads use the same resolver as the upstream
+check. A failed latest alias falls back only to the current dated extract
+identified on that region's official Geofabrik page. The resolver rejects
+foreign hosts, other regions/dates, stale or future cutoffs, missing/ambiguous
+publication records, malformed redirects, HTML bodies and mismatched sizes or
+PBF timestamps. Redirects and transient retries are bounded, with URL, status,
+attempt and nested network errors logged. The upstream report records the
+resolved URL and whether fallback was used; fresh acquisition reports retain
+the canonical source URL and add the actual `downloadUrl`.
+
+Downloads stream into temporary files, checking their complete byte count,
+SHA-256, PBF framing and compressed blocks before atomically replacing the
+cache. Extraction verifies the cutoff and hash again. A failure leaves the
+previous cached input and published release intact. The staging gate rejects
+stale, future, incomplete or mixed-age OSM inputs even during a cached rebuild.
+If official publication metadata is unavailable or inconsistent, the refresh
+fails rather than selecting an arbitrary older file. Inspect the logged source
+URL and error before retrying; do not manually relabel cached data as fresh.
 
 The **Data maintenance** GitHub workflow runs metadata checks every Friday at
 06:23 UTC and a complete refresh on the first of each month at 02:23 UTC.
