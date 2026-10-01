@@ -107,7 +107,9 @@ async function request(url, init, paths, options) {
       // by retrying. Network failures and transient HTTP errors get one retry.
       if (
         attempt === 2 ||
-        (error.retryable !== true && !(error instanceof TypeError))
+        (error.retryable !== true &&
+          !(error instanceof TypeError) &&
+          error.name !== 'TimeoutError')
       )
         throw error;
       await sleep(1_000);
