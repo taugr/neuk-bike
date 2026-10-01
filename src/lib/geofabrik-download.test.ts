@@ -333,6 +333,48 @@ describe('official Geofabrik resolution', () => {
     );
   });
 
+  it('retries a transient publication-page timeout before resolving the validated fallback', async () => {
+    let timedOut = false;
+    const fetcher = upstream((url) => {
+      if (url === page && !timedOut) {
+        timedOut = true;
+        throw new DOMException(
+          'The operation was aborted due to timeout',
+          'TimeoutError',
+        );
+      }
+      if (url === latest) return new Response(null, { status: 404 });
+    });
+    const settings = options(fetcher);
+    expect(await resolveGeofabrikExtract(latest, settings)).toMatchObject({
+      downloadUrl: dated,
+      sourceTimestamp: timestamp,
+    });
+    expect(
+      fetcher.mock.calls.filter(([url]) => String(url) === page),
+    ).toHaveLength(2);
+    expect(settings.log).toHaveBeenCalledWith(
+      expect.stringContaining('timeout'),
+    );
+  });
+
+  it('stops after two publication-page timeouts without probing unvalidated extracts', async () => {
+    const fetcher = vi.fn(async (url: RequestInfo | URL) => {
+      expect(String(url)).toBe(page);
+      throw new DOMException(
+        'The operation was aborted due to timeout',
+        'TimeoutError',
+      );
+    });
+    await expect(
+      resolveGeofabrikExtract(latest, options(fetcher)),
+    ).rejects.toMatchObject({ name: 'TimeoutError' });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher.mock.calls.every(([url]) => String(url) === page)).toBe(
+      true,
+    );
+  });
+
   it('rejects foreign latest input before any network request', async () => {
     const fetcher = upstream();
     await expect(
