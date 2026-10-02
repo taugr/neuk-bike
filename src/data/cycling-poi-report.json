@@ -1,9 +1,9 @@
 {
   "categoryCounts": {
-    "shop": 4131,
-    "repair": 2667,
-    "hire": 8059,
-    "water": 54897
+    "shop": 4128,
+    "repair": 2673,
+    "hire": 8066,
+    "water": 54969
   },
   "chunkZoom": 12,
   "chunks": {
@@ -1290,9 +1290,9 @@
         "south": 28.92163128242129,
         "west": -13.53515625
       },
-      "byteLength": 1280,
-      "count": 5,
-      "path": "chunks/12/1894/1703.3bc475b85fa6e523.json"
+      "byteLength": 1430,
+      "count": 6,
+      "path": "chunks/12/1894/1703.dbbf42808ba3a8a8.json"
     },
     "12/1931/1322": {
       "bounds": {
@@ -1400,9 +1400,9 @@
         "south": 53.4880455360562,
         "west": -10.107421875
       },
-      "byteLength": 215,
+      "byteLength": 258,
       "count": 1,
-      "path": "chunks/12/1933/1324.27b1c281dfa1c834.json"
+      "path": "chunks/12/1933/1324.b4b9d24864321a93.json"
     },
     "12/1933/1325": {
       "bounds": {
@@ -1480,6 +1480,17 @@
       "byteLength": 206,
       "count": 1,
       "path": "chunks/12/1934/1322.0f7cadc349f657af.json"
+    },
+    "12/1934/1323": {
+      "bounds": {
+        "east": -9.931640625,
+        "north": 53.59250480903937,
+        "south": 53.54030739150021,
+        "west": -10.01953125
+      },
+      "byteLength": 206,
+      "count": 1,
+      "path": "chunks/12/1934/1323.38170aa0cc397891.json"
     },
     "12/1934/1324": {
       "bounds": {
@@ -3283,7 +3294,7 @@
       },
       "byteLength": 19810,
       "count": 122,
-      "path": "chunks/12/1948/1517.ca8e945039e65b3b.json"
+      "path": "chunks/12/1948/1517.93162bea64352649.json"
     },
     "12/1948/1518": {
       "bounds": {
@@ -3732,9 +3743,9 @@
         "south": 42.81152174509789,
         "west": -8.61328125
       },
-      "byteLength": 19492,
-      "count": 117,
-      "path": "chunks/12/1950/1507.5fcbc0151ba51aa4.json"
+      "byteLength": 19340,
+      "count": 116,
+      "path": "chunks/12/1950/1507.4a31ae01842bfd55.json"
     },
     "12/1950/1508": {
       "bounds": {
@@ -4183,9 +4194,9 @@
         "south": 42.163403424223986,
         "west": -8.525390625
       },
-      "byteLength": 4721,
+      "byteLength": 4734,
       "count": 30,
-      "path": "chunks/12/1951/1517.c77edb8eb3be5989.json"
+      "path": "chunks/12/1951/1517.0c6601abe2a6c867.json"
     },
     "12/1951/1518": {
       "bounds": {
@@ -4370,9 +4381,9 @@
         "south": 43.004647127794435,
         "west": -8.4375
       },
-      "byteLength": 566,
-      "count": 3,
-      "path": "chunks/12/1952/1504.7c7dd0d73bfc3cfd.json"
+      "byteLength": 720,
+      "count": 4,
+      "path": "chunks/12/1952/1504.549354cc5c7e55cb.json"
     },
     "12/1952/1505": {
       "bounds": {
@@ -5437,9 +5448,9 @@
         "south": 53.90433815627469,
         "west": -8.0859375
       },
-      "byteLength": 361,
-      "count": 2,
-      "path": "chunks/12/1956/1316.7dcdf6862adfc6bd.json"
+      "byteLength": 565,
+      "count": 3,
+      "path": "chunks/12/1956/1316.b2e114bf51d9169b.json"
     },
     "12/1956/1328": {
       "bounds": {
@@ -5470,9 +5481,9 @@
         "south": 51.89005393521691,
         "west": -8.0859375
       },
-      "byteLength": 216,
-      "count": 1,
-      "path": "chunks/12/1956/1354.9c7008a468fe8fea.json"
+      "byteLength": 371,
+      "count": 2,
+      "path": "chunks/12/1956/1354.03b992420cdc169e.json"
     },
     "12/1956/1355": {
       "bounds": {
@@ -6064,9 +6075,9 @@
         "south": 43.38908193911751,
         "west": -7.91015625
       },
-      "byteLength": 612,
-      "count": 3,
-      "path": "chunks/12/1958/1498.c085b1c53ce4c2ee.json"
+      "byteLength": 767,
+      "count": 4,
+      "path": "chunks/12/1958/1498.77aecfb5d3b5f5b5.json"
     },
     "12/1958/1502": {
       "bounds": {
@@ -6176,7 +6187,7 @@
       },
       "byteLength": 15833,
       "count": 101,
-      "path": "chunks/12/1958/1515.66d90fa026d19943.json"
+      "path": "chunks/12/1958/1515.02534efd18303820.json"
     },
     "12/1958/1516": {
       "bounds": {
@@ -7967,9 +7978,9 @@
         "south": 53.01478324585923,
         "west": -7.3828125
       },
-      "byteLength": 943,
-      "count": 5,
-      "path": "chunks/12/1964/1333.71f307da243622f2.json"
+      "byteLength": 1108,
+      "count": 6,
+      "path": "chunks/12/1964/1333.eaf719db00a44b86.json"
     },
     "12/1964/1334": {
       "bounds": {
@@ -12367,9 +12378,9 @@
         "south": 57.46858919208934,
         "west": -6.50390625
       },
-      "byteLength": 385,
+      "byteLength": 532,
       "count": 1,
-      "path": "chunks/12/1974/1244.9ec89ffa2c408b59.json"
+      "path": "chunks/12/1974/1244.bd8566fec554b2e8.json"
     },
     "12/1974/1294": {
       "bounds": {
@@ -13753,9 +13764,9 @@
         "south": 53.33087298301704,
         "west": -6.328125
       },
-      "byteLength": 36058,
-      "count": 157,
-      "path": "chunks/12/1976/1327.ebeea3be720151f6.json"
+      "byteLength": 36246,
+      "count": 158,
+      "path": "chunks/12/1976/1327.4c84deaf6db68ee7.json"
     },
     "12/1976/1328": {
       "bounds": {
@@ -13764,9 +13775,9 @@
         "south": 53.27835301753183,
         "west": -6.328125
       },
-      "byteLength": 5571,
-      "count": 24,
-      "path": "chunks/12/1976/1328.15168cfb162a265c.json"
+      "byteLength": 5725,
+      "count": 25,
+      "path": "chunks/12/1976/1328.6c483cb7ed61da52.json"
     },
     "12/1976/1329": {
       "bounds": {
@@ -13775,9 +13786,9 @@
         "south": 53.2257684357902,
         "west": -6.328125
       },
-      "byteLength": 1907,
-      "count": 11,
-      "path": "chunks/12/1976/1329.cb394b97c970012d.json"
+      "byteLength": 2062,
+      "count": 12,
+      "path": "chunks/12/1976/1329.83b559f4b0772ef3.json"
     },
     "12/1976/1333": {
       "bounds": {
@@ -15920,9 +15931,9 @@
         "south": 43.06888777416961,
         "west": -6.064453125
       },
-      "byteLength": 1466,
-      "count": 9,
-      "path": "chunks/12/1979/1503.3ff0585d6b41dc75.json"
+      "byteLength": 1621,
+      "count": 10,
+      "path": "chunks/12/1979/1503.92b9604955005e4b.json"
     },
     "12/1979/1504": {
       "bounds": {
@@ -16187,17 +16198,6 @@
       "byteLength": 844,
       "count": 5,
       "path": "chunks/12/1979/1552.a3a124f9a0277e20.json"
-    },
-    "12/1979/1553": {
-      "bounds": {
-        "east": -5.9765625,
-        "north": 39.84228602074339,
-        "south": 39.77476948529547,
-        "west": -6.064453125
-      },
-      "byteLength": 533,
-      "count": 3,
-      "path": "chunks/12/1979/1553.58c6537a2d48b943.json"
     },
     "12/1979/1574": {
       "bounds": {
@@ -16899,9 +16899,9 @@
         "south": 37.23032838760387,
         "west": -5.9765625
       },
-      "byteLength": 2395,
-      "count": 14,
-      "path": "chunks/12/1980/1590.20da8db3bc0afa6a.json"
+      "byteLength": 3201,
+      "count": 18,
+      "path": "chunks/12/1980/1590.5b513648f6a6cd17.json"
     },
     "12/1980/1591": {
       "bounds": {
@@ -17438,9 +17438,9 @@
         "south": 40.11168866559596,
         "west": -5.888671875
       },
-      "byteLength": 829,
-      "count": 5,
-      "path": "chunks/12/1981/1548.3ace0d5af1218e5a.json"
+      "byteLength": 984,
+      "count": 6,
+      "path": "chunks/12/1981/1548.1a57808e1ecceb6a.json"
     },
     "12/1981/1549": {
       "bounds": {
@@ -18223,6 +18223,17 @@
       "count": 6,
       "path": "chunks/12/1982/1591.08bc12e4d8452e67.json"
     },
+    "12/1982/1592": {
+      "bounds": {
+        "east": -5.712890625,
+        "north": 37.16031654673676,
+        "south": 37.09023980307207,
+        "west": -5.80078125
+      },
+      "byteLength": 207,
+      "count": 1,
+      "path": "chunks/12/1982/1592.3e1d13148550d14e.json"
+    },
     "12/1982/1599": {
       "bounds": {
         "east": -5.712890625,
@@ -18714,9 +18725,9 @@
         "south": 40.91351257612757,
         "west": -5.712890625
       },
-      "byteLength": 45857,
-      "count": 251,
-      "path": "chunks/12/1983/1536.6a40e0e4bede7ae5.json"
+      "byteLength": 45703,
+      "count": 250,
+      "path": "chunks/12/1983/1536.0bbc7aa871a99b4c.json"
     },
     "12/1983/1537": {
       "bounds": {
@@ -18937,6 +18948,17 @@
       "byteLength": 760,
       "count": 4,
       "path": "chunks/12/1983/1607.29ab2fd0586a8f40.json"
+    },
+    "12/1984/1235": {
+      "bounds": {
+        "east": -5.537109375,
+        "north": 57.938183012205315,
+        "south": 57.891497352710324,
+        "west": -5.625
+      },
+      "byteLength": 293,
+      "count": 1,
+      "path": "chunks/12/1984/1235.701a724a4c58e9e6.json"
     },
     "12/1984/1236": {
       "bounds": {
@@ -21039,6 +21061,17 @@
       "count": 1,
       "path": "chunks/12/1987/1229.be84080228b39acb.json"
     },
+    "12/1987/1230": {
+      "bounds": {
+        "east": -5.2734375,
+        "north": 58.17070248348609,
+        "south": 58.124319605693756,
+        "west": -5.361328125
+      },
+      "byteLength": 270,
+      "count": 1,
+      "path": "chunks/12/1987/1230.d481f6cc3b6f3585.json"
+    },
     "12/1987/1236": {
       "bounds": {
         "east": -5.2734375,
@@ -21079,9 +21112,9 @@
         "south": 57.46858919208934,
         "west": -5.361328125
       },
-      "byteLength": 428,
+      "byteLength": 440,
       "count": 2,
-      "path": "chunks/12/1987/1244.bc5f72b9234ca36e.json"
+      "path": "chunks/12/1987/1244.cff4bdc1c511b9be.json"
     },
     "12/1987/1262": {
       "bounds": {
@@ -21145,9 +21178,9 @@
         "south": 50.23315183247224,
         "west": -5.361328125
       },
-      "byteLength": 232,
-      "count": 1,
-      "path": "chunks/12/1987/1384.40fe36cd397a0ed3.json"
+      "byteLength": 387,
+      "count": 2,
+      "path": "chunks/12/1987/1384.c610f0319c5b0fa5.json"
     },
     "12/1987/1385": {
       "bounds": {
@@ -21698,6 +21731,17 @@
       "byteLength": 278,
       "count": 1,
       "path": "chunks/12/1988/1235.dfe6e51569b5eeb4.json"
+    },
+    "12/1988/1274": {
+      "bounds": {
+        "east": -5.185546875,
+        "north": 56.07203547180087,
+        "south": 56.02294807962744,
+        "west": -5.2734375
+      },
+      "byteLength": 292,
+      "count": 1,
+      "path": "chunks/12/1988/1274.15382f9511c291a0.json"
     },
     "12/1988/1355": {
       "bounds": {
@@ -22872,9 +22916,9 @@
         "south": 40.313043208880906,
         "west": -5.185546875
       },
-      "byteLength": 2879,
-      "count": 18,
-      "path": "chunks/12/1989/1545.7fc46cf8c9dce73d.json"
+      "byteLength": 3034,
+      "count": 19,
+      "path": "chunks/12/1989/1545.e7e88facdb78afb9.json"
     },
     "12/1989/1546": {
       "bounds": {
@@ -24346,9 +24390,9 @@
         "south": 40.38002840251182,
         "west": -5.009765625
       },
-      "byteLength": 1940,
-      "count": 12,
-      "path": "chunks/12/1991/1544.bebd24a571bbdf21.json"
+      "byteLength": 2095,
+      "count": 13,
+      "path": "chunks/12/1991/1544.4162719cf7ac74f3.json"
     },
     "12/1991/1545": {
       "bounds": {
@@ -24536,6 +24580,17 @@
       "byteLength": 205,
       "count": 1,
       "path": "chunks/12/1992/1223.6eefdec81689b63a.json"
+    },
+    "12/1992/1257": {
+      "bounds": {
+        "east": -4.833984375,
+        "north": 56.897003921272606,
+        "south": 56.84897198026976,
+        "west": -4.921875
+      },
+      "byteLength": 287,
+      "count": 1,
+      "path": "chunks/12/1992/1257.31de7e22a662491c.json"
     },
     "12/1992/1262": {
       "bounds": {
@@ -27107,9 +27162,9 @@
         "south": 43.133061162406136,
         "west": -4.658203125
       },
-      "byteLength": 4853,
+      "byteLength": 4867,
       "count": 30,
-      "path": "chunks/12/1995/1502.6334b90d4e796faf.json"
+      "path": "chunks/12/1995/1502.831a5ebd0f7c9315.json"
     },
     "12/1995/1503": {
       "bounds": {
@@ -27118,9 +27173,9 @@
         "south": 43.06888777416961,
         "west": -4.658203125
       },
-      "byteLength": 521,
-      "count": 3,
-      "path": "chunks/12/1995/1503.ba393015015083b2.json"
+      "byteLength": 667,
+      "count": 4,
+      "path": "chunks/12/1995/1503.9e4b92a461355dc8.json"
     },
     "12/1995/1505": {
       "bounds": {
@@ -27627,6 +27682,17 @@
       "byteLength": 517,
       "count": 3,
       "path": "chunks/12/1995/1601.d21bda4cc7537366.json"
+    },
+    "12/1996/1247": {
+      "bounds": {
+        "east": -4.482421875,
+        "north": 57.3739384187141,
+        "south": 57.32652122521708,
+        "west": -4.5703125
+      },
+      "byteLength": 270,
+      "count": 1,
+      "path": "chunks/12/1996/1247.942cd786ebdf1849.json"
     },
     "12/1996/1271": {
       "bounds": {
@@ -28397,6 +28463,17 @@
       "byteLength": 282,
       "count": 1,
       "path": "chunks/12/1997/1244.cad29773886ff22f.json"
+    },
+    "12/1997/1246": {
+      "bounds": {
+        "east": -4.39453125,
+        "north": 57.42129439209404,
+        "south": 57.3739384187141,
+        "west": -4.482421875
+      },
+      "byteLength": 264,
+      "count": 1,
+      "path": "chunks/12/1997/1246.797c8a1a5151d776.json"
     },
     "12/1997/1247": {
       "bounds": {
@@ -30165,9 +30242,9 @@
         "south": 55.825973254619015,
         "west": -4.306640625
       },
-      "byteLength": 24833,
-      "count": 107,
-      "path": "chunks/12/1999/1278.00086d8b2398275e.json"
+      "byteLength": 25033,
+      "count": 108,
+      "path": "chunks/12/1999/1278.1254596ecc8e7f71.json"
     },
     "12/1999/1279": {
       "bounds": {
@@ -30407,9 +30484,9 @@
         "south": 42.74701217318065,
         "west": -4.306640625
       },
-      "byteLength": 3605,
+      "byteLength": 3617,
       "count": 21,
-      "path": "chunks/12/1999/1508.0e78fe408a01461d.json"
+      "path": "chunks/12/1999/1508.349f87037c68266d.json"
     },
     "12/1999/1509": {
       "bounds": {
@@ -30979,9 +31056,9 @@
         "south": 57.46858919208934,
         "west": -4.21875
       },
-      "byteLength": 408,
-      "count": 2,
-      "path": "chunks/12/2000/1244.64d003770151aa71.json"
+      "byteLength": 631,
+      "count": 3,
+      "path": "chunks/12/2000/1244.903a451ca7b97367.json"
     },
     "12/2000/1254": {
       "bounds": {
@@ -31740,7 +31817,7 @@
       },
       "byteLength": 2856,
       "count": 18,
-      "path": "chunks/12/2000/1542.f8ae8cf0d3c841da.json"
+      "path": "chunks/12/2000/1542.7aab0337ac106a48.json"
     },
     "12/2000/1543": {
       "bounds": {
@@ -32068,9 +32145,9 @@
         "south": 57.79794388498275,
         "west": -4.130859375
       },
-      "byteLength": 231,
+      "byteLength": 282,
       "count": 1,
-      "path": "chunks/12/2001/1237.be6b53ba1e4c50ec.json"
+      "path": "chunks/12/2001/1237.be906096695dad7c.json"
     },
     "12/2001/1246": {
       "bounds": {
@@ -32442,9 +32519,9 @@
         "south": 43.32517767999294,
         "west": -4.130859375
       },
-      "byteLength": 28102,
+      "byteLength": 28112,
       "count": 138,
-      "path": "chunks/12/2001/1499.245ffc500991e493.json"
+      "path": "chunks/12/2001/1499.a6b945dacb88c1f7.json"
     },
     "12/2001/1500": {
       "bounds": {
@@ -33135,9 +33212,9 @@
         "south": 57.84475099289099,
         "west": -4.04296875
       },
-      "byteLength": 429,
+      "byteLength": 424,
       "count": 2,
-      "path": "chunks/12/2002/1236.61766d1911da87c8.json"
+      "path": "chunks/12/2002/1236.fcb20c16205b5968.json"
     },
     "12/2002/1267": {
       "bounds": {
@@ -33773,9 +33850,9 @@
         "south": 40.91351257612757,
         "west": -4.04296875
       },
-      "byteLength": 1783,
-      "count": 9,
-      "path": "chunks/12/2002/1536.a6ad44f02bbe8c08.json"
+      "byteLength": 1938,
+      "count": 10,
+      "path": "chunks/12/2002/1536.21f80f7c584f2a9c.json"
     },
     "12/2002/1537": {
       "bounds": {
@@ -33795,9 +33872,9 @@
         "south": 40.780541431860314,
         "west": -4.04296875
       },
-      "byteLength": 6825,
-      "count": 39,
-      "path": "chunks/12/2002/1538.1d47108485fbff80.json"
+      "byteLength": 7220,
+      "count": 40,
+      "path": "chunks/12/2002/1538.69fd1f80fa43255d.json"
     },
     "12/2002/1539": {
       "bounds": {
@@ -33817,9 +33894,9 @@
         "south": 40.64730356252252,
         "west": -4.04296875
       },
-      "byteLength": 5231,
+      "byteLength": 5242,
       "count": 33,
-      "path": "chunks/12/2002/1540.907fb248594ada91.json"
+      "path": "chunks/12/2002/1540.c8e7c2c2cc8c2bf6.json"
     },
     "12/2002/1541": {
       "bounds": {
@@ -35478,9 +35555,9 @@
         "south": 53.27835301753183,
         "west": -3.8671875
       },
-      "byteLength": 1054,
-      "count": 5,
-      "path": "chunks/12/2004/1328.61f97b40fa9ff63f.json"
+      "byteLength": 1291,
+      "count": 6,
+      "path": "chunks/12/2004/1328.3fc6f0ba7c003343.json"
     },
     "12/2004/1329": {
       "bounds": {
@@ -35711,7 +35788,7 @@
       },
       "byteLength": 2057,
       "count": 13,
-      "path": "chunks/12/2004/1506.79382bb927fcb7f5.json"
+      "path": "chunks/12/2004/1506.27c9e3deb90842c9.json"
     },
     "12/2004/1507": {
       "bounds": {
@@ -36589,9 +36666,9 @@
         "south": 43.45291889355465,
         "west": -3.779296875
       },
-      "byteLength": 2618,
+      "byteLength": 2621,
       "count": 16,
-      "path": "chunks/12/2005/1497.5cb043e8ea132ace.json"
+      "path": "chunks/12/2005/1497.fe01f3e4393f3c1b.json"
     },
     "12/2005/1498": {
       "bounds": {
@@ -36688,9 +36765,9 @@
         "south": 42.87596410238253,
         "west": -3.779296875
       },
-      "byteLength": 3756,
-      "count": 24,
-      "path": "chunks/12/2005/1506.d771bf5287a11267.json"
+      "byteLength": 3911,
+      "count": 25,
+      "path": "chunks/12/2005/1506.cc63a8d269383cc6.json"
     },
     "12/2005/1507": {
       "bounds": {
@@ -37084,9 +37161,9 @@
         "south": 40.38002840251182,
         "west": -3.779296875
       },
-      "byteLength": 131087,
-      "count": 647,
-      "path": "chunks/12/2005/1544.b4774983910df02c.json"
+      "byteLength": 130996,
+      "count": 646,
+      "path": "chunks/12/2005/1544.7e5228f1a1f72031.json"
     },
     "12/2005/1545": {
       "bounds": {
@@ -37095,9 +37172,9 @@
         "south": 40.313043208880906,
         "west": -3.779296875
       },
-      "byteLength": 55522,
+      "byteLength": 55552,
       "count": 303,
-      "path": "chunks/12/2005/1545.258f727f006ff51a.json"
+      "path": "chunks/12/2005/1545.5b7fca955b6b8b3b.json"
     },
     "12/2005/1546": {
       "bounds": {
@@ -38063,9 +38140,9 @@
         "south": 40.51379915504414,
         "west": -3.69140625
       },
-      "byteLength": 23848,
-      "count": 151,
-      "path": "chunks/12/2006/1542.cbe1021466b65f5f.json"
+      "byteLength": 24002,
+      "count": 152,
+      "path": "chunks/12/2006/1542.6002149fb6b0bb4a.json"
     },
     "12/2006/1543": {
       "bounds": {
@@ -40586,6 +40663,17 @@
       "count": 1,
       "path": "chunks/12/2009/1219.16ff9057b86c7302.json"
     },
+    "12/2009/1240": {
+      "bounds": {
+        "east": -3.33984375,
+        "north": 57.70414723434192,
+        "south": 57.657157596582984,
+        "west": -3.427734375
+      },
+      "byteLength": 550,
+      "count": 2,
+      "path": "chunks/12/2009/1240.88ddb90785b85076.json"
+    },
     "12/2009/1246": {
       "bounds": {
         "east": -3.33984375,
@@ -41660,9 +41748,9 @@
         "south": 36.80928470205938,
         "west": -3.427734375
       },
-      "byteLength": 691,
-      "count": 4,
-      "path": "chunks/12/2009/1596.b48be93d09bee8d6.json"
+      "byteLength": 528,
+      "count": 3,
+      "path": "chunks/12/2009/1596.15f6bef3084f0ec2.json"
     },
     "12/2009/1597": {
       "bounds": {
@@ -42672,9 +42760,9 @@
         "south": 36.73888412439432,
         "west": -3.33984375
       },
-      "byteLength": 1053,
-      "count": 6,
-      "path": "chunks/12/2010/1597.a4c7178ae835f492.json"
+      "byteLength": 1362,
+      "count": 8,
+      "path": "chunks/12/2010/1597.a998a7ef9b477301.json"
     },
     "12/2011/1219": {
       "bounds": {
@@ -42771,9 +42859,9 @@
         "south": 55.92458580482951,
         "west": -3.251953125
       },
-      "byteLength": 14651,
-      "count": 66,
-      "path": "chunks/12/2011/1276.c285110aa893b188.json"
+      "byteLength": 14850,
+      "count": 67,
+      "path": "chunks/12/2011/1276.f9f356e37ad3a19f.json"
     },
     "12/2011/1277": {
       "bounds": {
@@ -42870,9 +42958,9 @@
         "south": 54.11094294272431,
         "west": -3.251953125
       },
-      "byteLength": 1409,
-      "count": 7,
-      "path": "chunks/12/2011/1312.0efd7df1201de761.json"
+      "byteLength": 1583,
+      "count": 8,
+      "path": "chunks/12/2011/1312.c62c75b9cfbeac32.json"
     },
     "12/2011/1326": {
       "bounds": {
@@ -43002,9 +43090,9 @@
         "south": 51.45400691005982,
         "west": -3.251953125
       },
-      "byteLength": 6055,
-      "count": 27,
-      "path": "chunks/12/2011/1362.db28bd7e560240aa.json"
+      "byteLength": 6247,
+      "count": 28,
+      "path": "chunks/12/2011/1362.25aacd5ae79ae5e9.json"
     },
     "12/2011/1363": {
       "bounds": {
@@ -43136,7 +43224,7 @@
       },
       "byteLength": 2520,
       "count": 16,
-      "path": "chunks/12/2011/1503.319192560a028481.json"
+      "path": "chunks/12/2011/1503.06255be23603bb9a.json"
     },
     "12/2011/1504": {
       "bounds": {
@@ -43257,7 +43345,7 @@
       },
       "byteLength": 3484,
       "count": 22,
-      "path": "chunks/12/2011/1514.279b887932ecd11f.json"
+      "path": "chunks/12/2011/1514.a2da243f441683a5.json"
     },
     "12/2011/1515": {
       "bounds": {
@@ -43596,9 +43684,9 @@
         "south": 37.30027528134432,
         "west": -3.251953125
       },
-      "byteLength": 668,
-      "count": 4,
-      "path": "chunks/12/2011/1589.02292e308e9b2588.json"
+      "byteLength": 823,
+      "count": 5,
+      "path": "chunks/12/2011/1589.8dd2c52258cc7268.json"
     },
     "12/2011/1590": {
       "bounds": {
@@ -43665,6 +43753,17 @@
       "byteLength": 593,
       "count": 3,
       "path": "chunks/12/2011/1597.b347474ef21c9853.json"
+    },
+    "12/2012/1224": {
+      "bounds": {
+        "east": -3.076171875,
+        "north": 58.44773280389082,
+        "south": 58.401711667607984,
+        "west": -3.1640625
+      },
+      "byteLength": 280,
+      "count": 1,
+      "path": "chunks/12/2012/1224.1d33a600568271ad.json"
     },
     "12/2012/1240": {
       "bounds": {
@@ -44696,9 +44795,9 @@
         "south": 36.949891786813275,
         "west": -3.1640625
       },
-      "byteLength": 4558,
-      "count": 26,
-      "path": "chunks/12/2012/1594.58a6c94aa555a5a3.json"
+      "byteLength": 4888,
+      "count": 28,
+      "path": "chunks/12/2012/1594.669b066bb8a69687.json"
     },
     "12/2012/1595": {
       "bounds": {
@@ -44729,9 +44828,9 @@
         "south": 58.63121664342478,
         "west": -3.076171875
       },
-      "byteLength": 241,
-      "count": 1,
-      "path": "chunks/12/2013/1219.4e5eb16ffdfa2b10.json"
+      "byteLength": 487,
+      "count": 2,
+      "path": "chunks/12/2013/1219.3787f897f716fd82.json"
     },
     "12/2013/1253": {
       "bounds": {
@@ -45435,7 +45534,7 @@
       },
       "byteLength": 3179,
       "count": 20,
-      "path": "chunks/12/2013/1515.97ec06881317c050.json"
+      "path": "chunks/12/2013/1515.5aae1251a868a0e9.json"
     },
     "12/2013/1516": {
       "bounds": {
@@ -45499,9 +45598,9 @@
         "south": 41.836827860727134,
         "west": -3.076171875
       },
-      "byteLength": 843,
+      "byteLength": 847,
       "count": 5,
-      "path": "chunks/12/2013/1522.168f9aea8fb61601.json"
+      "path": "chunks/12/2013/1522.b5ced74211bc84b4.json"
     },
     "12/2013/1523": {
       "bounds": {
@@ -45510,9 +45609,9 @@
         "south": 41.77131167976407,
         "west": -3.076171875
       },
-      "byteLength": 1774,
+      "byteLength": 1777,
       "count": 11,
-      "path": "chunks/12/2013/1523.b4a74cbae2e0679c.json"
+      "path": "chunks/12/2013/1523.eb0dd638d28ba36f.json"
     },
     "12/2013/1524": {
       "bounds": {
@@ -45785,9 +45884,9 @@
         "south": 37.71859032558813,
         "west": -3.076171875
       },
-      "byteLength": 514,
+      "byteLength": 520,
       "count": 3,
-      "path": "chunks/12/2013/1583.c65380ec8ddc47a4.json"
+      "path": "chunks/12/2013/1583.b82c25a8da2b5086.json"
     },
     "12/2013/1584": {
       "bounds": {
@@ -45961,9 +46060,9 @@
         "south": 56.41390137600676,
         "west": -2.98828125
       },
-      "byteLength": 1790,
-      "count": 8,
-      "path": "chunks/12/2014/1266.8e13b2d4116fde98.json"
+      "byteLength": 2050,
+      "count": 9,
+      "path": "chunks/12/2014/1266.c8bc5467a800dacf.json"
     },
     "12/2014/1269": {
       "bounds": {
@@ -46313,9 +46412,9 @@
         "south": 43.26120612479978,
         "west": -2.98828125
       },
-      "byteLength": 79561,
+      "byteLength": 79599,
       "count": 444,
-      "path": "chunks/12/2014/1500.203c128b0bbbeb91.json"
+      "path": "chunks/12/2014/1500.68ca3aa9ccd98e34.json"
     },
     "12/2014/1501": {
       "bounds": {
@@ -47303,9 +47402,9 @@
         "south": 43.32517767999294,
         "west": -2.900390625
       },
-      "byteLength": 3788,
+      "byteLength": 3798,
       "count": 24,
-      "path": "chunks/12/2015/1499.476988e98c63b607.json"
+      "path": "chunks/12/2015/1499.848151eb2fb17b59.json"
     },
     "12/2015/1500": {
       "bounds": {
@@ -49448,9 +49547,9 @@
         "south": 43.004647127794435,
         "west": -2.724609375
       },
-      "byteLength": 1915,
-      "count": 12,
-      "path": "chunks/12/2017/1504.0b98f41b94ac6987.json"
+      "byteLength": 2070,
+      "count": 13,
+      "path": "chunks/12/2017/1504.aa413110115b2403.json"
     },
     "12/2017/1505": {
       "bounds": {
@@ -50306,9 +50405,9 @@
         "south": 51.45400691005982,
         "west": -2.63671875
       },
-      "byteLength": 8438,
+      "byteLength": 8459,
       "count": 40,
-      "path": "chunks/12/2018/1362.59bfcce99acb01e9.json"
+      "path": "chunks/12/2018/1362.ec1c7d430ffa13d5.json"
     },
     "12/2018/1363": {
       "bounds": {
@@ -52605,9 +52704,9 @@
         "south": 43.133061162406136,
         "west": -2.4609375
       },
-      "byteLength": 10640,
-      "count": 66,
-      "path": "chunks/12/2020/1502.eff646b67fb0b4cc.json"
+      "byteLength": 10861,
+      "count": 67,
+      "path": "chunks/12/2020/1502.3ca638ef590a17c0.json"
     },
     "12/2020/1503": {
       "bounds": {
@@ -52629,7 +52728,7 @@
       },
       "byteLength": 3460,
       "count": 22,
-      "path": "chunks/12/2020/1504.48085e80be4b6120.json"
+      "path": "chunks/12/2020/1504.d9d24d6d91506fca.json"
     },
     "12/2020/1505": {
       "bounds": {
@@ -53617,9 +53716,9 @@
         "south": 43.133061162406136,
         "west": -2.373046875
       },
-      "byteLength": 5912,
-      "count": 38,
-      "path": "chunks/12/2021/1502.98d59dcd0ae33789.json"
+      "byteLength": 6067,
+      "count": 39,
+      "path": "chunks/12/2021/1502.7b31c4021f064c2b.json"
     },
     "12/2021/1503": {
       "bounds": {
@@ -54684,9 +54783,9 @@
         "south": 43.26120612479978,
         "west": -2.28515625
       },
-      "byteLength": 8299,
+      "byteLength": 8313,
       "count": 53,
-      "path": "chunks/12/2022/1500.5c71fd0b29fc2237.json"
+      "path": "chunks/12/2022/1500.8a96470400d8bac3.json"
     },
     "12/2022/1501": {
       "bounds": {
@@ -58593,6 +58692,17 @@
       "count": 1,
       "path": "chunks/12/2026/1286.67906b498dd12d9d.json"
     },
+    "12/2026/1295": {
+      "bounds": {
+        "east": -1.845703125,
+        "north": 55.02802211299251,
+        "south": 54.97761367069626,
+        "west": -1.93359375
+      },
+      "byteLength": 503,
+      "count": 2,
+      "path": "chunks/12/2026/1295.14ae2fabc25373b8.json"
+    },
     "12/2026/1296": {
       "bounds": {
         "east": -1.845703125,
@@ -58996,9 +59106,9 @@
         "south": 43.26120612479978,
         "west": -1.93359375
       },
-      "byteLength": 28035,
+      "byteLength": 28066,
       "count": 177,
-      "path": "chunks/12/2026/1500.955098f686959466.json"
+      "path": "chunks/12/2026/1500.25b2e610971d99b0.json"
     },
     "12/2026/1501": {
       "bounds": {
@@ -59051,9 +59161,9 @@
         "south": 42.940339233631825,
         "west": -1.93359375
       },
-      "byteLength": 2282,
-      "count": 14,
-      "path": "chunks/12/2026/1505.2c95b0e5ea75500a.json"
+      "byteLength": 2437,
+      "count": 15,
+      "path": "chunks/12/2026/1505.b5c217000808b4a3.json"
     },
     "12/2026/1506": {
       "bounds": {
@@ -59460,7 +59570,7 @@
       },
       "byteLength": 39484,
       "count": 238,
-      "path": "chunks/12/2026/1565.eeb93a0492ebf6d0.json"
+      "path": "chunks/12/2026/1565.a9f918f90911700f.json"
     },
     "12/2026/1566": {
       "bounds": {
@@ -59788,9 +59898,9 @@
         "south": 52.643063436658906,
         "west": -1.845703125
       },
-      "byteLength": 722,
-      "count": 3,
-      "path": "chunks/12/2027/1340.a528543d8b8c0cb4.json"
+      "byteLength": 964,
+      "count": 4,
+      "path": "chunks/12/2027/1340.4fefa06d454c7af6.json"
     },
     "12/2027/1342": {
       "bounds": {
@@ -60019,9 +60129,9 @@
         "south": 43.004647127794435,
         "west": -1.845703125
       },
-      "byteLength": 514,
-      "count": 3,
-      "path": "chunks/12/2027/1504.28ba05b752498733.json"
+      "byteLength": 669,
+      "count": 4,
+      "path": "chunks/12/2027/1504.1aa11e6c65901d80.json"
     },
     "12/2027/1505": {
       "bounds": {
@@ -60351,7 +60461,7 @@
       },
       "byteLength": 1906,
       "count": 11,
-      "path": "chunks/12/2027/1565.f575430c8f6ef4e2.json"
+      "path": "chunks/12/2027/1565.f3c6869fe0e6f435.json"
     },
     "12/2027/1569": {
       "bounds": {
@@ -61878,9 +61988,9 @@
         "south": 51.6180165487737,
         "west": -1.669921875
       },
-      "byteLength": 865,
-      "count": 4,
-      "path": "chunks/12/2029/1359.a18d07189ca55fd4.json"
+      "byteLength": 1020,
+      "count": 5,
+      "path": "chunks/12/2029/1359.31a945554218b040.json"
     },
     "12/2029/1361": {
       "bounds": {
@@ -65035,9 +65145,9 @@
         "south": 41.310823880918186,
         "west": -1.40625
       },
-      "byteLength": 529,
+      "byteLength": 525,
       "count": 3,
-      "path": "chunks/12/2032/1530.a4ba0b1afa4547eb.json"
+      "path": "chunks/12/2032/1530.fb64abb344177f04.json"
     },
     "12/2032/1531": {
       "bounds": {
@@ -65829,7 +65939,7 @@
       },
       "byteLength": 1752,
       "count": 11,
-      "path": "chunks/12/2033/1511.bea5b91c7109f121.json"
+      "path": "chunks/12/2033/1511.79a2d9b0b400f3ed.json"
     },
     "12/2033/1513": {
       "bounds": {
@@ -65948,9 +66058,9 @@
         "south": 41.310823880918186,
         "west": -1.318359375
       },
-      "byteLength": 357,
+      "byteLength": 353,
       "count": 2,
-      "path": "chunks/12/2033/1530.17197f9f8c923fa4.json"
+      "path": "chunks/12/2033/1530.d0f26a2581b2fb96.json"
     },
     "12/2033/1533": {
       "bounds": {
@@ -66410,9 +66520,9 @@
         "south": 52.90890204777025,
         "west": -1.23046875
       },
-      "byteLength": 7703,
+      "byteLength": 7707,
       "count": 44,
-      "path": "chunks/12/2034/1335.4b9351ccb231df2e.json"
+      "path": "chunks/12/2034/1335.cc2b5f9878e7d30e.json"
     },
     "12/2034/1336": {
       "bounds": {
@@ -67301,9 +67411,9 @@
         "south": 52.90890204777025,
         "west": -1.142578125
       },
-      "byteLength": 3881,
-      "count": 21,
-      "path": "chunks/12/2035/1335.b81b9f24ebce5f66.json"
+      "byteLength": 3709,
+      "count": 20,
+      "path": "chunks/12/2035/1335.2f2cb3c1a25ffa3e.json"
     },
     "12/2035/1339": {
       "bounds": {
@@ -69160,9 +69270,9 @@
         "south": 41.64007838467891,
         "west": -0.966796875
       },
-      "byteLength": 54061,
-      "count": 296,
-      "path": "chunks/12/2037/1525.3be4816dc6d843e0.json"
+      "byteLength": 53684,
+      "count": 294,
+      "path": "chunks/12/2037/1525.2148262c4d9eb60c.json"
     },
     "12/2037/1526": {
       "bounds": {
@@ -69171,9 +69281,9 @@
         "south": 41.57436130598913,
         "west": -0.966796875
       },
-      "byteLength": 30884,
-      "count": 166,
-      "path": "chunks/12/2037/1526.f3caf64814db88bd.json"
+      "byteLength": 31062,
+      "count": 167,
+      "path": "chunks/12/2037/1526.337fceac282202b9.json"
     },
     "12/2037/1527": {
       "bounds": {
@@ -69985,9 +70095,9 @@
         "south": 41.64007838467891,
         "west": -0.87890625
       },
-      "byteLength": 33664,
-      "count": 190,
-      "path": "chunks/12/2038/1525.b28eb684d6293362.json"
+      "byteLength": 33951,
+      "count": 192,
+      "path": "chunks/12/2038/1525.da7f081b4bb1d0ff.json"
     },
     "12/2038/1526": {
       "bounds": {
@@ -69996,9 +70106,9 @@
         "south": 41.57436130598913,
         "west": -0.87890625
       },
-      "byteLength": 11045,
+      "byteLength": 11034,
       "count": 62,
-      "path": "chunks/12/2038/1526.63b5e22e6601143c.json"
+      "path": "chunks/12/2038/1526.63a9343b2a8a937c.json"
     },
     "12/2038/1528": {
       "bounds": {
@@ -72229,9 +72339,9 @@
         "south": 52.268157373768176,
         "west": -0.615234375
       },
-      "byteLength": 404,
-      "count": 2,
-      "path": "chunks/12/2041/1347.60909b779159c61b.json"
+      "byteLength": 251,
+      "count": 1,
+      "path": "chunks/12/2041/1347.adb7b5f819e04143.json"
     },
     "12/2041/1349": {
       "bounds": {
@@ -72702,9 +72812,9 @@
         "south": 39.909736234537185,
         "west": -0.615234375
       },
-      "byteLength": 2574,
-      "count": 16,
-      "path": "chunks/12/2041/1551.0fd028149102564b.json"
+      "byteLength": 2731,
+      "count": 17,
+      "path": "chunks/12/2041/1551.9d097665a853d1b6.json"
     },
     "12/2041/1552": {
       "bounds": {
@@ -73243,7 +73353,7 @@
       },
       "byteLength": 878,
       "count": 4,
-      "path": "chunks/12/2042/1364.8c7622270fde1645.json"
+      "path": "chunks/12/2042/1364.4f956434f7cf9a89.json"
     },
     "12/2042/1365": {
       "bounds": {
@@ -74132,9 +74242,9 @@
         "south": 51.563412328675874,
         "west": -0.439453125
       },
-      "byteLength": 1280,
-      "count": 6,
-      "path": "chunks/12/2043/1360.d7794931f40550ea.json"
+      "byteLength": 1445,
+      "count": 7,
+      "path": "chunks/12/2043/1360.ef6ef1002b1e5241.json"
     },
     "12/2043/1361": {
       "bounds": {
@@ -74605,9 +74715,9 @@
         "south": 39.43619299931408,
         "west": -0.439453125
       },
-      "byteLength": 208496,
-      "count": 999,
-      "path": "chunks/12/2043/1558.40a9df9766da9600.json"
+      "byteLength": 209069,
+      "count": 1000,
+      "path": "chunks/12/2043/1558.d218af528acbfe78.json"
     },
     "12/2043/1559": {
       "bounds": {
@@ -75034,9 +75144,9 @@
         "south": 51.39920565355378,
         "west": -0.3515625
       },
-      "byteLength": 8605,
+      "byteLength": 8726,
       "count": 45,
-      "path": "chunks/12/2044/1363.22df380762190031.json"
+      "path": "chunks/12/2044/1363.7e47daba14184144.json"
     },
     "12/2044/1364": {
       "bounds": {
@@ -75474,9 +75584,9 @@
         "south": 39.43619299931408,
         "west": -0.3515625
       },
-      "byteLength": 50958,
-      "count": 242,
-      "path": "chunks/12/2044/1558.368d53aeb2bbafff.json"
+      "byteLength": 51444,
+      "count": 245,
+      "path": "chunks/12/2044/1558.0e2c6726d403d04b.json"
     },
     "12/2044/1559": {
       "bounds": {
@@ -75848,9 +75958,9 @@
         "south": 51.50874245880333,
         "west": -0.263671875
       },
-      "byteLength": 18164,
+      "byteLength": 18203,
       "count": 90,
-      "path": "chunks/12/2045/1361.0f154e0d46de129e.json"
+      "path": "chunks/12/2045/1361.7345a46f0a95e37f.json"
     },
     "12/2045/1362": {
       "bounds": {
@@ -75980,9 +76090,9 @@
         "south": 50.79204706440685,
         "west": -0.263671875
       },
-      "byteLength": 6492,
+      "byteLength": 6485,
       "count": 27,
-      "path": "chunks/12/2045/1374.3214f6bd2da45bfc.json"
+      "path": "chunks/12/2045/1374.98ad202fe9ae6182.json"
     },
     "12/2045/1508": {
       "bounds": {
@@ -76266,9 +76376,9 @@
         "south": 39.77476948529547,
         "west": -0.263671875
       },
-      "byteLength": 6747,
-      "count": 43,
-      "path": "chunks/12/2045/1553.3f08c7477c573707.json"
+      "byteLength": 6900,
+      "count": 44,
+      "path": "chunks/12/2045/1553.0b3dd01731425066.json"
     },
     "12/2045/1554": {
       "bounds": {
@@ -76541,9 +76651,9 @@
         "south": 52.3755991766591,
         "west": -0.17578125
       },
-      "byteLength": 311,
-      "count": 1,
-      "path": "chunks/12/2046/1345.ebb26d937593bf94.json"
+      "byteLength": 466,
+      "count": 2,
+      "path": "chunks/12/2046/1345.3c2ee741e92a1437.json"
     },
     "12/2046/1346": {
       "bounds": {
@@ -76618,9 +76728,9 @@
         "south": 51.50874245880333,
         "west": -0.17578125
       },
-      "byteLength": 78083,
-      "count": 377,
-      "path": "chunks/12/2046/1361.5fc8e6cabe69c21b.json"
+      "byteLength": 78622,
+      "count": 380,
+      "path": "chunks/12/2046/1361.3930b9156954af12.json"
     },
     "12/2046/1362": {
       "bounds": {
@@ -76629,9 +76739,9 @@
         "south": 51.45400691005982,
         "west": -0.17578125
       },
-      "byteLength": 70610,
+      "byteLength": 70612,
       "count": 332,
-      "path": "chunks/12/2046/1362.1b21daa5f3661301.json"
+      "path": "chunks/12/2046/1362.224684e1e3efc4d9.json"
     },
     "12/2046/1363": {
       "bounds": {
@@ -76739,9 +76849,9 @@
         "south": 50.79204706440685,
         "west": -0.17578125
       },
-      "byteLength": 22136,
+      "byteLength": 22106,
       "count": 93,
-      "path": "chunks/12/2046/1374.99f69820ee80f253.json"
+      "path": "chunks/12/2046/1374.476049aeadd03f9b.json"
     },
     "12/2046/1508": {
       "bounds": {
@@ -76860,9 +76970,9 @@
         "south": 41.96765920367817,
         "west": -0.17578125
       },
-      "byteLength": 206,
-      "count": 1,
-      "path": "chunks/12/2046/1520.c118c81393d173c8.json"
+      "byteLength": 361,
+      "count": 2,
+      "path": "chunks/12/2046/1520.7ebcdbb4affac387.json"
     },
     "12/2046/1523": {
       "bounds": {
@@ -77333,9 +77443,9 @@
         "south": 51.6180165487737,
         "west": -0.087890625
       },
-      "byteLength": 2127,
+      "byteLength": 2138,
       "count": 11,
-      "path": "chunks/12/2047/1359.2cae17a232a7be0e.json"
+      "path": "chunks/12/2047/1359.ef54fb16b7917fd7.json"
     },
     "12/2047/1360": {
       "bounds": {
@@ -77355,9 +77465,9 @@
         "south": 51.50874245880333,
         "west": -0.087890625
       },
-      "byteLength": 82082,
-      "count": 423,
-      "path": "chunks/12/2047/1361.ab11efa6697de3e7.json"
+      "byteLength": 81944,
+      "count": 422,
+      "path": "chunks/12/2047/1361.52492f10debdaad9.json"
     },
     "12/2047/1362": {
       "bounds": {
@@ -77366,9 +77476,9 @@
         "south": 51.45400691005982,
         "west": -0.087890625
       },
-      "byteLength": 24693,
-      "count": 121,
-      "path": "chunks/12/2047/1362.e170b7329928fd15.json"
+      "byteLength": 24868,
+      "count": 122,
+      "path": "chunks/12/2047/1362.0e2df7f67ddcb12d.json"
     },
     "12/2047/1363": {
       "bounds": {
@@ -77410,9 +77520,9 @@
         "south": 51.06901665960391,
         "west": -0.087890625
       },
-      "byteLength": 729,
+      "byteLength": 737,
       "count": 3,
-      "path": "chunks/12/2047/1369.cb9cab86100cbe7d.json"
+      "path": "chunks/12/2047/1369.bbcaacf770a70c33.json"
     },
     "12/2047/1370": {
       "bounds": {
@@ -78290,9 +78400,9 @@
         "south": 40.044437584608566,
         "west": 0
       },
-      "byteLength": 7386,
+      "byteLength": 7387,
       "count": 46,
-      "path": "chunks/12/2048/1549.107f36bf2bf20444.json"
+      "path": "chunks/12/2048/1549.b97367b8133bee37.json"
     },
     "12/2048/1550": {
       "bounds": {
@@ -78510,9 +78620,9 @@
         "south": 51.45400691005982,
         "west": 0.087890625
       },
-      "byteLength": 1398,
-      "count": 7,
-      "path": "chunks/12/2049/1362.39e5a010dc00b303.json"
+      "byteLength": 1172,
+      "count": 6,
+      "path": "chunks/12/2049/1362.ef1a4f728be59703.json"
     },
     "12/2049/1363": {
       "bounds": {
@@ -78587,9 +78697,9 @@
         "south": 50.73645513701065,
         "west": 0.087890625
       },
-      "byteLength": 2150,
-      "count": 11,
-      "path": "chunks/12/2049/1375.75116afe94d96f20.json"
+      "byteLength": 2303,
+      "count": 12,
+      "path": "chunks/12/2049/1375.9ef7b0633eaf4b8f.json"
     },
     "12/2049/1510": {
       "bounds": {
@@ -78787,7 +78897,7 @@
       },
       "byteLength": 209,
       "count": 1,
-      "path": "chunks/12/2049/1541.d77f58590e8bdabe.json"
+      "path": "chunks/12/2049/1541.3dbfde5df6f2c414.json"
     },
     "12/2049/1542": {
       "bounds": {
@@ -80512,9 +80622,9 @@
         "south": 42.5530802889558,
         "west": 0.439453125
       },
-      "byteLength": 3749,
-      "count": 24,
-      "path": "chunks/12/2053/1511.3a86014e1cb264e8.json"
+      "byteLength": 3898,
+      "count": 25,
+      "path": "chunks/12/2053/1511.93c089cbc93b41ef.json"
     },
     "12/2053/1512": {
       "bounds": {
@@ -80824,6 +80934,17 @@
       "count": 1,
       "path": "chunks/12/2054/1366.dcdd281c6f389d81.json"
     },
+    "12/2054/1371": {
+      "bounds": {
+        "east": 0.615234375,
+        "north": 51.01375465718819,
+        "south": 50.95842672335991,
+        "west": 0.52734375
+      },
+      "byteLength": 206,
+      "count": 1,
+      "path": "chunks/12/2054/1371.819574be904f98d7.json"
+    },
     "12/2054/1373": {
       "bounds": {
         "east": 0.615234375,
@@ -80875,9 +80996,9 @@
         "south": 42.42345651793831,
         "west": 0.52734375
       },
-      "byteLength": 358,
-      "count": 2,
-      "path": "chunks/12/2054/1513.f5c76732f41bfe2f.json"
+      "byteLength": 512,
+      "count": 3,
+      "path": "chunks/12/2054/1513.b3b0851601993126.json"
     },
     "12/2054/1514": {
       "bounds": {
@@ -81381,9 +81502,9 @@
         "south": 41.57436130598913,
         "west": 0.615234375
       },
-      "byteLength": 16040,
-      "count": 101,
-      "path": "chunks/12/2055/1526.d152b493d54bad6b.json"
+      "byteLength": 16194,
+      "count": 102,
+      "path": "chunks/12/2055/1526.b5b0041b56d14dd2.json"
     },
     "12/2055/1527": {
       "bounds": {
@@ -83262,9 +83383,9 @@
         "south": 42.35854391749705,
         "west": 1.0546875
       },
-      "byteLength": 1659,
-      "count": 10,
-      "path": "chunks/12/2060/1514.a1f7c626afd06ba9.json"
+      "byteLength": 1823,
+      "count": 11,
+      "path": "chunks/12/2060/1514.811ff2fd4551a802.json"
     },
     "12/2060/1515": {
       "bounds": {
@@ -83603,9 +83724,9 @@
         "south": 42.48830197960226,
         "west": 1.142578125
       },
-      "byteLength": 667,
-      "count": 4,
-      "path": "chunks/12/2061/1512.b69dae8f2de3b638.json"
+      "byteLength": 885,
+      "count": 5,
+      "path": "chunks/12/2061/1512.7b63166bc294efd8.json"
     },
     "12/2061/1513": {
       "bounds": {
@@ -85022,9 +85143,9 @@
         "south": 41.70572851523752,
         "west": 1.494140625
       },
-      "byteLength": 666,
-      "count": 4,
-      "path": "chunks/12/2065/1524.3db39aead2474362.json"
+      "byteLength": 819,
+      "count": 5,
+      "path": "chunks/12/2065/1524.0ec0477053f74e8b.json"
     },
     "12/2065/1525": {
       "bounds": {
@@ -86210,9 +86331,9 @@
         "south": 41.50857729743934,
         "west": 1.93359375
       },
-      "byteLength": 11459,
-      "count": 65,
-      "path": "chunks/12/2070/1527.a2f0e1f17d81a7e8.json"
+      "byteLength": 12075,
+      "count": 69,
+      "path": "chunks/12/2070/1527.936456e2a9e8a121.json"
     },
     "12/2070/1528": {
       "bounds": {
@@ -86408,9 +86529,9 @@
         "south": 41.44272637767211,
         "west": 2.021484375
       },
-      "byteLength": 21069,
-      "count": 133,
-      "path": "chunks/12/2071/1528.de17a609193d5769.json"
+      "byteLength": 21233,
+      "count": 134,
+      "path": "chunks/12/2071/1528.3b8fb011f5444274.json"
     },
     "12/2071/1529": {
       "bounds": {
@@ -86421,7 +86542,7 @@
       },
       "byteLength": 28675,
       "count": 163,
-      "path": "chunks/12/2071/1529.b79c82f4a0235e48.json"
+      "path": "chunks/12/2071/1529.6b30485c4cbe5f57.json"
     },
     "12/2071/1530": {
       "bounds": {
@@ -86573,9 +86694,9 @@
         "south": 41.57436130598913,
         "west": 2.109375
       },
-      "byteLength": 4797,
-      "count": 31,
-      "path": "chunks/12/2072/1526.34229a1a3c1fa2ce.json"
+      "byteLength": 4951,
+      "count": 32,
+      "path": "chunks/12/2072/1526.7a2b328de3a2938d.json"
     },
     "12/2072/1527": {
       "bounds": {
@@ -86606,9 +86727,9 @@
         "south": 41.37680856570235,
         "west": 2.109375
       },
-      "byteLength": 358516,
-      "count": 1703,
-      "path": "chunks/12/2072/1529.386a84dac2da9c2f.json"
+      "byteLength": 358168,
+      "count": 1701,
+      "path": "chunks/12/2072/1529.851c7c3e00216969.json"
     },
     "12/2072/1530": {
       "bounds": {
@@ -86617,9 +86738,9 @@
         "south": 41.310823880918186,
         "west": 2.109375
       },
-      "byteLength": 96001,
+      "byteLength": 96018,
       "count": 469,
-      "path": "chunks/12/2072/1530.7b7f71648ca562aa.json"
+      "path": "chunks/12/2072/1530.9ff89593dc661147.json"
     },
     "12/2072/1531": {
       "bounds": {
@@ -86716,9 +86837,9 @@
         "south": 41.902277040963696,
         "west": 2.197265625
       },
-      "byteLength": 6817,
-      "count": 41,
-      "path": "chunks/12/2073/1521.7e6bfd041bc94b46.json"
+      "byteLength": 6979,
+      "count": 42,
+      "path": "chunks/12/2073/1521.c388a883dea498c7.json"
     },
     "12/2073/1522": {
       "bounds": {
@@ -86740,7 +86861,7 @@
       },
       "byteLength": 4369,
       "count": 28,
-      "path": "chunks/12/2073/1523.c1cbc1b2cb5e37ad.json"
+      "path": "chunks/12/2073/1523.64a83bdbfd6041ab.json"
     },
     "12/2073/1524": {
       "bounds": {
@@ -86782,9 +86903,9 @@
         "south": 41.50857729743934,
         "west": 2.197265625
       },
-      "byteLength": 13960,
-      "count": 86,
-      "path": "chunks/12/2073/1527.2cd6ff204ebdd4f2.json"
+      "byteLength": 14114,
+      "count": 87,
+      "path": "chunks/12/2073/1527.03fb23291bf152fc.json"
     },
     "12/2073/1528": {
       "bounds": {
@@ -86936,9 +87057,9 @@
         "south": 41.64007838467891,
         "west": 2.28515625
       },
-      "byteLength": 3668,
-      "count": 23,
-      "path": "chunks/12/2074/1525.dc4ea17ee0be33b4.json"
+      "byteLength": 3821,
+      "count": 24,
+      "path": "chunks/12/2074/1525.e8ce5b5b002993c6.json"
     },
     "12/2074/1526": {
       "bounds": {
@@ -86958,9 +87079,9 @@
         "south": 41.50857729743934,
         "west": 2.28515625
       },
-      "byteLength": 5924,
-      "count": 37,
-      "path": "chunks/12/2074/1527.e965d2c1e5548580.json"
+      "byteLength": 6078,
+      "count": 38,
+      "path": "chunks/12/2074/1527.8987351b1b6f7d28.json"
     },
     "12/2074/1528": {
       "bounds": {
@@ -87182,6 +87303,17 @@
       "count": 3,
       "path": "chunks/12/2076/1515.9eaa6403744093d0.json"
     },
+    "12/2076/1516": {
+      "bounds": {
+        "east": 2.548828125,
+        "north": 42.29356419217008,
+        "south": 42.2285173562085,
+        "west": 2.4609375
+      },
+      "byteLength": 216,
+      "count": 1,
+      "path": "chunks/12/2076/1516.bba77998b81b3bd0.json"
+    },
     "12/2076/1517": {
       "bounds": {
         "east": 2.548828125,
@@ -87365,9 +87497,9 @@
         "south": 42.2285173562085,
         "west": 2.548828125
       },
-      "byteLength": 688,
-      "count": 4,
-      "path": "chunks/12/2077/1516.1fc22c88e047ae50.json"
+      "byteLength": 852,
+      "count": 5,
+      "path": "chunks/12/2077/1516.2b3fe5c379c744c0.json"
     },
     "12/2077/1517": {
       "bounds": {
@@ -89963,7 +90095,7 @@
       },
       "byteLength": 11278,
       "count": 72,
-      "path": "chunks/12/2553/1548.6534fabef76b5bf3.json"
+      "path": "chunks/12/2553/1548.1a24af71bd199256.json"
     },
     "12/2553/1549": {
       "bounds": {
@@ -90093,9 +90225,9 @@
         "south": 40.17887331434695,
         "west": 44.47265625
       },
-      "byteLength": 89386,
+      "byteLength": 89415,
       "count": 563,
-      "path": "chunks/12/2554/1547.b6ef7fcc922e06e8.json"
+      "path": "chunks/12/2554/1547.746d4054b6e0d162.json"
     },
     "12/2554/1548": {
       "bounds": {
@@ -100137,10 +100269,10 @@
     ],
     "label": "UK, Ireland, Spain and Armenia"
   },
-  "pointIndexPath": "indexes/point-index.1c022c62511af062.json",
-  "recordCount": 68229,
-  "refreshedAt": "2026-09-25T13:48:50.730Z",
-  "releaseId": "sha256-1d9cffa70600de2e5751f9e411af94245870f3bdcf0df4b953e98c3a59741af8",
+  "pointIndexPath": "indexes/point-index.d705bd555f184319.json",
+  "recordCount": 68306,
+  "refreshedAt": "2026-10-02T13:39:47.289Z",
+  "releaseId": "sha256-1cd6b253a55bb194aa66a21dd388c9b12a8e002b4974388c7a7c45d16a7d7266",
   "schemaVersion": 2,
   "sources": [
     {
@@ -100149,12 +100281,12 @@
       "label": "OpenStreetMap",
       "licenceName": "Open Database Licence 1.0",
       "licenceUrl": "https://opendatacommons.org/licenses/odbl/1-0/",
-      "recordCount": 68229,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
+      "recordCount": 68306,
+      "sourceTimestamp": "2026-10-01T20:22:06.000Z",
       "sourceUrl": "https://download.geofabrik.de"
     }
   ],
-  "chunkCount": 8395,
+  "chunkCount": 8407,
   "discarded": {
     "relation": 0,
     "way": 0
@@ -100265,45 +100397,49 @@
     ]
   },
   "generatedAssets": {
-    "cyclingPoiDataBytes": 16517495,
-    "fileCount": 8397,
-    "largestAssetBytes": 2538934,
-    "manifestBytes": 1691252,
-    "maximumInitialCompressedBytes": 81027,
-    "pointIndexBytes": 2538934
+    "cyclingPoiDataBytes": 16538458,
+    "fileCount": 8409,
+    "largestAssetBytes": 2541840,
+    "manifestBytes": 1693610,
+    "maximumInitialCompressedBytes": 81001,
+    "pointIndexBytes": 2541840
   },
   "geometryCounts": {
-    "node": 66114,
+    "node": 66178,
     "relation": 33,
-    "way": 2556
+    "way": 2569
   },
   "inputs": [
     {
       "categoryCounts": {
-        "shop": 243,
-        "repair": 295,
-        "hire": 207,
-        "water": 723
+        "shop": 244,
+        "repair": 296,
+        "hire": 209,
+        "water": 734
       },
       "countryId": "scotland",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 74.9,
+      "elapsedSeconds": 85.9,
       "geometryCounts": {
-        "node": 994,
+        "node": 997,
         "relation": 3,
-        "way": 354
+        "way": 365
       },
       "id": "scotland",
       "label": "Scotland",
-      "pbfSha256": "d30db3a64baa8de504ece95b22552763662699e28d1404290eefc9d9c2ef044e",
-      "retrievedAt": "2026-09-25T13:15:47.091Z",
-      "peakRssBytes": 302776320,
-      "recordCount": 1351,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-latest.osm.pbf"
+      "pbfSha256": "d308153f2dec5ca705c6d6fa6da2a2677827bd753f32bad095e1e79ccebc43fe",
+      "retrievedAt": "2026-10-02T13:01:18.618Z",
+      "peakRssBytes": 394268672,
+      "recordCount": 1365,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T12:59:57.664Z",
+      "publishedAt": "2026-10-01T01:55:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100317,7 +100453,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 1.9,
+      "elapsedSeconds": 2.3,
       "geometryCounts": {
         "node": 29,
         "relation": 0,
@@ -100325,12 +100461,16 @@
       },
       "id": "bedfordshire",
       "label": "Bedfordshire",
-      "pbfSha256": "9151401df6299e3db751819c674791f6a312d6ff3d2bbe3e101dc558e5a68bc4",
-      "retrievedAt": "2026-09-25T13:18:09.204Z",
-      "peakRssBytes": 321323008,
+      "pbfSha256": "ed408e36c50a106cea4543c7c3f88b8bcdc67c7d49fee405450c3a73bffb1c79",
+      "retrievedAt": "2026-10-02T13:04:19.516Z",
+      "peakRssBytes": 390225920,
       "recordCount": 34,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T12:59:58.501Z",
+      "publishedAt": "2026-10-01T02:08:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100344,7 +100484,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.9,
+      "elapsedSeconds": 3.3,
       "geometryCounts": {
         "node": 62,
         "relation": 0,
@@ -100352,12 +100492,16 @@
       },
       "id": "berkshire",
       "label": "Berkshire",
-      "pbfSha256": "1464c48b37e28b3103e34cad5fd69018979471eac12fd75bd0ac3111b99baff3",
-      "retrievedAt": "2026-09-25T13:18:15.348Z",
-      "peakRssBytes": 333250560,
+      "pbfSha256": "da62d1d7daa92a33686b0d717e6f4ceee6c3b8b1034ce59891a8e4ca8512bd3e",
+      "retrievedAt": "2026-10-02T13:04:27.685Z",
+      "peakRssBytes": 387117056,
       "recordCount": 74,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T12:59:59.403Z",
+      "publishedAt": "2026-10-01T02:01:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100371,7 +100515,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 1.7,
+      "elapsedSeconds": 2.1,
       "geometryCounts": {
         "node": 38,
         "relation": 0,
@@ -100379,12 +100523,16 @@
       },
       "id": "bristol",
       "label": "Bristol",
-      "pbfSha256": "c98c6a7af394bc83215d72a0aaa7141d5866225008bf768203fc1bf38e89ce22",
-      "retrievedAt": "2026-09-25T13:18:24.057Z",
-      "peakRssBytes": 346013696,
+      "pbfSha256": "3ba34e4f314d45f11592c8772816ed601c9e1e003e2a8ea7e60a353df5610112",
+      "retrievedAt": "2026-10-02T13:04:38.605Z",
+      "peakRssBytes": 388034560,
       "recordCount": 81,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:00.277Z",
+      "publishedAt": "2026-10-01T02:04:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100398,7 +100546,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.9,
+      "elapsedSeconds": 3.5,
       "geometryCounts": {
         "node": 75,
         "relation": 0,
@@ -100406,39 +100554,47 @@
       },
       "id": "buckinghamshire",
       "label": "Buckinghamshire",
-      "pbfSha256": "f9ee2970927040964a1aa70d92c883c0e412ca3a7353268c6d3408305d1504a4",
-      "retrievedAt": "2026-09-25T13:18:32.821Z",
-      "peakRssBytes": 346996736,
+      "pbfSha256": "bc635a205f83385c9df7436f655c539e27d0c2ec835b5ff2dc4243a780771aa8",
+      "retrievedAt": "2026-10-02T13:04:50.889Z",
+      "peakRssBytes": 387391488,
       "recordCount": 81,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:01.135Z",
+      "publishedAt": "2026-10-01T02:05:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 56,
         "repair": 53,
         "hire": 13,
-        "water": 65
+        "water": 66
       },
       "countryId": "england",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.3,
+      "elapsedSeconds": 5.3,
       "geometryCounts": {
-        "node": 138,
+        "node": 139,
         "relation": 0,
         "way": 25
       },
       "id": "cambridgeshire",
       "label": "Cambridgeshire",
-      "pbfSha256": "6c599c2310751575b703eafa6a6adc9f078d7fcb89fdcd64a5c17d837ecb4cd8",
-      "retrievedAt": "2026-09-25T13:18:41.106Z",
-      "peakRssBytes": 344440832,
-      "recordCount": 163,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-latest.osm.pbf"
+      "pbfSha256": "b429d2c6e6a2ee98954ad974f0a6c5f0ab90cc5829bfa9876661d0d214e28560",
+      "retrievedAt": "2026-10-02T13:05:03.066Z",
+      "peakRssBytes": 389283840,
+      "recordCount": 164,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:02.312Z",
+      "publishedAt": "2026-10-01T02:15:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100452,7 +100608,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.9,
+      "elapsedSeconds": 6,
       "geometryCounts": {
         "node": 75,
         "relation": 0,
@@ -100460,44 +100616,52 @@
       },
       "id": "cheshire",
       "label": "Cheshire",
-      "pbfSha256": "1ee3dabbbb1c54ac3d533ecd3b6142a3152d01353a2d535ee0164fa274a341b0",
-      "retrievedAt": "2026-09-25T13:18:55.795Z",
-      "peakRssBytes": 343752704,
+      "pbfSha256": "dce26f939516b080eae26920471327895e5e228ab5c79d7617c59968b216b142",
+      "retrievedAt": "2026-10-02T13:05:22.884Z",
+      "peakRssBytes": 393945088,
       "recordCount": 88,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:03.553Z",
+      "publishedAt": "2026-10-01T02:05:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 19,
         "repair": 11,
         "hire": 67,
-        "water": 90
+        "water": 91
       },
       "countryId": "england",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.6,
+      "elapsedSeconds": 5.8,
       "geometryCounts": {
-        "node": 139,
+        "node": 140,
         "relation": 0,
         "way": 42
       },
       "id": "cornwall",
       "label": "Cornwall",
-      "pbfSha256": "c05b4233a4343a04eeded8b25c1747a0e2191ca52270f49e41893ecbe7095975",
-      "retrievedAt": "2026-09-25T13:19:11.191Z",
-      "peakRssBytes": 345522176,
-      "recordCount": 181,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-latest.osm.pbf"
+      "pbfSha256": "7692038770959ae842430c019fefd80d27681f0ee9cc0d7c50b32a2c4defcabe",
+      "retrievedAt": "2026-10-02T13:05:41.337Z",
+      "peakRssBytes": 391483392,
+      "recordCount": 182,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:04.638Z",
+      "publishedAt": "2026-10-01T02:07:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 30,
-        "repair": 23,
+        "repair": 24,
         "hire": 25,
         "water": 73
       },
@@ -100506,20 +100670,24 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 6.5,
+      "elapsedSeconds": 8,
       "geometryCounts": {
-        "node": 100,
+        "node": 101,
         "relation": 0,
         "way": 34
       },
       "id": "cumbria",
       "label": "Cumbria",
-      "pbfSha256": "ef6cefa01be47750c8f420fdfde32d66a21b1908ad3713bb676cb07105b650ee",
-      "retrievedAt": "2026-09-25T13:19:25.458Z",
-      "peakRssBytes": 345931776,
-      "recordCount": 134,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-latest.osm.pbf"
+      "pbfSha256": "b7f09cf4c09e10bef023005fcfb866e2481004db0b9b411861c1059d62cb74d0",
+      "retrievedAt": "2026-10-02T13:05:58.647Z",
+      "peakRssBytes": 391667712,
+      "recordCount": 135,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:05.819Z",
+      "publishedAt": "2026-10-01T02:04:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100533,7 +100701,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.5,
+      "elapsedSeconds": 6.6,
       "geometryCounts": {
         "node": 109,
         "relation": 0,
@@ -100541,12 +100709,16 @@
       },
       "id": "derbyshire",
       "label": "Derbyshire",
-      "pbfSha256": "b1594f28093b5d547c1da983620d749d90d71ffb04ff83e8c79930ddc49be7da",
-      "retrievedAt": "2026-09-25T13:19:42.207Z",
-      "peakRssBytes": 348815360,
+      "pbfSha256": "8362e0380a33a57603bac5ac31249d0f56c3d2a4f3fbd46346a6358b4f71fdfa",
+      "retrievedAt": "2026-10-02T13:06:20.978Z",
+      "peakRssBytes": 393371648,
       "recordCount": 137,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:06.669Z",
+      "publishedAt": "2026-10-01T01:56:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100560,7 +100732,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 7.7,
+      "elapsedSeconds": 9.3,
       "geometryCounts": {
         "node": 219,
         "relation": 0,
@@ -100568,12 +100740,16 @@
       },
       "id": "devon",
       "label": "Devon",
-      "pbfSha256": "6a45e9072110733d00b624a0ad3c558d2e571c404813543773d7377c32b943c2",
-      "retrievedAt": "2026-09-25T13:19:58.218Z",
-      "peakRssBytes": 346685440,
+      "pbfSha256": "1cdbcbfbb6449e4e893813eaa061787d3729d2c9ad09dc4e6e1d1c5e2efeafdb",
+      "retrievedAt": "2026-10-02T13:06:41.399Z",
+      "peakRssBytes": 391954432,
       "recordCount": 258,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:07.762Z",
+      "publishedAt": "2026-10-01T02:07:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100587,7 +100763,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.7,
+      "elapsedSeconds": 6.9,
       "geometryCounts": {
         "node": 574,
         "relation": 1,
@@ -100595,12 +100771,16 @@
       },
       "id": "dorset",
       "label": "Dorset",
-      "pbfSha256": "5b3353bd855f0eebe8ceb2d8c50a6fa7d1c60368a98630deb4ad02e6068c3aa8",
-      "retrievedAt": "2026-09-25T13:20:19.998Z",
-      "peakRssBytes": 311869440,
+      "pbfSha256": "3e43bae1c251741e571b79780d95bf81ff1dc583ae981af84120b31aff4bf161",
+      "retrievedAt": "2026-10-02T13:07:09.280Z",
+      "peakRssBytes": 391114752,
       "recordCount": 606,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:08.594Z",
+      "publishedAt": "2026-10-01T02:11:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100614,7 +100794,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.9,
+      "elapsedSeconds": 3.5,
       "geometryCounts": {
         "node": 34,
         "relation": 0,
@@ -100622,39 +100802,47 @@
       },
       "id": "durham",
       "label": "Durham",
-      "pbfSha256": "00fd39861b44a832706579a8283ba18dd3ce29b433dd27210cb34e7d0fe79453",
-      "retrievedAt": "2026-09-25T13:20:31.681Z",
-      "peakRssBytes": 314982400,
+      "pbfSha256": "92b1155567fd7bb73a5a4596b6bcd388c13510a49ce942f4ed9ac799269d2a02",
+      "retrievedAt": "2026-10-02T13:07:23.819Z",
+      "peakRssBytes": 394354688,
       "recordCount": 44,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:09.752Z",
+      "publishedAt": "2026-10-01T02:05:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 17,
         "repair": 10,
         "hire": 5,
-        "water": 43
+        "water": 45
       },
       "countryId": "england",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.7,
+      "elapsedSeconds": 3.4,
       "geometryCounts": {
-        "node": 57,
+        "node": 59,
         "relation": 0,
         "way": 13
       },
       "id": "east-sussex",
       "label": "East Sussex",
-      "pbfSha256": "d819df9fe4d35daf3342934f60b94baa01b5133583cebf38a8704830f9d10118",
-      "retrievedAt": "2026-09-25T13:20:40.046Z",
-      "peakRssBytes": 312213504,
-      "recordCount": 70,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-latest.osm.pbf"
+      "pbfSha256": "955c8691860d20ce6571b781963600f51cac2eda8b9c55830432051932e895b1",
+      "retrievedAt": "2026-10-02T13:07:34.934Z",
+      "peakRssBytes": 388980736,
+      "recordCount": 72,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:10.616Z",
+      "publishedAt": "2026-10-01T02:09:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100668,7 +100856,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.6,
+      "elapsedSeconds": 3.2,
       "geometryCounts": {
         "node": 30,
         "relation": 0,
@@ -100676,12 +100864,16 @@
       },
       "id": "east-yorkshire-with-hull",
       "label": "East Yorkshire with Hull",
-      "pbfSha256": "e097cd085ddcc223fdd2c14bc2e39cfa0b364bd9884aa67b18e0c0b1ce861c8c",
-      "retrievedAt": "2026-09-25T13:20:47.799Z",
-      "peakRssBytes": 313098240,
+      "pbfSha256": "923eb395ce2591d2de976168e41f45bf794c943f4aa601c966731f5277e7b519",
+      "retrievedAt": "2026-10-02T13:07:45.189Z",
+      "peakRssBytes": 390553600,
       "recordCount": 44,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:11.493Z",
+      "publishedAt": "2026-10-01T02:10:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100695,7 +100887,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 6.6,
+      "elapsedSeconds": 7.7,
       "geometryCounts": {
         "node": 113,
         "relation": 0,
@@ -100703,12 +100895,16 @@
       },
       "id": "essex",
       "label": "Essex",
-      "pbfSha256": "6751cdf7bff704230225eccf7949cd3e4ce7644607319fd9fae10e242e102931",
-      "retrievedAt": "2026-09-25T13:20:56.238Z",
-      "peakRssBytes": 312213504,
+      "pbfSha256": "12f7b8ffcbdcad792f0d7ac40899fd1b81e2a5becb797480dc29551557782bf2",
+      "retrievedAt": "2026-10-02T13:07:58.469Z",
+      "peakRssBytes": 396128256,
       "recordCount": 148,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:12.347Z",
+      "publishedAt": "2026-10-01T02:12:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100722,7 +100918,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 7.7,
+      "elapsedSeconds": 9.5,
       "geometryCounts": {
         "node": 135,
         "relation": 1,
@@ -100730,39 +100926,47 @@
       },
       "id": "gloucestershire",
       "label": "Gloucestershire",
-      "pbfSha256": "dbf10f18f83543e41c3904743b72b624d9e111df9c8145ecebe827a1d4d4cadd",
-      "retrievedAt": "2026-09-25T13:21:13.797Z",
-      "peakRssBytes": 254984192,
+      "pbfSha256": "79391c9455983af785ac70d272b423914ffcb5ea5b7e991e01117455f1ffcf0c",
+      "retrievedAt": "2026-10-02T13:08:24.177Z",
+      "peakRssBytes": 393490432,
       "recordCount": 165,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:13.221Z",
+      "publishedAt": "2026-10-01T02:02:00.000Z"
     },
     {
       "categoryCounts": {
-        "shop": 329,
+        "shop": 327,
         "repair": 238,
-        "hire": 1262,
-        "water": 623
+        "hire": 1263,
+        "water": 627
       },
       "countryId": "england",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 21.8,
+      "elapsedSeconds": 26.5,
       "geometryCounts": {
-        "node": 2176,
+        "node": 2178,
         "relation": 2,
-        "way": 156
+        "way": 157
       },
       "id": "greater-london",
       "label": "Greater London",
-      "pbfSha256": "7ec6bfc796775320eeccc617bcdf6eb8870c4cad091a743c91ec4ed49f121096",
-      "retrievedAt": "2026-09-25T13:21:37.801Z",
-      "peakRssBytes": 315555840,
-      "recordCount": 2334,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-latest.osm.pbf"
+      "pbfSha256": "3acd36a3584c7df660564edda3897125ae057519f402cb23619592c6ee4fea30",
+      "retrievedAt": "2026-10-02T13:08:49.558Z",
+      "peakRssBytes": 396972032,
+      "recordCount": 2337,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:14.096Z",
+      "publishedAt": "2026-10-01T02:14:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100776,7 +100980,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 6.7,
+      "elapsedSeconds": 8.4,
       "geometryCounts": {
         "node": 302,
         "relation": 0,
@@ -100784,12 +100988,16 @@
       },
       "id": "greater-manchester",
       "label": "Greater Manchester",
-      "pbfSha256": "3dbac8ef082feec2c8185ce0b453d872ce0221806db83f521cbef1d3e2204648",
-      "retrievedAt": "2026-09-25T13:23:23.676Z",
-      "peakRssBytes": 296599552,
+      "pbfSha256": "5745097b01380f4634b8a86bd5187f587b26824c1f45a0f0e171770c6910818e",
+      "retrievedAt": "2026-10-02T13:11:15.411Z",
+      "peakRssBytes": 400506880,
       "recordCount": 323,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:14.945Z",
+      "publishedAt": "2026-10-01T02:00:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100803,7 +101011,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 8.1,
+      "elapsedSeconds": 10.1,
       "geometryCounts": {
         "node": 278,
         "relation": 0,
@@ -100811,12 +101019,16 @@
       },
       "id": "hampshire",
       "label": "Hampshire",
-      "pbfSha256": "1a5bf8e0431815ee905f01763e5f054a1a47e9304e8e98dc553d6d614c11db0e",
-      "retrievedAt": "2026-09-25T13:23:46.502Z",
-      "peakRssBytes": 285032448,
+      "pbfSha256": "5bc04fb7957e5ea3e6147a235e501cfdbbcfce7354e40c2072c54f58a6110903",
+      "retrievedAt": "2026-10-02T13:11:42.708Z",
+      "peakRssBytes": 395403264,
       "recordCount": 325,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:15.789Z",
+      "publishedAt": "2026-10-01T02:08:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100830,7 +101042,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 1.5,
+      "elapsedSeconds": 1.7,
       "geometryCounts": {
         "node": 79,
         "relation": 0,
@@ -100838,12 +101050,16 @@
       },
       "id": "herefordshire",
       "label": "Herefordshire",
-      "pbfSha256": "0b9d3e730b570b17ac6665ea5ebdb1c20534c36a46a9cfa4f9245206d8fb98df",
-      "retrievedAt": "2026-09-25T13:24:08.479Z",
-      "peakRssBytes": 279461888,
+      "pbfSha256": "5d68aa1610f6865e4f468794d13175da2784b03e3a226c998b539150815dc787",
+      "retrievedAt": "2026-10-02T13:12:11.543Z",
+      "peakRssBytes": 390303744,
       "recordCount": 86,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:16.648Z",
+      "publishedAt": "2026-10-01T02:08:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100857,7 +101073,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.1,
+      "elapsedSeconds": 6.3,
       "geometryCounts": {
         "node": 151,
         "relation": 0,
@@ -100865,12 +101081,16 @@
       },
       "id": "hertfordshire",
       "label": "Hertfordshire",
-      "pbfSha256": "45252c230e51270c519e7b18dfd9b1bb77b609670bfa3886fcb2f5873e103697",
-      "retrievedAt": "2026-09-25T13:24:14.296Z",
-      "peakRssBytes": 286507008,
+      "pbfSha256": "c92010511b81dcff91d43c44aaf57ded35aeba0f017ebefd7b7461d03e17b35f",
+      "retrievedAt": "2026-10-02T13:12:19.150Z",
+      "peakRssBytes": 396201984,
       "recordCount": 170,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:17.507Z",
+      "publishedAt": "2026-10-01T02:11:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100884,7 +101104,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 1,
+      "elapsedSeconds": 1.3,
       "geometryCounts": {
         "node": 40,
         "relation": 0,
@@ -100892,12 +101112,16 @@
       },
       "id": "isle-of-wight",
       "label": "Isle of Wight",
-      "pbfSha256": "b283de41b2d28889e3c26e699288a745c055a031ffb7778d153748feafb676b4",
-      "retrievedAt": "2026-09-25T13:24:27.551Z",
-      "peakRssBytes": 281657344,
+      "pbfSha256": "e3268317e89064bf2fc853aca19b4834f434e2c6cc77eb1b62a0b602426c1645",
+      "retrievedAt": "2026-10-02T13:12:36.784Z",
+      "peakRssBytes": 393711616,
       "recordCount": 43,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:18.359Z",
+      "publishedAt": "2026-10-01T02:09:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100911,7 +101135,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 9.9,
+      "elapsedSeconds": 12,
       "geometryCounts": {
         "node": 115,
         "relation": 1,
@@ -100919,12 +101143,16 @@
       },
       "id": "kent",
       "label": "Kent",
-      "pbfSha256": "1943c25cb4a8a358e2d11d7e65199248b06cdc77c98bce2fe9f78917ca37f8c9",
-      "retrievedAt": "2026-09-25T13:24:32.788Z",
-      "peakRssBytes": 287260672,
+      "pbfSha256": "1b62966068e98a0c383ef192958ec4ff0e7f0f266b110a2deda10e6bb8b3718a",
+      "retrievedAt": "2026-10-02T13:12:44.780Z",
+      "peakRssBytes": 396595200,
       "recordCount": 154,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:19.232Z",
+      "publishedAt": "2026-10-01T02:10:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100938,7 +101166,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.5,
+      "elapsedSeconds": 6.6,
       "geometryCounts": {
         "node": 58,
         "relation": 0,
@@ -100946,12 +101174,16 @@
       },
       "id": "lancashire",
       "label": "Lancashire",
-      "pbfSha256": "41cb083d6da35982c493f15592a8c8f8d15e3fe0226c7d5125a32a6375dd4f30",
-      "retrievedAt": "2026-09-25T13:24:51.873Z",
-      "peakRssBytes": 281952256,
+      "pbfSha256": "20378a6f7be2c5c71b980353426af55c08a70e5a492feaeee121e529192129fc",
+      "retrievedAt": "2026-10-02T13:13:09.908Z",
+      "peakRssBytes": 390660096,
       "recordCount": 75,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:20.077Z",
+      "publishedAt": "2026-10-01T02:07:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100965,7 +101197,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.6,
+      "elapsedSeconds": 3.1,
       "geometryCounts": {
         "node": 51,
         "relation": 0,
@@ -100973,12 +101205,16 @@
       },
       "id": "leicestershire",
       "label": "Leicestershire",
-      "pbfSha256": "225b8a630a35b89f8fe210da9b2bb47ea09e840457dd6bba60499768c1249659",
-      "retrievedAt": "2026-09-25T13:25:06.315Z",
-      "peakRssBytes": 284999680,
+      "pbfSha256": "8c02762074bc5bb83e5b68702b4f055541e2b1a54a8dd973ffe8425d51bc8c9c",
+      "retrievedAt": "2026-10-02T13:13:28.614Z",
+      "peakRssBytes": 393936896,
       "recordCount": 61,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:20.935Z",
+      "publishedAt": "2026-10-01T02:01:00.000Z"
     },
     {
       "categoryCounts": {
@@ -100992,7 +101228,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.8,
+      "elapsedSeconds": 7.1,
       "geometryCounts": {
         "node": 62,
         "relation": 0,
@@ -101000,12 +101236,16 @@
       },
       "id": "lincolnshire",
       "label": "Lincolnshire",
-      "pbfSha256": "135fee4cd38b8c69c30ba77d74bda0f2a92bb31799291bb88eace98007a6af5d",
-      "retrievedAt": "2026-09-25T13:25:15.361Z",
-      "peakRssBytes": 286507008,
+      "pbfSha256": "2624b4cb7b95769a58f82b3739fff4a4a79de4aed18003050d81c08d5b283107",
+      "retrievedAt": "2026-10-02T13:13:40.241Z",
+      "peakRssBytes": 395640832,
       "recordCount": 80,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:21.783Z",
+      "publishedAt": "2026-10-01T02:14:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101019,7 +101259,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 3.4,
+      "elapsedSeconds": 4.3,
       "geometryCounts": {
         "node": 60,
         "relation": 0,
@@ -101027,12 +101267,16 @@
       },
       "id": "merseyside",
       "label": "Merseyside",
-      "pbfSha256": "d97d441a6458400dc810195549b048d98decf72c614e76f12540c311e0759eae",
-      "retrievedAt": "2026-09-25T13:25:29.602Z",
-      "peakRssBytes": 287604736,
+      "pbfSha256": "4be0b3e81adaea01b6a1f56cfd46f1953763f9752919528c20ad4d7108102ea0",
+      "retrievedAt": "2026-10-02T13:13:59.147Z",
+      "peakRssBytes": 396689408,
       "recordCount": 75,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:22.660Z",
+      "publishedAt": "2026-10-01T02:02:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101046,7 +101290,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.9,
+      "elapsedSeconds": 7.2,
       "geometryCounts": {
         "node": 236,
         "relation": 0,
@@ -101054,12 +101298,16 @@
       },
       "id": "norfolk",
       "label": "Norfolk",
-      "pbfSha256": "acf11355b2843509efc633d9c1b9094814fc7a5a059fd6de37a8ed784a32d531",
-      "retrievedAt": "2026-09-25T13:25:43.185Z",
-      "peakRssBytes": 277413888,
+      "pbfSha256": "165daf8eb3f94f079b4ca41e3680778d9af6f391df3423cfc5a5bd5145296cfd",
+      "retrievedAt": "2026-10-02T13:14:15.589Z",
+      "peakRssBytes": 394129408,
       "recordCount": 269,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:23.523Z",
+      "publishedAt": "2026-10-01T02:08:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101073,7 +101321,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 11.2,
+      "elapsedSeconds": 13.6,
       "geometryCounts": {
         "node": 173,
         "relation": 1,
@@ -101081,16 +101329,20 @@
       },
       "id": "north-yorkshire",
       "label": "North Yorkshire",
-      "pbfSha256": "5e1e04a342c133477e93bf966db2f35d032d59f77339a4e0f0e3635ee75dd295",
-      "retrievedAt": "2026-09-25T13:25:59.873Z",
-      "peakRssBytes": 274382848,
+      "pbfSha256": "44243f9a7a113b680f7d85fbcb391bb8ae464d60183f5683f07d6bbb73b904a1",
+      "retrievedAt": "2026-10-02T13:14:41.354Z",
+      "peakRssBytes": 389787648,
       "recordCount": 210,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:24.363Z",
+      "publishedAt": "2026-10-01T02:11:00.000Z"
     },
     {
       "categoryCounts": {
-        "shop": 24,
+        "shop": 23,
         "repair": 11,
         "hire": 8,
         "water": 38
@@ -101100,53 +101352,61 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.9,
+      "elapsedSeconds": 3.6,
       "geometryCounts": {
-        "node": 68,
+        "node": 67,
         "relation": 0,
         "way": 10
       },
       "id": "northamptonshire",
       "label": "Northamptonshire",
-      "pbfSha256": "0d7e680d8a14fc405432b03f848bac49a7b0e82e29f1fa17768147801fa538bb",
-      "retrievedAt": "2026-09-25T13:26:20.149Z",
-      "peakRssBytes": 274825216,
-      "recordCount": 78,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-latest.osm.pbf"
+      "pbfSha256": "588521ed1c3a9e3336a8e8a433d15fca2b4cde5db2480a571653fd2b26753925",
+      "retrievedAt": "2026-10-02T13:15:07.982Z",
+      "peakRssBytes": 390836224,
+      "recordCount": 77,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:25.214Z",
+      "publishedAt": "2026-10-01T02:06:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 11,
         "repair": 10,
         "hire": 2,
-        "water": 31
+        "water": 33
       },
       "countryId": "england",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 3.4,
+      "elapsedSeconds": 4.1,
       "geometryCounts": {
         "node": 38,
         "relation": 0,
-        "way": 14
+        "way": 16
       },
       "id": "northumberland",
       "label": "Northumberland",
-      "pbfSha256": "b65e79e1bb730768397ee87fa301c77826aa20ec6b857af11f1fe0043dbf5a57",
-      "retrievedAt": "2026-09-25T13:26:30.501Z",
-      "peakRssBytes": 274284544,
-      "recordCount": 52,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-latest.osm.pbf"
+      "pbfSha256": "2f7c44e43ee52c322b328db1049c996e46fa872a008e94251b077febb7375bb7",
+      "retrievedAt": "2026-10-02T13:15:21.899Z",
+      "peakRssBytes": 389918720,
+      "recordCount": 54,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:26.092Z",
+      "publishedAt": "2026-10-01T02:10:00.000Z"
     },
     {
       "categoryCounts": {
-        "shop": 30,
+        "shop": 28,
         "repair": 17,
-        "hire": 53,
+        "hire": 54,
         "water": 32
       },
       "countryId": "england",
@@ -101154,47 +101414,55 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.9,
+      "elapsedSeconds": 6.1,
       "geometryCounts": {
         "node": 98,
         "relation": 0,
-        "way": 27
+        "way": 26
       },
       "id": "nottinghamshire",
       "label": "Nottinghamshire",
-      "pbfSha256": "510beb9841b9a05368fb81dc95a9f32dd8494a1d421667b87ff8b60dc984c76d",
-      "retrievedAt": "2026-09-25T13:26:40.201Z",
-      "peakRssBytes": 283492352,
-      "recordCount": 125,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-latest.osm.pbf"
+      "pbfSha256": "7363fb1a40b456bc596e1180b5d44a19e399cda163a05aff4b7d07735d7f1f08",
+      "retrievedAt": "2026-10-02T13:15:35.673Z",
+      "peakRssBytes": 395968512,
+      "recordCount": 124,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:26.949Z",
+      "publishedAt": "2026-10-01T02:11:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 29,
         "repair": 30,
         "hire": 16,
-        "water": 50
+        "water": 51
       },
       "countryId": "england",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.1,
+      "elapsedSeconds": 6.2,
       "geometryCounts": {
-        "node": 96,
+        "node": 97,
         "relation": 1,
         "way": 13
       },
       "id": "oxfordshire",
       "label": "Oxfordshire",
-      "pbfSha256": "8e9fde5cbe06927dcd9f18baae2cd893eb36b88b18020c1201e537a43c947422",
-      "retrievedAt": "2026-09-25T13:26:54.712Z",
-      "peakRssBytes": 250789888,
-      "recordCount": 110,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-latest.osm.pbf"
+      "pbfSha256": "b557f71667fdba0daca35ec35fc9d27bfa15e44cd2b18eb90aa87833e726129c",
+      "retrievedAt": "2026-10-02T13:15:54.973Z",
+      "peakRssBytes": 390230016,
+      "recordCount": 111,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:27.813Z",
+      "publishedAt": "2026-10-01T02:15:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101208,7 +101476,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 0.2,
+      "elapsedSeconds": 0.3,
       "geometryCounts": {
         "node": 4,
         "relation": 0,
@@ -101216,12 +101484,16 @@
       },
       "id": "rutland",
       "label": "Rutland",
-      "pbfSha256": "c2032e21e8569e6bf3f5a018e10e750c71aa90f3e53e17c4716b48bbf60257b6",
-      "retrievedAt": "2026-09-25T13:27:05.486Z",
-      "peakRssBytes": 249511936,
+      "pbfSha256": "72337f257702b74921e7dcbfa40b91b1a41929d73147e434b8c8d83ed31c75c9",
+      "retrievedAt": "2026-10-02T13:16:09.139Z",
+      "peakRssBytes": 388263936,
       "recordCount": 7,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:28.667Z",
+      "publishedAt": "2026-10-01T02:09:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101235,7 +101507,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.8,
+      "elapsedSeconds": 5.8,
       "geometryCounts": {
         "node": 38,
         "relation": 1,
@@ -101243,12 +101515,16 @@
       },
       "id": "shropshire",
       "label": "Shropshire",
-      "pbfSha256": "1818d8089a905514add56932f6474d9e5675ae19308e30603e06f392fef54e14",
-      "retrievedAt": "2026-09-25T13:27:06.839Z",
-      "peakRssBytes": 281837568,
+      "pbfSha256": "99098b65d720032ec430da15eb02ece0c3c0aa28d3902cdb1d5cc3ef228c62a5",
+      "retrievedAt": "2026-10-02T13:16:12.455Z",
+      "peakRssBytes": 388030464,
       "recordCount": 51,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:29.531Z",
+      "publishedAt": "2026-10-01T02:09:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101262,7 +101538,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 6.5,
+      "elapsedSeconds": 8.1,
       "geometryCounts": {
         "node": 77,
         "relation": 0,
@@ -101270,12 +101546,16 @@
       },
       "id": "somerset",
       "label": "Somerset",
-      "pbfSha256": "f13f616139fce8d0ac6ee74f43973b3ab2504ea185d7ab62728031b0ae18d39f",
-      "retrievedAt": "2026-09-25T13:27:16.827Z",
-      "peakRssBytes": 279838720,
+      "pbfSha256": "181cdf221b39380e4c77b54f5f132e69d75afe342e02c0596af1db710eb9d814",
+      "retrievedAt": "2026-10-02T13:16:30.262Z",
+      "peakRssBytes": 389148672,
       "recordCount": 113,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:30.383Z",
+      "publishedAt": "2026-10-01T02:11:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101289,7 +101569,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 3.7,
+      "elapsedSeconds": 4.5,
       "geometryCounts": {
         "node": 48,
         "relation": 0,
@@ -101297,17 +101577,21 @@
       },
       "id": "south-yorkshire",
       "label": "South Yorkshire",
-      "pbfSha256": "ba1f18bb12e339d91c70d5e4408be08810b879b6803c054f071b0627dcc72f69",
-      "retrievedAt": "2026-09-25T13:27:34.611Z",
-      "peakRssBytes": 285261824,
+      "pbfSha256": "ae4bffecc83f3f9541523e2d3b0719b7463250472b5b083e2121c341b9320ec7",
+      "retrievedAt": "2026-10-02T13:16:55.758Z",
+      "peakRssBytes": 395046912,
       "recordCount": 85,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:31.257Z",
+      "publishedAt": "2026-10-01T02:12:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 26,
-        "repair": 13,
+        "repair": 14,
         "hire": 3,
         "water": 61
       },
@@ -101316,20 +101600,24 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4,
+      "elapsedSeconds": 4.8,
       "geometryCounts": {
-        "node": 81,
+        "node": 82,
         "relation": 0,
         "way": 20
       },
       "id": "staffordshire",
       "label": "Staffordshire",
-      "pbfSha256": "2012cbc2e32234dc741e06d536ee074592f7f43979c59c9329244b030d22601d",
-      "retrievedAt": "2026-09-25T13:27:57.532Z",
-      "peakRssBytes": 283344896,
-      "recordCount": 101,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-latest.osm.pbf"
+      "pbfSha256": "6f065f52f03c6aa9c8f03556e4ef623ae62c642d68e01db567d09899fd2a0d4e",
+      "retrievedAt": "2026-10-02T13:17:13.271Z",
+      "peakRssBytes": 392347648,
+      "recordCount": 102,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:33.025Z",
+      "publishedAt": "2026-10-01T02:03:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101343,7 +101631,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.4,
+      "elapsedSeconds": 5.4,
       "geometryCounts": {
         "node": 64,
         "relation": 0,
@@ -101351,12 +101639,16 @@
       },
       "id": "suffolk",
       "label": "Suffolk",
-      "pbfSha256": "99a90d9ff8a4550e740f67a4ae49e8c11266aa7362beddc07809e1f6c715b0fa",
-      "retrievedAt": "2026-09-25T13:28:08.380Z",
-      "peakRssBytes": 278020096,
+      "pbfSha256": "5c4f71e6add160cb72174b013d7fde7869822685841a69654dc28fa1a34328fe",
+      "retrievedAt": "2026-10-02T13:17:30.661Z",
+      "peakRssBytes": 393658368,
       "recordCount": 91,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:33.896Z",
+      "publishedAt": "2026-10-01T02:07:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101370,7 +101662,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.5,
+      "elapsedSeconds": 6.7,
       "geometryCounts": {
         "node": 126,
         "relation": 0,
@@ -101378,12 +101670,16 @@
       },
       "id": "surrey",
       "label": "Surrey",
-      "pbfSha256": "661bacb7e1a87d75f412df9c2881fe72dbb4a7de52a48731327d36242638bdd0",
-      "retrievedAt": "2026-09-25T13:28:27.561Z",
-      "peakRssBytes": 277757952,
+      "pbfSha256": "6c0c8e9786c0ef2986dda56fc4a5e5ad40f5007be1d2ab9d31da533fde2a2a16",
+      "retrievedAt": "2026-10-02T13:17:48.099Z",
+      "peakRssBytes": 389402624,
       "recordCount": 142,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:34.768Z",
+      "publishedAt": "2026-10-01T02:11:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101397,7 +101693,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.5,
+      "elapsedSeconds": 3.1,
       "geometryCounts": {
         "node": 33,
         "relation": 0,
@@ -101405,12 +101701,16 @@
       },
       "id": "tyne-and-wear",
       "label": "Tyne and Wear",
-      "pbfSha256": "29e76c57dc052b2559af7e504607b2c90f2d5f2d39d3226179f86d3b23155e6f",
-      "retrievedAt": "2026-09-25T13:28:41.837Z",
-      "peakRssBytes": 274939904,
+      "pbfSha256": "b7449e6eb9f0d59b86e2538a862b34d082a69900ccd006d5f7ae105830413097",
+      "retrievedAt": "2026-10-02T13:18:07.439Z",
+      "peakRssBytes": 393334784,
       "recordCount": 44,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:35.623Z",
+      "publishedAt": "2026-10-01T01:57:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101424,7 +101724,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 3.1,
+      "elapsedSeconds": 3.8,
       "geometryCounts": {
         "node": 63,
         "relation": 0,
@@ -101432,12 +101732,16 @@
       },
       "id": "warwickshire",
       "label": "Warwickshire",
-      "pbfSha256": "0371d62584cc0166c9db8406016b58ea7773063f2b05ff55c15033a90cf3224d",
-      "retrievedAt": "2026-09-25T13:28:49.583Z",
-      "peakRssBytes": 272236544,
+      "pbfSha256": "148e450a38459e09d648e6831f40ab333dd880974156026356ca984497fd81fb",
+      "retrievedAt": "2026-10-02T13:18:18.385Z",
+      "peakRssBytes": 391884800,
       "recordCount": 71,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:36.462Z",
+      "publishedAt": "2026-10-01T02:09:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101451,7 +101755,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 7.4,
+      "elapsedSeconds": 9,
       "geometryCounts": {
         "node": 303,
         "relation": 0,
@@ -101459,12 +101763,16 @@
       },
       "id": "west-midlands",
       "label": "West Midlands",
-      "pbfSha256": "6b28dcb6a6798a03d95ea4fbb856f0aa25d4e7129e83155cafe6c60d9a31b8e9",
-      "retrievedAt": "2026-09-25T13:29:00.562Z",
-      "peakRssBytes": 276742144,
+      "pbfSha256": "2808ff7ca1dd08d502165c39dbbce3c864783147b7939d979f020065946df755",
+      "retrievedAt": "2026-10-02T13:18:39.993Z",
+      "peakRssBytes": 405946368,
       "recordCount": 333,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:37.336Z",
+      "publishedAt": "2026-10-01T02:02:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101478,7 +101786,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 6.5,
+      "elapsedSeconds": 8.3,
       "geometryCounts": {
         "node": 283,
         "relation": 0,
@@ -101486,12 +101794,16 @@
       },
       "id": "west-sussex",
       "label": "West Sussex",
-      "pbfSha256": "fd4358817028f698c50f29823927fedc7c6d16c706f4613f83b8b5cc0df38016",
-      "retrievedAt": "2026-09-25T13:29:21.918Z",
-      "peakRssBytes": 243793920,
+      "pbfSha256": "d83db8080adef1f8bc0b22a9ef5bdf3e955ec8a01a6c9e9877062529193f56e7",
+      "retrievedAt": "2026-10-02T13:19:08.242Z",
+      "peakRssBytes": 392880128,
       "recordCount": 315,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:38.206Z",
+      "publishedAt": "2026-10-01T02:13:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101505,7 +101817,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 6.7,
+      "elapsedSeconds": 8.4,
       "geometryCounts": {
         "node": 92,
         "relation": 0,
@@ -101513,12 +101825,16 @@
       },
       "id": "west-yorkshire",
       "label": "West Yorkshire",
-      "pbfSha256": "3e5c5cd84d8bd5fec6517f25ee58c458bd69a511cdabb574b1554c2cdb658b4b",
-      "retrievedAt": "2026-09-25T13:29:41.828Z",
-      "peakRssBytes": 240238592,
+      "pbfSha256": "b4451a1a812ff97623239d6d3e4f68b3076d7a0eb7b1f969a75038d7f06b66eb",
+      "retrievedAt": "2026-10-02T13:19:34.664Z",
+      "peakRssBytes": 395546624,
       "recordCount": 122,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:39.072Z",
+      "publishedAt": "2026-10-01T02:08:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101532,7 +101848,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.8,
+      "elapsedSeconds": 6,
       "geometryCounts": {
         "node": 49,
         "relation": 0,
@@ -101540,12 +101856,16 @@
       },
       "id": "wiltshire",
       "label": "Wiltshire",
-      "pbfSha256": "7d44e3a0be04d34ca4cf781dd7a17c7c42d14469d12d0c51ece546c3a6b69de8",
-      "retrievedAt": "2026-09-25T13:30:02.785Z",
-      "peakRssBytes": 241631232,
+      "pbfSha256": "2acfa423fa3fca6ddd06ae4ef34518b9f0eb87afce165aab2acab49ece709add",
+      "retrievedAt": "2026-10-02T13:20:02.055Z",
+      "peakRssBytes": 389537792,
       "recordCount": 64,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:39.935Z",
+      "publishedAt": "2026-10-01T02:05:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101559,7 +101879,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 2.6,
+      "elapsedSeconds": 3.2,
       "geometryCounts": {
         "node": 40,
         "relation": 0,
@@ -101567,174 +101887,202 @@
       },
       "id": "worcestershire",
       "label": "Worcestershire",
-      "pbfSha256": "02c64fffa5f7c40c5425bdd3a182f5791518fb69916fd963f5c6acb8297df01d",
-      "retrievedAt": "2026-09-25T13:30:15.817Z",
-      "peakRssBytes": 244301824,
+      "pbfSha256": "b25a3de5b78ccb0e7885136114a432a0893abfdbbe716d41552209cc7c683e8c",
+      "retrievedAt": "2026-10-02T13:20:20.839Z",
+      "peakRssBytes": 390897664,
       "recordCount": 53,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:40.783Z",
+      "publishedAt": "2026-10-01T02:09:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 86,
-        "repair": 84,
+        "repair": 85,
         "hire": 31,
-        "water": 358
+        "water": 359
       },
       "countryId": "wales",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 29.7,
+      "elapsedSeconds": 36.4,
       "geometryCounts": {
-        "node": 397,
+        "node": 399,
         "relation": 1,
         "way": 136
       },
       "id": "wales",
       "label": "Wales",
-      "pbfSha256": "eedeb42f2253788d289a4d6b7eb9faec0332c63045208f8204da0ddc7ee7fa01",
-      "retrievedAt": "2026-09-25T13:30:29.783Z",
-      "peakRssBytes": 264503296,
-      "recordCount": 534,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-latest.osm.pbf"
+      "pbfSha256": "f2003122a05c2243534b2b9f2c15ddba1a0a12ebcde7f8f1b79e8851623144bf",
+      "retrievedAt": "2026-10-02T13:20:44.683Z",
+      "peakRssBytes": 390619136,
+      "recordCount": 536,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:41.661Z",
+      "publishedAt": "2026-10-01T01:32:00.000Z"
     },
     {
       "categoryCounts": {
-        "shop": 234,
-        "repair": 186,
+        "shop": 235,
+        "repair": 187,
         "hire": 412,
-        "water": 501
+        "water": 506
       },
       "countryId": "ireland",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 86.6,
+      "elapsedSeconds": 107.6,
       "geometryCounts": {
-        "node": 1124,
+        "node": 1131,
         "relation": 1,
         "way": 126
       },
       "id": "ireland-and-northern-ireland",
       "label": "Ireland and Northern Ireland",
-      "pbfSha256": "ac89d91322d2e1301035dee47d97b6a544d9c336a6b19daa4a91b8413b3e52b7",
-      "retrievedAt": "2026-09-25T13:32:58.861Z",
-      "peakRssBytes": 347815936,
-      "recordCount": 1251,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf"
+      "pbfSha256": "d9fd87a83a0d646a61756f25f5c8c0be798aa535f491a141e665ee7271477a1f",
+      "retrievedAt": "2026-10-02T13:22:29.472Z",
+      "peakRssBytes": 396701696,
+      "recordCount": 1258,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:42.535Z",
+      "publishedAt": "2026-10-01T00:02:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 227,
         "repair": 90,
         "hire": 364,
-        "water": 4528
+        "water": 4537
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 39.8,
+      "elapsedSeconds": 48.7,
       "geometryCounts": {
-        "node": 4997,
+        "node": 5006,
         "relation": 3,
         "way": 108
       },
       "id": "spain-andalucia",
       "label": "Andalucía",
-      "pbfSha256": "bd5168ca797d62dc728fdbed68fbb43ba0419325925f434f376397594b82657f",
-      "retrievedAt": "2026-09-25T13:36:35.211Z",
-      "peakRssBytes": 355794944,
-      "recordCount": 5108,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/andalucia-latest.osm.pbf"
+      "pbfSha256": "ce73542fe7fe130ef73889dc20944de9ee4b4fbbc06db3c33556057c1cf395f7",
+      "retrievedAt": "2026-10-02T13:26:00.368Z",
+      "peakRssBytes": 393646080,
+      "recordCount": 5117,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/andalucia-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/andalucia-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:43.407Z",
+      "publishedAt": "2026-10-01T04:18:00.000Z"
     },
     {
       "categoryCounts": {
-        "shop": 52,
+        "shop": 53,
         "repair": 43,
-        "hire": 240,
-        "water": 2292
+        "hire": 241,
+        "water": 2294
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 19.3,
+      "elapsedSeconds": 23.6,
       "geometryCounts": {
-        "node": 2554,
+        "node": 2558,
         "relation": 2,
         "way": 52
       },
       "id": "spain-aragon",
       "label": "Aragón",
-      "pbfSha256": "cffcf295d8c3a08cf77ce3880053e3eca38d3bad0dedcd990dbe62d9e5165d1c",
-      "retrievedAt": "2026-09-25T13:37:46.533Z",
-      "peakRssBytes": 406765568,
-      "recordCount": 2608,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/aragon-latest.osm.pbf"
+      "pbfSha256": "9484e652060e5172fbfcc2b4f7e30298dd6205d41996332a4af8242c48f68a55",
+      "retrievedAt": "2026-10-02T13:27:32.072Z",
+      "peakRssBytes": 399478784,
+      "recordCount": 2612,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/aragon-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/aragon-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:44.254Z",
+      "publishedAt": "2026-10-01T04:11:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 47,
         "repair": 17,
         "hire": 60,
-        "water": 1728
+        "water": 1729
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5,
+      "elapsedSeconds": 5.9,
       "geometryCounts": {
-        "node": 1817,
+        "node": 1818,
         "relation": 0,
         "way": 21
       },
       "id": "spain-asturias",
       "label": "Asturias",
-      "pbfSha256": "2893706a20b129966f86d8d3215a8371c48921a7ae58f2b9feb7bd085a089ac3",
-      "retrievedAt": "2026-09-25T13:38:19.886Z",
-      "peakRssBytes": 399261696,
-      "recordCount": 1838,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/asturias-latest.osm.pbf"
+      "pbfSha256": "0616fd00c4c66a47b254318a4ea09ea2fb898debd370a2d01aad717728f37907",
+      "retrievedAt": "2026-10-02T13:28:16.019Z",
+      "peakRssBytes": 394129408,
+      "recordCount": 1839,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/asturias-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/asturias-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:45.110Z",
+      "publishedAt": "2026-10-01T04:14:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 22,
         "repair": 22,
         "hire": 122,
-        "water": 1384
+        "water": 1385
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 4.8,
+      "elapsedSeconds": 5.8,
       "geometryCounts": {
-        "node": 1522,
+        "node": 1523,
         "relation": 0,
         "way": 20
       },
       "id": "spain-cantabria",
       "label": "Cantabria",
-      "pbfSha256": "3f09e79011741e2c3642d48b83513ed259e8ec7db139f96779dcbfa0521d47de",
-      "retrievedAt": "2026-09-25T13:38:34.408Z",
-      "peakRssBytes": 352600064,
-      "recordCount": 1542,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/cantabria-latest.osm.pbf"
+      "pbfSha256": "78b356cb0ed3b2df3f51eb9ad11791102cedcf62999f59068fb69a402bb95b49",
+      "retrievedAt": "2026-10-02T13:28:33.854Z",
+      "peakRssBytes": 393146368,
+      "recordCount": 1543,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/cantabria-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/cantabria-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:45.968Z",
+      "publishedAt": "2026-10-01T04:13:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101748,7 +102096,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 15.9,
+      "elapsedSeconds": 19.5,
       "geometryCounts": {
         "node": 1935,
         "relation": 0,
@@ -101756,66 +102104,78 @@
       },
       "id": "spain-castilla-la-mancha",
       "label": "Castilla-La Mancha",
-      "pbfSha256": "acd60542871913141f4121fbcb6c188db682a14e8b4a10cadd013b21d489479a",
-      "retrievedAt": "2026-09-25T13:38:49.889Z",
-      "peakRssBytes": 364969984,
+      "pbfSha256": "bd6f4d5902112bfaf315f7a68361d653c417078c20b1d7b4824b1a5314973db9",
+      "retrievedAt": "2026-10-02T13:28:54.350Z",
+      "peakRssBytes": 393822208,
       "recordCount": 1968,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:46.815Z",
+      "publishedAt": "2026-10-01T03:58:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 131,
         "repair": 93,
         "hire": 252,
-        "water": 7821
+        "water": 7825
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 35.8,
+      "elapsedSeconds": 43.5,
       "geometryCounts": {
-        "node": 8116,
+        "node": 8120,
         "relation": 2,
         "way": 110
       },
       "id": "spain-castilla-y-leon",
       "label": "Castilla y León",
-      "pbfSha256": "0c88c91efa0e75163097d3879d72614f25fa7720a89d47800e1850097d8cc7f5",
-      "retrievedAt": "2026-09-25T13:39:45.104Z",
-      "peakRssBytes": 366034944,
-      "recordCount": 8228,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+      "pbfSha256": "4ccd78fec213854f175b244a9836cc76b2b39fdfa3e4fdb6588b0d5994489eb2",
+      "retrievedAt": "2026-10-02T13:29:50.622Z",
+      "peakRssBytes": 406966272,
+      "recordCount": 8232,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:47.669Z",
+      "publishedAt": "2026-10-01T04:01:00.000Z"
     },
     {
       "categoryCounts": {
-        "shop": 350,
+        "shop": 349,
         "repair": 194,
         "hire": 933,
-        "water": 8218
+        "water": 8234
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 58.1,
+      "elapsedSeconds": 70.9,
       "geometryCounts": {
-        "node": 9456,
+        "node": 9470,
         "relation": 10,
         "way": 87
       },
       "id": "spain-cataluna",
       "label": "Cataluña",
-      "pbfSha256": "225af021a4a5561e009d9c6ec71a2fdbd6826e99c56c648c0bcfa72a428e44e0",
-      "retrievedAt": "2026-09-25T13:41:39.125Z",
-      "peakRssBytes": 387842048,
-      "recordCount": 9553,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/cataluna-latest.osm.pbf"
+      "pbfSha256": "5620da93a3cf5614b4a8970706dbf2ab8650832f2f119d8912bf8447ac5e9951",
+      "retrievedAt": "2026-10-02T13:31:20.700Z",
+      "peakRssBytes": 428695552,
+      "recordCount": 9567,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/cataluna-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/cataluna-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:48.505Z",
+      "publishedAt": "2026-10-01T04:19:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101837,66 +102197,78 @@
       },
       "id": "spain-ceuta",
       "label": "Ceuta",
-      "pbfSha256": "b8f21b38c427fdd1c7c9553155ce1e2ccc0c4597b8cd0764c9eb598326f8a18b",
-      "retrievedAt": "2026-09-25T13:43:49.376Z",
-      "peakRssBytes": 386826240,
+      "pbfSha256": "028e59a28754d1de604bd589e0fd808130e048a0b5cf76af819fa2bdd7f0a493",
+      "retrievedAt": "2026-10-02T13:34:05.481Z",
+      "peakRssBytes": 398610432,
       "recordCount": 8,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/ceuta-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/ceuta-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/ceuta-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:49.352Z",
+      "publishedAt": "2026-10-01T04:11:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 44,
         "repair": 7,
         "hire": 8,
-        "water": 715
+        "water": 713
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.7,
+      "elapsedSeconds": 6.9,
       "geometryCounts": {
-        "node": 735,
+        "node": 733,
         "relation": 0,
         "way": 32
       },
       "id": "spain-extremadura",
       "label": "Extremadura",
-      "pbfSha256": "4f9512bfaf7fb2f57bae6e0c88f587be4ce5be2268f81e13269ac96c907eae70",
-      "retrievedAt": "2026-09-25T13:43:51.175Z",
-      "peakRssBytes": 388497408,
-      "recordCount": 767,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/extremadura-latest.osm.pbf"
+      "pbfSha256": "977355516ec8920c7d69e4190dbc77e66854a069e1071c771aadd44250dc487c",
+      "retrievedAt": "2026-10-02T13:34:09.350Z",
+      "peakRssBytes": 404619264,
+      "recordCount": 765,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/extremadura-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/extremadura-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:50.208Z",
+      "publishedAt": "2026-10-01T04:06:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 108,
-        "repair": 56,
+        "repair": 55,
         "hire": 148,
-        "water": 4013
+        "water": 4015
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 15,
+      "elapsedSeconds": 18.4,
       "geometryCounts": {
-        "node": 4233,
+        "node": 4234,
         "relation": 0,
         "way": 61
       },
       "id": "spain-galicia",
       "label": "Galicia",
-      "pbfSha256": "8b15ee48148e2c3a12f4c34698fb6cded5ec153184ee518fa5c692287b3923cb",
-      "retrievedAt": "2026-09-25T13:44:15.597Z",
-      "peakRssBytes": 389824512,
-      "recordCount": 4294,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+      "pbfSha256": "dacdb2471ac17b5d44bd9da6757ffe82706f62c09ca68aa46f8b93dd0dcb128d",
+      "retrievedAt": "2026-10-02T13:34:31.697Z",
+      "peakRssBytes": 410427392,
+      "recordCount": 4295,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/galicia-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:51.079Z",
+      "publishedAt": "2026-10-01T04:01:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101910,7 +102282,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 6.2,
+      "elapsedSeconds": 7.7,
       "geometryCounts": {
         "node": 560,
         "relation": 0,
@@ -101918,12 +102290,16 @@
       },
       "id": "spain-islas-baleares",
       "label": "Islas Baleares",
-      "pbfSha256": "48857b53d0dfa6329d649fbb7ec89ad744669c639443004ad1dd82fe606bf04e",
-      "retrievedAt": "2026-09-25T13:44:55.239Z",
-      "peakRssBytes": 390561792,
+      "pbfSha256": "5d6df3e8ce86f42f5fd5d87c05e0839fbf1463f9879c94a9304247a0404d559f",
+      "retrievedAt": "2026-10-02T13:35:20.821Z",
+      "peakRssBytes": 410509312,
       "recordCount": 605,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/islas-baleares-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/islas-baleares-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/islas-baleares-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:51.947Z",
+      "publishedAt": "2026-10-01T04:15:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101937,7 +102313,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 1.8,
+      "elapsedSeconds": 2.3,
       "geometryCounts": {
         "node": 919,
         "relation": 0,
@@ -101945,17 +102321,21 @@
       },
       "id": "spain-la-rioja",
       "label": "La Rioja",
-      "pbfSha256": "1bf28726ed7dab8e0d16f42ec002697348f9344994f7ac72cfa60fba31edafd7",
-      "retrievedAt": "2026-09-25T13:45:12.107Z",
-      "peakRssBytes": 387825664,
+      "pbfSha256": "9fbe23290d88dc5c49433cb403cb5612ad5a0a60cee66cc1a9b6ebe10d6a0f87",
+      "retrievedAt": "2026-10-02T13:35:40.845Z",
+      "peakRssBytes": 402780160,
       "recordCount": 926,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/la-rioja-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:52.808Z",
+      "publishedAt": "2026-10-01T04:06:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 172,
-        "repair": 59,
+        "repair": 60,
         "hire": 627,
         "water": 3605
       },
@@ -101964,7 +102344,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 15.5,
+      "elapsedSeconds": 18.9,
       "geometryCounts": {
         "node": 4352,
         "relation": 1,
@@ -101972,12 +102352,16 @@
       },
       "id": "spain-madrid",
       "label": "Madrid",
-      "pbfSha256": "784988130306c497a3fe1658bfd32cc6255bcfc212a337eecd77eb74d0b0a376",
-      "retrievedAt": "2026-09-25T13:45:20.222Z",
-      "peakRssBytes": 390594560,
+      "pbfSha256": "0848fffcbd37e4b402447116437f19c8d91e168f027c383b93d4bba4b72a465d",
+      "retrievedAt": "2026-10-02T13:35:51.939Z",
+      "peakRssBytes": 405590016,
       "recordCount": 4397,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/madrid-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/madrid-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/madrid-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:53.679Z",
+      "publishedAt": "2026-10-01T04:15:00.000Z"
     },
     {
       "categoryCounts": {
@@ -101999,12 +102383,16 @@
       },
       "id": "spain-melilla",
       "label": "Melilla",
-      "pbfSha256": "d5d50de9effe8e5abb23a7ee4dea7885ae7d32f09bcada1a304b8944d9329902",
-      "retrievedAt": "2026-09-25T13:45:52.063Z",
-      "peakRssBytes": 373653504,
+      "pbfSha256": "d1e7dfa822dd5ff54d952cbfa6d4c862aac08d4a163c92c29862153bf166c49c",
+      "retrievedAt": "2026-10-02T13:36:30.013Z",
+      "peakRssBytes": 404643840,
       "recordCount": 5,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/melilla-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/melilla-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/melilla-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:54.520Z",
+      "publishedAt": "2026-10-01T04:11:00.000Z"
     },
     {
       "categoryCounts": {
@@ -102018,7 +102406,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.2,
+      "elapsedSeconds": 6.5,
       "geometryCounts": {
         "node": 400,
         "relation": 0,
@@ -102026,99 +102414,115 @@
       },
       "id": "spain-murcia",
       "label": "Murcia",
-      "pbfSha256": "e59005b1bfe6dbed0db4fff36079a70ce4463b14ce11f95bdface3b7cf2de7a5",
-      "retrievedAt": "2026-09-25T13:45:53.601Z",
-      "peakRssBytes": 375422976,
+      "pbfSha256": "bd013b3d7274bcc98b28367a0da3581b93592a86e6a594f8886b338d6d3e938d",
+      "retrievedAt": "2026-10-02T13:36:32.388Z",
+      "peakRssBytes": 410439680,
       "recordCount": 411,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/murcia-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/murcia-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/murcia-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:55.375Z",
+      "publishedAt": "2026-10-01T04:16:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 40,
         "repair": 30,
         "hire": 65,
-        "water": 1404
+        "water": 1406
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 5.2,
+      "elapsedSeconds": 6.5,
       "geometryCounts": {
-        "node": 1510,
+        "node": 1512,
         "relation": 0,
         "way": 16
       },
       "id": "spain-navarra",
       "label": "Navarra",
-      "pbfSha256": "e1789df1081424d6161d812cee13c72b3c6c3c342ce999112725b720a33fbac1",
-      "retrievedAt": "2026-09-25T13:46:18.023Z",
-      "peakRssBytes": 369082368,
-      "recordCount": 1526,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf"
+      "pbfSha256": "09e9d7f578b05cf65ad2bac183cd7d4d58d64584424fc70a5432c440f185dc0a",
+      "retrievedAt": "2026-10-02T13:36:51.535Z",
+      "peakRssBytes": 408358912,
+      "recordCount": 1528,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/navarra-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:56.238Z",
+      "publishedAt": "2026-10-01T04:05:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 115,
-        "repair": 96,
+        "repair": 97,
         "hire": 243,
-        "water": 4801
+        "water": 4804
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 13.6,
+      "elapsedSeconds": 16.4,
       "geometryCounts": {
-        "node": 5150,
+        "node": 5153,
         "relation": 2,
         "way": 68
       },
       "id": "spain-pais-vasco",
       "label": "País Vasco",
-      "pbfSha256": "6b9758a373fcade8bbdbf527be6ee9ac4cf06a2ee2c491391e7edfd030655f84",
-      "retrievedAt": "2026-09-25T13:46:38.233Z",
-      "peakRssBytes": 369639424,
-      "recordCount": 5220,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/pais-vasco-latest.osm.pbf"
+      "pbfSha256": "a5de1bceacbc3e0622f07558209beccc1f9b9dbeecc2c1b9c91ff366a06c4736",
+      "retrievedAt": "2026-10-02T13:37:11.153Z",
+      "peakRssBytes": 406958080,
+      "recordCount": 5223,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/pais-vasco-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/pais-vasco-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:57.107Z",
+      "publishedAt": "2026-10-01T04:03:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 187,
         "repair": 87,
         "hire": 580,
-        "water": 3617
+        "water": 3623
       },
       "countryId": "spain",
       "discarded": {
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 19.3,
+      "elapsedSeconds": 23.9,
       "geometryCounts": {
-        "node": 4351,
+        "node": 4357,
         "relation": 0,
         "way": 50
       },
       "id": "spain-valencia",
       "label": "Valencia",
-      "pbfSha256": "add6cd39abfb57e7b37a5fce8876307a8c93743b9c598f09033e9dd65a7d1969",
-      "retrievedAt": "2026-09-25T13:47:15.446Z",
-      "peakRssBytes": 367493120,
-      "recordCount": 4401,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/europe/spain/valencia-latest.osm.pbf"
+      "pbfSha256": "022dd0b600275e477b8ea2af266664ef6812e4203fed90e72886f7ac24f5b474",
+      "retrievedAt": "2026-10-02T13:37:48.704Z",
+      "peakRssBytes": 406298624,
+      "recordCount": 4407,
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/europe/spain/valencia-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/europe/spain/valencia-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:57.964Z",
+      "publishedAt": "2026-10-01T04:02:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 85,
         "repair": 43,
-        "hire": 163,
+        "hire": 164,
         "water": 544
       },
       "countryId": "spain",
@@ -102126,26 +102530,30 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 8.1,
+      "elapsedSeconds": 10,
       "geometryCounts": {
-        "node": 760,
+        "node": 761,
         "relation": 0,
         "way": 18
       },
       "id": "canary-islands",
       "label": "Canary Islands",
-      "pbfSha256": "c6c8d3e6cd769265bac750249bde8f11617f3c7c120fbe5d46e2155c5d07720b",
-      "retrievedAt": "2026-09-25T13:48:05.962Z",
-      "peakRssBytes": 365625344,
-      "recordCount": 778,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/africa/canary-islands-latest.osm.pbf"
+      "pbfSha256": "7ae6353a89efd93859148d11897fbe5bfeda0ee6f8838050fa411a6473f0f74d",
+      "retrievedAt": "2026-10-02T13:38:51.809Z",
+      "peakRssBytes": 403128320,
+      "recordCount": 779,
+      "sourceTimestamp": "2026-10-01T20:22:06.000Z",
+      "sourceUrl": "https://download.geofabrik.de/africa/canary-islands-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/africa/canary-islands-261001.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:58.849Z",
+      "publishedAt": "2026-10-02T09:53:00.000Z"
     },
     {
       "categoryCounts": {
         "shop": 29,
         "repair": 14,
-        "hire": 9,
+        "hire": 10,
         "water": 2876
       },
       "countryId": "armenia",
@@ -102153,7 +102561,7 @@
         "relation": 0,
         "way": 0
       },
-      "elapsedSeconds": 8.6,
+      "elapsedSeconds": 10.6,
       "geometryCounts": {
         "node": 2910,
         "relation": 0,
@@ -102161,30 +102569,34 @@
       },
       "id": "armenia",
       "label": "Armenia",
-      "pbfSha256": "5e30233859f393049d2892e4158c8d2d913c1bfd9d7adbb52d1e7bb1d31ef14a",
-      "retrievedAt": "2026-09-25T13:48:29.287Z",
-      "peakRssBytes": 365707264,
+      "pbfSha256": "da5a6f5a175df8b7ed9f8799b886f8d6cb3c4a08df2664a61fdc3f84c25c281e",
+      "retrievedAt": "2026-10-02T13:39:19.102Z",
+      "peakRssBytes": 405413888,
       "recordCount": 2914,
-      "sourceTimestamp": "2026-09-24T20:21:20.000Z",
-      "sourceUrl": "https://download.geofabrik.de/asia/armenia-latest.osm.pbf"
+      "sourceTimestamp": "2026-09-30T20:22:42.000Z",
+      "sourceUrl": "https://download.geofabrik.de/asia/armenia-latest.osm.pbf",
+      "downloadUrl": "https://download.geofabrik.de/asia/armenia-260930.osm.pbf",
+      "publicationPlanId": "61607b8d-c45a-4069-b6e8-ce58e80542f5",
+      "publicationValidatedAt": "2026-10-02T13:00:59.711Z",
+      "publishedAt": "2026-10-01T17:57:00.000Z"
     }
   ],
-  "multiCategoryCount": 1288,
+  "multiCategoryCount": 1292,
   "naming": {
-    "explicit": 24036,
-    "generic": 44193
+    "explicit": 24057,
+    "generic": 44249
   },
   "websites": {
     "byCategory": {
-      "hire": 3316,
-      "repair": 1052,
-      "shop": 1663,
-      "water": 681
+      "hire": 3318,
+      "repair": 1053,
+      "shop": 1664,
+      "water": 695
     },
-    "total": 5801
+    "total": 5817
   },
   "resourceUsage": {
-    "elapsedSeconds": 712.1,
-    "peakRssBytes": 406765568
+    "elapsedSeconds": 901.6,
+    "peakRssBytes": 428695552
   }
 }

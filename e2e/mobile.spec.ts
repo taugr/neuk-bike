@@ -2309,7 +2309,8 @@ test('shows distance in cycling-place popups and keeps the website in details', 
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/?mockGps=55.9533,-3.1883,5');
+  // Keep all three shops under test within the eight nearest results.
+  await page.goto('/?mockGps=55.948,-3.195,5');
   await page.getByTestId('category-chip-shop').click();
 
   const weeSpokeServices = page.getByTestId(
