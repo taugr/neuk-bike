@@ -293,7 +293,12 @@ OPENFREEMAP_SMOKE=1 pnpm exec playwright test e2e/offline-openfreemap-live.spec.
 Use `pnpm refresh:data` for a consistent release of parking, cycling places,
 and NCN. Fresh acquisition is the default. `--cached` explicitly rebuilds
 OSM data from existing inputs; it does not make their source dates newer.
-Single-dataset commands remain available, and `pnpm check:data` flags
+Fresh refreshes validate and pin all dated OSM publications once per invocation,
+then download those files and require matching same-run hashes for POI reuse.
+The plan expires after two hours; all source-age, completeness and full-PBF
+checks still apply. Refresh artifacts describe preflight publications without
+re-fetching metadata after the build. Upstream files and other feeds must still
+remain available. Single-dataset commands remain available, and `pnpm check:data` flags
 parking/POI input mismatches. Partial region releases are rejected.
 
 Geofabrik downloads and upstream checks share a validated dated-file fallback

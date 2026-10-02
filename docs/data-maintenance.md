@@ -33,20 +33,39 @@ The report is `.cache/source-status.json`. Source dates and retrieval dates
 are separate in `public/data/freshness.json`; cached files are accepted as
 retrieval evidence only when their hash matches the report.
 
-Both parking and cycling-place downloads use the same resolver as the upstream
-check. A failed latest alias falls back only to the current dated extract
+A fresh refresh first validates all 70 configured OSM publications once, then
+pins their **dated** URLs, exact sizes, real cutoffs and validation times in a
+plan inside that invocation's staging directory. The plan binds to the code
+revision and a unique invocation, expires after two hours, and requires the full
+source set with the existing 35-day age and two-day spread limits. An earlier
+check-only report is diagnostic; it is never imported as trusted refresh input.
+The release uses the publications validated at preflight even if a newer
+publication appears during the build. Dates are never advanced to the build day.
+
+The shared resolver supplies the plan and also powers standalone upstream checks.
+A failed latest alias falls back only to the current dated extract
 identified on that region's official Geofabrik page. The resolver rejects
 foreign hosts, other regions/dates, stale or future cutoffs, missing/ambiguous
 publication records, malformed redirects, HTML bodies and mismatched sizes or
 PBF timestamps. Redirects and transient retries are bounded, with URL, status,
-attempt and nested network errors logged. The upstream report records the
-resolved URL and whether fallback was used; fresh acquisition reports retain
+attempt and nested network errors logged. Publication HTML, including its body,
+gets three 30-second attempts with five- and fifteen-second backoffs for transient
+network/timeouts, HTTP 429 and 5xx. Permanent and integrity failures remain hard
+errors. HEAD/range requests and full-file retries retain their existing bounds.
+The upstream report records the resolved URL and whether fallback was used; fresh acquisition reports retain
 the canonical source URL and add the actual `downloadUrl`.
 
 Downloads stream into temporary files, checking their complete byte count,
 SHA-256, PBF framing and compressed blocks before atomically replacing the
-cache. Extraction verifies the cutoff and hash again. A failure leaves the
-previous cached input and published release intact. The staging gate rejects
+cache. Extraction verifies the cutoff and hash again. Full-download retries keep
+the same pinned dated URL without re-fetching publication pages. POI cache reuse
+requires the plan's exact size/cutoff and a matching full-file SHA receipt from
+this invocation; an older age-valid cache cannot stand in for a planned input.
+The final gate compares both reports with the plan and receipts before promotion.
+Per-input reports/freshness retain the plan ID, publication and validation times.
+The explicit `--cached` rebuild keeps its existing semantics without creating a
+fresh-publication plan. An invalid download leaves its previous cached input
+intact; any refresh failure preserves the previous release. The staging gate rejects
 stale, future, incomplete or mixed-age OSM inputs even during a cached rebuild.
 If official publication metadata is unavailable or inconsistent, the refresh
 fails rather than selecting an arbitrary older file. Inspect the logged source
@@ -59,8 +78,13 @@ schedules are best-effort and may be delayed; check the actual run before
 reporting a missed check. Each run includes its source report in the job summary.
 Manual dispatch can request either. It has read-only repository permissions
 and never deploys. Refresh runs upload a binary Git patch, release archive,
-and status report retained for 30 days. A failed check leaves diagnostic
-artifacts; it is not proof of a usable release. Review and apply the patch in
+status report, publication plan and full-file receipts retained for 30 days.
+Refresh status describes the pinned publications and actual NCN acquisition;
+post-build verification checks installed provenance without fetching OSM pages
+again. Check-only runs still inspect current upstream availability. Council feeds,
+coverage polygons and NCN acquisition still make their normal network requests;
+a plan cannot guarantee those feeds or the pinned PBF downloads stay available.
+A failed check leaves diagnostic artifacts; it is not proof of a usable release. Review and apply the patch in
 a clean checkout, run the quality gates, and commit/push only when authorized.
 
 For every release, inspect stable-ID additions/removals, changed geometry and

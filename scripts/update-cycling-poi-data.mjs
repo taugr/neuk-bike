@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createOSMStream } from 'osm-pbf-parser-node';
 import { downloadGeofabrikExtract } from './geofabrik-download.mjs';
+import { openPublicationPlan } from './publication-plan.mjs';
 import {
   createManifestReleaseId,
   getTileBounds,
@@ -637,6 +638,7 @@ async function main() {
     throw new Error('At least one OSM input is required.');
   }
 
+  const publicationPlan = await openPublicationPlan();
   const resourceMonitor = createResourceMonitor();
   const refreshedAt = new Date().toISOString();
   const mergedPoints = new Map();
@@ -644,7 +646,9 @@ async function main() {
   const inputsReport = [];
 
   for (const input of inputs) {
-    const download = await downloadGeofabrikExtract({
+    const download = await (
+      publicationPlan?.download ?? downloadGeofabrikExtract
+    )({
       forceDownload,
       label: `${input.label} OSM extract`,
       outputPath: input.pbfPath,
@@ -694,6 +698,13 @@ async function main() {
       sourceTimestamp: result.sourceTimestamp,
       sourceUrl: input.url,
       ...(download.downloadUrl ? { downloadUrl: download.downloadUrl } : {}),
+      ...(download.publicationPlanId
+        ? {
+            publicationPlanId: download.publicationPlanId,
+            publicationValidatedAt: download.validatedAt,
+            publishedAt: download.publishedAt,
+          }
+        : {}),
     });
     console.log(
       `Processed ${result.points.length.toLocaleString()} ${input.label} cycling places in ${inputUsage.elapsedSeconds.toLocaleString()}s.`,

@@ -1,11 +1,17 @@
-import { spawn } from 'node:child_process';
-import { cp, mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { execFileSync, spawn } from 'node:child_process';
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   assertFreshOsmRelease,
   promoteStagedPaths,
 } from './data-release-utils.mjs';
+
+import {
+  createPublicationPlan,
+  openPublicationPlan,
+} from './publication-plan.mjs';
+import { checkDataFreshness } from './check-data-freshness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const definitions = {
@@ -45,6 +51,31 @@ try {
       resolve(staging, 'src/data', name),
     );
   }
+  const selected = selection === 'all' ? Object.keys(definitions) : [selection];
+  let planEnv = {};
+  let publicationPlan;
+  const review = resolve(cache, 'review');
+  if (selected.some((id) => id !== 'network') && !args.includes('--cached')) {
+    const revision = execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: root,
+      encoding: 'utf8',
+    }).trim();
+    const { plan, context } = await createPublicationPlan(revision);
+    const planPath = resolve(staging, 'publication-plan.json');
+    await writeFile(planPath, JSON.stringify(plan, null, 2) + '\n');
+    planEnv = {
+      NEUK_PUBLICATION_PLAN: planPath,
+      NEUK_PLAN_INVOCATION: context.invocationId,
+      NEUK_PLAN_REVISION: context.codeRevision,
+      NEUK_PLAN_DIGEST: context.digest,
+    };
+    publicationPlan = await openPublicationPlan(planEnv);
+    await mkdir(review, { recursive: true });
+    await cp(planPath, resolve(review, 'publication-plan.json'));
+    console.log(
+      `Pinned ${plan.sources.length} dated publications for invocation ${plan.invocationId}; expires ${plan.expiresAt}`,
+    );
+  }
   async function run(script, scriptArgs = []) {
     await new Promise((accept, reject) => {
       const child = spawn(
@@ -54,6 +85,7 @@ try {
           stdio: 'inherit',
           env: {
             ...process.env,
+            ...planEnv,
             NEUK_DATA_ROOT: staging,
             NEUK_DATA_CACHE_ROOT: cache,
           },
@@ -67,7 +99,6 @@ try {
       );
     });
   }
-  const selected = selection === 'all' ? Object.keys(definitions) : [selection];
   for (const dataset of selected) {
     const download =
       dataset !== 'network' &&
@@ -96,6 +127,57 @@ try {
         selected.includes(dataset.id === 'cycling-pois' ? 'pois' : dataset.id),
     ),
   );
+  if (publicationPlan) {
+    const plan = await publicationPlan.assertRelease(
+      freshness,
+      selected
+        .filter((id) => id !== 'network')
+        .map((id) => (id === 'pois' ? 'cycling-pois' : id)),
+    );
+    const status = await checkDataFreshness(freshness);
+    const selectedIds = selected.map((id) =>
+      id === 'pois' ? 'cycling-pois' : id === 'network' ? 'cycle-network' : id,
+    );
+    if (
+      status.datasets
+        .filter((item) => selectedIds.includes(item.id))
+        .some((item) => item.stale || !item.complete || item.mixedAge) ||
+      (selection === 'all' && !status.osmInputsMatch)
+    )
+      throw new Error(
+        'Release source checks failed; release was not promoted.',
+      );
+    status.mode = 'pinned-release';
+    status.publicationPlanId = plan.invocationId;
+    status.preflightStartedAt = plan.createdAt;
+    status.upstream = plan.sources.map((source) => ({
+      id: source.id,
+      downloadUrl: source.datedUrl,
+      sourceTimestamp: source.sourceTimestamp,
+      bytes: source.bytes,
+      validatedAt: source.validatedAt,
+      publishedAt: source.publishedAt,
+    }));
+    // NCN provenance comes from the actual release (acquired in an all refresh).
+    status.upstream.push(
+      ...freshness.datasets
+        .filter((item) => item.id === 'cycle-network')
+        .flatMap((item) =>
+          item.inputs.map((input) => ({
+            id: input.id,
+            dataEditedAt: input.sourceTimestamp,
+          })),
+        ),
+    );
+    await writeFile(
+      resolve(cache, 'source-status.json'),
+      JSON.stringify(status, null, 2) + '\n',
+    );
+    await writeFile(
+      resolve(review, 'publication-receipts.json'),
+      JSON.stringify(await publicationPlan.receipts(), null, 2) + '\n',
+    );
+  }
   await promoteStagedPaths(staging, root, [
     'public/data',
     'src/data/cycle-parking.json',
