@@ -54,6 +54,13 @@ export async function writeDataFreshness() {
         sourceUrl: input.sourceUrl,
         ...(input.downloadUrl ? { downloadUrl: input.downloadUrl } : {}),
         sourceTimestamp: input.sourceTimestamp,
+        ...(input.publicationPlanId
+          ? {
+              publicationPlanId: input.publicationPlanId,
+              publicationValidatedAt: input.publicationValidatedAt,
+              publishedAt: input.publishedAt,
+            }
+          : {}),
         sha256: input.pbfSha256,
         retrievedAt: await verifiedRetrievalDate(input),
       });

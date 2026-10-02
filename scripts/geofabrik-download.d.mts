@@ -29,6 +29,11 @@ export function parsePublication(
   latestUrl: string,
   now?: number,
 ): GeofabrikPublication;
+export function validatePinnedPublication(
+  source: GeofabrikSource,
+  latestUrl: string,
+  now?: number,
+): GeofabrikSource;
 export function validatePbfFile(
   path: string,
   expectedTimestamp?: string,
@@ -44,9 +49,11 @@ export function downloadGeofabrikExtract(
     outputPath: string;
     forceDownload?: boolean;
     label?: string;
+    publication?: GeofabrikSource;
+    expectedSha256?: string;
   },
   options?: GeofabrikOptions,
 ): Promise<
   | { sourceTimestamp: string; cached: true }
-  | (GeofabrikSource & { sha256: string; cached: false })
+  | (GeofabrikSource & { sha256: string; cached: boolean })
 >;

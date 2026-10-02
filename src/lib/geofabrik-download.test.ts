@@ -7,6 +7,8 @@ import {
   writeFile,
   mkdir,
   stat,
+  cp,
+  symlink,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -25,6 +27,14 @@ import {
   resolveGeofabrikExtract,
   validatePbfFile,
 } from '../../scripts/geofabrik-download.mjs';
+
+import {
+  createPublicationPlan,
+  openPublicationPlan,
+  planDigest,
+  validatePublicationPlan,
+} from '../../scripts/publication-plan.mjs';
+import { osmInputs } from '../../scripts/parking-data-sources.mjs';
 
 const latest =
   'https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf';
@@ -327,7 +337,7 @@ describe('official Geofabrik resolution', () => {
     await expect(resolveGeofabrikExtract(latest, settings)).rejects.toThrow(
       'fetch failed',
     );
-    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher).toHaveBeenCalledTimes(3);
     expect(settings.log).toHaveBeenCalledWith(
       expect.stringContaining('socket closed'),
     );
@@ -358,7 +368,7 @@ describe('official Geofabrik resolution', () => {
     );
   });
 
-  it('stops after two publication-page timeouts without probing unvalidated extracts', async () => {
+  it('stops after three publication-page timeouts without probing unvalidated extracts', async () => {
     const fetcher = vi.fn(async (url: RequestInfo | URL) => {
       expect(String(url)).toBe(page);
       throw new DOMException(
@@ -369,7 +379,7 @@ describe('official Geofabrik resolution', () => {
     await expect(
       resolveGeofabrikExtract(latest, options(fetcher)),
     ).rejects.toMatchObject({ name: 'TimeoutError' });
-    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher).toHaveBeenCalledTimes(3);
     expect(fetcher.mock.calls.every(([url]) => String(url) === page)).toBe(
       true,
     );
@@ -388,9 +398,23 @@ describe('official Geofabrik resolution', () => {
 });
 
 describe('validated download and release fixtures', () => {
-  it('runs both real command-line updaters against a dated fallback without network access', async () => {
+  it('runs both real updaters from one complete plan after metadata becomes unavailable', async () => {
     const root = join(await output(), '..');
     await mkdir(join(root, 'src/data'), { recursive: true });
+    const { plan } = await createPublicationPlan(
+      'a'.repeat(40),
+      options(upstream()),
+      [{ id: 'berkshire', url: latest }],
+    );
+    plan.sources = osmInputs.map((input) => ({
+      ...plan.sources[0],
+      id: input.id,
+      latestUrl: input.url,
+      datedUrl: input.url.replace('latest', '260930'),
+      downloadUrl: input.url.replace('latest', '260930'),
+    }));
+    const planPath = join(root, 'plan.json');
+    await writeFile(planPath, JSON.stringify(plan));
     const preload = join(root, 'fixture-fetch.mjs');
     await writeFile(
       preload,
@@ -402,7 +426,7 @@ describe('validated download and release fixtures', () => {
       const page = ${JSON.stringify(page)};
       globalThis.fetch = async (input, init = {}) => {
         const url = String(input);
-        if (url === page) return new Response(${JSON.stringify(html())}, { headers: { 'content-type': 'text/html' } });
+        if (url === page) throw new Error('Publication metadata now unavailable');
         if (url === latest) return new Response(null, { status: 301, headers: { location: latest + '/' } });
         if (url === dated) {
           const headers = { 'content-type': 'application/octet-stream', 'content-length': String(body.length) };
@@ -432,13 +456,19 @@ describe('validated download and release fixtures', () => {
           preload,
           new URL('../../scripts/' + script, import.meta.url).pathname,
           '--regions=berkshire',
-          '--force-download',
+          ...(script === 'update-cycle-parking-data.mjs'
+            ? ['--force-download']
+            : []),
         ],
         {
           env: {
             ...process.env,
             NEUK_DATA_ROOT: root,
             NEUK_DATA_CACHE_ROOT: join(root, 'cache'),
+            NEUK_PUBLICATION_PLAN: planPath,
+            NEUK_PLAN_INVOCATION: plan.invocationId,
+            NEUK_PLAN_REVISION: plan.codeRevision,
+            NEUK_PLAN_DIGEST: planDigest(plan),
           },
           timeout: 15_000,
           stdio: 'pipe',
@@ -458,6 +488,7 @@ describe('validated download and release fixtures', () => {
         sourceTimestamp: timestamp,
         pbfSha256: createHash('sha256').update(body).digest('hex'),
         recordCount: 1,
+        publicationPlanId: plan.invocationId,
       });
     expect(parking.mergedRecordCount).toBe(1);
     expect(pois.recordCount).toBe(1);
@@ -756,5 +787,399 @@ describe('upstream freshness uses the shared resolver and actual OSM cutoff', ()
       { ...options(upstream(undefined, 'error page')), checkUpstream: true },
     );
     expect(report.upstream[0].error).toContain('timestamp');
+  });
+});
+
+describe('one-invocation publication plan', () => {
+  const inputs = [{ id: 'berkshire', url: latest }];
+  async function fixture() {
+    const fetcher = upstream();
+    const { plan, context } = await createPublicationPlan(
+      'a'.repeat(40),
+      options(fetcher),
+      inputs,
+    );
+    const path = await output();
+    const planPath = path + '.json';
+    await writeFile(planPath, JSON.stringify(plan));
+    const env = {
+      NEUK_PUBLICATION_PLAN: planPath,
+      NEUK_PLAN_INVOCATION: context.invocationId,
+      NEUK_PLAN_REVISION: context.codeRevision,
+      NEUK_PLAN_DIGEST: context.digest,
+    };
+    return { plan, context, path, planPath, env, fetcher };
+  }
+
+  it('downloads and retries only the pinned dated file when metadata disappears', async () => {
+    const f = await fixture();
+    let full = 0;
+    const fetcher = upstream((url) => {
+      expect(url).toBe(dated);
+      if (++full === 1)
+        return new Response(body.subarray(0, -1), {
+          headers: {
+            'content-type': 'application/octet-stream',
+            'content-length': String(body.length),
+          },
+        });
+    });
+    const runner = (await openPublicationPlan(
+      f.env,
+      options(fetcher),
+      inputs,
+    ))!;
+    const result = await runner.download({
+      url: latest,
+      outputPath: f.path,
+      forceDownload: true,
+    });
+    expect(result).toMatchObject({
+      downloadUrl: dated,
+      publicationPlanId: f.plan.invocationId,
+    });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(f.fetcher.mock.calls.map(([url]) => url)).toEqual([
+      page,
+      dated,
+      dated,
+    ]);
+    const cached = await runner.download({ url: latest, outputPath: f.path });
+    expect(cached.sha256).toBe(result.sha256);
+    expect(cached.cached).toBe(true);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    const input = {
+      id: 'berkshire',
+      sourceUrl: latest,
+      sourceTimestamp: timestamp,
+      downloadUrl: dated,
+      publicationPlanId: f.plan.invocationId,
+      publicationValidatedAt: f.plan.sources[0].validatedAt,
+      publishedAt: f.plan.sources[0].publishedAt,
+      sha256: result.sha256,
+    };
+    await expect(
+      runner.assertRelease({ datasets: [{ id: 'parking', inputs: [input] }] }, [
+        'parking',
+      ]),
+    ).resolves.toBeDefined();
+    for (const patch of [
+      { sha256: 'f'.repeat(64) },
+      { sourceTimestamp: '2026-09-29' },
+      { sourceUrl: latest.replace('berkshire', 'bristol') },
+      { publicationPlanId: 'foreign' },
+      { publicationValidatedAt: '2026-10-01T11:59:59Z' },
+      { publishedAt: '2026-10-01T03:00:00Z' },
+      { downloadUrl: latest },
+    ])
+      await expect(
+        runner.assertRelease(
+          { datasets: [{ id: 'parking', inputs: [{ ...input, ...patch }] }] },
+          ['parking'],
+        ),
+      ).rejects.toThrow();
+    await expect(
+      runner.assertRelease(
+        { datasets: [{ id: 'parking', inputs: [input, input] }] },
+        ['parking'],
+      ),
+    ).rejects.toThrow();
+    await expect(
+      runner.assertRelease({ datasets: [] }, ['parking']),
+    ).rejects.toThrow();
+  });
+
+  it.each([
+    'changed',
+    'foreign invocation',
+    'foreign revision',
+    'expired',
+    'future',
+    'missing',
+    'duplicate',
+    'unknown',
+    'foreign URL',
+    'wrong region',
+    'wrong dated URL',
+    'stale cutoff',
+    'future cutoff',
+    'invalid size',
+    'publication date',
+  ])('rejects a %s plan before download', async (failure) => {
+    const f = await fixture();
+    const p = structuredClone(f.plan);
+    const c = { ...f.context };
+    let checkAt = now;
+    if (failure === 'changed') p.sources[0].bytes += 1;
+    if (failure === 'foreign invocation') c.invocationId = 'other';
+    if (failure === 'foreign revision') c.codeRevision = 'b'.repeat(40);
+    if (failure === 'expired') checkAt = Date.parse(p.expiresAt);
+    if (failure === 'future') checkAt = now - 1;
+    if (failure === 'missing') p.sources = [];
+    if (failure === 'duplicate') p.sources.push(p.sources[0]);
+    if (failure === 'unknown') p.sources[0].id = 'bristol';
+    if (failure === 'foreign URL')
+      p.sources[0].latestUrl = latest.replace(
+        'download.geofabrik.de',
+        'evil.example',
+      );
+    if (failure === 'wrong region')
+      p.sources[0].latestUrl = latest.replace('berkshire', 'bristol');
+    if (failure === 'wrong dated URL') p.sources[0].downloadUrl = latest;
+    if (failure === 'stale cutoff')
+      p.sources[0].sourceTimestamp = '2026-07-30T20:22:42Z';
+    if (failure === 'future cutoff')
+      p.sources[0].sourceTimestamp = '2026-10-02T20:22:42Z';
+    if (failure === 'invalid size') p.sources[0].bytes = 0;
+    if (failure === 'publication date') p.sources[0].publishedAt = '2026-09-29';
+    if (failure !== 'changed') c.digest = planDigest(p);
+    expect(() => validatePublicationPlan(p, c, checkAt, inputs)).toThrow();
+  });
+
+  it('rejects changed plan on disk, unplanned requests, missing receipts and changed cache', async () => {
+    const f = await fixture();
+    const fetcher = upstream();
+    const runner = (await openPublicationPlan(
+      f.env,
+      options(fetcher),
+      inputs,
+    ))!;
+    await expect(
+      runner.download({
+        url: latest.replace('berkshire', 'bristol'),
+        outputPath: f.path,
+      }),
+    ).rejects.toThrow('Unplanned');
+    await writeFile(f.path, body);
+    await expect(
+      runner.download({ url: latest, outputPath: f.path }),
+    ).rejects.toThrow('receipt');
+    expect(fetcher).not.toHaveBeenCalled();
+    await runner.download({
+      url: latest,
+      outputPath: f.path,
+      forceDownload: true,
+    });
+    await writeFile(f.path, pbf('2026-09-29T20:22:42Z'));
+    await expect(
+      runner.download({ url: latest, outputPath: f.path }),
+    ).rejects.toThrow('timestamp');
+    await writeFile(f.path, body);
+    const receiptsPath = f.planPath + '.receipts.json';
+    const receipts = JSON.parse(await readFile(receiptsPath, 'utf8'));
+    receipts.inputs.berkshire.sha256 = '0'.repeat(64);
+    await writeFile(receiptsPath, JSON.stringify(receipts));
+    await expect(
+      runner.download({ url: latest, outputPath: f.path }),
+    ).rejects.toThrow('hash');
+    await writeFile(
+      f.planPath,
+      JSON.stringify({ ...f.plan, invocationId: 'changed' }),
+    );
+    await expect(
+      runner.download({ url: latest, outputPath: f.path, forceDownload: true }),
+    ).rejects.toThrow('plan');
+  });
+
+  it('rejects mixed source dates even though each input is within its age limit', async () => {
+    const f = await fixture();
+    f.plan.sources.push({
+      ...f.plan.sources[0],
+      id: 'bristol',
+      latestUrl: latest.replace('berkshire', 'bristol'),
+      datedUrl: dated.replace('berkshire-260930', 'bristol-260927'),
+      downloadUrl: dated.replace('berkshire-260930', 'bristol-260927'),
+      sourceTimestamp: '2026-09-27T20:22:42.000Z',
+      publishedAt: '2026-09-28T02:01:00Z',
+    });
+    f.context.digest = planDigest(f.plan);
+    expect(() =>
+      validatePublicationPlan(f.plan, f.context, now, [
+        ...inputs,
+        { id: 'bristol', url: latest.replace('berkshire', 'bristol') },
+      ]),
+    ).toThrow('mixed-age');
+  });
+
+  it.each(['truncated', 'corrupt', 'timestamp', 'HTML', 'alias redirect'])(
+    'preserves the old cache after a pinned %s failure',
+    async (failure) => {
+      const f = await fixture();
+      await writeFile(f.path, 'previous cache');
+      const fetcher = upstream((url) => {
+        expect(url).toBe(dated);
+        if (failure === 'alias redirect')
+          return new Response(null, {
+            status: 302,
+            headers: { location: latest },
+          });
+        const bytes =
+          failure === 'truncated'
+            ? body.subarray(0, -1)
+            : failure === 'timestamp'
+              ? pbf('2026-09-29T20:22:42Z')
+              : failure === 'corrupt'
+                ? Buffer.concat([body.subarray(0, -2), Buffer.from([0, 0])])
+                : body;
+        return new Response(bytes, {
+          headers: {
+            'content-type':
+              failure === 'HTML' ? 'text/html' : 'application/octet-stream',
+            'content-length': String(body.length),
+          },
+        });
+      });
+      const runner = (await openPublicationPlan(
+        f.env,
+        options(fetcher),
+        inputs,
+      ))!;
+      await expect(
+        runner.download({
+          url: latest,
+          outputPath: f.path,
+          forceDownload: true,
+        }),
+      ).rejects.toThrow();
+      expect(await readFile(f.path, 'utf8')).toBe('previous cache');
+      await expect(stat(f.path + '.download')).rejects.toMatchObject({
+        code: 'ENOENT',
+      });
+      await expect(stat(f.planPath + '.receipts.json')).rejects.toMatchObject({
+        code: 'ENOENT',
+      });
+      expect(fetcher.mock.calls.every(([url]) => url === dated)).toBe(true);
+    },
+  );
+
+  it('leaves the real coordinator release untouched when a pinned download fails', async () => {
+    const root = join(await output(), '..');
+    const repo = new URL('../../', import.meta.url).pathname;
+    await cp(join(repo, 'scripts'), join(root, 'scripts'), { recursive: true });
+    await symlink(
+      join(repo, 'node_modules'),
+      join(root, 'node_modules'),
+      'dir',
+    );
+    await mkdir(join(root, 'public/data'), { recursive: true });
+    await mkdir(join(root, 'src/data'), { recursive: true });
+    const previous = [
+      'public/data/marker',
+      'src/data/cycle-parking.json',
+      'src/data/cycle-parking-report.json',
+      'src/data/cycling-poi-report.json',
+      'src/data/cycle-network-report.json',
+    ];
+    for (const path of previous)
+      await writeFile(join(root, path), 'previous release');
+    const preload = join(root, 'fetch.mjs');
+    await writeFile(
+      preload,
+      `
+      Date.now = () => ${now};
+      const body = Buffer.from(${JSON.stringify(body.toString('base64'))}, 'base64');
+      globalThis.fetch = async (value, init = {}) => {
+        const url = String(value);
+        if (url.endsWith('.html')) {
+          const stem = new URL(url).pathname.split('/').at(-1).replace('.html', '');
+          return new Response(${JSON.stringify(html())}.replaceAll('berkshire', stem), { headers: { 'content-type': 'text/html' } });
+        }
+        if (url.endsWith('-260930.osm.pbf')) {
+          const headers = { 'content-type': 'application/octet-stream', 'content-length': String(body.length) };
+          if (init.method === 'HEAD') return new Response(null, { headers });
+          if (init.headers?.Range) {
+            headers['content-range'] = 'bytes 0-' + (body.length - 1) + '/' + body.length;
+            return new Response(body, { status: 206, headers });
+          }
+          return new Response('upstream error body', { headers: { 'content-type': 'text/html' } });
+        }
+        if (url.includes('Public_Bike_Parking/FeatureServer/0/query')) return Response.json({ features: [] });
+        throw new Error('Unexpected coordinator fixture request: ' + url);
+      };
+    `,
+    );
+    let failed = '';
+    try {
+      execFileSync(
+        process.execPath,
+        [
+          '--import',
+          preload,
+          join(root, 'scripts/refresh-data-release.mjs'),
+          'all',
+        ],
+        {
+          env: {
+            ...process.env,
+            NODE_OPTIONS: '--import=' + preload,
+            GIT_DIR: join(repo, '.git'),
+          },
+          timeout: 15_000,
+          stdio: 'pipe',
+        },
+      );
+    } catch (error) {
+      failed = String((error as { stderr: Buffer }).stderr);
+    }
+    expect(failed).toContain('Expected unencoded PBF');
+    expect(failed).toContain('previous release preserved');
+    for (const path of previous)
+      expect(await readFile(join(root, path), 'utf8')).toBe('previous release');
+    await expect(
+      stat(join(root, '.cache/data-refresh.lock')),
+    ).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('rejects a plan that expires while downloading and incomplete context', async () => {
+    const f = await fixture();
+    const settings = options(upstream());
+    const expires = Date.parse(f.plan.expiresAt);
+    settings.fetcher = upstream(() => {
+      settings.now = expires;
+    });
+    const runner = (await openPublicationPlan(f.env, settings, inputs))!;
+    await expect(
+      runner.download({ url: latest, outputPath: f.path, forceDownload: true }),
+    ).rejects.toThrow('expired');
+    await expect(stat(f.planPath + '.receipts.json')).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
+    await expect(
+      openPublicationPlan(
+        { NEUK_PUBLICATION_PLAN: f.planPath },
+        options(upstream()),
+        inputs,
+      ),
+    ).rejects.toThrow('Incomplete');
+  });
+
+  it('bounds metadata HTTP and body retries but rejects permanent errors immediately', async () => {
+    const sleep = vi.fn(async () => {});
+    let count = 0;
+    const fetcher = upstream((url) => {
+      if (url !== page) return;
+      count += 1;
+      if (count === 1) return new Response(null, { status: 503 });
+      if (count === 2)
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              controller.error(new TypeError('socket body closed'));
+            },
+          }),
+          { headers: { 'content-type': 'text/html' } },
+        );
+    });
+    await expect(
+      resolveGeofabrikExtract(latest, { ...options(fetcher), sleep }),
+    ).resolves.toBeDefined();
+    expect(sleep.mock.calls).toEqual([[5000], [15000]]);
+    const permanent = upstream((url) =>
+      url === page ? new Response(null, { status: 404 }) : undefined,
+    );
+    await expect(
+      resolveGeofabrikExtract(latest, options(permanent)),
+    ).rejects.toThrow('404');
+    expect(permanent).toHaveBeenCalledTimes(1);
   });
 });

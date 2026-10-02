@@ -105,11 +105,13 @@ if (
   const report = await checkDataFreshness(freshness, {
     checkUpstream: process.argv.includes('--upstream'),
   });
-  await mkdir(resolve(root, '.cache'), { recursive: true });
-  await writeFile(
-    resolve(root, '.cache/source-status.json'),
-    JSON.stringify(report, null, 2) + '\n',
+  const output = resolve(
+    root,
+    process.argv.find((arg) => arg.startsWith('--output='))?.slice(9) ??
+      '.cache/source-status.json',
   );
+  await mkdir(dirname(output), { recursive: true });
+  await writeFile(output, JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
   if (
     report.datasets.some(

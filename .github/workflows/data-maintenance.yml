@@ -34,15 +34,19 @@ jobs:
       - name: Build monthly or requested release
         if: github.event.schedule == '23 2 1 * *' || inputs.refresh == true
         run: pnpm refresh:data
-      - name: Review source age and upstream publications
+      - name: Review current upstream publications (check-only run)
+        if: github.event.schedule != '23 2 1 * *' && inputs.refresh != true
         run: pnpm check:data --upstream
+      - name: Verify installed release source age (refresh run)
+        if: github.event.schedule == '23 2 1 * *' || inputs.refresh == true
+        run: pnpm check:data --output=.cache/review/installed-source-status.json
       - name: Summarize source check
         if: always()
         run: |
           if [ -f .cache/source-status.json ]; then
             {
               echo '## Source freshness check'
-              echo 'New upstream publications require review; this workflow does not deploy.'
+              echo 'Refresh reports describe pinned preflight publications; check-only reports inspect current upstream. This workflow does not deploy.'
               echo '```json'
               cat .cache/source-status.json
               echo '```'

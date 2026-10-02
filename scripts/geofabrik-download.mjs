@@ -56,7 +56,9 @@ async function request(url, init, paths, options) {
     log = console.warn,
     sleep = (ms) => new Promise((accept) => setTimeout(accept, ms)),
   } = options;
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  const delays = options.metadata ? [5_000, 15_000] : [1_000];
+  const attempts = delays.length + 1;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
     let current = trustedUrl(url, paths);
     const seen = new Set();
     try {
@@ -82,7 +84,7 @@ async function request(url, init, paths, options) {
             throw new Error(`Redirect without Location at ${current}`);
           const next = new URL(location, current);
           log(
-            `Geofabrik ${init.method ?? 'GET'} attempt ${attempt}/2: ${response.status} ${current} -> ${next}`,
+            `Geofabrik ${init.method ?? 'GET'} attempt ${attempt}/${attempts}: ${response.status} ${current} -> ${next}`,
           );
           current = trustedUrl(next, paths);
           if (hop === 4)
@@ -97,22 +99,26 @@ async function request(url, init, paths, options) {
           error.retryable = response.status >= 500 || response.status === 429;
           throw error;
         }
-        return { response, url: current.href };
+        const body = options.consumeResponse
+          ? await options.consumeResponse(response)
+          : undefined;
+        return { response, url: current.href, body };
       }
     } catch (error) {
       log(
-        `Geofabrik ${init.method ?? 'GET'} attempt ${attempt}/2 ${url}: ${describeDownloadError(error)}`,
+        `Geofabrik ${init.method ?? 'GET'} attempt ${attempt}/${attempts} ${url}: ${describeDownloadError(error)}`,
       );
       // Invalid redirects/metadata and permanent HTTP errors are not improved
-      // by retrying. Network failures and transient HTTP errors get one retry.
+      // by retrying. Metadata includes body consumption in its bounded retries.
       if (
-        attempt === 2 ||
+        attempt === attempts ||
         (error.retryable !== true &&
           !(error instanceof TypeError) &&
-          error.name !== 'TimeoutError')
+          error.name !== 'TimeoutError' &&
+          !(options.metadata && error.name === 'AbortError'))
       )
         throw error;
-      await sleep(1_000);
+      await sleep(delays[attempt - 1]);
     }
   }
 }
@@ -196,6 +202,30 @@ export function parsePublication(html, latestUrl, now = Date.now()) {
     bytes,
     publishedAt: new Date(publishedAt).toISOString(),
   };
+}
+
+// A plan may pin only the exact dated file derived from the verified cutoff.
+export function validatePinnedPublication(source, latestUrl, now = Date.now()) {
+  const { latest, stem } = sourceUrls(latestUrl);
+  const timestamp = validateSourceTimestamp(source.sourceTimestamp, now);
+  const dated = new URL(
+    `${stem}-${timestamp.slice(2, 10).replaceAll('-', '')}.osm.pbf`,
+    origin,
+  ).href;
+  const published = Date.parse(source.publishedAt);
+  if (
+    source.latestUrl !== latest.href ||
+    source.datedUrl !== dated ||
+    source.downloadUrl !== dated ||
+    !Number.isSafeInteger(source.bytes) ||
+    source.bytes <= 0 ||
+    !Number.isFinite(published) ||
+    published > now ||
+    published < Date.parse(timestamp) ||
+    published - Date.parse(timestamp) > 2 * day
+  )
+    throw new Error('Invalid pinned publication URL, size or date');
+  return source;
 }
 
 function binaryHeaders(response, bytes, ranged = false) {
@@ -338,13 +368,17 @@ export async function resolveGeofabrikExtract(latestUrl, options = {}) {
   const metadata = await request(page.href, {}, [page.pathname], {
     ...options,
     timeoutMs: 30_000,
+    metadata: true,
+    consumeResponse: async (response) => {
+      if (!response.headers.get('content-type')?.startsWith('text/html')) {
+        await response.body?.cancel();
+        throw new Error('Expected official Geofabrik publication HTML');
+      }
+      return boundedBody(response, 2 * 1024 * 1024);
+    },
   });
-  if (!metadata.response.headers.get('content-type')?.startsWith('text/html')) {
-    await metadata.response.body?.cancel();
-    throw new Error('Expected official Geofabrik publication HTML');
-  }
   const publication = parsePublication(
-    (await boundedBody(metadata.response, 2 * 1024 * 1024)).toString('utf8'),
+    metadata.body.toString('utf8'),
     latest.href,
     options.now,
   );
@@ -361,21 +395,50 @@ export async function resolveGeofabrikExtract(latestUrl, options = {}) {
 }
 
 export async function downloadGeofabrikExtract(
-  { url, outputPath, forceDownload = false, label = url },
+  {
+    url,
+    outputPath,
+    forceDownload = false,
+    label = url,
+    publication,
+    expectedSha256,
+  },
   options = {},
 ) {
+  if (publication) validatePinnedPublication(publication, url, options.now);
   if (!forceDownload) {
     try {
       if ((await stat(outputPath)).size > 0) {
         const sourceTimestamp = await validatePbfFile(
           outputPath,
-          undefined,
+          publication?.sourceTimestamp,
           options.now,
         );
+        if (publication) {
+          if (
+            (await stat(outputPath)).size !== publication.bytes ||
+            !/^[a-f0-9]{64}$/.test(expectedSha256 ?? '')
+          )
+            throw new Error(
+              'Cached PBF does not have a matching same-run receipt',
+            );
+          const hash = createHash('sha256');
+          for await (const chunk of createReadStream(outputPath))
+            hash.update(chunk);
+          if (hash.digest('hex') !== expectedSha256)
+            throw new Error('Cached PBF hash differs from same-run receipt');
+        }
         (options.log ?? console.log)(
           `Using cached ${label} at ${outputPath}; OSM cutoff ${sourceTimestamp}`,
         );
-        return { sourceTimestamp, cached: true };
+        return publication
+          ? {
+              ...publication,
+              sourceTimestamp,
+              sha256: expectedSha256,
+              cached: true,
+            }
+          : { sourceTimestamp, cached: true };
       }
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
@@ -383,7 +446,7 @@ export async function downloadGeofabrikExtract(
   }
   await mkdir(dirname(outputPath), { recursive: true });
   const temporary = `${outputPath}.download`;
-  let source = await resolveGeofabrikExtract(url, options);
+  let source = publication ?? (await resolveGeofabrikExtract(url, options));
   try {
     for (let attempt = 1; attempt <= 2; attempt += 1) {
       try {
@@ -391,10 +454,14 @@ export async function downloadGeofabrikExtract(
         (options.log ?? console.log)(
           `Downloading ${label}, attempt ${attempt}/2: ${source.downloadUrl}; ${source.bytes} bytes, OSM cutoff ${source.sourceTimestamp}`,
         );
-        const paths = [
-          new URL(source.latestUrl).pathname,
-          new URL(source.datedUrl).pathname,
-        ];
+        if (publication)
+          validatePinnedPublication(publication, url, options.now);
+        const paths = publication
+          ? [new URL(publication.datedUrl).pathname]
+          : [
+              new URL(source.latestUrl).pathname,
+              new URL(source.datedUrl).pathname,
+            ];
         const { response, url: downloadUrl } = await request(
           source.downloadUrl,
           {},
@@ -441,10 +508,12 @@ export async function downloadGeofabrikExtract(
           `Geofabrik download attempt ${attempt}/2 ${source.downloadUrl}: ${describeDownloadError(error)}`,
         );
         if (attempt === 2) throw error;
-        source = await resolveGeofabrikExtract(url, {
-          ...options,
-          preferDated: true,
-        });
+        source =
+          publication ??
+          (await resolveGeofabrikExtract(url, {
+            ...options,
+            preferDated: true,
+          }));
       }
     }
   } finally {
