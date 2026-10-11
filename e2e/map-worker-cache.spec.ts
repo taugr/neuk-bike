@@ -39,13 +39,12 @@ test('an installed PWA ignores obsolete unversioned workers after an update', as
           for (const request of await cache.keys())
             paths.push(new URL(request.url).pathname);
         }
-        return ['maplibre-gl-worker.mjs', 'maplibre-gl-shared.mjs'].every(
-          (file) =>
-            paths.some((path) =>
-              new RegExp(
-                `/vendor/maplibre-gl/\\d+\\.\\d+\\.\\d+/${file}$`,
-              ).test(path),
-            ),
+        // MapLibre 6.13 ships a self-contained worker; the deprecated shared
+        // module is empty and is no longer requested or cached.
+        return paths.some((path) =>
+          /\/vendor\/maplibre-gl\/\d+\.\d+\.\d+\/maplibre-gl-worker\.mjs$/.test(
+            path,
+          ),
         );
       }),
     )

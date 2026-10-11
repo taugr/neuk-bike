@@ -83,7 +83,7 @@ Useful source endpoints:
    includes Northern Ireland but excludes the Republic of Ireland, Spain, and
    Armenia. Preserve the saved preference while the control is unavailable.
 5. **Accurate language:** call the layer `National Cycle Network` or `Cycle
-network`, never `Sustrans cycle paths`. The source contains on-road sections,
+   network`, never `Sustrans cycle paths`. The source contains on-road sections,
    ferries, links, and regional routes as well as traffic-free paths.
 6. **Parking remains primary:** parking and cycling-place markers stay above
    the network. Marker selection, map movement, saved neuks, sharing, and
@@ -93,7 +93,7 @@ network`, never `Sustrans cycle paths`. The source contains on-road sections,
    rather than hiding useful context completely.
 8. **Display does not alter routing:** this feature does not claim that
    CycleStreets follows the National Cycle Network and does not add a `prefer
-NCN` routing option.
+   NCN` routing option.
 9. **Static core data:** fetch the source during a deliberate data refresh,
    commit generated assets, and serve only same-origin static files at runtime.
    Do not send user viewports to ArcGIS.

@@ -1831,7 +1831,7 @@ full-view comparison and was resolved in the second capture.
 
 1. Initial desktop capture found a P2 title-wrap mismatch: the visible
    `Edit route name` label consumed enough width to wrap `Browser test –
-Edinburgh Castle` onto two lines.
+   Edinburgh Castle` onto two lines.
 2. The visible label was shortened to `Edit name` while preserving the
    descriptive `Edit route name` accessible name.
 3. The production export was rebuilt and recaptured. The post-fix comparison

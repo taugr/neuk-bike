@@ -6,14 +6,14 @@ const { version } = JSON.parse(
     'utf8',
   ),
 );
-// The worker imports its shared module relatively. Version the directory so
-// both URLs change together, including in an already installed PWA's cache.
+// Version the self-contained worker so an already installed PWA never reuses
+// a worker cached for a previous MapLibre release.
 const directory = new URL(
   `../public/vendor/maplibre-gl/${version}/`,
   import.meta.url,
 );
 mkdirSync(directory, { recursive: true });
-for (const asset of ['maplibre-gl-shared.mjs', 'maplibre-gl-worker.mjs']) {
+for (const asset of ['maplibre-gl-worker.mjs']) {
   copyFileSync(
     new URL(`../node_modules/maplibre-gl/dist/${asset}`, import.meta.url),
     new URL(asset, directory),
