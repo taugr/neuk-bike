@@ -1,4 +1,5 @@
 'use client';
+import { useUnits } from '@/components/units-provider';
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -63,6 +64,7 @@ export function SavedRoutesPanel({
   onShareLink: (route: SavedRouteRecord) => void;
 }) {
   const { locale, t } = useLanguage();
+  const { units } = useUnits();
   const [name, setName] = useState(selectedRoute?.name ?? '');
   const [isRenaming, setIsRenaming] = useState(false);
   const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
@@ -262,7 +264,7 @@ export function SavedRoutesPanel({
           ) : null}
           <div className="saved-route-summary">
             <strong>
-              {formatLocalizedDistance(route.distanceMeters, locale)}
+              {formatLocalizedDistance(route.distanceMeters, locale, units)}
             </strong>
             <strong>
               {selectedRoute.durationSeconds === null
@@ -463,12 +465,17 @@ export function SavedRoutesPanel({
                       )}
                     </span>
                     <span className="saved-route-instruction-copy">
-                      {describeCycleRouteInstruction(instruction, locale)}
+                      {describeCycleRouteInstruction(
+                        instruction,
+                        locale,
+                        units,
+                      )}
                     </span>
                     <small>
                       {formatLocalizedDistance(
                         instruction.distanceMeters,
                         locale,
+                        units,
                       )}
                     </small>
                   </li>
@@ -560,7 +567,12 @@ export function SavedRoutesPanel({
                   <span>
                     <strong>{route.name}</strong>
                     <small>
-                      {formatLocalizedDistance(route.distanceMeters, locale)} ·{' '}
+                      {formatLocalizedDistance(
+                        route.distanceMeters,
+                        locale,
+                        units,
+                      )}{' '}
+                      ·{' '}
                       {route.durationSeconds === null
                         ? t('durationUnknown')
                         : formatCycleRouteDuration(

@@ -1,0 +1,211 @@
+{
+  "version": 1,
+  "kind": "station-snapshot",
+  "capturedAt": "2026-10-15T19:39:28.699897+00:00",
+  "coverage": {
+    "west": -3.6,
+    "east": -2.95,
+    "south": 55.8,
+    "north": 56.15
+  },
+  "method": "Experimental regional vector blend: tapered inverse squared distance, 20km support, nearest station within10km, at least2 readings, max age90min at capture. Not validated street wind.",
+  "excludedSources": [
+    "Weather Underground (derivative restrictions)",
+    "Met Office webpage (automated scraping restriction)",
+    "Forth Bridges (copying restriction)",
+    "Port feeds1966/1967 (sensor positions unresolved)"
+  ],
+  "stations": [
+    {
+      "id": "EGPH",
+      "name": "Edinburgh Airport",
+      "point": [-3.36, 55.952],
+      "positionKind": "reported station coordinate",
+      "positionUncertaintyM": 0,
+      "exposure": "Airport observation; sensor height and averaging details not verified.",
+      "observedAt": "2026-10-15T15:50:00Z",
+      "rawTime": "METAR EGPH 151550Z 23014KT 9999 FEW027 12/08 Q1013",
+      "timezoneInferred": false,
+      "speed": 7.202222222222223,
+      "direction": 230,
+      "gust": null,
+      "directionResolutionDegrees": 10,
+      "originalSpeed": 14,
+      "originalUnits": "knots",
+      "raw": {
+        "icaoId": "EGPH",
+        "receiptTime": "2026-10-15T15:54:28.396Z",
+        "obsTime": 1792079400,
+        "reportTime": "2026-10-15T16:00:00.000Z",
+        "temp": 12,
+        "dewp": 8,
+        "wdir": 230,
+        "wspd": 14,
+        "visib": "6+",
+        "altim": 1013,
+        "qcField": 0,
+        "metarType": "METAR",
+        "rawOb": "METAR EGPH 151550Z 23014KT 9999 FEW027 12/08 Q1013",
+        "lat": 55.952,
+        "lon": -3.36,
+        "elev": 29,
+        "name": "Edinburgh Arpt, SC, GB",
+        "cover": "FEW",
+        "clouds": [
+          {
+            "cover": "FEW",
+            "base": 2700
+          }
+        ],
+        "fltCat": "VFR"
+      },
+      "source": {
+        "url": "https://aviationweather.gov/api/data/metar?ids=EGPH&format=json",
+        "capturedAt": "2026-10-15T19:39:26.836758+00:00",
+        "sha256": "ebfd2075ac203dade5834cd6e81eace384147c60ec79b9d6331d772f98aeb089",
+        "status": 200,
+        "contentType": "application/json; charset=utf-8",
+        "name": "NOAA/NWS Aviation Weather Center",
+        "reuse": "NWS public-domain policy unless specifically marked otherwise; no endorsement claimed.",
+        "evidenceUrl": "https://www.weather.gov/disclaimer"
+      }
+    },
+    {
+      "id": "JCMB",
+      "name": "JCMB roof",
+      "point": [-3.1743, 55.9216],
+      "positionKind": "building proxy; not surveyed sensor position",
+      "positionUncertaintyM": 100,
+      "exposure": "Rooftop station; height and exposure correction unknown. 100m is a modelling assumption, not an accuracy bound.",
+      "observedAt": "2026-10-15T19:16:33Z",
+      "rawTime": "2026-10-15 20:16:33",
+      "timezoneInferred": true,
+      "timezoneNote": "Raw CSV has no timezone. Europe/London/BST inferred for this date, not confirmed by the feed.",
+      "speed": 7.0,
+      "direction": 219.0,
+      "gust": 8.4,
+      "directionResolutionDegrees": 1,
+      "originalSpeed": 7.0,
+      "originalUnits": "m/s",
+      "raw": {
+        "Date/Time": "2026-10-15 20:16:33",
+        "Wind Dir Min": "206.0",
+        "Wind Dir Ave": "219.0",
+        "Wind Dir Max": "231.0",
+        "Wind Speed Min": "6.0",
+        "Wind Speed Ave": "7.0",
+        "Wind Speed Max": "8.4",
+        "Air Temp": "11.2",
+        "Humidity": "68.2",
+        "Air Pressure": "1002.4",
+        "Rain Accum": "655.35",
+        "Rain Duration": "27750.0",
+        "Rain Intensity": "0.0",
+        "Hail Accum": "0.0",
+        "Hail Duration": "0.0",
+        "Hail Intensity": "0.0"
+      },
+      "coordinateSource": "https://www.ph.ed.ac.uk/about/finding-us/james-clerk-maxwell-building-jcmb",
+      "source": {
+        "url": "https://www.geos.ed.ac.uk/~hcp/metstat_arch/2026-10-15_minute_data.csv.gz",
+        "capturedAt": "2026-10-15T19:39:27.643825+00:00",
+        "sha256": "b92bc29d6968e7c927cd6d45537e4463a1a07604e26a87f4aba6e796071a1eeb",
+        "status": 200,
+        "contentType": "application/x-gzip",
+        "name": "University of Edinburgh GeoSciences / Hugh Pumphrey",
+        "reuse": "No explicit restriction found on the raw archive; blog copyright applicability unclear. Open licence/commercial clearance not established.",
+        "evidenceUrl": "https://blogs.ed.ac.uk/hughpumphrey/current-weather/"
+      }
+    },
+    {
+      "id": "1931",
+      "name": "Leith port",
+      "point": [-3.1718402, 55.9798009],
+      "positionKind": "port contact-map proxy; sensor position unknown",
+      "positionUncertaintyM": 2000,
+      "exposure": "Marine/port exposure; sensor height unknown. 2km proxy uncertainty is a modelling assumption, not an accuracy bound.",
+      "observedAt": "2026-10-15T19:37:00Z",
+      "rawTime": "2026-10-15T19:37:00Z",
+      "timezoneInferred": false,
+      "speed": 4.064111111111112,
+      "direction": 247.5,
+      "gust": 5.350222222222222,
+      "directionResolutionDegrees": 22.5,
+      "originalSpeed": 7.9,
+      "originalUnits": "knots",
+      "raw": {
+        "direction": {
+          "display": "WSW",
+          "observedAt": "2026-10-15T19:37:00Z",
+          "details": "Site: FTHP-TG03 Leith (1931);\nDataset: Met (5);\nParameter: Wind Direction (50003);\nValue: WSW;\nDateTime: 2026-10-15 19:37:00 UTC (2.4 mins);\nReceived: 2026-10-15 19:38:46 UTC (42 secs);\nQuality: 100%;\nAlert: None;\n"
+        },
+        "sustained": {
+          "display": "7.9",
+          "observedAt": "2026-10-15T19:37:00Z",
+          "details": "Site: FTHP-TG03 Leith (1931);\nDataset: Met (5);\nParameter: Wind Speed (50002);\nValue: 4.1;\nDateTime: 2026-10-15 19:37:00 UTC (2.4 mins);\nReceived: 2026-10-15 19:38:46 UTC (42 secs);\nQuality: 100%;\nAlert: None;\n"
+        },
+        "gust": {
+          "display": "10.4",
+          "observedAt": "2026-10-15T19:37:00Z",
+          "details": "Site: FTHP-TG03 Leith (1931);\nDataset: Met (5);\nParameter: Gust Speed (50006);\nValue: 5.3;\nDateTime: 2026-10-15 19:37:00 UTC (2.4 mins);\nReceived: 2026-10-15 19:38:46 UTC (42 secs);\nQuality: 100%;\nAlert: None;\n"
+        }
+      },
+      "coordinateSource": "https://forthports.co.uk/contacts/",
+      "source": {
+        "url": "https://forthports.port-log.net/live/Display.php",
+        "capturedAt": "2026-10-15T19:39:28.699897+00:00",
+        "sha256": "6b7e36f2089695846f04dd8933ff8f80035edf9e1a1c93b818f77f3f8c8b7185",
+        "status": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "name": "Forth Ports / Port-Log",
+        "reuse": "Public anonymous display; no explicit reuse prohibition found. Open licence/commercial clearance not established. Displayed speeds are knots; tooltip Value is not used.",
+        "evidenceUrl": "https://forthports.port-log.net/live/Display.php"
+      }
+    },
+    {
+      "id": "1921",
+      "name": "Rosyth port",
+      "point": [-3.4401603, 56.0238586],
+      "positionKind": "port contact-map proxy; sensor position unknown",
+      "positionUncertaintyM": 2000,
+      "exposure": "Marine/port exposure; sensor height unknown. 2km proxy uncertainty is a modelling assumption, not an accuracy bound.",
+      "observedAt": "2026-10-15T19:39:00Z",
+      "rawTime": "2026-10-15T19:39:00Z",
+      "timezoneInferred": false,
+      "speed": 4.938666666666667,
+      "direction": 247.5,
+      "gust": 6.58488888888889,
+      "directionResolutionDegrees": 22.5,
+      "originalSpeed": 9.6,
+      "originalUnits": "knots",
+      "raw": {
+        "direction": {
+          "display": "WSW",
+          "observedAt": "2026-10-15T19:39:00Z",
+          "details": "Site: FTHP-TG02 Rosyth (1921);\nDataset: Met (5);\nParameter: Wind Direction (50003);\nValue: WSW;\nDateTime: 2026-10-15 19:39:00 UTC (25 secs);\nReceived: 2026-10-15 19:38:59 UTC (29 secs);\nQuality: 100%;\nAlert: None;\n"
+        },
+        "sustained": {
+          "display": "9.6",
+          "observedAt": "2026-10-15T19:39:00Z",
+          "details": "Site: FTHP-TG02 Rosyth (1921);\nDataset: Met (5);\nParameter: Wind Speed (50002);\nValue: 5.0;\nDateTime: 2026-10-15 19:39:00 UTC (25 secs);\nReceived: 2026-10-15 19:38:59 UTC (29 secs);\nQuality: 100%;\nAlert: None;\n"
+        },
+        "gust": {
+          "display": "12.8",
+          "observedAt": "2026-10-15T19:39:00Z",
+          "details": "Site: FTHP-TG02 Rosyth (1921);\nDataset: Met (5);\nParameter: Gust Speed (50006);\nValue: 6.6;\nDateTime: 2026-10-15 19:39:00 UTC (25 secs);\nReceived: 2026-10-15 19:38:59 UTC (29 secs);\nQuality: 100%;\nAlert: None;\n"
+        }
+      },
+      "coordinateSource": "https://forthports.co.uk/contacts/",
+      "source": {
+        "url": "https://forthports.port-log.net/live/Display.php",
+        "capturedAt": "2026-10-15T19:39:28.699897+00:00",
+        "sha256": "6b7e36f2089695846f04dd8933ff8f80035edf9e1a1c93b818f77f3f8c8b7185",
+        "status": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "name": "Forth Ports / Port-Log",
+        "reuse": "Public anonymous display; no explicit reuse prohibition found. Open licence/commercial clearance not established. Displayed speeds are knots; tooltip Value is not used.",
+        "evidenceUrl": "https://forthports.port-log.net/live/Display.php"
+      }
+    }
+  ]
+}

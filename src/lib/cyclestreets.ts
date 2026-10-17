@@ -1,3 +1,5 @@
+import { calculateRouteAscent } from '@/lib/route-elevation';
+import type { UnitSystem } from '@/lib/units';
 import type { ParkingPoint, UserLocation } from '@/lib/types';
 import { distanceMeters } from '@/lib/geo';
 import type { AppLocale } from '@/lib/i18n/locales';
@@ -52,6 +54,7 @@ export type CycleRouteInstruction = {
 export type CycleRoute = {
   plan: CycleRoutePlan;
   distanceMeters: number;
+  ascentMeters?: number;
   durationSeconds: number;
   points: CycleRoutePoint[];
   segments?: CycleRoutePoint[][];
@@ -292,6 +295,7 @@ function buildArrivalInstruction(
 export function describeCycleRouteInstruction(
   instruction: CycleRouteInstruction,
   locale: AppLocale = 'en',
+  units: UnitSystem = 'metric',
 ) {
   const name = instruction.streetName.trim();
   const turn = instruction.turn.trim();
@@ -310,7 +314,11 @@ export function describeCycleRouteInstruction(
 
   if (turn === 'straight' && !name) {
     return translate(locale, 'straightDistance', {
-      distance: formatLocalizedDistance(instruction.distanceMeters, locale),
+      distance: formatLocalizedDistance(
+        instruction.distanceMeters,
+        locale,
+        units,
+      ),
     });
   }
 
@@ -488,10 +496,11 @@ function parseCycleStreetsRouteForPlan(
     );
   }
 
-  const instructions = features
-    .filter((feature) =>
-      getPath(getFeatureProperties(feature)).startsWith(`plan/${plan}/street/`),
-    )
+  const streets = features.filter((feature) =>
+    getPath(getFeatureProperties(feature)).startsWith(`plan/${plan}/street/`),
+  );
+  const ascentMeters = calculateRouteAscent(streets.map(getFeatureProperties));
+  const instructions = streets
     .map((feature, index): CycleRouteInstruction | null => {
       const properties = getFeatureProperties(feature);
       const streetName = getString(properties.name) ?? '';
@@ -530,6 +539,7 @@ function parseCycleStreetsRouteForPlan(
     durationSeconds,
     points,
     instructions: [...instructions, buildArrivalInstruction(destination)],
+    ...(ascentMeters === undefined ? {} : { ascentMeters }),
     source: 'cyclestreets',
     ...parseRouteUrl(routeProperties),
   };

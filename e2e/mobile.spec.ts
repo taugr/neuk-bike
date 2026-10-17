@@ -417,7 +417,7 @@ test('changes language from the mobile menu and keeps the choice', async ({
 
   await page.locator('.settings-menu--mobile .settings-trigger').click();
   await page
-    .locator('.settings-menu--mobile .language-select')
+    .locator('.settings-menu--mobile select[id^="language-setting"]')
     .selectOption('gd');
   await expect(page.locator('html')).toHaveAttribute('lang', 'gd');
   await expect(page.locator('#place-search-mobile')).toHaveAttribute(
@@ -919,7 +919,7 @@ test('keeps localized categories in one row and fits English without scrolling',
   await expect(page.getByTestId('parking-list')).toBeVisible();
 
   const languageSelect = page.locator(
-    '.settings-menu--mobile .language-select',
+    '.settings-menu--mobile select[id^="language-setting"]',
   );
   const categoryChips = page.getByTestId('category-chips');
   const getCategoryMetrics = () =>
@@ -1901,7 +1901,7 @@ test('contains Armenian parking type and cover text inside pin popup cells', asy
 
   await page.locator('.settings-menu--mobile .settings-trigger').click();
   await page
-    .locator('.settings-menu--mobile .language-select')
+    .locator('.settings-menu--mobile select[id^="language-setting"]')
     .selectOption('hy');
 
   const parkingId = 'osm:node:13235966141';
@@ -2411,7 +2411,7 @@ test('shows distance in cycling-place popups and keeps the website in details', 
 
   await page.getByRole('button', { name: 'Bike Neuk menu' }).click();
   const languageSelect = page.locator(
-    '.settings-menu--mobile .language-select',
+    '.settings-menu--mobile select[id^="language-setting"]',
   );
   await languageSelect.selectOption('es');
   await expect(weeSpokeServices).toHaveText('Reparación');

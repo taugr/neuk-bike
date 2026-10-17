@@ -645,3 +645,19 @@ describe('CycleStreets utilities', () => {
     ).toThrow('CycleStreets did not return a usable route.');
   });
 });
+
+it('parses complete street elevation profiles and omits incomplete climbing', () => {
+  const fixture = structuredClone(cycleStreetsFixture);
+  const streets = fixture.features.filter((feature) =>
+    feature.properties.path.startsWith('plan/balanced/street/'),
+  );
+  for (const street of streets)
+    Object.assign(street.properties, { elevationsMetres: [10, 15, 12, 14] });
+  expect(
+    parseCycleStreetsRoutes(fixture, destination).balanced?.ascentMeters,
+  ).toBe(streets.length * 7);
+  Object.assign(streets[0]!.properties, { elevationsMetres: undefined });
+  expect(
+    parseCycleStreetsRoutes(fixture, destination).balanced?.ascentMeters,
+  ).toBeUndefined();
+});

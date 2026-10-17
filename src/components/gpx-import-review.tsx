@@ -1,4 +1,5 @@
 'use client';
+import { useUnits } from '@/components/units-provider';
 
 import { ChevronLeft, FileUp, Info, RefreshCw } from 'lucide-react';
 import { useRef } from 'react';
@@ -19,6 +20,7 @@ export function GpxImportReview({
   onChooseFile: (file: File) => void;
 }) {
   const { locale, t } = useLanguage();
+  const { units } = useUnits();
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -42,7 +44,9 @@ export function GpxImportReview({
         </div>
 
         <div className="saved-route-summary">
-          <strong>{formatLocalizedDistance(gpx.distanceMeters, locale)}</strong>
+          <strong>
+            {formatLocalizedDistance(gpx.distanceMeters, locale, units)}
+          </strong>
           <strong>
             {gpx.durationSeconds === null
               ? t('durationUnknown')

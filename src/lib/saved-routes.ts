@@ -21,6 +21,7 @@ export type SavedRouteRecord = {
   plan: CycleRoutePlan | null;
   waypoints: CycleRouteWaypoint[];
   distanceMeters: number;
+  ascentMeters?: number;
   durationSeconds: number | null;
   points: CycleRoutePoint[];
   segments?: CycleRoutePoint[][];
@@ -90,6 +91,10 @@ function isSavedRouteRecordV2(value: unknown): value is SavedRouteRecord {
     record.waypoints.every(isWaypoint) &&
     typeof record.distanceMeters === 'number' &&
     record.distanceMeters >= 0 &&
+    (record.ascentMeters === undefined ||
+      (typeof record.ascentMeters === 'number' &&
+        Number.isFinite(record.ascentMeters) &&
+        record.ascentMeters >= 0)) &&
     (record.durationSeconds === null ||
       (typeof record.durationSeconds === 'number' &&
         record.durationSeconds >= 0)) &&
@@ -145,6 +150,9 @@ export function savedRouteToCycleRoute(record: SavedRouteRecord): CycleRoute {
     plan: record.plan ?? 'balanced',
     distanceMeters: record.distanceMeters,
     durationSeconds: record.durationSeconds ?? 0,
+    ...(record.ascentMeters === undefined
+      ? {}
+      : { ascentMeters: record.ascentMeters }),
     points: record.points,
     ...(record.segments ? { segments: record.segments } : {}),
     instructions: record.instructions,
@@ -225,6 +233,9 @@ export function createSavedRouteRecord({
     waypoints,
     distanceMeters: route.distanceMeters,
     durationSeconds: route.durationSeconds,
+    ...(route.ascentMeters === undefined
+      ? {}
+      : { ascentMeters: route.ascentMeters }),
     points: route.points,
     instructions: route.instructions,
     source: route.source,

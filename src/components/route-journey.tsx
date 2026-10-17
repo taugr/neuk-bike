@@ -1,4 +1,5 @@
 'use client';
+import { useUnits } from '@/components/units-provider';
 
 import type { ReactNode } from 'react';
 import {
@@ -14,7 +15,10 @@ import {
   Flag,
   LoaderCircle,
   Pencil,
-  Search,
+  ArrowRight,
+  MapPin,
+  ChevronRight,
+  CirclePlus,
   Bookmark,
   RefreshCw,
 } from 'lucide-react';
@@ -28,7 +32,10 @@ import {
   type CycleRoutesByPlan,
   type CycleRouteWaypoint,
 } from '@/lib/cyclestreets';
-import { formatLocalizedDistance } from '@/lib/i18n/format';
+import {
+  formatLocalizedDistance,
+  formatLocalizedElevation,
+} from '@/lib/i18n/format';
 import { getRouteInstructionManeuver } from '@/lib/route-instructions';
 import type { RouteDraft } from '@/lib/route-draft';
 
@@ -84,6 +91,7 @@ export function RouteJourney({
   onSelectPlan,
 }: Props) {
   const { t, locale } = useLanguage();
+  const { units } = useUnits();
   const selectedRoute = routes[draft.plan];
   const destination =
     pendingDestination ??
@@ -133,18 +141,25 @@ export function RouteJourney({
                 disabled={tracking}
                 onClick={() => onSearch(target)}
               >
+                {target === 'destination' ? (
+                  <ArrowRight
+                    className="journey-endpoint-arrow"
+                    size={18}
+                    aria-hidden="true"
+                  />
+                ) : null}
                 <span
                   className={`journey-endpoint-icon journey-endpoint-${target}`}
                   aria-hidden="true"
                 >
                   {target === 'start' ? (
-                    <Circle size={14} />
+                    <Circle size={12} fill="currentColor" />
                   ) : (
-                    <Flag size={18} />
+                    <MapPin size={18} />
                   )}
                 </span>
-                <span>
-                  <small>
+                <span className="journey-endpoint-label">
+                  <small className="sr-only">
                     {t(target === 'start' ? 'routeStart' : 'destination')}
                   </small>
                   <strong
@@ -158,7 +173,6 @@ export function RouteJourney({
                       )}
                   </strong>
                 </span>
-                <Search size={17} aria-hidden="true" />
               </button>
             );
           })}
@@ -230,10 +244,44 @@ export function RouteJourney({
                           )
                         : '—'}
                     </strong>
-                    <small>
-                      {route
-                        ? formatLocalizedDistance(route.distanceMeters, locale)
-                        : t('routeUnavailable')}
+                    <small className="journey-route-metrics">
+                      <span>
+                        {route
+                          ? formatLocalizedDistance(
+                              route.distanceMeters,
+                              locale,
+                              units,
+                            )
+                          : t('routeUnavailable')}
+                      </span>
+                      {route?.ascentMeters !== undefined ? (
+                        <span
+                          className="journey-ascent"
+                          role="img"
+                          data-testid={`route-ascent-${plan}`}
+                          aria-label={t('routeClimbing', {
+                            height: formatLocalizedElevation(
+                              route.ascentMeters,
+                              locale,
+                              units,
+                            ),
+                          })}
+                          title={t('routeClimbing', {
+                            height: formatLocalizedElevation(
+                              route.ascentMeters,
+                              locale,
+                              units,
+                            ),
+                          })}
+                        >
+                          <ArrowUpRight size={15} aria-hidden="true" />
+                          {formatLocalizedElevation(
+                            route.ascentMeters,
+                            locale,
+                            units,
+                          )}
+                        </span>
+                      ) : null}
                     </small>
                   </button>
                 );
@@ -249,9 +297,8 @@ export function RouteJourney({
                 <CircleParking size={23} />
                 <span>
                   <strong>{t('finishAtBikeParking')}</strong>
-                  <small>{t('finishAtBikeParkingHelp')}</small>
                 </span>
-                <ArrowUpRight size={18} />
+                <ChevronRight size={18} />
               </button>
             ) : null}
             {trackingStatus === 'denied' ||
@@ -310,12 +357,17 @@ export function RouteJourney({
                         >
                           <Icon size={19} aria-hidden="true" />
                           <strong>
-                            {describeCycleRouteInstruction(instruction, locale)}
+                            {describeCycleRouteInstruction(
+                              instruction,
+                              locale,
+                              units,
+                            )}
                           </strong>
                           <small>
                             {formatLocalizedDistance(
                               instruction.distanceMeters,
                               locale,
+                              units,
                             )}
                           </small>
                         </button>
@@ -350,6 +402,7 @@ export function RouteJourney({
         ) : null}
         <div className="journey-tools">
           <button type="button" disabled={tracking} onClick={onNew}>
+            <CirclePlus size={18} aria-hidden="true" />
             {t('newRoute')}
           </button>
           <button type="button" disabled={tracking} onClick={onLibrary}>

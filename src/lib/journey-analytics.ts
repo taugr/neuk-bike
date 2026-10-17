@@ -1,4 +1,5 @@
 import { captureAnalyticsEvent } from '@/lib/analytics';
+import { createLocalId } from '@/lib/local-id';
 
 type Capture = typeof captureAnalyticsEvent;
 type Properties = Record<string, unknown>;
@@ -20,7 +21,7 @@ export function locationErrorOutcome(error: { code: number }): LocationOutcome {
 
 // Identifiers live only in memory, never contain route data, and are not saved.
 export function createAnalyticsId() {
-  return crypto.randomUUID();
+  return createLocalId();
 }
 
 export function createLocationAttempt(

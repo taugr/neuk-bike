@@ -136,9 +136,9 @@ test('denied GPS retains destination and never routes from the default reference
   ).toBeVisible();
   expect(requests).toBe(0);
   await page.getByRole('button', { name: 'Use my location' }).click();
-  await expect(page.getByRole('status')).toContainText(
-    'Enable location permissions',
-  );
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Enable location permissions' }),
+  ).toContainText('Enable location permissions');
   expect(requests).toBe(0);
   await page
     .getByRole('combobox', { name: 'Choose a starting point' })
@@ -152,9 +152,9 @@ test('denied GPS retains destination and never routes from the default reference
     page.getByRole('button', { name: 'Start route', exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Start route', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText(
-    'Enable location permissions',
-  );
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Enable location permissions' }),
+  ).toContainText('Enable location permissions');
   await expect(page.getByTestId('live-route-marker')).toHaveCount(0);
 });
 

@@ -22,7 +22,11 @@ for (const state of ['denied', 'unavailable', '55.9533,-3.1883']) {
       await page
         .getByRole('button', { name: 'Use current location', exact: true })
         .click();
-      await expect(page.getByRole('status')).toContainText(
+      await expect(
+        page
+          .getByRole('status')
+          .filter({ hasText: /^Location (permission needed|unavailable)$/ }),
+      ).toContainText(
         state === 'denied'
           ? 'Location permission needed'
           : 'Location unavailable',

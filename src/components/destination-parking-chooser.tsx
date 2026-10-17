@@ -1,4 +1,5 @@
 'use client';
+import { useUnits } from '@/components/units-provider';
 
 import {
   Bike,
@@ -37,6 +38,7 @@ function CandidateSummary({
   candidate: DestinationParkingCandidate;
 }) {
   const { locale, t } = useLanguage();
+  const { units } = useUnits();
   const delta = candidate.routeDurationDeltaSeconds;
   const routeCopy =
     delta === null
@@ -61,6 +63,7 @@ function CandidateSummary({
               distance: formatLocalizedDistance(
                 candidate.route.distanceMeters,
                 locale,
+                units,
               ),
             })}
           </span>
@@ -75,6 +78,7 @@ function CandidateSummary({
           distance: formatLocalizedDistance(
             candidate.destinationDistanceMeters,
             locale,
+            units,
           ),
         })}
       </span>
@@ -88,12 +92,14 @@ function CandidateDetails({
   candidate: DestinationParkingCandidate;
 }) {
   const { locale } = useLanguage();
+  const { units } = useUnits();
   const details = getParkingDetails(
     {
       ...candidate.point,
       distanceMeters: candidate.destinationDistanceMeters,
     },
     locale,
+    units,
   ).filter(({ kind }) => kind !== 'distance');
 
   return (
@@ -121,6 +127,7 @@ export function DestinationParkingChooser({
   onToggleExpanded,
 }: DestinationParkingChooserProps) {
   const { locale, t } = useLanguage();
+  const { units } = useUnits();
   const selected =
     candidates.find(({ point }) => point.id === selectedId) ??
     candidates[0] ??
@@ -194,6 +201,7 @@ export function DestinationParkingChooser({
                     distanceMeters: selected.destinationDistanceMeters,
                   },
                   locale,
+                  units,
                 )
                   .filter(({ kind }) => kind !== 'distance')
                   .map((detail) => (

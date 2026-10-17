@@ -1,0 +1,18 @@
+{
+  "kind": "demo",
+  "capturedAt": "2026-10-13T18:58:37.880401+00:00",
+  "validAt": "2026-10-14T07:00Z",
+  "speed": 4.4,
+  "from": 194,
+  "units": "m/s",
+  "coverage": {
+    "west": -3.4,
+    "east": -3.0,
+    "south": 55.88,
+    "north": 56.02
+  },
+  "source": "UK Met Office seamless via Open-Meteo",
+  "sourceUrl": "https://api.open-meteo.com/v1/forecast?latitude=55.9533&longitude=-3.1883&hourly=wind_speed_10m%2Cwind_direction_10m%2Cwind_gusts_10m&wind_speed_unit=ms&timezone=UTC&forecast_days=2&models=ukmo_seamless",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+}

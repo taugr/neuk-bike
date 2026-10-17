@@ -1,13 +1,14 @@
 'use client';
+import { useUnits } from '@/components/units-provider';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowUp,
   CornerUpLeft,
   CornerUpRight,
   Flag,
-  Monitor,
   Volume2,
+  VolumeX,
   RefreshCw,
 } from 'lucide-react';
 import { useLanguage } from '@/components/language-provider';
@@ -22,6 +23,8 @@ import {
   type LiveRouteProgress,
 } from '@/lib/route-progress';
 import { getRouteInstructionManeuver } from '@/lib/route-instructions';
+
+const audioMutedStorageKey = 'cycle-parking-ride-audio-muted';
 
 export function RideGuidance({
   route,
@@ -39,8 +42,9 @@ export function RideGuidance({
   onReroute: () => void;
 }) {
   const { t, locale } = useLanguage();
-  const [keepAwake, setKeepAwake] = useState(false);
-  const [audio, setAudio] = useState(false);
+  const { units } = useUnits();
+  const [muted, setMuted] = useState(false);
+  const [audioPreferenceLoaded, setAudioPreferenceLoaded] = useState(false);
   const [wakeSupported, setWakeSupported] = useState<boolean | null>(null);
   const [wakeStatus, setWakeStatus] = useState<
     'idle' | 'active' | 'paused' | 'error'
@@ -65,7 +69,7 @@ export function RideGuidance({
           ? Flag
           : ArrowUp;
   const instructionText = next
-    ? describeCycleRouteInstruction(next.instruction, locale)
+    ? describeCycleRouteInstruction(next.instruction, locale, units)
     : t('rideContinueToDestination');
   const cue = progress?.isOffRoute
     ? t('rideOffRoute')
@@ -73,7 +77,11 @@ export function RideGuidance({
       ? t('arrivedDestination')
       : next
         ? t('rideInDistance', {
-            distance: formatLocalizedDistance(next.distanceMeters, locale),
+            distance: formatLocalizedDistance(
+              next.distanceMeters,
+              locale,
+              units,
+            ),
             instruction: instructionText,
           })
         : instructionText;
@@ -82,6 +90,15 @@ export function RideGuidance({
     : progress?.hasArrived
       ? 'arrived'
       : `${next?.instruction.id ?? 'finish'}:${next && next.distanceMeters <= 50 ? 'near' : 'ahead'}`;
+
+  useEffect(() => {
+    try {
+      setMuted(localStorage.getItem(audioMutedStorageKey) === 'true');
+    } catch {
+      // Audio is on by default; this ride remains usable without storage.
+    }
+    setAudioPreferenceLoaded(true);
+  }, []);
 
   useEffect(() => {
     setWakeSupported(window.isSecureContext && 'wakeLock' in navigator);
@@ -105,7 +122,7 @@ export function RideGuidance({
   }, [locale]);
 
   useEffect(() => {
-    if (!keepAwake || !riding || !wakeSupported) {
+    if (!riding || !wakeSupported) {
       setWakeStatus('idle');
       return;
     }
@@ -144,14 +161,10 @@ export function RideGuidance({
       document.removeEventListener('visibilitychange', onVisibility);
       if (lock) void lock.release().catch(() => {});
     };
-  }, [keepAwake, riding, wakeSupported]);
+  }, [riding, wakeSupported]);
 
-  useEffect(() => {
-    if (!audio || !tracking || !voice || rerouting) {
-      lastSpoken.current = null;
-      announcedInstructions.current.clear();
-      return;
-    }
+  const speakCue = useCallback(() => {
+    if (!voice) return;
     const key = `${locale}:${cueId}`;
     if (lastSpoken.current === key) return;
     if (cueId === 'off-route') announcedInstructions.current.clear();
@@ -167,17 +180,73 @@ export function RideGuidance({
       if (event.error !== 'canceled' && event.error !== 'interrupted')
         setAudioError(true);
     };
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  }, [audio, tracking, voice, locale, cue, cueId, rerouting]);
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      setAudioError(true);
+    }
+  }, [voice, locale, cue, cueId]);
 
   useEffect(() => {
-    if ((!audio || !tracking || rerouting) && 'speechSynthesis' in window)
+    if (
+      !audioPreferenceLoaded ||
+      muted ||
+      !tracking ||
+      !voice ||
+      rerouting ||
+      audioError
+    ) {
+      lastSpoken.current = null;
+      announcedInstructions.current.clear();
+      return;
+    }
+    speakCue();
+  }, [
+    audioPreferenceLoaded,
+    muted,
+    tracking,
+    voice,
+    rerouting,
+    audioError,
+    speakCue,
+  ]);
+
+  useEffect(() => {
+    if (!tracking) setAudioError(false);
+  }, [tracking]);
+
+  useEffect(() => {
+    if ((!tracking || rerouting) && 'speechSynthesis' in window)
       window.speechSynthesis.cancel();
     return () => {
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     };
-  }, [audio, tracking, rerouting]);
+  }, [tracking, rerouting]);
+
+  function toggleAudio() {
+    const nextMuted = !muted && !audioError;
+    setMuted(nextMuted);
+    setAudioError(false);
+    try {
+      localStorage.setItem(audioMutedStorageKey, String(nextMuted));
+    } catch {
+      // Keep the current ride's choice when browser storage is blocked.
+    }
+    if (nextMuted) window.speechSynthesis.cancel();
+    else {
+      lastSpoken.current = null;
+      announcedInstructions.current.clear();
+      // Retry from the actual tap as some browsers require user activation.
+      speakCue();
+    }
+  }
+
+  if (!tracking) return null;
+  const audioSilent = muted || audioError || !voice;
+  const audioLabel = !voice
+    ? t('rideAudioUnavailable')
+    : t(audioSilent ? 'rideUnmute' : 'rideMute');
 
   return (
     <section
@@ -191,15 +260,34 @@ export function RideGuidance({
           data-testid="ride-next-turn"
         >
           <Icon size={32} aria-hidden="true" />
-          <div>
-            <strong>
-              {progress.isOffRoute
-                ? t('rideOffRoute')
-                : formatLocalizedDistance(
-                    next?.distanceMeters ?? progress.remainingMeters,
-                    locale,
-                  )}
-            </strong>
+          <div className="ride-turn-content">
+            <div className="ride-turn-heading">
+              <strong>
+                {progress.isOffRoute
+                  ? t('rideOffRoute')
+                  : formatLocalizedDistance(
+                      next?.distanceMeters ?? progress.remainingMeters,
+                      locale,
+                      units,
+                    )}
+              </strong>
+              <button
+                type="button"
+                className="ride-audio-toggle"
+                data-testid="ride-audio-toggle"
+                data-muted={audioSilent}
+                aria-label={audioLabel}
+                title={audioLabel}
+                disabled={!voice || !audioPreferenceLoaded}
+                onClick={toggleAudio}
+              >
+                {audioSilent ? (
+                  <VolumeX size={21} aria-hidden="true" />
+                ) : (
+                  <Volume2 size={21} aria-hidden="true" />
+                )}
+              </button>
+            </div>
             <p role="status">
               {progress.isOffRoute ? t('rideOffRouteHelp') : instructionText}
             </p>
@@ -209,6 +297,7 @@ export function RideGuidance({
                   distance: formatLocalizedDistance(
                     progress.remainingMeters,
                     locale,
+                    units,
                   ),
                 })}
               </small>
@@ -236,54 +325,20 @@ export function RideGuidance({
           {rerouteError}
         </p>
       ) : null}
-      <div className="ride-options">
-        <button
-          type="button"
-          aria-pressed={keepAwake}
-          disabled={wakeSupported === false}
-          onClick={() => setKeepAwake(!keepAwake)}
-        >
-          <Monitor size={17} aria-hidden="true" />
-          {t('rideKeepAwake')}
-        </button>
-        <button
-          type="button"
-          aria-pressed={audio}
-          disabled={!voice}
-          onClick={() => {
-            setAudioError(false);
-            setAudio(!audio);
-            if (!audio && voice) {
-              const utterance = new SpeechSynthesisUtterance(
-                t('rideAudioEnabled'),
-              );
-              utterance.voice = voice;
-              window.speechSynthesis.speak(utterance);
-            }
-          }}
-        >
-          <Volume2 size={17} aria-hidden="true" />
-          {t('rideAudio')}
-        </button>
-      </div>
-      <p className="ride-help" aria-live="polite">
-        {wakeSupported === false
-          ? t('rideWakeUnavailable')
-          : keepAwake
-            ? t(
-                wakeStatus === 'active'
-                  ? 'rideWakeActive'
-                  : wakeStatus === 'error' || wakeStatus === 'paused'
-                    ? 'rideWakePaused'
-                    : 'rideWakeOnStart',
-              )
+      {riding ? (
+        <p className="ride-help" aria-live="polite">
+          {wakeSupported === false ||
+          wakeStatus === 'error' ||
+          wakeStatus === 'paused'
+            ? t('rideWakeLimited')
             : null}
-        {!voice
-          ? ` ${t('rideAudioUnavailable')}`
-          : audioError
-            ? ` ${t('rideAudioFailed')}`
-            : null}
-      </p>
+          {!muted && !voice
+            ? ` ${t('rideAudioUnavailable')}`
+            : audioError
+              ? ` ${t('rideAudioRetry')}`
+              : null}
+        </p>
+      ) : null}
     </section>
   );
 }

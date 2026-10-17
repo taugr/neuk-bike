@@ -1,10 +1,28 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  createAnalyticsId,
   createLocationAttempt,
   createRideAnalytics,
   createRouteAttempt,
   locationErrorOutcome,
 } from '@/lib/journey-analytics';
+
+it('does not break the finder on HTTP previews without randomUUID', () => {
+  vi.stubGlobal('crypto', {});
+  try {
+    const first = createAnalyticsId();
+    expect(first).toBeTruthy();
+    expect(createAnalyticsId()).not.toBe(first);
+    expect(() =>
+      createLocationAttempt(
+        { trigger: 'automatic', purpose: 'finder' },
+        vi.fn(),
+      ),
+    ).not.toThrow();
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
 
 describe('location measurement', () => {
   it.each(['automatic', 'manual'] as const)(

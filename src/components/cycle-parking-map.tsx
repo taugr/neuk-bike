@@ -1,4 +1,6 @@
 'use client';
+import type { UnitSystem } from '@/lib/units';
+import { useUnits } from '@/components/units-provider';
 
 import { improveDarkMapReadability } from '@/lib/map-readability';
 import { createMapRecovery } from '@/lib/map-recovery';
@@ -94,6 +96,8 @@ import {
   type CycleNetworkRouteIdentity,
 } from '@/lib/cycle-network-presentation';
 
+import { WindMapOverlay } from '@/components/wind-map-overlay';
+import type { WindForecast } from '@/lib/wind';
 maplibregl.setWorkerUrl(
   `/vendor/maplibre-gl/${maplibregl.getVersion()}/maplibre-gl-worker.mjs`,
 );
@@ -103,6 +107,8 @@ type CycleParkingMapProps = {
   points: ParkingPoint[];
   cycleNetworkFeatures: CycleNetworkFeature[];
   isCycleNetworkVisible: boolean;
+  wind?: WindForecast | null;
+  windLabel?: string;
   userLocation: UserLocation;
   referenceLocationLabel: string;
   isReferenceCurrentLocation: boolean;
@@ -1135,6 +1141,7 @@ function ParkingPopupContent({
   onToggleSavedPoint,
   point,
   locale,
+  units,
 }: {
   canRequestDirections: boolean;
   canShowStreetView: boolean;
@@ -1150,14 +1157,15 @@ function ParkingPopupContent({
   onToggleSavedPoint: (point: ParkingPoint) => void;
   point: ParkingPoint;
   locale: AppLocale;
+  units: UnitSystem;
 }) {
   const isParking = !isCyclingPoiPoint(point);
   const isWaterPoint =
     isCyclingPoiPoint(point) && point.categories[0] === 'water';
   const essentialDetails = isParking
-    ? getParkingEssentialDetails(point, locale)
+    ? getParkingEssentialDetails(point, locale, units)
     : [];
-  const popupDetails = getParkingPopupDetails(point, locale);
+  const popupDetails = getParkingPopupDetails(point, locale, units);
 
   if (isWaterPoint) {
     return (
@@ -1960,6 +1968,8 @@ export default function CycleParkingMap({
   points,
   cycleNetworkFeatures,
   isCycleNetworkVisible,
+  wind = null,
+  windLabel = '',
   userLocation,
   referenceLocationLabel,
   isReferenceCurrentLocation,
@@ -2000,6 +2010,7 @@ export default function CycleParkingMap({
   onBrowseLocation,
   offlineAreaSelectionBounds = null,
 }: CycleParkingMapProps) {
+  const { units } = useUnits();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const onViewportChangeRef = useRef(onViewportChange);
@@ -2857,6 +2868,7 @@ export default function CycleParkingMap({
     isMapLoaded,
     isRoutePlanningMode,
     locale,
+    units,
     map,
     onClearSelection,
     selectedPoint,
@@ -3009,6 +3021,7 @@ export default function CycleParkingMap({
     closeMarkerPopups,
     isRoutePlanningMode,
     locale,
+    units,
     map,
     showCurrentLocationMarker,
     referenceLocationLabel,
@@ -3173,6 +3186,7 @@ export default function CycleParkingMap({
           onToggleSavedPoint={onToggleSavedPoint}
           point={point}
           locale={locale}
+          units={units}
         />
       );
       const existingMarker = parkingMarkerRefs.current.get(point.id);
@@ -3360,6 +3374,7 @@ export default function CycleParkingMap({
     isDestinationParkingMode,
     isRoutePlanningMode,
     locale,
+    units,
     map,
     onShareParkingLink,
     onOpenDetails,
@@ -3900,6 +3915,13 @@ export default function CycleParkingMap({
         data-testid="parking-map"
         ref={mapContainerRef}
       />
+      {wind && map && isMapLoaded && !isOfflineBasemap ? (
+        <WindMapOverlay
+          map={map}
+          wind={wind}
+          label={`${windLabel} · ${wind.grid ? 'Regional forecast · arrows show air movement' : translate(locale, 'windAirLabel')}`}
+        />
+      ) : null}
       {isOfflineBasemap ? (
         <div className="offline-basemap-notice" role="status">
           {translate(locale, 'offlineMapBackgroundUnavailable')}

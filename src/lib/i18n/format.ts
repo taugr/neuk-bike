@@ -1,3 +1,4 @@
+import { METRES_PER_MILE, METRES_PER_FOOT, type UnitSystem } from '@/lib/units';
 import { localeDetails, type AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
 
@@ -15,12 +16,26 @@ export function formatNumber(
 export function formatLocalizedDistance(
   distance: number | undefined,
   locale: AppLocale,
+  units: UnitSystem = 'metric',
 ) {
-  if (typeof distance !== 'number') {
+  if (typeof distance !== 'number' || !Number.isFinite(distance)) {
     return translate(locale, 'unknownDistance');
   }
 
-  if (distance < 1_000) {
+  distance = Math.max(0, distance);
+  if (units === 'imperial') {
+    return distance < METRES_PER_MILE / 10
+      ? translate(locale, 'feet', {
+          count: formatNumber(Math.round(distance / METRES_PER_FOOT), locale),
+        })
+      : translate(locale, 'miles', {
+          count: formatNumber(distance / METRES_PER_MILE, locale, {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          }),
+        });
+  }
+  if (Math.round(distance) < 1_000) {
     return translate(locale, 'metres', {
       count: formatNumber(Math.round(distance), locale),
     });
@@ -41,5 +56,18 @@ export function formatLocalizedDuration(seconds: number, locale: AppLocale) {
 
   return translate(locale, 'minutes', {
     count: formatNumber(Math.max(1, Math.round(seconds / 60)), locale),
+  });
+}
+
+export function formatLocalizedElevation(
+  metres: number,
+  locale: AppLocale,
+  units: UnitSystem = 'metric',
+) {
+  return translate(locale, units === 'imperial' ? 'feet' : 'metres', {
+    count: formatNumber(
+      Math.round(units === 'imperial' ? metres / METRES_PER_FOOT : metres),
+      locale,
+    ),
   });
 }

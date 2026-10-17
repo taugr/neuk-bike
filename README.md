@@ -22,9 +22,10 @@
 - See the official UK National Cycle Network as a default-on, optional map
   layer from zoom 10
 - Show nearby OpenStreetMap drinking-water points as a default-off map layer
+- Regional wind forecasts as an optional map layer
 - Show cycle directions to a selected parking place with CycleStreets
 - Build multi-stop cycle routes and compare Quietest, Balanced, and Fastest
-  options
+  options with distance and total climbing where elevation data is available
 - Compare the best three neuks near a route destination, then finish the route
   at the chosen parking place
 - Save routes on the current device and export them as GPX files
@@ -34,6 +35,123 @@
 - Download an explicit map area for predictable offline parking, cycling-place,
   and National Cycle Network access
 - Use the interface in English, Scottish Gaelic, Spanish, or Armenian
+
+## Wind forecast
+
+**Wind forecast** is available in Map layers, off by default. The Layers
+button stays available while planning and hides during riding. Screen readers
+announce “Turn on to load forecast” before the first request; loading, available,
+stale and failed states remain distinct in accessible descriptions. Wind controls use
+simple labels. Forecast timing remains available to screen readers; demo routes,
+raw forecast-cell inspection and diagnostic links are not part of the app.
+Unboxed teal arrows
+show where air travels (weather FROM direction +180°). Persistent MapLibre markers use subpixel positioning and move with the map in
+the same camera update during panning, zooming and rotation. A buffered geographic
+grid stays fixed throughout a gesture; membership and density update after it ends.
+Nested geographic sampling, fixed icon size and collision filtering
+keep arrows readable, with a fine stroke halo instead of white tiles. Circular
+markers remain distinct cycling/location cues. Wind arrows do not encode speed
+through size. Sparse labels show the estimated speed in km/h (or mph with Imperial units), rounded to one decimal. Half
+the original geographic lattice is retained; a stable hash labels about one in
+three arrows on desktop and one in five on mobile. Forecast arrows are interpolated samples, not extra provider cells, observations
+or precise street-level speeds.
+
+Route cards show total uphill elevation from CycleStreets street profiles beside
+route distance, in metres or feet according to the units setting. Missing or
+incomplete profiles omit climbing; flat and downhill-only routes show zero.
+Saved planned routes retain climbing. The figure is a provider estimate, not an
+effort or energy prediction.
+
+Wind is controlled through Map layers and is fetched only while enabled. It does
+not select or change a route. The experimental headwind preference is hidden
+pending validation; its scoring utilities remain outside the app workflow.
+
+The app loads **regional forecasts** through Open-Meteo across the app's UK, Ireland, Spain
+(including the Balearics, Canaries, Ceuta and Melilla) and Armenia coverage.
+Outside the original Edinburgh experiment, `best_match` selects available models;
+resolution varies by region and is not presented as street-level detail.
+The existing fine Edinburgh UKV grid remains for local Edinburgh views/journeys.
+
+The app requests one 4×5 grid around the viewed area or all candidate routes,
+with centres quantized to half-degree tiles and a one- or two-degree extent.
+Only hourly 10 m wind speed/direction for the current day are requested.
+These are map-region coordinates, never exact GPS fixes or route stops, although
+requests reveal the broad region being viewed. Actual returned cells are
+deduplicated. Signed airflow vectors are interpolated within neighbouring mesh
+triangles; degenerate/folded areas and points outside the mesh are unsupported.
+The map uses signed-vector sampling. No shelter or energy model is claimed.
+
+Regional requests debounce for 800 ms, have a ten-second minimum interval, and
+are capped at 10 requests/minute, 50/hour and 250/day per tab (20 locations per
+request). Aborted/failed requests count too. HTTP 429 honours Retry-After with
+at least a 30-minute pause. This local budget is not a production-wide quota
+solution. Pan within a tile reuses its forecast; session caching retains at most
+12 tile/hour entries, refreshes after 30 minutes and expires after two hours.
+Forecast hours advance without relabelling the original fetch timestamp. Old
+requests are aborted and cannot replace the newly selected region.
+
+Views wider than 1.5 degrees do not automatically download weather. Long journeys
+retain only the local map field; wind cannot change a route unless its entire
+sampled geometry has coverage. Unsupported map centres do not request forecasts.
+Regional request failure uses only a valid cache for that same region, otherwise
+wind is unavailable. It never uses Edinburgh weather elsewhere. The legacy
+Edinburgh-only grid may still use its explicitly labelled single-city fallback.
+Missing, expired, variable or unsupported samples cannot change a route. Weather
+changes clear comparisons outside active riding; riding geometry stays fixed.
+
+Forecast validity remains in accessible descriptions. Credits are in the
+existing Attributions dialog: [Open-Meteo](https://open-meteo.com/),
+[CC BY 4.0 and model-provider credits](https://open-meteo.com/en/licence), and
+UK Met Office [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+for Edinburgh UKV. Interpolation is an app-derived estimate. The API does not
+supply model initialization time; a new fetch is not a new model run.
+
+Wind is enabled on all hosts by default. Set `NEXT_PUBLIC_WIND_ENABLED=false`
+before `pnpm build` to hide both wind controls, remove the overlay and prevent
+weather requests, including when opening a route. Set it to `true` (or leave it
+unset) to enable the feature. Other values disable it. This is a build-time flag:
+changing it requires rebuilding and deploying the static export. No flag service
+or hostname exception is needed.
+For GitHub Actions deployments, set the repository variable
+`NEXT_PUBLIC_WIND_ENABLED` to `false` before the next approved push to `main`.
+The build runs in GitHub Actions, so changing only a Cloudflare Pages environment
+variable does not change the deployed flag.
+
+The non-commercial app uses Open-Meteo's free endpoint without an account or key.
+[Open-Meteo's terms](https://open-meteo.com/en/terms) allow non-commercial public
+apps without advertising or subscriptions, subject to their API limits. Commercial
+use needs a paid plan. The per-tab request budget above does not enforce a shared
+application quota; monitor usage before scaling. Missing weather leaves the map
+and route planner usable, and historical or synthetic forecasts are never loaded.
+Live smoke captures on 16 October 2026 verified Belfast, Dublin, Madrid, Palma,
+Tenerife, Ceuta, Melilla, Yerevan, Glasgow, Cardiff and London. The dated fixture
+is regression evidence only, never runtime current weather.
+The [original Edinburgh comparison](docs/wind-provider-comparison.md) documents
+that earlier experiment; its fixed-request policy is superseded here outside Edinburgh.
+Existing council OGL and OpenStreetMap ODbL attribution is unchanged.
+
+### Retired station research
+
+The station snapshot experiment has been removed from the app. Its historical
+capture, provenance, interpolation code and tests remain in
+[`research/wind-stations/`](research/wind-stations/README.md), outside the static
+export. The wind map uses the forecast providers only.
+
+Automated checks exercise the normal forecast and routing flows with mocked
+provider responses. Synthetic route geometry and dated forecast evidence live
+under `test/fixtures/` and `src/lib/fixtures/`, outside the static export. The old
+`windDemo` and `windStations` query parameters no longer activate special modes.
+
+The retained experimental distance-weighted squared opposing-wind score reranks
+available cycling routes in tests only; it is not connected to the planner. It requires at least 5% score improvement and
+0.5 m/s mean opposing wind, at most 20% extra time and 25% extra distance,
+no more than 300 m additional corridor deviation or 50 m additional
+backtracking, matching endpoints within 35 m, and provider/geometry distance
+consistency within 15%. It never switches to a less quiet provider style. There
+are no same-style alternatives from the current provider response, so Quietest
+will often have no eligible alternative. Calm, absent, stale, out-of-area or
+unusable data leaves the route unchanged. The score is not an energy saving or
+a claim that a route is safer.
 
 ## Live app
 
@@ -210,13 +328,16 @@ and retains via stops not yet passed on the route. Recalculation needs a connect
 and keeps the original route if it fails. Stopping or leaving the ride invalidates
 pending recalculation results.
 
-**Keep screen on** is optional and applies only during a live ride. It releases
-on arrival, stop, or leaving the journey and reacquires when the page becomes
-visible again. Wake lock requires browser support and a secure context (HTTPS
-or localhost); a plain HTTP LAN address may not support it. **Spoken directions**
-uses a device-local voice for the selected language when one is available. It
-announces instruction changes, off-route status and arrival, without sending
-instructions to a speech service. These options are off by default.
+Starting a ride automatically keeps the screen awake where the browser supports
+it. The wake lock releases on arrival, stop or leaving navigation, and is
+requested again when the page returns to the foreground. If it is unavailable,
+the riding screen explains that the screen may turn off.
+
+Spoken turn guidance starts automatically using an on-device voice for the chosen
+language. The speaker button inside the next-turn panel mutes or unmutes guidance;
+the choice is remembered on this device. No ride controls appear while planning.
+If speech is blocked, the speaker button can retry from a tap. No route text is
+sent to a remote speech service.
 
 Open the Bike Neuk menu and use **Plan a route** to start a draft or **My
 routes** to reopen routes saved on the current device. The normal Nearby sheet
@@ -241,12 +362,17 @@ journey events use temporary random identifiers, with no route coordinates,
 place names, parking IDs, or URL query/fragment data. See
 [the analytics contract](docs/analytics.md) for event definitions and reporting.
 
-## Language setting
+## Language and units settings
 
 Open the settings menu to switch between English, Scottish Gaelic
 (`Gàidhlig`), Spanish (`Español`), and Armenian (`Հայերեն`). The choice is
 stored only in the browser and is reused on the next visit. On a first visit
 the app uses the first supported browser language, then falls back to English.
+
+The Units setting defaults to Metric (metres/kilometres and km/h). Choose
+Imperial for feet/miles and mph. This browser-only preference is remembered
+across visits and applies to wind, parking distances, routes and guidance.
+Forecast vectors, saved routes and routing thresholds keep their SI values.
 
 The translated interface, parking-name templates, route instructions, and
 number formatting are bundled into the static app. Street and place names,

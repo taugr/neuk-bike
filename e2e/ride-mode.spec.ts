@@ -9,6 +9,7 @@ declare global {
       released: number;
       cancelled: number;
       spoken: string[];
+      activeSpeech: string | null;
       releaseLock: () => void;
     };
   }
@@ -45,6 +46,7 @@ test.beforeEach(async ({ context, page }) => {
       released: 0,
       cancelled: 0,
       spoken: [] as string[],
+      activeSpeech: null as string | null,
       releaseLock: () => {},
     });
     Object.defineProperty(navigator, 'geolocation', {
@@ -92,9 +94,11 @@ test.beforeEach(async ({ context, page }) => {
     ];
     speech.cancel = () => {
       state.cancelled++;
+      state.activeSpeech = null;
     };
     speech.speak = (utterance) => {
       state.spoken.push(utterance.text);
+      state.activeSpeech = utterance.text;
     };
     Object.defineProperty(window, 'speechSynthesis', { value: speech });
     // A lightweight constructor allows deterministic voice assignment.
@@ -203,12 +207,9 @@ test('guidance, audio and wake lock survive starting, recover on foreground, and
   page,
 }) => {
   await plan(page);
-  await page
-    .getByRole('button', { name: 'Keep screen on', exact: true })
-    .click();
-  await page
-    .getByRole('button', { name: 'Spoken directions', exact: true })
-    .click();
+  await expect(page.getByTestId('ride-guidance')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__rideTest.acquired)).toBe(0);
+  expect(await page.evaluate(() => window.__rideTest.spoken)).toEqual([]);
   await page.getByRole('button', { name: 'Start route', exact: true }).click();
   await expect(page.getByTestId('ride-next-turn')).toContainText(
     'Turn right onto Next Street',
@@ -388,4 +389,164 @@ test('failed and offline recalculation preserve the route; a stopped ride ignore
   release!();
   await expect(page.getByTestId('route-plan-balanced')).toContainText('7 min');
   await expect(page.getByTestId('live-route-marker')).toHaveCount(0);
+});
+
+for (const width of [320, 390, 581, 1440]) {
+  test(`mute control fits the turn panel and cancels/resumes speech at ${width}px`, async ({
+    page,
+  }, testInfo) => {
+    await plan(page);
+    await page.setViewportSize({ width, height: 844 });
+    await page
+      .getByRole('button', { name: 'Start route', exact: true })
+      .click();
+    const mute = page.getByRole('button', {
+      name: 'Mute spoken directions',
+      exact: true,
+    });
+    await expect(mute).toBeVisible();
+    const buttonBox = await mute.boundingBox();
+    expect(buttonBox!.width).toBeGreaterThanOrEqual(44);
+    expect(buttonBox!.height).toBeGreaterThanOrEqual(44);
+    await expect
+      .poll(() => page.evaluate(() => window.__rideTest.activeSpeech))
+      .toContain('Next Street');
+    await mute.click();
+    await expect(
+      page.getByRole('button', {
+        name: 'Unmute spoken directions',
+        exact: true,
+      }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(() => window.__rideTest.activeSpeech),
+    ).toBeNull();
+    const spoken = await page.evaluate(() => window.__rideTest.spoken.length);
+    await page.evaluate(() => window.__rideTest.emit(55.9556, -3.1883));
+    await expect(page.getByTestId('ride-next-turn')).toContainText('45 m');
+    expect(await page.evaluate(() => window.__rideTest.spoken.length)).toBe(
+      spoken,
+    );
+    await page
+      .getByRole('button', { name: 'Unmute spoken directions', exact: true })
+      .click();
+    await expect(mute).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => window.__rideTest.activeSpeech))
+      .toContain('Next Street');
+    expect(await page.evaluate(() => window.__rideTest.spoken.length)).toBe(
+      spoken + 1,
+    );
+    const panel = await page.getByTestId('ride-next-turn').boundingBox();
+    expect(buttonBox!.x + buttonBox!.width).toBeLessThanOrEqual(
+      panel!.x + panel!.width,
+    );
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBe(width);
+    await page.screenshot({ path: testInfo.outputPath(`riding-${width}.png`) });
+    await page.getByRole('button', { name: 'Stop', exact: true }).click();
+    await expect(page.getByTestId('ride-guidance')).toHaveCount(0);
+    expect(
+      await page.evaluate(() => window.__rideTest.activeSpeech),
+    ).toBeNull();
+    await expect
+      .poll(() => page.evaluate(() => window.__rideTest.released))
+      .toBe(1);
+  });
+}
+
+test('remembers mute across reload and does not speak before loading the preference', async ({
+  page,
+}) => {
+  await plan(page);
+  await page.getByRole('button', { name: 'Start route', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Mute spoken directions', exact: true })
+    .click();
+  await plan(page);
+  await page.getByRole('button', { name: 'Start route', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Unmute spoken directions', exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => window.__rideTest.spoken)).toEqual([]);
+  await expect
+    .poll(() => page.evaluate(() => window.__rideTest.acquired))
+    .toBe(1);
+});
+
+test('blocked storage keeps mute usable for this ride', async ({ page }) => {
+  await page.addInitScript(() => {
+    Storage.prototype.setItem = () => {
+      throw new Error('blocked');
+    };
+  });
+  await plan(page);
+  await page.getByRole('button', { name: 'Start route', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Mute spoken directions', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Stop', exact: true }).click();
+  await page.getByRole('button', { name: 'Start route', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Unmute spoken directions', exact: true }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => window.__rideTest.activeSpeech)).toBeNull();
+});
+
+test('unavailable wake lock and local voice are explained only while riding', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    speechSynthesis.getVoices = () => [];
+    navigator.wakeLock.request = async () => {
+      throw new Error('Denied');
+    };
+  });
+  await plan(page);
+  await expect(page.getByTestId('ride-guidance')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Start route', exact: true }).click();
+  await expect(page.getByTestId('ride-audio-toggle')).toBeDisabled();
+  await expect(page.getByTestId('ride-guidance')).toContainText(
+    'Your device may let the screen turn off.',
+  );
+  await expect(page.getByTestId('ride-guidance')).toContainText(
+    'No on-device voice is available',
+  );
+  await page.getByRole('button', { name: 'Stop', exact: true }).click();
+  await expect(page.getByTestId('ride-guidance')).toHaveCount(0);
+});
+
+test('blocked automatic speech can retry directly from the speaker tap', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const speak = speechSynthesis.speak;
+    let first = true;
+    speechSynthesis.speak = (utterance) => {
+      if (first) {
+        first = false;
+        utterance.onerror?.({
+          error: 'not-allowed',
+        } as SpeechSynthesisErrorEvent);
+      } else speak(utterance);
+    };
+  });
+  await plan(page);
+  await page.getByRole('button', { name: 'Start route', exact: true }).click();
+  await expect(page.getByTestId('ride-guidance')).toContainText(
+    'Tap the speaker to enable spoken directions.',
+  );
+  await page
+    .getByRole('button', { name: 'Unmute spoken directions', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Mute spoken directions', exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => window.__rideTest.activeSpeech))
+    .toContain('Next Street');
+  await expect(page.getByTestId('ride-guidance')).not.toContainText(
+    'Tap the speaker',
+  );
 });

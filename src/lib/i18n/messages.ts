@@ -1,6 +1,27 @@
 import type { AppLocale } from '@/lib/i18n/locales';
 
 const en = {
+  windRegionalHour: 'Regional forecast · {date} UTC',
+  windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
+  windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',
+  windForecastHour: 'Edinburgh forecast · {date} UTC',
+  windForecastIdle: 'Turn on to load forecast',
+  windForecastStale: 'Forecast out of date',
+  windLoading: 'Loading forecast…',
+  windForecastMissing: 'Forecast unavailable',
+
+  windForecast: 'Wind forecast',
+  windUncertain: 'Too little wind coverage. Route unchanged.',
+  windPrefer: 'Prefer less headwind',
+  windUnavailable: 'Wind unavailable. Route unchanged.',
+  windOutside: 'Outside wind coverage. Route unchanged.',
+  windStale: 'Forecast out of date. Route unchanged.',
+  windCalm: 'Little opposing wind. Route unchanged.',
+  windNoImprovement: 'No improvement within +20% time and +25% distance.',
+  windNoAlternatives: 'No suitable cycling alternative. Route unchanged.',
+  windChanged: 'Using {style}: {time} s, {distance} vs {baseline}.',
+  windAirLabel: 'Area-wide estimate · arrows show air movement',
+
   dataFreshness: 'Source dates',
   dataParking: 'Cycle parking',
   dataPlaces: 'Cycling places',
@@ -19,6 +40,10 @@ const en = {
   rideRecalculating: 'Recalculating…',
   rideRecalculate: 'Recalculate route',
   rideKeepAwake: 'Keep screen on',
+  rideMute: 'Mute spoken directions',
+  rideUnmute: 'Unmute spoken directions',
+  rideWakeLimited: 'Your device may let the screen turn off.',
+  rideAudioRetry: 'Tap the speaker to enable spoken directions.',
   rideAudio: 'Spoken directions',
   rideAudioEnabled: 'Spoken directions on',
   rideWakeUnavailable:
@@ -360,6 +385,7 @@ const en = {
   routeBalanced: 'Balanced',
   routeFastest: 'Fastest',
   routeUnavailable: 'Unavailable',
+  routeClimbing: 'Climbing: {height}',
   routeSummary: 'Route summary',
   routeBy: 'Route by',
   arrivedParking: 'Arrived at bike parking.',
@@ -367,6 +393,11 @@ const en = {
   search: 'Search',
   searching: 'Searching',
   selectedPlace: 'selected place',
+  units: 'Units',
+  metricUnits: 'Metric (km, km/h)',
+  imperialUnits: 'Imperial (mi, mph)',
+  feet: '{count} ft',
+  miles: '{count} mi',
   settings: 'Settings',
   spotsAcrossCoverage:
     '{count} cycle parking spots in the UK, Ireland, Spain and Armenia',
@@ -454,6 +485,28 @@ const en = {
 type MessageCatalogue = { [Key in keyof typeof en]: string };
 
 const gd: MessageCatalogue = {
+  windRegionalHour: 'Ro-shealladh roinneil · {date} UTC',
+  windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
+  windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',
+  windForecastHour: 'Ro-aithris Dhùn Èideann · {date} UTC',
+  windForecastIdle: 'Cuir air gus an ro-aithris a luchdachadh',
+  windForecastStale: 'Ro-aithris ro shean',
+  windLoading: 'A’ luchdachadh na ro-aithris…',
+  windForecastMissing: 'Ro-aithris gun fhaighinn',
+
+  windForecast: 'Ro-aithris gaoithe',
+  windUncertain: 'Chan eil dàta stèisein gu leòr ann. Slighe gun atharrachadh.',
+  windPrefer: 'Tagh nas lugha de ghaoth na h-aghaidh',
+  windUnavailable: 'Chan eil gaoth ri fhaighinn. Slighe gun atharrachadh.',
+  windOutside: 'Taobh a-muigh còmhdach na gaoithe. Slighe gun atharrachadh.',
+  windStale: 'Ro-aithris ro shean. Slighe gun atharrachadh.',
+  windCalm: 'Beagan gaoithe na h-aghaidh. Slighe gun atharrachadh.',
+  windNoImprovement: 'Gun leasachadh taobh a-staigh +20% ùine is +25% astar.',
+  windNoAlternatives: 'Chan eil slighe rothaireachd eile iomchaidh ann.',
+  windChanged:
+    'A’ cleachdadh {style}: {time} s, {distance} an coimeas ri {baseline}.',
+  windAirLabel: 'Tuairmse sgìreil · gluasad an adhair',
+
   dataFreshness: 'Cinn-latha nan tùsan',
   dataParking: 'Pàirceadh bhaidhsagalan',
   dataPlaces: 'Àiteachan rothaireachd',
@@ -474,6 +527,11 @@ const gd: MessageCatalogue = {
   rideRecalculating: 'Ag ath-àireamhachadh…',
   rideRecalculate: 'Ath-àireamhaich an t-slighe',
   rideKeepAwake: 'Cùm an sgrìn air',
+  rideMute: 'Cuir stiùireadh labhairteach sàmhach',
+  rideUnmute: 'Cuir stiùireadh labhairteach air',
+  rideWakeLimited: 'Dh’fhaodadh an sgrìn tionndadh dheth.',
+  rideAudioRetry:
+    'Tap air an neach-labhairt gus stiùireadh labhairteach a chur air.',
   rideAudio: 'Stiùireadh labhairteach',
   rideAudioEnabled: 'Stiùireadh labhairteach air',
   rideWakeUnavailable:
@@ -842,6 +900,7 @@ const gd: MessageCatalogue = {
   routeBalanced: 'Cothromach',
   routeFastest: 'As luaithe',
   routeUnavailable: 'Chan eil ri fhaighinn',
+  routeClimbing: 'Dìreadh: {height}',
   routeSummary: 'Geàrr-chunntas na slighe',
   routeBy: 'Slighe le',
   arrivedParking: 'Ràinig thu pàirceadh nam baidhsagalan.',
@@ -849,6 +908,11 @@ const gd: MessageCatalogue = {
   search: 'Lorg',
   searching: 'A’ lorg',
   selectedPlace: 'àite taghte',
+  units: 'Aonadan',
+  metricUnits: 'Meatrach (km, km/h)',
+  imperialUnits: 'Ìmpireil (mi, mph)',
+  feet: '{count} ft',
+  miles: '{count} mi',
   settings: 'Roghainnean',
   spotsAcrossCoverage:
     '{count} àiteachan pàircidh bhaidhsagalan san RA, ann an Èirinn, san Spàinn agus ann an Airmeinia',
@@ -936,6 +1000,28 @@ const gd: MessageCatalogue = {
 };
 
 const es: MessageCatalogue = {
+  windRegionalHour: 'Pronóstico regional · {date} UTC',
+  windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
+  windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',
+  windForecastHour: 'Previsión de Edimburgo · {date} UTC',
+  windForecastIdle: 'Activa para cargar la previsión',
+  windForecastStale: 'Previsión caducada',
+  windLoading: 'Cargando previsión…',
+  windForecastMissing: 'Previsión no disponible',
+
+  windForecast: 'Previsión de viento',
+  windUncertain: 'Faltan datos de estaciones. Ruta sin cambios.',
+  windPrefer: 'Preferir menos viento de frente',
+  windUnavailable: 'Viento no disponible. Ruta sin cambios.',
+  windOutside: 'Fuera de la cobertura de viento. Ruta sin cambios.',
+  windStale: 'Previsión caducada. Ruta sin cambios.',
+  windCalm: 'Poco viento de frente. Ruta sin cambios.',
+  windNoImprovement: 'Sin mejora dentro de +20% de tiempo y +25% de distancia.',
+  windNoAlternatives: 'No hay alternativa ciclista adecuada. Ruta sin cambios.',
+  windChanged: 'Usando {style}: {time} s, {distance} frente a {baseline}.',
+  windAirLabel:
+    'Estimación del área · las flechas indican el movimiento del aire',
+
   dataFreshness: 'Fechas de las fuentes',
   dataParking: 'Aparcamiento de bicicletas',
   dataPlaces: 'Servicios ciclistas',
@@ -955,6 +1041,10 @@ const es: MessageCatalogue = {
   rideRecalculating: 'Recalculando…',
   rideRecalculate: 'Recalcular ruta',
   rideKeepAwake: 'Mantener pantalla encendida',
+  rideMute: 'Silenciar indicaciones de voz',
+  rideUnmute: 'Activar indicaciones de voz',
+  rideWakeLimited: 'El dispositivo puede apagar la pantalla.',
+  rideAudioRetry: 'Toca el altavoz para activar las indicaciones de voz.',
   rideAudio: 'Indicaciones de voz',
   rideAudioEnabled: 'Indicaciones de voz activadas',
   rideWakeUnavailable:
@@ -1305,6 +1395,7 @@ const es: MessageCatalogue = {
   routeBalanced: 'Equilibrada',
   routeFastest: 'Más rápida',
   routeUnavailable: 'No disponible',
+  routeClimbing: 'Ascenso: {height}',
   routeSummary: 'Resumen de la ruta',
   routeBy: 'Ruta de',
   arrivedParking: 'Has llegado al aparcabicis.',
@@ -1312,6 +1403,11 @@ const es: MessageCatalogue = {
   search: 'Buscar',
   searching: 'Buscando',
   selectedPlace: 'lugar seleccionado',
+  units: 'Unidades',
+  metricUnits: 'Métrico (km, km/h)',
+  imperialUnits: 'Imperial (mi, mph)',
+  feet: '{count} ft',
+  miles: '{count} mi',
   settings: 'Ajustes',
   spotsAcrossCoverage:
     '{count} aparcabicis en Reino Unido, Irlanda, España y Armenia',
@@ -1397,6 +1493,28 @@ const es: MessageCatalogue = {
 };
 
 const hy: MessageCatalogue = {
+  windRegionalHour: 'Տարածաշրջանային կանխատեսում · {date} UTC',
+  windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
+  windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',
+  windForecastHour: 'Էդինբուրգի կանխատեսում · {date} UTC',
+  windForecastIdle: 'Միացրեք՝ կանխատեսումը բեռնելու համար',
+  windForecastStale: 'Կանխատեսումը հնացել է',
+  windLoading: 'Կանխատեսումը բեռնվում է…',
+  windForecastMissing: 'Կանխատեսումը հասանելի չէ',
+
+  windForecast: 'Քամու կանխատեսում',
+  windUncertain: 'Կայանների տվյալները բավարար չեն։ Երթուղին չի փոխվել։',
+  windPrefer: 'Նախընտրել ավելի քիչ հանդիպակաց քամի',
+  windUnavailable: 'Քամու տվյալները հասանելի չեն։ Երթուղին չի փոխվել։',
+  windOutside: 'Քամու տվյալների ծածկույթից դուրս է։ Երթուղին չի փոխվել։',
+  windStale: 'Կանխատեսումը հնացել է։ Երթուղին չի փոխվել։',
+  windCalm: 'Թույլ հանդիպակաց քամի։ Երթուղին չի փոխվել։',
+  windNoImprovement:
+    'Բարելավում չկա +20% ժամանակի և +25% հեռավորության սահմաններում։',
+  windNoAlternatives: 'Հարմար այլընտրանքային հեծանվային երթուղի չկա։',
+  windChanged: 'Ընտրված է {style}՝ {time} վ, {distance}՝ համեմատած {baseline}։',
+  windAirLabel: 'Տարածքի գնահատական · սլաքները ցույց են տալիս օդի շարժումը',
+
   dataFreshness: 'Աղբյուրների ամսաթվերը',
   dataParking: 'Հեծանիվների կայանատեղեր',
   dataPlaces: 'Հեծանվային ծառայություններ',
@@ -1416,6 +1534,10 @@ const hy: MessageCatalogue = {
   rideRecalculating: 'Վերահաշվարկվում է…',
   rideRecalculate: 'Վերահաշվարկել երթուղին',
   rideKeepAwake: 'Էկրանը միացված պահել',
+  rideMute: 'Անջատել ձայնային ուղղությունները',
+  rideUnmute: 'Միացնել ձայնային ուղղությունները',
+  rideWakeLimited: 'Սարքը կարող է անջատել էկրանը։',
+  rideAudioRetry: 'Հպեք բարձրախոսին՝ ձայնային ուղղությունները միացնելու համար։',
   rideAudio: 'Ձայնային ուղղություններ',
   rideAudioEnabled: 'Ձայնային ուղղությունները միացված են',
   rideWakeUnavailable:
@@ -1765,6 +1887,7 @@ const hy: MessageCatalogue = {
   routeBalanced: 'Հավասարակշռված',
   routeFastest: 'Ամենաարագը',
   routeUnavailable: 'Անհասանելի է',
+  routeClimbing: 'Վերելք՝ {height}',
   routeSummary: 'Երթուղու ամփոփում',
   routeBy: 'Երթուղին՝',
   arrivedParking: 'Դուք հասել եք հեծանիվների կայանատեղի։',
@@ -1772,6 +1895,11 @@ const hy: MessageCatalogue = {
   search: 'Որոնել',
   searching: 'Որոնում',
   selectedPlace: 'ընտրված վայր',
+  units: 'Միավորներ',
+  metricUnits: 'Մետրային (կմ, km/h)',
+  imperialUnits: 'Կայսերական (mi, mph)',
+  feet: '{count} ft',
+  miles: '{count} mi',
   settings: 'Կարգավորումներ',
   spotsAcrossCoverage:
     '{count} հեծանիվների կայանատեղի ՄԹ-ում, Իռլանդիայում, Իսպանիայում և Հայաստանում',

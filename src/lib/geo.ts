@@ -1,3 +1,4 @@
+import type { UnitSystem } from '@/lib/units';
 import type { ParkingPoint, UserLocation } from '@/lib/types';
 import type { AppLocale } from '@/lib/i18n/locales';
 import { formatLocalizedDistance } from '@/lib/i18n/format';
@@ -82,6 +83,7 @@ export function isFarFromNearestParking(
 export function formatDistance(
   distance: number | undefined,
   locale: AppLocale = 'en',
+  units: UnitSystem = 'metric',
 ) {
-  return formatLocalizedDistance(distance, locale);
+  return formatLocalizedDistance(distance, locale, units);
 }

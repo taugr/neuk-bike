@@ -149,3 +149,19 @@ describe('saved routes', () => {
     ).toEqual([[1], [], [2], [3]]);
   });
 });
+
+it('preserves climbing across saving and reopening without requiring it on older records', () => {
+  const record = createSavedRouteRecord({
+    id: 'climb',
+    name: 'Climb',
+    route: { ...route, ascentMeters: 24.5 },
+    waypoints,
+  });
+  expect(savedRouteToCycleRoute(record).ascentMeters).toBe(24.5);
+  expect(isSavedRouteRecord(record)).toBe(true);
+  for (const ascentMeters of [-1, NaN, Infinity, '24'])
+    expect(isSavedRouteRecord({ ...record, ascentMeters })).toBe(false);
+  delete record.ascentMeters;
+  expect(isSavedRouteRecord(record)).toBe(true);
+  expect(savedRouteToCycleRoute(record).ascentMeters).toBeUndefined();
+});

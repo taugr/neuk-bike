@@ -90,6 +90,13 @@ a normal `pnpm build` before release or manual production-like testing.
 See [data maintenance](docs/data-maintenance.md) and
 [analytics definitions](docs/analytics.md) for the relevant review gates.
 
+For wind flag changes, also serve an export built with
+`NEXT_PUBLIC_WIND_ENABLED=false` and run `e2e/wind-feature-flag.spec.ts` with
+`WIND_FLAG_TEST=disabled`. Set `PLAYWRIGHT_PORT` to the preview server's port
+(4181 for the manual-test skill). Restore an enabled export afterward and run
+the same spec without `WIND_FLAG_TEST` to check public-host forecast loading.
+Both modes use recorded weather responses and do not contact production.
+
 Tests live next to the app code under `src/`.
 
 Run the full suite:

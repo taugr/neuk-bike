@@ -1,4 +1,5 @@
 'use client';
+import { useUnits } from '@/components/units-provider';
 
 import { useRef, useState, type FormEvent } from 'react';
 import {
@@ -86,6 +87,7 @@ export function RoutePlanner({
   onUndoMapPlacement,
 }: RoutePlannerProps) {
   const { locale, t } = useLanguage();
+  const { units } = useUnits();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<
     ReturnType<typeof parsePlaceSearchResults>
@@ -425,7 +427,7 @@ export function RoutePlanner({
                   </strong>
                   <small>
                     {route
-                      ? `${formatCycleRouteDuration(route.durationSeconds, locale)} · ${formatLocalizedDistance(route.distanceMeters, locale)}`
+                      ? `${formatCycleRouteDuration(route.durationSeconds, locale)} · ${formatLocalizedDistance(route.distanceMeters, locale, units)}`
                       : t('routeUnavailable')}
                   </small>
                 </button>

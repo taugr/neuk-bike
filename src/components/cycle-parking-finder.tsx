@@ -1,4 +1,6 @@
 'use client';
+import { resolveUnits } from '@/lib/units';
+import { useUnits } from '@/components/units-provider';
 
 import dynamic from 'next/dynamic';
 import { RideGuidance } from '@/components/ride-guidance';
@@ -159,6 +161,13 @@ import {
 import { usePwaInstallPrompt } from '@/components/pwa-install-prompt';
 import { Bollard } from '@/components/icons/bollard';
 import { useLanguage } from '@/components/language-provider';
+import {
+  windRegion,
+  windRequestBounds,
+  useEdinburghGrid,
+} from '@/lib/regional-wind';
+import { useWindForecast } from '@/components/wind-forecast';
+import { WIND_ENABLED } from '@/lib/features';
 import { RouteJourney } from '@/components/route-journey';
 import { RoutePlanner } from '@/components/route-planner';
 import { RouteDestinationSearch } from '@/components/route-destination-search';
@@ -484,12 +493,13 @@ function ParkingDetailStrip({
   showAllDetails?: boolean;
 }) {
   const { locale, t } = useLanguage();
-  const parkingDetails = getParkingPopupDetails(point, locale);
+  const { units } = useUnits();
+  const parkingDetails = getParkingPopupDetails(point, locale, units);
   const visibleDetails =
     details ??
     (showAllDetails
       ? parkingDetails.details
-      : getParkingEssentialDetails(point, locale));
+      : getParkingEssentialDetails(point, locale, units));
 
   if (!includeDistance && visibleDetails.length === 0) {
     return null;
@@ -935,6 +945,7 @@ function getLoadedAppShellPlan(): OfflineAreaPlan {
 
 export default function CycleParkingFinder() {
   const { formattingLocale, locale, setLocale, t } = useLanguage();
+  const { units, setUnits } = useUnits();
   const shouldReduceMotion = useReducedMotion();
   const [locationState, setLocationState] = useState<LocationState>({
     status: 'fallback',
@@ -965,6 +976,14 @@ export default function CycleParkingFinder() {
   const [isCycleNetworkVisible, setIsCycleNetworkVisible] = useState(true);
   const [isDrinkingWaterVisible, setIsDrinkingWaterVisible] = useState(false);
   const [isMapLayersOpen, setIsMapLayersOpen] = useState(false);
+  const [manualWindVisible, setManualWindVisible] = useState(false);
+  const [windViewport, setWindViewport] = useState<ParkingMapBounds | null>(
+    null,
+  );
+  const windViewportTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  useEffect(() => () => clearTimeout(windViewportTimer.current), []);
   const [isOfflineAreasOpen, setIsOfflineAreasOpen] = useState(false);
   const [offlineAreas, setOfflineAreas] = useState<OfflineAreaRecord[]>([]);
   const [offlineAreasLoading, setOfflineAreasLoading] = useState(false);
@@ -1849,6 +1868,11 @@ export default function CycleParkingFinder() {
 
   const loadMapDataForBounds = useCallback(
     (bounds: ParkingMapBounds, zoom: number) => {
+      clearTimeout(windViewportTimer.current);
+      windViewportTimer.current = setTimeout(
+        () => setWindViewport(bounds),
+        500,
+      );
       setCycleNetworkZoom(zoom);
       cycleNetworkViewport.current = { bounds, zoom };
       if (offlineAreaSelectionBounds) {
@@ -2596,7 +2620,7 @@ export default function CycleParkingFinder() {
   const explicitSelectedPoint =
     selectedPointFromMap ?? selectedPointCache.current;
   const explicitSelectedPointDetails = explicitSelectedPoint
-    ? getParkingPopupDetails(explicitSelectedPoint, locale)
+    ? getParkingPopupDetails(explicitSelectedPoint, locale, units)
     : null;
   const parkingDetailMessage =
     shareError ??
@@ -2609,6 +2633,70 @@ export default function CycleParkingFinder() {
       ? (mapPoints.find((point) => point.id === directionsState.parkingId) ??
         null)
       : null;
+  const isWindVisible = WIND_ENABLED && manualWindVisible;
+  const windTarget = useMemo(() => {
+    if (!windViewport || !parkingManifest) return null;
+    const routes =
+      routeWorkspaceView === 'planner'
+        ? Object.values(routePlannerRoutes).map((route) =>
+            route.points.map(([lat, lng]): [number, number] => [lng, lat]),
+          )
+        : [];
+    const bounds = windRequestBounds(windViewport, routes);
+    const centre = {
+      latitude: (bounds.south + bounds.north) / 2,
+      longitude: (bounds.west + bounds.east) / 2,
+    };
+    if (!isLocationInParkingCoverage(centre, parkingManifest)) return null;
+    return useEdinburghGrid(bounds, routes.length > 0)
+      ? undefined
+      : windRegion(bounds);
+  }, [windViewport, parkingManifest, routeWorkspaceView, routePlannerRoutes]);
+  const {
+    wind,
+    availability: loadedWindAvailability,
+    freshness: windFreshness,
+    provider: windProvider,
+  } = useWindForecast(isWindVisible && windViewport !== null, windTarget);
+  const windAvailability =
+    !windViewport && isWindVisible ? 'loading' : loadedWindAvailability;
+  const windBaseLabel =
+    windAvailability === 'idle'
+      ? t('windForecastIdle')
+      : windAvailability === 'loading'
+        ? t('windLoading')
+        : windAvailability === 'error'
+          ? t('windForecastMissing')
+          : windAvailability === 'stale'
+            ? t('windForecastStale')
+            : wind
+              ? t(
+                  wind.grid
+                    ? wind.grid.model === 'best_match'
+                      ? 'windRegionalHour'
+                      : 'windGridHour'
+                    : windProvider === 'fallback'
+                      ? 'windFallbackHour'
+                      : 'windForecastHour',
+                  {
+                    resolution: units === 'imperial' ? '1.2 mi' : '2 km',
+                    date: new Intl.DateTimeFormat(locale, {
+                      timeZone: 'UTC',
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hourCycle: 'h23',
+                    }).format(new Date(wind.validAt)),
+                  },
+                )
+              : t('windForecastIdle');
+  const windLabel =
+    windBaseLabel +
+    (windAvailability === 'available' && windProvider === 'cached' && wind?.grid
+      ? ' · cached'
+      : '');
   const activeRoute =
     routeWorkspaceView === 'planner' && routeDraft
       ? (routePlannerRoutes[routeDraft.plan] ?? null)
@@ -5732,7 +5820,7 @@ export default function CycleParkingFinder() {
               latitude: point.latitude,
               longitude: point.longitude,
               distanceMeters: point.distanceMeters,
-              details: getParkingPopupDetails(point, locale),
+              details: getParkingPopupDetails(point, locale, units),
             }))
           : [],
       totalInList: webMcpDataStatus === 'ready' ? activeListPoints.length : 0,
@@ -5768,7 +5856,7 @@ export default function CycleParkingFinder() {
         status: 'selected',
         id: point.id,
         name: point.name,
-        details: getParkingPopupDetails(point, locale),
+        details: getParkingPopupDetails(point, locale, units),
       };
     },
     startRoutePlanning: () => {
@@ -5881,12 +5969,15 @@ export default function CycleParkingFinder() {
                   </motion.button>
                 ))}
               </div>
-              <label className="settings-label" htmlFor="language-setting">
+              <label
+                className="settings-label"
+                htmlFor={`language-setting-${triggerVariant}`}
+              >
                 {t('language')}
               </label>
               <select
                 className="language-select"
-                id="language-setting"
+                id={`language-setting-${triggerVariant}`}
                 value={locale}
                 onChange={(event) =>
                   chooseLanguage(event.target.value as AppLocale)
@@ -5897,6 +5988,21 @@ export default function CycleParkingFinder() {
                     {localeDetails[optionLocale].selfName}
                   </option>
                 ))}
+              </select>
+              <label
+                className="settings-label"
+                htmlFor={`units-setting-${triggerVariant}`}
+              >
+                {t('units')}
+              </label>
+              <select
+                className="language-select"
+                id={`units-setting-${triggerVariant}`}
+                value={units}
+                onChange={(event) => setUnits(resolveUnits(event.target.value))}
+              >
+                <option value="metric">{t('metricUnits')}</option>
+                <option value="imperial">{t('imperialUnits')}</option>
               </select>
               <span className="settings-label">{t('app')}</span>
               <motion.button
@@ -6310,6 +6416,8 @@ export default function CycleParkingFinder() {
             offlineAreaSelectionBounds={offlineAreaSelectionBounds}
             cycleNetworkFeatures={cycleNetworkFeatures}
             isCycleNetworkVisible={isCycleNetworkVisible}
+            wind={isWindVisible && windFreshness !== 'stale' ? wind : null}
+            windLabel={windLabel}
           />
           {isDestinationParkingMode ? (
             <div
@@ -6378,11 +6486,24 @@ export default function CycleParkingFinder() {
               onNameChange={setOfflineAreaName}
             />
           ) : null}
-          {!isDirectionsMode && !isRouteWorkspace ? (
+          {liveRouteTracking.status !== 'tracking' &&
+          liveRouteTracking.status !== 'starting' ? (
             <div className="map-layers-control">
+              <span
+                className="sr-only"
+                id="wind-layer-feedback"
+                role="status"
+                aria-atomic="true"
+                data-testid="wind-feedback"
+              >
+                {isWindVisible ? windLabel : ''}
+              </span>
               <motion.button
                 aria-expanded={isMapLayersOpen}
                 aria-label={t('mapLayers')}
+                aria-describedby={
+                  isWindVisible ? 'wind-layer-feedback' : undefined
+                }
                 className="map-layers-trigger"
                 data-testid="map-layers-trigger"
                 type="button"
@@ -6437,6 +6558,32 @@ export default function CycleParkingFinder() {
                         }
                       />
                     </label>
+                    {WIND_ENABLED ? (
+                      <label className="map-layers-option">
+                        <span>
+                          {t('windForecast')}
+                          <small
+                            className="sr-only"
+                            id="wind-layer-status"
+                            data-testid="wind-layer-status"
+                            data-state={windAvailability}
+                          >
+                            {windLabel}
+                          </small>
+                        </span>
+                        <input
+                          aria-label={t('windForecast')}
+                          aria-describedby="wind-layer-status"
+                          checked={isWindVisible}
+                          data-testid="wind-layer-toggle"
+                          role="switch"
+                          type="checkbox"
+                          onChange={(event) =>
+                            setManualWindVisible(event.target.checked)
+                          }
+                        />
+                      </label>
+                    ) : null}
                   </motion.div>
                 ) : null}
               </AnimatePresence>
@@ -6719,9 +6866,9 @@ export default function CycleParkingFinder() {
                         }
                         onRequestMapPlacement={beginRouteWaypointPlacement}
                         onSave={() => void saveRouteDraft()}
-                        onSelectPlan={(plan) =>
-                          setRouteDraft({ ...routeDraft, plan })
-                        }
+                        onSelectPlan={(plan) => {
+                          setRouteDraft({ ...routeDraft, plan });
+                        }}
                         onSwapEndpoints={() =>
                           commitRouteDraft(swapRouteEndpoints(routeDraft))
                         }
@@ -6893,6 +7040,7 @@ export default function CycleParkingFinder() {
                                     details={getDirectionsParkingDetails(
                                       directionsParkingPoint,
                                       locale,
+                                      units,
                                     )}
                                     point={directionsParkingPoint}
                                   />
@@ -6998,12 +7146,14 @@ export default function CycleParkingFinder() {
                             {describeCycleRouteInstruction(
                               activeRouteInstruction,
                               locale,
+                              units,
                             )}
                           </span>
                           <small className="directions-step-distance directions-current-step-distance">
                             {formatDistance(
                               activeRouteInstruction.distanceMeters,
                               locale,
+                              units,
                             )}
                           </small>
                         </motion.div>
@@ -7074,6 +7224,7 @@ export default function CycleParkingFinder() {
                                         ? formatDistance(
                                             route.distanceMeters,
                                             locale,
+                                            units,
                                           )
                                         : t('routeUnavailable')}
                                     </small>
@@ -7185,12 +7336,14 @@ export default function CycleParkingFinder() {
                                       {describeCycleRouteInstruction(
                                         instruction,
                                         locale,
+                                        units,
                                       )}
                                     </span>
                                     <small className="directions-step-distance">
                                       {formatDistance(
                                         instruction.distanceMeters,
                                         locale,
+                                        units,
                                       )}
                                     </small>
                                   </motion.li>
@@ -8010,6 +8163,7 @@ export default function CycleParkingFinder() {
                                                 {formatDistance(
                                                   point.distanceMeters ?? 0,
                                                   locale,
+                                                  units,
                                                 )}
                                               </span>
                                               {openingHoursLines.length ===
@@ -8515,6 +8669,19 @@ export default function CycleParkingFinder() {
                 </div>
                 <DataFreshness locale={locale} />
                 <div className="attribution-details">
+                  <span>
+                    Weather data by{' '}
+                    <a href="https://open-meteo.com/">Open-Meteo</a> ·{' '}
+                    <a href="https://open-meteo.com/en/licence">
+                      CC BY 4.0 and model-provider credits
+                    </a>
+                    . Wind vectors interpolated by Bike Neuks. Edinburgh UKV: UK
+                    Met Office ·{' '}
+                    <a href="https://creativecommons.org/licenses/by-sa/4.0/">
+                      CC BY-SA 4.0
+                    </a>
+                    .
+                  </span>
                   {parkingManifest?.sources.map((source) => (
                     <Fragment key={source.id}>
                       <span>{source.attribution}</span>

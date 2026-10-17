@@ -231,7 +231,7 @@ test('switches and persists the interface language without moving the map', asyn
   );
   await desktopSettings.click();
   await page
-    .locator('.settings-menu--desktop .language-select')
+    .locator('.settings-menu--desktop select[id^="language-setting"]')
     .selectOption('es');
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
@@ -272,7 +272,7 @@ test('switches and persists the interface language without moving the map', asyn
 
   await page.locator('.settings-menu--desktop .settings-trigger').click();
   await page
-    .locator('.settings-menu--desktop .language-select')
+    .locator('.settings-menu--desktop select[id^="language-setting"]')
     .selectOption('gd');
   await expect(page.locator('html')).toHaveAttribute('lang', 'gd');
   await expect(page.locator('#place-search-desktop')).toHaveAttribute(
@@ -285,7 +285,7 @@ test('switches and persists the interface language without moving the map', asyn
 
   await page.locator('.settings-menu--desktop .settings-trigger').click();
   await page
-    .locator('.settings-menu--desktop .language-select')
+    .locator('.settings-menu--desktop select[id^="language-setting"]')
     .selectOption('hy');
   await expect(page.locator('html')).toHaveAttribute('lang', 'hy');
   await expect(page.locator('#place-search-desktop')).toHaveAttribute(
@@ -754,7 +754,9 @@ for (const [mockGps, message] of [
       page.getByRole('combobox', { name: 'Choose a starting point' }),
     ).toBeVisible();
     await page.getByRole('button', { name: 'Use my location' }).click();
-    await expect(page.getByRole('status')).toContainText(message);
+    await expect(
+      page.locator('[role="status"]:not(#wind-layer-feedback)'),
+    ).toContainText(message);
     await expect(
       page.getByRole('button', { name: 'Start route', exact: true }),
     ).toHaveCount(0);

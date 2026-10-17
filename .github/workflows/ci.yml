@@ -10,6 +10,9 @@ on:
 permissions:
   contents: read
 
+env:
+  NEXT_PUBLIC_WIND_ENABLED: ${{ vars.NEXT_PUBLIC_WIND_ENABLED || 'true' }}
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true

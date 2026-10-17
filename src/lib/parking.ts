@@ -1,3 +1,4 @@
+import type { UnitSystem } from '@/lib/units';
 import { formatDistance } from '@/lib/geo';
 import type { AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
@@ -352,6 +353,7 @@ function formatAccessDetail(
 export function getParkingDetails(
   point: ParkingPoint,
   locale: AppLocale = 'en',
+  units: UnitSystem = 'metric',
 ): ParkingDetail[] {
   return [
     {
@@ -360,7 +362,7 @@ export function getParkingDetails(
       value:
         typeof point.distanceMeters === 'number'
           ? translate(locale, 'away', {
-              distance: formatDistance(point.distanceMeters, locale),
+              distance: formatDistance(point.distanceMeters, locale, units),
             })
           : translate(locale, 'notListed'),
     },
@@ -394,6 +396,7 @@ export function getParkingDetails(
 export function getParkingPopupDetails(
   point: ParkingPoint,
   locale: AppLocale = 'en',
+  units: UnitSystem = 'metric',
 ): ParkingPopupDetails {
   return {
     metrics: [
@@ -405,7 +408,7 @@ export function getParkingPopupDetails(
         value:
           typeof point.distanceMeters === 'number'
             ? translate(locale, 'away', {
-                distance: formatDistance(point.distanceMeters, locale),
+                distance: formatDistance(point.distanceMeters, locale, units),
               })
             : translate(locale, 'notListed'),
       },
@@ -424,8 +427,9 @@ const essentialParkingDetailKinds = new Set(['cover', 'spaces', 'type']);
 export function getParkingEssentialDetails(
   point: ParkingPoint,
   locale: AppLocale = 'en',
+  units: UnitSystem = 'metric',
 ): ParkingPopupDetail[] {
-  return getParkingPopupDetails(point, locale).details.filter((detail) =>
+  return getParkingPopupDetails(point, locale, units).details.filter((detail) =>
     essentialParkingDetailKinds.has(detail.kind),
   );
 }
@@ -435,8 +439,9 @@ const genericDirectionsParkingTypes = new Set(['rack', 'racks', 'stands']);
 export function getDirectionsParkingDetails(
   point: ParkingPoint,
   locale: AppLocale = 'en',
+  units: UnitSystem = 'metric',
 ): ParkingPopupDetail[] {
-  const details = getParkingPopupDetails(point, locale).details;
+  const details = getParkingPopupDetails(point, locale, units).details;
   const capacity = details.find((detail) => detail.kind === 'spaces');
   const covered = details.find(
     (detail) => detail.kind === 'cover' && detail.icon === 'covered',

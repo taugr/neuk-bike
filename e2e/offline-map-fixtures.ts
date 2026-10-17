@@ -86,6 +86,11 @@ export async function installOfflineMapFixture(
   context: BrowserContext,
   initial: Partial<OfflineMapFixtureState> = {},
 ) {
+  // Ordinary browser regressions must not consume the hosted weather quota.
+  // Wind tests register their own page routes after this context fallback.
+  await context.route('https://api.open-meteo.com/**', (route) =>
+    route.fulfill({ status: 503, body: 'Weather fixture not supplied' }),
+  );
   const state: OfflineMapFixtureState = {
     failedRequests: [],
     requests: [],

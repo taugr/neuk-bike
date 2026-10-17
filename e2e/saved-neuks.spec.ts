@@ -573,7 +573,7 @@ test('keeps session-only saved neuks when language changes', async ({
 
   await page.locator('.settings-menu--desktop .settings-trigger').click();
   await page
-    .locator('.settings-menu--desktop .language-select')
+    .locator('.settings-menu--desktop select[id^="language-setting"]')
     .selectOption('es');
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');

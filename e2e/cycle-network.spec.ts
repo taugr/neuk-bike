@@ -124,7 +124,9 @@ test('opens a fixed-anchor route popup immediately and keeps popups exclusive', 
 
   const desktopSettings = page.locator('.settings-menu--desktop');
   await desktopSettings.locator('.settings-trigger').click();
-  await desktopSettings.locator('.language-select').selectOption('es');
+  await desktopSettings
+    .locator('select[id^="language-setting"]')
+    .selectOption('es');
   await expect(page.getByTestId('cycle-network-popup')).toHaveCount(0);
 });
 

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import PwaInstallPrompt from '@/components/pwa-install-prompt';
+import { UnitsProvider } from '@/components/units-provider';
 import { LanguageProvider } from '@/components/language-provider';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
@@ -117,9 +118,11 @@ export default function RootLayout({
       </head>
       <body>
         <LanguageProvider>
-          <PwaInstallPrompt assetBasePath={assetBasePath}>
-            {children}
-          </PwaInstallPrompt>
+          <UnitsProvider>
+            <PwaInstallPrompt assetBasePath={assetBasePath}>
+              {children}
+            </PwaInstallPrompt>
+          </UnitsProvider>
         </LanguageProvider>
       </body>
     </html>
