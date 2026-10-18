@@ -871,16 +871,8 @@ a {
   width: 17rem;
 }
 
-.map-layers-popover > strong {
-  color: var(--text);
-  font-size: 0.82rem;
-  line-height: 1.2;
-  padding: 0.1rem 0.1rem 0.15rem;
-}
-
 .map-layers-option {
   align-items: center;
-  border-top: 1px solid var(--subtle);
   color: var(--text);
   display: flex;
   font-size: 0.8rem;
@@ -889,6 +881,10 @@ a {
   justify-content: space-between;
   min-height: 2.7rem;
   padding: 0.45rem 0.1rem 0;
+}
+
+.map-layers-option + .map-layers-option {
+  border-top: 1px solid var(--subtle);
 }
 
 .map-layers-option > span {

@@ -6524,7 +6524,6 @@ export default function CycleParkingFinder() {
                     data-testid="map-layers-popover"
                     role="dialog"
                   >
-                    <strong>{t('mapLayers')}</strong>
                     {isCycleNetworkAvailable ? (
                       <label className="map-layers-option">
                         <span>
