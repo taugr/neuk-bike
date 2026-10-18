@@ -863,8 +863,7 @@ a {
   border-radius: 12px;
   box-shadow: var(--shadow);
   display: grid;
-  gap: 0.55rem;
-  padding: 0.7rem;
+  padding: 0 0.7rem;
   position: absolute;
   right: 0;
   top: calc(100% + 0.55rem);
@@ -880,7 +879,7 @@ a {
   gap: 0.75rem;
   justify-content: space-between;
   min-height: 2.7rem;
-  padding: 0.45rem 0.1rem 0;
+  padding: 0.7rem 0.1rem;
 }
 
 .map-layers-option + .map-layers-option {
