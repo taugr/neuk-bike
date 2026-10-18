@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { windGridAnchors } from './wind-grid';
+import { windAnchorHasLabel, windGridAnchors } from './wind-grid';
 
 const area = { west: -3.21, east: -3.17, south: 55.94, north: 55.96 };
 describe('geographic wind anchors', () => {
+  it('labels more arrows on desktop while retaining an unlabelled majority on phones', () => {
+    const anchors = windGridAnchors(area, 16);
+    const mobile = anchors.filter((a) => windAnchorHasLabel(a.id, true));
+    const desktop = anchors.filter((a) => windAnchorHasLabel(a.id, false));
+    expect(mobile.length / anchors.length).toBeGreaterThan(0.25);
+    expect(mobile.length / anchors.length).toBeLessThan(0.4);
+    expect(desktop.length / anchors.length).toBeGreaterThan(0.4);
+    expect(desktop.length / anchors.length).toBeLessThan(0.6);
+  });
+
   it('retains geographic identity when the visible area pans', () => {
     const before = windGridAnchors(area, 14);
     const after = windGridAnchors({ ...area, west: -3.2, east: -3.16 }, 14);

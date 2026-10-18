@@ -11,6 +11,7 @@
   --accent: #0f766e;
   --accent-strong: #0b5c55;
   --accent-soft: #cfeee7;
+  --wind-color: #426b8a;
   --warning: #a15c11;
   --separator: rgb(219 230 224 / 84%);
   --hover-soft: rgb(15 118 110 / 8%);
@@ -61,6 +62,7 @@
   --accent: #5eead4;
   --accent-strong: #99f6e4;
   --accent-soft: rgb(94 234 212 / 14%);
+  --wind-color: #93bddd;
   --warning: #fbbf24;
   --separator: rgb(49 67 61 / 84%);
   --hover-soft: rgb(94 234 212 / 12%);
@@ -7634,7 +7636,7 @@ a {
   width: 28px;
   height: 28px;
   pointer-events: none;
-  color: var(--accent-strong);
+  color: var(--wind-color);
 }
 .wind-map-arrow svg {
   position: absolute;

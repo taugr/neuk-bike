@@ -32,5 +32,5 @@ export function windGridAnchors(bounds: Bounds, zoom: number) {
 export function windAnchorHasLabel(id: string, mobile: boolean) {
   let hash = 0;
   for (const char of id) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) | 0;
-  return Math.abs(hash) % (mobile ? 5 : 3) === 0;
+  return Math.abs(hash) % (mobile ? 3 : 2) === 0;
 }

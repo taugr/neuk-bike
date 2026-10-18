@@ -44,7 +44,7 @@ announce “Turn on to load forecast” before the first request; loading, avail
 stale and failed states remain distinct in accessible descriptions. Wind controls use
 simple labels. Forecast timing remains available to screen readers; demo routes,
 raw forecast-cell inspection and diagnostic links are not part of the app.
-Unboxed teal arrows
+Unboxed slate-blue arrows
 show where air travels (weather FROM direction +180°). Persistent MapLibre markers use subpixel positioning and move with the map in
 the same camera update during panning, zooming and rotation. A buffered geographic
 grid stays fixed throughout a gesture; membership and density update after it ends.
@@ -53,7 +53,7 @@ keep arrows readable, with a fine stroke halo instead of white tiles. Circular
 markers remain distinct cycling/location cues. Wind arrows do not encode speed
 through size. Sparse labels show the estimated speed in km/h (or mph with Imperial units), rounded to one decimal. Half
 the original geographic lattice is retained; a stable hash labels about one in
-three arrows on desktop and one in five on mobile. Forecast arrows are interpolated samples, not extra provider cells, observations
+two arrows on desktop and one in three on mobile. Forecast arrows are interpolated samples, not extra provider cells, observations
 or precise street-level speeds.
 
 Route cards show total uphill elevation from CycleStreets street profiles beside
