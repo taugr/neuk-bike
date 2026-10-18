@@ -206,6 +206,9 @@
         <label><input id="cover" type="checkbox" /> Covered</label>
         <label><input id="selected" type="checkbox" /> Selected</label>
         <label
+          ><input id="satellite" type="checkbox" /> Satellite contrast</label
+        >
+        <label
           >Rotate
           <input
             id="rotation"
@@ -265,7 +268,7 @@
         surface.height = 420;
         const gl = surface.getContext('webgl2', {
           antialias: true,
-          alpha: false,
+          alpha: true,
           preserveDrawingBuffer: true,
         });
         if (!gl) throw new Error('WebGL is unavailable in this browser.');
@@ -303,6 +306,13 @@
         }
         const matrix = gl.getUniformLocation(program, 'u_matrix');
         const view = gl.getUniformLocation(program, 'u_view');
+        const expand = gl.getUniformLocation(program, 'u_expand');
+        const outline = gl.getUniformLocation(program, 'u_outline');
+        gl.uniform2f(
+          gl.getUniformLocation(program, 'u_viewport'),
+          surface.width,
+          surface.height,
+        );
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
         gl.disable(gl.CULL_FACE);
@@ -310,7 +320,8 @@
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.viewport(0, 0, surface.width, surface.height);
         const cover = document.querySelector('#cover'),
-          selected = document.querySelector('#selected');
+          selected = document.querySelector('#selected'),
+          satellite = document.querySelector('#satellite');
         const rotation = document.querySelector('#rotation'),
           tilt = document.querySelector('#tilt'),
           family = document.querySelector('#family');
@@ -367,12 +378,16 @@
             ce = Math.cos(e),
             se = Math.sin(e);
           gl.uniform3f(view, s * ce, -c * ce, se);
+          gl.uniform1i(
+            gl.getUniformLocation(program, 'u_satellite'),
+            Number(satellite.checked),
+          );
           let count = 0;
           for (const item of cards) {
             item.card.hidden =
               family.value !== 'all' && family.value !== item.model.kind;
             if (item.card.hidden) continue;
-            const key = `${item.model.kind}/${cover.checked}/${selected.checked}`;
+            const key = `${item.model.kind}/${cover.checked}/${selected.checked}/${satellite.checked}`;
             if (!cache.has(key))
               cache.set(
                 key,
@@ -380,6 +395,7 @@
                   item.model.kind,
                   cover.checked,
                   selected.checked,
+                  satellite.checked,
                 ),
               );
             const mesh = cache.get(key);
@@ -428,8 +444,17 @@
             );
 
             gl.depthMask(true);
-            gl.clearColor(0.914, 0.933, 0.898, 1);
+            gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            if (satellite.checked) {
+              gl.depthMask(false);
+              gl.uniform1i(outline, 1);
+              gl.uniform1f(expand, 2.2);
+              gl.bufferData(gl.ARRAY_BUFFER, mesh.opaque, gl.STREAM_DRAW);
+              gl.drawArrays(gl.TRIANGLES, 0, mesh.opaque.length / 10);
+            }
+            gl.uniform1i(outline, 0);
+            gl.uniform1f(expand, 0);
             for (const [data, opaque] of [
               [mesh.opaque, true],
               [mesh.glass, false],
@@ -439,16 +464,35 @@
               gl.drawArrays(gl.TRIANGLES, 0, data.length / 10);
             }
             item.context.clearRect(0, 0, surface.width, surface.height);
+            item.context.fillStyle = satellite.checked ? '#283b35' : '#e9eee5';
+            item.context.fillRect(0, 0, surface.width, surface.height);
+            if (satellite.checked) {
+              // Deliberately patterned contrast test surface, not aerial imagery.
+              for (let x = 0; x < surface.width; x += 100)
+                for (let y = 0; y < surface.height; y += 80) {
+                  item.context.fillStyle =
+                    (x / 100 + y / 80) % 2 ? '#a6a99a' : '#5a6256';
+                  item.context.fillRect(x + 10, y + 10, 75, 50);
+                }
+            }
             item.context.drawImage(surface, 0, 0);
             count++;
           }
-          status.textContent = `${count} of ${cards.length} models · ${cover.checked ? 'Covered' : 'Uncovered'} view`;
+          status.textContent = `${count} of ${cards.length} models · ${cover.checked ? 'Covered' : 'Uncovered'} view${satellite.checked ? ' · Satellite contrast on a patterned test background' : ''}`;
         }
-        for (const control of [cover, selected, rotation, tilt, family])
+        for (const control of [
+          cover,
+          selected,
+          satellite,
+          rotation,
+          tilt,
+          family,
+        ])
           control.addEventListener('input', render);
         document.querySelector('#reset').addEventListener('click', () => {
           cover.checked = false;
           selected.checked = false;
+          satellite.checked = false;
           rotation.value = '28';
           tilt.value = '32';
           family.value = 'all';

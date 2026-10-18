@@ -7,6 +7,25 @@ export type ParkingMapBounds = {
   west: number;
 };
 
+/** Screen corners do not correspond to compass directions on a rotated map. */
+export function getParkingMapBounds(
+  area: { left: number; right: number; top: number; bottom: number },
+  unproject: (point: [number, number]) => { lng: number; lat: number },
+): ParkingMapBounds {
+  const corners = [
+    unproject([area.left, area.top]),
+    unproject([area.right, area.top]),
+    unproject([area.right, area.bottom]),
+    unproject([area.left, area.bottom]),
+  ];
+  return {
+    east: Math.max(...corners.map((point) => point.lng)),
+    north: Math.max(...corners.map((point) => point.lat)),
+    south: Math.min(...corners.map((point) => point.lat)),
+    west: Math.min(...corners.map((point) => point.lng)),
+  };
+}
+
 export type ParkingView = 'nearby' | 'saved';
 
 export type ParkingMarkerVariant =
@@ -62,6 +81,8 @@ type RenderableParkingPointsOptions = {
   points: ParkingPoint[];
   selectedPoint?: ParkingPoint | null;
   zoom: number;
+  screenSpace?: boolean;
+  protectedPoints?: ParkingPoint[];
 };
 
 const allPointZoom = 16;
@@ -178,14 +199,18 @@ export function getRenderableParkingPoints({
   points,
   selectedPoint,
   zoom,
+  screenSpace = false,
+  protectedPoints = [],
 }: RenderableParkingPointsOptions) {
   const renderablePoints = new Map<string, ParkingPoint>();
-  const candidateBounds = bounds ? getPaddedBounds(bounds, zoom) : null;
+  const candidateBounds = bounds
+    ? getPaddedBounds(bounds, screenSpace ? Math.max(15, zoom) : zoom)
+    : null;
   const candidatePoints = candidateBounds
     ? points.filter((point) => containsPoint(candidateBounds, point))
     : points;
 
-  if (zoom >= allPointZoom) {
+  if (screenSpace || zoom >= allPointZoom) {
     for (const point of candidatePoints) {
       addUniquePoint(renderablePoints, point);
     }
@@ -219,6 +244,8 @@ export function getRenderableParkingPoints({
   if (selectedPoint) {
     addUniquePoint(renderablePoints, selectedPoint);
   }
+
+  for (const point of protectedPoints) addUniquePoint(renderablePoints, point);
 
   return Array.from(renderablePoints.values());
 }

@@ -6,7 +6,14 @@ import { useUnits } from '@/components/units-provider';
 import { improveDarkMapReadability } from '@/lib/map-readability';
 import { createMapRecovery } from '@/lib/map-recovery';
 import { useMapTerrain } from '@/components/use-map-terrain';
+import { useMapPinDensity } from '@/components/use-map-pin-density';
 import { terrainPitch } from '@/lib/map-terrain';
+import { useMapSatellite } from '@/components/use-map-satellite';
+import {
+  loadSatelliteTile,
+  satelliteProtocol,
+  satelliteSourceId,
+} from '@/lib/map-satellite';
 import {
   buildParkingModels,
   parkingModelButtonOffset,
@@ -87,6 +94,7 @@ import {
   type RouteInstructionManeuver,
 } from '@/lib/route-instructions';
 import {
+  getParkingMapBounds,
   getParkingMarkerVariant,
   getRenderableParkingPoints,
   type ParkingMapBounds,
@@ -101,6 +109,8 @@ import type { AppLocale } from '@/lib/i18n/locales';
 import { translate } from '@/lib/i18n/messages';
 import { getPointSavedNeukKey } from '@/lib/saved-neuks';
 import type { CycleNetworkFeature } from '@/lib/cycle-network-data';
+import { getCycleNetworkLineStyles } from '@/lib/cycle-network-style';
+import { getScreenHeading } from '@/lib/map-route-heading';
 import {
   getCycleNetworkCoRoutes,
   getCycleNetworkPopupDetails,
@@ -115,12 +125,15 @@ import type { WindForecast } from '@/lib/wind';
 maplibregl.setWorkerUrl(
   `/vendor/maplibre-gl/${maplibregl.getVersion()}/maplibre-gl-worker.mjs`,
 );
+maplibregl.addProtocol(satelliteProtocol, loadSatelliteTile);
 
 type CycleParkingMapProps = {
   locale: AppLocale;
   points: ParkingPoint[];
   cycleNetworkFeatures: CycleNetworkFeature[];
   isCycleNetworkVisible: boolean;
+  isSatelliteVisible: boolean;
+  onSatelliteUnavailable: () => void;
   wind?: WindForecast | null;
   windLabel?: string;
   userLocation: UserLocation;
@@ -724,16 +737,9 @@ function isPointInVisibleMapArea(map: MapLibreMap, point: CycleRoutePoint) {
 }
 
 function getVisibleMapBounds(map: MapLibreMap): ParkingMapBounds {
-  const visibleArea = getVisibleMapArea(map);
-  const northWest = map.unproject([visibleArea.left, visibleArea.top]);
-  const southEast = map.unproject([visibleArea.right, visibleArea.bottom]);
-
-  return {
-    east: southEast.lng,
-    north: northWest.lat,
-    south: southEast.lat,
-    west: northWest.lng,
-  };
+  return getParkingMapBounds(getVisibleMapArea(map), (point) =>
+    map.unproject(point),
+  );
 }
 
 function getDistanceMeters(a: CycleRoutePoint, b: CycleRoutePoint) {
@@ -1557,8 +1563,6 @@ const offlineAreaSelectionSourceId = 'offline-area-selection';
 const offlineAreaSelectionFillLayerId = 'offline-area-selection-fill';
 const offlineAreaSelectionLineLayerId = 'offline-area-selection-line';
 const cycleNetworkHitLayerId = 'cycle-network-hit';
-const cycleNetworkCasingLayerId = 'cycle-network-casing';
-const cycleNetworkSelectedCasingLayerId = 'cycle-network-selected-casing';
 const cycleNetworkBundleLayerId = 'cycle-network-bundle-labels';
 const cycleNetworkShieldImageScale = 3;
 // Popup selection re-runs layer styling. Preserve unchanged source data so
@@ -1694,6 +1698,7 @@ function syncCycleNetworkBundleSource({
 function syncCycleNetworkLayers({
   bundles,
   features,
+  highContrast,
   isDirectionsMode,
   map,
   selectedRouteKey,
@@ -1701,6 +1706,7 @@ function syncCycleNetworkLayers({
 }: {
   bundles: CycleNetworkRouteBundle[];
   features: CycleNetworkFeature[];
+  highContrast: boolean;
   isDirectionsMode: boolean;
   map: MapLibreMap;
   selectedRouteKey: string | null;
@@ -1736,177 +1742,32 @@ function syncCycleNetworkLayers({
   const firstSymbolLayer = map
     .getStyle()
     .layers?.find((layer) => layer.type === 'symbol')?.id;
-  const selectedOpacity = isDirectionsMode ? 0.3 : 1;
-  const unselectedOpacity = isDirectionsMode
-    ? 0.12
-    : selectedRouteKey
-      ? 0.24
-      : 0.86;
-  const lineOpacity: NonNullable<
-    LineLayerSpecification['paint']
-  >['line-opacity'] = selectedRouteKey
-    ? [
-        'case',
-        ['==', ['get', 'routeKey'], selectedRouteKey],
-        selectedOpacity,
-        unselectedOpacity,
-      ]
-    : unselectedOpacity;
-  const selectedRouteFilter = [
-    '==',
-    ['get', 'routeKey'],
-    selectedRouteKey ?? '__no-selected-cycle-network-route__',
-  ] as FilterSpecification;
-
-  if (map.getLayer(cycleNetworkCasingLayerId)) {
-    map.setPaintProperty(
-      cycleNetworkCasingLayerId,
-      'line-color',
-      theme === 'dark' ? '#020617' : '#ffffff',
-    );
-    map.setPaintProperty(
-      cycleNetworkCasingLayerId,
-      'line-opacity',
-      isDirectionsMode ? 0.16 : selectedRouteKey ? 0.28 : 0.68,
-    );
-  } else {
-    map.addLayer(
-      {
-        id: cycleNetworkCasingLayerId,
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: {
-          'line-color': theme === 'dark' ? '#020617' : '#ffffff',
-          'line-opacity': isDirectionsMode
-            ? 0.16
-            : selectedRouteKey
-              ? 0.28
-              : 0.68,
-          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 5.2, 15, 7],
-        },
-        source: cycleNetworkSourceId,
-        type: 'line',
-      },
-      firstSymbolLayer,
-    );
-  }
-  if (map.getLayer(cycleNetworkSelectedCasingLayerId)) {
-    map.setFilter(cycleNetworkSelectedCasingLayerId, selectedRouteFilter);
-    map.setPaintProperty(
-      cycleNetworkSelectedCasingLayerId,
-      'line-color',
-      theme === 'dark' ? '#f8fafc' : '#ffffff',
-    );
-    map.setPaintProperty(
-      cycleNetworkSelectedCasingLayerId,
-      'line-opacity',
-      isDirectionsMode ? 0.3 : 0.98,
-    );
-  } else {
-    map.addLayer(
-      {
-        filter: selectedRouteFilter,
-        id: cycleNetworkSelectedCasingLayerId,
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: {
-          'line-color': theme === 'dark' ? '#f8fafc' : '#ffffff',
-          'line-opacity': isDirectionsMode ? 0.3 : 0.98,
-          'line-width': ['interpolate', ['linear'], ['zoom'], 10, 7.2, 15, 9.4],
-        },
-        source: cycleNetworkSourceId,
-        type: 'line',
-      },
-      firstSymbolLayer,
-    );
-  }
-  const styles = [
-    {
-      color: theme === 'dark' ? '#42d6a4' : '#087f5b',
-      filter: ['==', ['get', 'kind'], 'traffic-free'],
-      id: 'cycle-network-traffic-free',
-      width: 3.4,
-    },
-    {
-      color: theme === 'dark' ? '#a5b4fc' : '#4f46a5',
-      dash: [2, 1.4],
-      filter: ['==', ['get', 'kind'], 'on-road'],
-      id: 'cycle-network-on-road',
-      width: 2.4,
-    },
-    {
-      color: theme === 'dark' ? '#67e8f9' : '#08799c',
-      dash: [0.4, 2],
-      filter: ['==', ['get', 'kind'], 'ferry'],
-      id: 'cycle-network-ferry',
-      width: 2.6,
-    },
-    {
-      color: theme === 'dark' ? '#cbd5e1' : '#64748b',
-      dash: [1, 1.5],
-      filter: ['==', ['get', 'kind'], 'unknown'],
-      id: 'cycle-network-other',
-      width: 2,
-    },
-  ];
-  for (const style of styles) {
+  for (const style of getCycleNetworkLineStyles({
+    theme,
+    highContrast,
+    isDirectionsMode,
+    selectedRouteKey,
+  })) {
     if (map.getLayer(style.id)) {
-      map.setPaintProperty(style.id, 'line-color', style.color);
-      map.setPaintProperty(style.id, 'line-opacity', lineOpacity);
-      continue;
-    }
-    const paint: NonNullable<LineLayerSpecification['paint']> = {
-      'line-color': style.color,
-      'line-opacity': lineOpacity,
-      'line-width': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        10,
-        style.width,
-        15,
-        style.width + 1.2,
-      ],
-    };
-    if (style.dash) paint['line-dasharray'] = style.dash;
-    map.addLayer(
-      {
-        filter: style.filter as FilterSpecification,
-        id: style.id,
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint,
-        source: cycleNetworkSourceId,
-        type: 'line',
-      },
-      firstSymbolLayer,
-    );
-  }
-  if (map.getLayer('cycle-network-temporary-closure')) {
-    map.setPaintProperty(
-      'cycle-network-temporary-closure',
-      'line-color',
-      theme === 'dark' ? '#fb923c' : '#c2410c',
-    );
-    map.setPaintProperty(
-      'cycle-network-temporary-closure',
-      'line-opacity',
-      isDirectionsMode ? 0.3 : 1,
-    );
-  } else {
-    map.addLayer(
-      {
-        filter: ['==', ['get', 'openStatus'], 'temporary-closure'],
-        id: 'cycle-network-temporary-closure',
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: {
-          'line-color': theme === 'dark' ? '#fb923c' : '#c2410c',
-          'line-dasharray': [0.8, 1.2],
-          'line-opacity': isDirectionsMode ? 0.3 : 1,
-          'line-width': 5,
+      if (style.filter) map.setFilter(style.id, style.filter);
+      for (const [property, value] of Object.entries(style.paint ?? {})) {
+        map.setPaintProperty(
+          style.id,
+          property as keyof NonNullable<LineLayerSpecification['paint']>,
+          value,
+        );
+      }
+    } else {
+      map.addLayer(
+        {
+          ...style,
+          source: cycleNetworkSourceId,
+          type: 'line',
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
         },
-        source: cycleNetworkSourceId,
-        type: 'line',
-      },
-      firstSymbolLayer,
-    );
+        firstSymbolLayer,
+      );
+    }
   }
   if (!map.getLayer(cycleNetworkHitLayerId)) {
     map.addLayer({
@@ -1987,6 +1848,8 @@ export default function CycleParkingMap({
   points,
   cycleNetworkFeatures,
   isCycleNetworkVisible,
+  isSatelliteVisible,
+  onSatelliteUnavailable,
   wind = null,
   windLabel = '',
   userLocation,
@@ -2090,6 +1953,16 @@ export default function CycleParkingMap({
     useState(0);
   const [renderedModelFeatureCount, setRenderedModelFeatureCount] = useState(0);
   const [styleRevision, setStyleRevision] = useState(0);
+  const basemapLayerIdsRef = useRef<string[]>([]);
+  const satelliteLoaded = useMapSatellite(
+    map,
+    isMapLoaded,
+    styleRevision,
+    isOfflineBasemap,
+    isSatelliteVisible,
+    basemapLayerIdsRef,
+    onSatelliteUnavailable,
+  );
   const terrain = useMapTerrain(
     map,
     isMapLoaded,
@@ -2262,7 +2135,23 @@ export default function CycleParkingMap({
     isReferenceCurrentLocation,
     userLocation,
   ]);
-  const visiblePoints = useMemo(
+  const savedMapPoints = useMemo(
+    () =>
+      points.filter((point) =>
+        savedPointKeySet.has(getPointSavedNeukKey(point)),
+      ),
+    [points, savedPointKeySet],
+  );
+  const protectedPinIds = useMemo(
+    () =>
+      new Set([
+        ...rankedPoints.slice(0, rankedPointCount).map((point) => point.id),
+        ...savedMapPoints.map((point) => point.id),
+        ...(selectedPoint ? [selectedPoint.id] : []),
+      ]),
+    [rankedPoints, savedMapPoints, selectedPoint],
+  );
+  const candidatePoints = useMemo(
     () =>
       isDestinationParkingMode
         ? points
@@ -2276,6 +2165,8 @@ export default function CycleParkingMap({
                 points,
                 selectedPoint,
                 zoom: viewport.zoom,
+                screenSpace: terrain.enabled,
+                protectedPoints: terrain.enabled ? savedMapPoints : [],
               }),
     [
       isDirectionsMode,
@@ -2286,8 +2177,18 @@ export default function CycleParkingMap({
       selectedPoint,
       viewport.bounds,
       viewport.zoom,
+      terrain.enabled,
+      savedMapPoints,
     ],
   );
+  const visiblePoints = useMapPinDensity({
+    map,
+    points: candidatePoints,
+    protectedIds: protectedPinIds,
+    enabled: terrain.enabled && !isDirectionsMode,
+    getArea: getVisibleMapArea,
+    layoutKey: `${mobileSheetState}:${styleRevision}`,
+  });
 
   const routeModelPoint =
     isDirectionsMode && !isDestinationParkingMode
@@ -2381,11 +2282,13 @@ export default function CycleParkingMap({
         dragRotate: true,
         locale: getMapLibreLocale(initialLocaleRef.current),
         minZoom: 1,
-        pitchWithRotate: false,
+        pitchWithRotate: true,
         style,
-        touchPitch: false,
+        touchPitch: true,
         zoom: savedCameraRef.current?.zoom ?? 13,
       });
+      basemapLayerIdsRef.current =
+        typeof style === 'string' ? [] : style.layers.map((layer) => layer.id);
       nextMap = mapInstance;
       basemapHasErrorsRef.current = offlineBasemap;
       setIsOfflineBasemap(offlineBasemap);
@@ -2466,6 +2369,7 @@ export default function CycleParkingMap({
       mapInstance.on('webglcontextlost', () => setIsMapLoaded(false));
       mapInstance.on('error', (event) => {
         const sourceId = 'sourceId' in event ? String(event.sourceId) : '';
+        if (sourceId === satelliteSourceId) return;
         const source = mapInstance.getStyle()?.sources[sourceId];
         const url = 'url' in event.error ? String(event.error.url) : '';
         if (
@@ -2628,6 +2532,7 @@ export default function CycleParkingMap({
         basemapHasErrorsRef.current = false;
         // A style diff retains failed sources when their URLs are unchanged.
         // Rebuild them so TileJSON, sprites, glyphs and tiles are requested again.
+        basemapLayerIdsRef.current = style.layers.map((layer) => layer.id);
         map.setStyle(style, { diff: false });
       },
     });
@@ -2766,6 +2671,8 @@ export default function CycleParkingMap({
       basemapHasErrorsRef.current = offlineBasemap;
       if (offlineBasemap) basemapRecoveryRef.current?.fail();
       void map.once('style.load', handleStyleLoad);
+      basemapLayerIdsRef.current =
+        typeof style === 'string' ? [] : style.layers.map((layer) => layer.id);
       map.setStyle(style);
     };
 
@@ -2878,6 +2785,7 @@ export default function CycleParkingMap({
     syncCycleNetworkLayers({
       bundles: cycleNetworkBundles,
       features: isCycleNetworkVisible ? cycleNetworkFeatures : [],
+      highContrast: terrain.enabled || satelliteLoaded,
       isDirectionsMode: isDirectionsMode && !isRoutePlanningMode,
       map,
       selectedRouteKey: selectedCycleNetworkRouteKey,
@@ -2893,6 +2801,8 @@ export default function CycleParkingMap({
     map,
     selectedCycleNetworkRouteKey,
     styleRevision,
+    terrain.enabled,
+    satelliteLoaded,
     theme,
   ]);
 
@@ -3254,7 +3164,23 @@ export default function CycleParkingMap({
 
     liveMarkerRef.current = { marker };
 
+    const headingCue = element.querySelector<HTMLElement>(
+      '.live-route-heading',
+    );
+    const updateHeading = () => {
+      if (!headingCue || liveRouteMarker.headingDegrees === null) return;
+      const angle = getScreenHeading(
+        liveRouteMarker.position,
+        liveRouteMarker.headingDegrees,
+        (point) => map.project(point),
+      );
+      headingCue.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+    };
+    updateHeading();
+    map.on('render', updateHeading);
+
     return () => {
+      map.off('render', updateHeading);
       cleanupRenderedMarker(liveMarkerRef.current);
       liveMarkerRef.current = null;
     };
@@ -3338,7 +3264,7 @@ export default function CycleParkingMap({
     );
     const updateModels = () => {
       if (!isMapLoaded) return;
-      syncParkingModels(map, models);
+      syncParkingModels(map, models, satelliteLoaded);
     };
     if (map.isStyleLoaded()) updateModels();
     else map.once('idle', updateModels);
@@ -3380,6 +3306,13 @@ export default function CycleParkingMap({
       const markerOffset: [number, number] = modelButton?.offset ?? [0, 0];
       if (modelKind) {
         presentation.className += ' parking-marker-model';
+      } else if (
+        terrain.enabled &&
+        pointCategory === 'parking' &&
+        presentation.className.startsWith('parking-marker')
+      ) {
+        presentation.className += ' parking-marker-raised';
+        presentation.offset = [0, -40];
       }
       if (pointCategory !== 'parking') {
         presentation.className = `${presentation.className} cycling-poi-marker cycling-poi-marker-${pointCategory}`;
@@ -3617,6 +3550,7 @@ export default function CycleParkingMap({
     showParkingModels,
     routeModelPoint,
     highlightRouteArrival,
+    satelliteLoaded,
     isMapLoaded,
     styleRevision,
   ]);
@@ -4083,18 +4017,19 @@ export default function CycleParkingMap({
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    map.panTo(
-      getMapPointFocusCenter(
-        map,
-        liveRouteMarker.position,
-        map.getZoom(),
-        mobileSheetState,
-      ),
-      {
-        duration: prefersReducedMotion ? 0 : 450,
-        easing: (progress) => progress * (2 - progress),
-      },
-    );
+    const visibleArea = getVisibleMapArea(map);
+    const size = getMapSize(map);
+    // MapLibre applies this screen offset using the actual terrain camera;
+    // subtracting pixels in a north-up Mercator plane fails after rotation.
+    map.easeTo({
+      center: toLngLat(liveRouteMarker.position),
+      offset: [
+        visibleArea.center.x - size.x / 2,
+        visibleArea.center.y - size.y / 2,
+      ],
+      duration: prefersReducedMotion ? 0 : 450,
+      easing: (progress) => progress * (2 - progress),
+    });
   }, [
     liveRouteMarker,
     liveRouteMarker?.updatedAt,
@@ -4149,8 +4084,15 @@ export default function CycleParkingMap({
         data-map-zoom={viewport.zoom}
         data-map-pitch={viewport.pitch}
         data-map-terrain={viewport.terrainSource}
+        data-map-satellite={
+          satelliteLoaded ? 'ready' : isSatelliteVisible ? 'loading' : 'off'
+        }
         data-parking-model-features={renderedModelFeatureCount}
+        data-parking-model-contrast={satelliteLoaded ? 'high' : 'standard'}
         data-rendered-basemap-features={renderedBasemapFeatureCount}
+        data-cycle-network-contrast={
+          terrain.enabled || satelliteLoaded ? 'high' : 'standard'
+        }
         data-cycle-network-enabled={isCycleNetworkVisible}
         data-cycle-network-presentation={
           isDirectionsMode && !isRoutePlanningMode ? 'dimmed' : 'full'

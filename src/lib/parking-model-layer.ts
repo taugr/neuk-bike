@@ -75,6 +75,7 @@ class ParkingLayer implements CustomLayerInterface {
   type = 'custom' as const;
   renderingMode = '3d' as const;
   models: ParkingModel[] = [];
+  satelliteContrast = false;
   renderedCount = 0;
   destinationBadgeOffset(pointId: string) {
     const placed = this.placed.find(({ model }) => model.point.id === pointId);
@@ -124,10 +125,15 @@ class ParkingLayer implements CustomLayerInterface {
     this.vao = gl.createVertexArray();
   }
   private gpu(gl: WebGL2RenderingContext, model: ParkingModel) {
-    const key = `${model.kind}:${model.covered}:${model.selected}`;
+    const key = `${model.kind}:${model.covered}:${model.selected}:${this.satelliteContrast}`;
     const existing = this.buffers.get(key);
     if (existing) return existing;
-    const mesh = createParkingMesh(model.kind, model.covered, model.selected);
+    const mesh = createParkingMesh(
+      model.kind,
+      model.covered,
+      model.selected,
+      this.satelliteContrast,
+    );
     const upload = (data: Float32Array) => {
       const buffer = gl.createBuffer()!;
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -190,6 +196,22 @@ class ParkingLayer implements CustomLayerInterface {
     }
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
+    gl.uniform2f(
+      gl.getUniformLocation(this.program!, 'u_viewport'),
+      gl.drawingBufferWidth,
+      gl.drawingBufferHeight,
+    );
+    gl.uniform1i(
+      gl.getUniformLocation(this.program!, 'u_satellite'),
+      Number(this.satelliteContrast),
+    );
+    const expandLocation = gl.getUniformLocation(this.program!, 'u_expand');
+    const outlineLocation = gl.getUniformLocation(this.program!, 'u_outline');
+    const pixelRatio = gl.drawingBufferWidth / Math.max(1, width);
+    // Give subpixel tubes a little more body at the first model zooms.
+    const expansion = this.satelliteContrast
+      ? Math.max(0, 19 - this.map.getZoom()) * 0.3 * pixelRatio
+      : 0;
     // Preserve MapLibre's depth range, which reserves space for map layers.
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
@@ -231,8 +253,19 @@ class ParkingLayer implements CustomLayerInterface {
       }
       gl.drawArrays(gl.TRIANGLES, 0, data.length / stride);
     };
+    if (this.satelliteContrast) {
+      // Paint the narrow silhouette first without writing depth, so the real
+      // surfaces cover its interior. Glazing keeps its open, transparent shape.
+      gl.depthMask(false);
+      gl.uniform1i(outlineLocation, 1);
+      gl.uniform1f(expandLocation, expansion + 1.1 * pixelRatio);
+      for (const placed of this.placed) draw(placed, false);
+    }
+    gl.uniform1i(outlineLocation, 0);
+    gl.uniform1f(expandLocation, expansion);
     gl.depthMask(true);
     for (const placed of this.placed) draw(placed, false);
+    gl.uniform1f(expandLocation, 0);
     gl.depthMask(false);
     // Render glazing after all opaque fixtures, far to near, without hiding
     // stands behind a transparent surface in the shared depth buffer.
@@ -310,7 +343,11 @@ class ParkingLayer implements CustomLayerInterface {
     this.program = null;
   }
 }
-export function syncParkingModels(map: Map, models: ParkingModel[]) {
+export function syncParkingModels(
+  map: Map,
+  models: ParkingModel[],
+  satelliteContrast = false,
+) {
   let layer = layers.get(map);
   if (!map.getLayer(parkingModelsLayer)) {
     layer = new ParkingLayer();
@@ -318,6 +355,7 @@ export function syncParkingModels(map: Map, models: ParkingModel[]) {
     map.addLayer(layer);
   }
   layer!.models = models;
+  layer!.satelliteContrast = satelliteContrast;
   map.triggerRepaint();
 }
 export const getParkingModelRenderCount = (map: Map) =>

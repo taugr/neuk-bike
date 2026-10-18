@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Map, ErrorEvent, MapSourceDataEvent } from 'maplibre-gl';
 import {
-  syncMapTerrain,
+  transitionMapTerrain,
   terrainOrigin,
-  terrainPitch,
   terrainSourceId,
   terrainStorageKey,
 } from '@/lib/map-terrain';
@@ -32,6 +31,7 @@ export function useMapTerrain(
     if (!map || !ready) return;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let failed = false;
+    let cancelTransition: (() => void) | undefined;
     const fail = () => {
       if (failed) return;
       failed = true;
@@ -68,24 +68,17 @@ export function useMapTerrain(
       // the pending tilt even when the camera is still at the target 2D pitch.
       if (active || applied3dRef.current) map.stop();
       applied3dRef.current = active;
-      syncMapTerrain(map, active);
-      const pitch = active ? terrainPitch : 0;
-      if (
-        active ? Math.abs(map.getPitch() - pitch) > 0.01 : map.getPitch() !== 0
-      ) {
-        map.easeTo({
-          pitch,
-          duration: window.matchMedia('(prefers-reduced-motion: reduce)')
-            .matches
-            ? 0
-            : 500,
-        });
-      }
+      cancelTransition = transitionMapTerrain(
+        map,
+        active,
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+      );
     } catch {
       if (active) fail();
     }
     return () => {
       clearTimeout(timeout);
+      cancelTransition?.();
       map.off('error', onError);
       map.off('sourcedata', onSourceData);
       window.removeEventListener('offline', fail);

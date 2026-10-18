@@ -25,6 +25,168 @@ test.beforeEach(async ({ context }) => {
   );
 });
 
+for (const satellite of [false, true]) {
+  test(`rotated ${satellite ? 'satellite' : 'street'} terrain keeps parking visible and allows tilting and panning`, async ({
+    page,
+  }) => {
+    // Multiple rendered drag gestures are slower with concurrent WebGL tests.
+    test.slow();
+    await page.setViewportSize({ width: 1440, height: 844 });
+    await page.route('https://services.arcgisonline.com/**', (route) =>
+      route.fulfill({ contentType: 'image/png', path: tilePath }),
+    );
+    await page.goto(appUrl);
+    await expectRenderedBasemap(page);
+    const map = page.getByTestId('parking-map');
+    if (satellite) {
+      await page.getByTestId('map-layers-trigger').click();
+      await page
+        .getByRole('switch', { name: 'Satellite', exact: true })
+        .check();
+      await page.getByTestId('map-layers-trigger').click();
+      await expect(map).toHaveAttribute('data-map-satellite', 'ready');
+    }
+    await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+    await expectPitch(map, 55);
+    await expect(map).toHaveAttribute('data-cycle-network-contrast', 'high');
+    await page.mouse.move(700, 250);
+    await page.mouse.down({ button: 'right' });
+    await page.mouse.move(960, 300, { steps: 16 });
+    await page.mouse.up({ button: 'right' });
+    await expect
+      .poll(async () => Number(await map.getAttribute('data-map-pitch')))
+      .toBeLessThan(50);
+    const expectParking = async () => {
+      await expect
+        .poll(async () =>
+          map.evaluate((element) => {
+            const d = (element as HTMLElement).dataset;
+            return (
+              Number(d.mapNorth) > Number(d.mapSouth) &&
+              Number(d.mapEast) > Number(d.mapWest)
+            );
+          }),
+        )
+        .toBe(true);
+      // Pinned nearby results alone hid the bug: require additional map pins.
+      await expect
+        .poll(async () =>
+          page
+            .locator('.parking-marker:not(.parking-marker-ranked)')
+            .evaluateAll(
+              (markers) =>
+                markers.filter((marker) => {
+                  const r = marker.getBoundingClientRect();
+                  return (
+                    r.x > 500 &&
+                    r.right < innerWidth &&
+                    r.y > 80 &&
+                    r.bottom < innerHeight
+                  );
+                }).length,
+            ),
+        )
+        .toBeGreaterThan(0);
+    };
+    await expectParking();
+    const longitude = Number(
+      await map.getAttribute('data-map-center-longitude'),
+    );
+    await page.mouse.move(800, 300);
+    await page.mouse.down();
+    await page.mouse.move(880, 360, { steps: 10 });
+    await page.mouse.up();
+    await expect
+      .poll(async () =>
+        Number(await map.getAttribute('data-map-center-longitude')),
+      )
+      .not.toBe(longitude);
+    await expectParking();
+    await page.getByRole('button', { name: 'Switch to 2D map' }).click();
+    await expectPitch(map, 0);
+    await expect(map).toHaveAttribute(
+      'data-cycle-network-contrast',
+      satellite ? 'high' : 'standard',
+    );
+    await page.mouse.move(700, 300);
+    await page.mouse.down({ button: 'right' });
+    await page.mouse.move(750, 230, { steps: 8 });
+    await page.mouse.up({ button: 'right' });
+    await expectPitch(map, 0);
+  });
+}
+
+test('two-finger vertical dragging adjusts terrain pitch on a phone', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(appUrl);
+  await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+  const map = page.getByTestId('parking-map');
+  await expectPitch(map, 55);
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [
+      { x: 150, y: 180 },
+      { x: 230, y: 180 },
+    ],
+  });
+  for (let step = 1; step <= 10; step++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [
+        { x: 150, y: 180 + step * 6 },
+        { x: 230, y: 180 + step * 6 },
+      ],
+    });
+  }
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchEnd',
+    touchPoints: [],
+  });
+  await cdp.detach();
+  await expect
+    .poll(async () => Number(await map.getAttribute('data-map-pitch')))
+    .toBeLessThan(50);
+});
+
+test('slow elevation stays flat until ready and a pending tilt can be cancelled', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  let release: () => void = () => {};
+  const tilesReady = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(terrainPattern, async (route) => {
+    await tilesReady;
+    await route.fulfill({ contentType: 'image/png', path: tilePath });
+  });
+  try {
+    await page.goto(appUrl);
+    await expectRenderedBasemap(page);
+    const map = page.getByTestId('parking-map');
+    await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+    await expect(map).toHaveAttribute('data-map-terrain', 'neuk-terrain');
+    // Longer than the old animation: missing elevation must not leave us tilted.
+    await page.waitForTimeout(900);
+    await expectPitch(map, 0);
+    await page.getByRole('button', { name: 'Switch to 2D map' }).click();
+    await expect(map).toHaveAttribute('data-map-terrain', 'none');
+    release();
+    await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+    await expectPitch(map, 55);
+    await page.getByRole('button', { name: 'Switch to 2D map' }).click();
+    // Terrain remains while the camera eases down.
+    await expect(map).toHaveAttribute('data-map-terrain', 'neuk-terrain');
+    await expectPitch(map, 0);
+    await expect(map).toHaveAttribute('data-map-terrain', 'none');
+  } finally {
+    release();
+  }
+});
+
 for (const width of [320, 390, 1440]) {
   test(`terrain toggle preserves the camera and sits below the compass at ${width}px`, async ({
     page,
@@ -205,7 +367,13 @@ test('parking routes show only the destination model at close zoom and keep thei
     })
     .click();
   await expect(map).toHaveAttribute('data-parking-model-features', '1');
-  await page.getByRole('button', { name: 'Zoom out', exact: true }).click();
+  while (Number(await map.getAttribute('data-map-zoom')) >= 17) {
+    const zoom = Number(await map.getAttribute('data-map-zoom'));
+    await page.getByRole('button', { name: 'Zoom out', exact: true }).click();
+    await expect
+      .poll(async () => Number(await map.getAttribute('data-map-zoom')))
+      .toBeCloseTo(zoom - 1, 1);
+  }
   await expect(map).toHaveAttribute('data-parking-model-features', '0');
   await expect(page.locator('.route-waypoint-marker-finish')).toBeVisible();
 });
@@ -339,7 +507,7 @@ test('close zoom models retain keyboard selection, restore pins, and survive sty
   await expectRenderedBasemap(page);
   await page.getByRole('button', { name: 'Switch to 3D map' }).click();
   const map = page.getByTestId('parking-map');
-  while (Number(await map.getAttribute('data-map-zoom')) < 18) {
+  while (Number(await map.getAttribute('data-map-zoom')) < 17) {
     const zoom = Number(await map.getAttribute('data-map-zoom'));
     await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
     await expect
@@ -468,7 +636,8 @@ test('Waverley shares one model for 4, 6 and 7 with separate standard numbered b
     await expect(button).toHaveAttribute('data-model-group', 'cec:143');
     await expect(button).toHaveAttribute('data-model-group-size', '3');
   }
-  await expect(page.getByTestId('parking-marker-cec:876')).toHaveAttribute(
+  // Use a protected numbered neighbour: ordinary pins can be decluttered.
+  await expect(page.getByTestId('parking-marker-cec:178')).toHaveAttribute(
     'data-model-group-size',
     '1',
   );

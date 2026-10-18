@@ -23,6 +23,33 @@ const point = (
 });
 
 describe('smooth parking meshes', () => {
+  it.each(['stands', 'post-hoop', 'loops', 'safe-loops', 'racks'] as const)(
+    'omits the artificial ground slab from %s, including selected and covered variants',
+    (kind) => {
+      for (const selected of [false, true])
+        for (const covered of [false, true]) {
+          const vertices = createParkingMesh(kind, covered, selected).opaque;
+          // The removed slab was the only geometry at ground z=0.
+          for (let i = 0; i < vertices.length; i += 10)
+            expect(vertices[i + 2]).toBeGreaterThan(0);
+        }
+    },
+  );
+  it('retains all six small mounting plates beneath Sheffield hoop legs', () => {
+    const vertices = createParkingMesh('stands', false).opaque;
+    for (const y of [-0.9, 0, 0.9])
+      for (const x of [-0.775, 0.775]) {
+        let plateVertices = 0;
+        for (let i = 0; i < vertices.length; i += 10)
+          if (
+            Math.abs(vertices[i] - x) < 0.096 &&
+            Math.abs(vertices[i + 1] - y) < 0.081 &&
+            Math.abs(vertices[i + 2] - 0.025) < 1e-6
+          )
+            plateVertices++;
+        expect(plateVertices).toBe(18);
+      }
+  });
   it.each(parkingModelCatalog.map(({ kind }) => kind))(
     'builds finite triangles with unit normals for %s',
     (kind) => {
@@ -219,7 +246,7 @@ describe('dataset type aliases', () => {
 });
 
 describe('teal model selection', () => {
-  it('preserves metal and glazing with a teal outline and faint ground fill for every model family', () => {
+  it('preserves metal and glazing with a teal outline and tints any remaining base', () => {
     const accent = new Float32Array([20 / 255, 184 / 255, 166 / 255]);
     const steel = new Float32Array([0.62, 0.71, 0.73]);
     const matchingVertices = (vertices: Float32Array, color: Float32Array) => {
@@ -234,11 +261,15 @@ describe('teal model selection', () => {
       const normal = createParkingMesh(kind, true);
       const selected = createParkingMesh(kind, true, true);
       expect(selected.glass).toEqual(normal.glass);
-      // The base becomes a faint teal fill, with no extra transparent surface.
-      expect(selected.opaque[6]).toBeLessThan(normal.opaque[6]);
-      expect(selected.opaque[7]).toBeGreaterThan(normal.opaque[7]);
-      expect(selected.opaque[8]).toBeGreaterThan(normal.opaque[8]);
-      expect(selected.opaque[9]).toBe(1);
+      if (
+        !['stands', 'post-hoop', 'loops', 'safe-loops', 'racks'].includes(kind)
+      ) {
+        // Remaining bases become faint teal fills without extra transparent surfaces.
+        expect(selected.opaque[6]).toBeLessThan(normal.opaque[6]);
+        expect(selected.opaque[7]).toBeGreaterThan(normal.opaque[7]);
+        expect(selected.opaque[8]).toBeGreaterThan(normal.opaque[8]);
+        expect(selected.opaque[9]).toBe(1);
+      }
       expect(matchingVertices(selected.opaque, steel).length).toBe(
         matchingVertices(normal.opaque, steel).length,
       );

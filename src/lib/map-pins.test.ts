@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getParkingMapBounds,
   getParkingMarkerVariant,
   getRenderableParkingPoints,
   type ParkingMapBounds,
@@ -41,6 +42,55 @@ function gridPoints(count: number) {
 }
 
 describe('map pin rendering', () => {
+  it('passes all nearby candidates to screen spacing and retains every protected saved point', () => {
+    const points = gridPoints(100);
+    const saved = Array.from({ length: 12 }, (_, i) =>
+      point(`saved-${i}`, 56.5, -3.2),
+    );
+    const rendered = getRenderableParkingPoints({
+      bounds: edinburghBounds,
+      points,
+      pinnedPoints: [],
+      protectedPoints: saved,
+      zoom: 11,
+      screenSpace: true,
+    });
+    expect(rendered).toEqual([...points, ...saved]);
+  });
+
+  it.each([0, 45, 90, 135, 180, 225, 270, 315])(
+    'keeps parking across the visible area at a %i degree bearing',
+    (bearing) => {
+      const angle = (bearing * Math.PI) / 180;
+      const unproject = ([x, y]: [number, number]) => ({
+        lng: -3.2 + (x * Math.cos(angle) - y * Math.sin(angle)) * 0.01,
+        lat: 55.95 + (x * Math.sin(angle) + y * Math.cos(angle)) * 0.01,
+      });
+      const bounds = getParkingMapBounds(
+        { left: -2, right: 2, top: -1, bottom: 1 },
+        unproject,
+      );
+      // These points approach all four corners, including the two that the
+      // old north-west/south-east-only calculation never considered.
+      const points = ([-1.9, 1.9] as const).flatMap((x) =>
+        [-0.9, 0.9].map((y) => {
+          const coordinate = unproject([x, y]);
+          return point(`${x},${y}`, coordinate.lat, coordinate.lng);
+        }),
+      );
+      expect(bounds.north).toBeGreaterThan(bounds.south);
+      expect(bounds.east).toBeGreaterThan(bounds.west);
+      expect(
+        getRenderableParkingPoints({
+          bounds,
+          points,
+          pinnedPoints: [],
+          zoom: 14,
+        }),
+      ).toEqual(points);
+    },
+  );
+
   it('renders fewer points at low zoom than high zoom', () => {
     const points = gridPoints(40);
     const lowZoomPoints = getRenderableParkingPoints({

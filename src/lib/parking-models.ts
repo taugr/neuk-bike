@@ -1,7 +1,7 @@
 import { isCyclingPoiPoint, type ParkingPoint } from '@/lib/types';
 import { distanceMeters } from '@/lib/geo';
 
-export const parkingModelsZoom = 18;
+export const parkingModelsZoom = 17;
 export const parkingModelScale = 3.4;
 export { createParkingMesh } from './parking-model-mesh';
 export type { ParkingMesh, Vec3 } from './parking-model-mesh';

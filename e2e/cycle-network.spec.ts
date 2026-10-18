@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { installOfflineMapFixture } from './offline-map-fixtures';
 
+// The popup checks click mapped coordinates, so do not race camera animation.
+test.use({ reducedMotion: 'reduce' });
+
 test.beforeEach(async ({ context }) => {
   await installOfflineMapFixture(context);
 });

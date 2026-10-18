@@ -1025,6 +1025,13 @@ a {
   font-weight: 620;
 }
 
+.map-layers-notice {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin: 0 0 0.7rem;
+}
+
 .map-layers-option input {
   appearance: none;
   background: var(--surface-neutral);
@@ -5594,6 +5601,70 @@ a {
     0 0 0 3px rgb(15 118 110 / 24%),
     0 8px 20px var(--marker-shadow);
   color: var(--pin-selected-text);
+}
+
+/* A viewport-facing head above a fixed ground anchor, without rotating text. */
+.parking-marker-raised {
+  height: 62px;
+}
+
+.parking-marker-raised::before,
+.parking-marker-raised::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+}
+
+.parking-marker-raised::before {
+  background: radial-gradient(ellipse, rgb(12 38 34 / 38%), transparent 70%);
+  height: 10px;
+  left: 10px;
+  top: calc(50% - 5px);
+  width: 24px;
+}
+
+.parking-marker-raised::after {
+  background: linear-gradient(90deg, #244e49, #a2c9c0 45%, #3e7068);
+  border-radius: 2px 2px 3px 3px;
+  height: 10px;
+  left: 20px;
+  top: calc(50% - 10px);
+  width: 4px;
+}
+
+.parking-marker-raised > span {
+  filter: drop-shadow(0 3px 0 rgb(23 65 57 / 70%));
+  position: relative;
+  transform: translateY(-22px);
+  z-index: 1;
+}
+
+.parking-marker-raised > span::after {
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 40%),
+    transparent 45%,
+    rgb(0 25 20 / 15%)
+  );
+  border-radius: inherit;
+  content: '';
+  inset: -3px;
+  pointer-events: none;
+  position: absolute;
+}
+
+.parking-marker-raised.parking-marker-default > span::after {
+  inset: -7px;
+}
+
+.parking-marker-raised > .parking-marker-bookmark {
+  bottom: 11px;
+  position: absolute;
+  z-index: 2;
+}
+
+.parking-marker-raised > .parking-marker-bookmark::after {
+  inset: -2px;
 }
 
 .start-marker span {

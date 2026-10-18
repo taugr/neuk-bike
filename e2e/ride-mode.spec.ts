@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
 import { installOfflineMapFixture } from './offline-map-fixtures';
 
 declare global {
@@ -201,6 +202,87 @@ async function plan(page: Page) {
   await expect(
     page.getByRole('button', { name: 'Start route', exact: true }),
   ).toBeVisible();
+}
+
+for (const satellite of [false, true]) {
+  test(`traverses a rotated 3D ${satellite ? 'satellite' : 'street'} route through off-route recovery and arrival`, async ({
+    page,
+  }) => {
+    // Plan, rotate, follow four GPS updates, and finish with terrain rendering.
+    test.slow();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    const tilePath = fileURLToPath(
+      new URL('./fixtures/terrain.png', import.meta.url),
+    );
+    await page.route(
+      'https://elevation-tiles-prod.s3.amazonaws.com/**',
+      (route) => route.fulfill({ contentType: 'image/png', path: tilePath }),
+    );
+    await page.route('https://services.arcgisonline.com/**', (route) =>
+      route.fulfill({ contentType: 'image/png', path: tilePath }),
+    );
+    await page.addInitScript((imagery) => {
+      localStorage.setItem('bike-neuk-map-3d', 'true');
+      localStorage.setItem('bike-neuk-map-satellite', String(imagery));
+    }, satellite);
+    await plan(page);
+    const map = page.getByTestId('parking-map');
+    await expect(map).toHaveAttribute('data-map-terrain', 'neuk-terrain');
+    await expect
+      .poll(async () => Number(await map.getAttribute('data-map-pitch')))
+      .toBeCloseTo(55);
+    await page
+      .getByRole('button', { name: 'Start route', exact: true })
+      .click();
+    await page.evaluate(() => window.__rideTest.emit(55.954, -3.1883));
+    const marker = page.getByTestId('live-route-marker');
+    const heading = marker.locator('.live-route-heading');
+    await expect(heading).toBeVisible();
+    const originalHeading = await heading.getAttribute('style');
+    const compass = (await page
+      .getByRole('button', { name: 'Reset bearing to north' })
+      .boundingBox())!;
+    await page.mouse.move(compass.x + 22, compass.y + 22);
+    await page.mouse.down();
+    await page.mouse.move(compass.x - 90, compass.y + 22, { steps: 10 });
+    await page.mouse.up();
+    await expect(heading).not.toHaveAttribute('style', originalHeading!);
+    await expect(marker.locator('svg')).toHaveCSS('transform', 'none');
+    const expectVisiblePosition = async () => {
+      await expect
+        .poll(() =>
+          marker.evaluate((element) => {
+            const r = element.getBoundingClientRect();
+            return !!document
+              .elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)
+              ?.closest('.live-route-marker');
+          }),
+        )
+        .toBe(true);
+      await expect
+        .poll(async () => Number(await map.getAttribute('data-map-pitch')))
+        .toBeCloseTo(55);
+    };
+    // Force the follow camera to bring an off-screen GPS update into view.
+    await page.evaluate(() => window.__rideTest.emit(55.9556, -3.1883));
+    await expect(page.getByTestId('ride-next-turn')).toContainText('45 m');
+    await expectVisiblePosition();
+    await expect(marker).not.toHaveClass(/off-route/);
+    await page.evaluate(() => window.__rideTest.emit(55.954, -3.18));
+    await expect(marker).toHaveClass(/off-route/);
+    await expectVisiblePosition();
+    await page.evaluate(() => window.__rideTest.emit(55.958, -3.1883));
+    await expect(marker).not.toHaveClass(/off-route/);
+    await expectVisiblePosition();
+    await page.evaluate(() => window.__rideTest.emit(55.96, -3.1883));
+    await expect(
+      page.getByRole('button', { name: 'Done', exact: true }),
+    ).toBeVisible();
+    await expectVisiblePosition();
+    await page.getByRole('button', { name: 'Done', exact: true }).click();
+    await expect(marker).toHaveCount(0);
+    await expect(map).toHaveAttribute('data-route-source', 'cyclestreets');
+  });
 }
 
 test('guidance, audio and wake lock survive starting, recover on foreground, and release on arrival/stop', async ({

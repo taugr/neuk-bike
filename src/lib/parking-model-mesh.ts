@@ -2,6 +2,21 @@ import type { ModelKind } from './parking-model-catalog';
 
 export type Vec3 = [number, number, number];
 type Color = [number, number, number, number];
+/** Satellite-only materials retain their hue, with enough lightness to read
+ * against imagery. Geometry and the street-map palette are untouched. */
+export function satelliteParkingColor(color: Color): Color {
+  if (color[3] < 1) return [0.76, 0.9, 0.94, 0.42];
+  if (color[0] === 0.62 && color[1] === 0.71 && color[2] === 0.73)
+    return [0.94, 0.97, 0.97, 1];
+  const lightness = color[0] * 0.2126 + color[1] * 0.7152 + color[2] * 0.0722;
+  const lift = Math.max(0, (0.56 - lightness) / Math.max(0.001, 1 - lightness));
+  return [
+    color[0] + (1 - color[0]) * lift,
+    color[1] + (1 - color[1]) * lift,
+    color[2] + (1 - color[2]) * lift,
+    color[3],
+  ];
+}
 export type ParkingMesh = { opaque: Float32Array; glass: Float32Array };
 const add = (a: Vec3, b: Vec3): Vec3 => a.map((v, i) => v + b[i]) as Vec3;
 const sub = (a: Vec3, b: Vec3): Vec3 => a.map((v, i) => v - b[i]) as Vec3;
@@ -19,6 +34,7 @@ export function createParkingMesh(
   kind: ModelKind,
   covered: boolean,
   selected = false,
+  satelliteContrast = false,
 ): ParkingMesh {
   const opaque: number[] = [],
     glass: number[] = [];
@@ -27,8 +43,15 @@ export function createParkingMesh(
   const steel: Color = [0.62, 0.71, 0.73, 1];
   const frame: Color = selected ? accent : [0.19, 0.31, 0.34, 1];
   const body: Color = selected ? accent : [0.2, 0.47, 0.45, 1];
-  const vertex = (out: number[], p: Vec3, n: Vec3, color: Color) =>
+  const materials = new WeakMap<Color, Color>();
+  const vertex = (out: number[], p: Vec3, n: Vec3, color: Color) => {
+    if (satelliteContrast) {
+      if (!materials.has(color))
+        materials.set(color, satelliteParkingColor(color));
+      color = materials.get(color)!;
+    }
     out.push(...p, ...n, ...color);
+  };
   const quad = (
     out: number[],
     points: Vec3[],
@@ -168,14 +191,23 @@ export function createParkingMesh(
     for (const side of [-1, 1])
       box(x + side * 0.11, 0, 0.035, length, z, z + 0.11, frame);
   };
-  // A faint teal tint is blended into the opaque base, leaving glazing alone.
+  // Open hoops use their own feet/rails. A flat slab intersects sloping terrain
+  // and leaves a misleading wedge beneath these otherwise open fixtures.
+  const openHoops = [
+    'stands',
+    'post-hoop',
+    'loops',
+    'safe-loops',
+    'racks',
+  ].includes(kind);
+  // A faint teal tint is blended into other models' bases, leaving glazing alone.
   const ground: Color = selected
     ? [0.66, 0.8, 0.775, 1]
     : [0.72, 0.79, 0.76, 1];
-  box(0, 0, 3.4, 2.85, 0, 0.025, ground);
+  if (!openHoops) box(0, 0, 3.4, 2.85, 0, 0.025, ground);
   if (selected) {
     // A rounded outline also identifies floor bays and wooden fixtures,
-    // which have no metal frame to highlight. Lift it clear of the base slab.
+    // which have no metal frame to highlight. Lift it above ground level.
     const outline: Vec3[] = [];
     for (let corner = 0; corner < 4; corner++) {
       const x = corner === 0 || corner === 3 ? 1.53 : -1.53;

@@ -38,25 +38,58 @@
 
 ## Map controls
 
+Map layers includes an optional Satellite switch using Esri World Imagery,
+with place labels, parking and route overlays retained in both 2D and 3D.
+The choice is remembered on this device. Imagery loads only when selected;
+until it is ready, the street map stays visible. A failed connection or going
+offline returns to the street map. Satellite imagery is not included in offline
+area downloads. Detailed imagery falls back to coarser tiles where unavailable.
+Imagery credits use the same startup fade as the street map and remain available
+in the Attributions panel: © Esri, Vantor,
+Earthstar Geographics, and the GIS User Community ([World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9)).
+
 Use the compass below Map layers to see north: drag it to rotate the map,
 then tap it to face north again. Two-finger rotation on touch screens and
 right-button dragging on desktop also rotate the map. The 3D/2D button below
 the compass switches between a flat map and terrain at a 55° tilt, keeping
 the current location, zoom and bearing. The choice is remembered on this device;
 new visitors start in 2D. The compass faces north without changing the mode.
+In 3D, drag up or down with the right mouse button (or Control-drag) to tilt;
+on touch screens, slide two fingers up or down together. Normal dragging pans
+in any direction. Tilt is adjustable from 0° to 60°; 2D stays flat.
+In 3D, surrounding pins are spaced according to their on-screen positions,
+with more room between distant pins. Pan, zoom in or flatten the view to reveal
+more. Selected, saved and numbered neuks stay visible, and small camera movements
+retain existing pins where possible. This only changes the map display; the
+nearby list and parking data are unchanged.
+Parking pins in 3D have a softly bevelled, upright face, a short stem and a
+ground shadow. Their numbers remain facing the screen as the map rotates or
+tilts. Close-up model buttons retain their compact appearance.
+Live routes follow the terrain while GPS progress, off-route detection and
+arrival work as in 2D. The heading cue follows map rotation and tilt, and the
+camera pans to keep the rider in the uncovered map area. It retains the chosen
+view rather than automatically turning or flying along the route.
+The map prepares elevation before smoothly tilting into 3D, and flattens before
+removing terrain on the way back. Reduced-motion preferences skip the animation.
 3D uses [Mapzen terrain tiles](https://registry.opendata.aws/terrain-tiles/)
 with [source credits and licences](https://github.com/tilezen/joerd/blob/master/docs/attribution.md).
-At zoom 18 and closer, 3D mode shows enlarged, ground-anchored illustrations
+At zoom 17 and closer, both street and satellite 3D views show enlarged, ground-anchored illustrations
 for recognized parking types. The catalogue includes stands, post hoops, wheel
 loops, supported loops, wheel racks, two-tier and upright racks, wave racks,
 anchors, ground slots, handlebar holders, saddle rails, railings, A-frames,
 scissor racks, lockers, streetpods, sheds, shelters, bollards, floor bays,
 trees, slotted logs, planters, bench hoops, lamp posts, and bicycle docks. Covered open fixtures have a continuous curved,
-translucent roof. Models are illustrative, not surveyed dimensions, orientation,
-or fixture counts. Case, spacing, hyphens and known aliases are normalized;
+translucent roof. Open hoop and loop models retain their feet or rails without
+an artificial ground slab. Models are illustrative, not surveyed dimensions,
+orientation or fixture counts.
+Satellite imagery adds brighter metal, frames and solid materials, a thin dark
+outline and slightly fuller tubing at the first model zoom levels. Canopy glass
+has a clearer pale-blue tint and stronger reflections while remaining translucent.
+Switching imagery off restores the standard appearance of every model.
+Case, spacing, hyphens and known aliases are normalized;
 unknown, access-only, capacity-only and mixed fixture types keep their pins.
 Building extrusions flatten at this close zoom so roofs do not hide the parking
-symbols. Zoom out or switch to 2D to restore all pins. Selection, ranking,
+symbols. Zoom out or switch to 2D to return to pin symbols. Selection, ranking,
 saved badges, and keyboard access remain available. Matching types with the same
 covered status within an 18-metre group share one model; every original parking
 option keeps its normal numbered button in a spaced row beside the model.
@@ -274,7 +307,9 @@ dataset is not included in the JavaScript bundle.
 The UK National Cycle Network is a separate official Walk Wheel Cycle Trust
 snapshot. The browser loads only nearby content-addressed zoom-10 chunks and
 keeps them behind a persistent Map layers switch. Traffic-free, on-road,
-ferry, and temporarily closed segments are styled distinctly. Numbered routes
+ferry, and temporarily closed segments are styled distinctly. In 3D or satellite
+views, brighter, wider lines with a light casing and dark outer edge keep the
+network readable over terrain and imagery. Numbered routes
 use compact repeated shields, while route popups present route type, confirmed
 surface, ride quality, and lighting in a compact translated fact grid using the
 same icon language as parking details. The layer is not shown outside published

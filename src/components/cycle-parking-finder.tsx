@@ -1,4 +1,5 @@
 'use client';
+import { satelliteStorageKey } from '@/lib/map-satellite';
 import { resolveUnits } from '@/lib/units';
 import { useUnits } from '@/components/units-provider';
 
@@ -976,6 +977,21 @@ export default function CycleParkingFinder() {
   const [isCycleNetworkVisible, setIsCycleNetworkVisible] = useState(true);
   const [isDrinkingWaterVisible, setIsDrinkingWaterVisible] = useState(false);
   const [isMapLayersOpen, setIsMapLayersOpen] = useState(false);
+  const [isSatelliteVisible, setIsSatelliteVisible] = useState(false);
+  const [satelliteUnavailable, setSatelliteUnavailable] = useState(false);
+  const handleSatelliteUnavailable = useCallback(() => {
+    setIsSatelliteVisible(false);
+    setSatelliteUnavailable(true);
+  }, []);
+  useEffect(() => {
+    try {
+      setIsSatelliteVisible(
+        window.localStorage.getItem(satelliteStorageKey) === 'true',
+      );
+    } catch {
+      // The layer still works when preference storage is unavailable.
+    }
+  }, []);
   const [manualWindVisible, setManualWindVisible] = useState(false);
   const [windViewport, setWindViewport] = useState<ParkingMapBounds | null>(
     null,
@@ -6434,6 +6450,8 @@ export default function CycleParkingFinder() {
             offlineAreaSelectionBounds={offlineAreaSelectionBounds}
             cycleNetworkFeatures={cycleNetworkFeatures}
             isCycleNetworkVisible={isCycleNetworkVisible}
+            isSatelliteVisible={isSatelliteVisible}
+            onSatelliteUnavailable={handleSatelliteUnavailable}
             wind={isWindVisible && windFreshness !== 'stale' ? wind : null}
             windLabel={windLabel}
           />
@@ -6542,6 +6560,33 @@ export default function CycleParkingFinder() {
                     data-testid="map-layers-popover"
                     role="dialog"
                   >
+                    <label className="map-layers-option">
+                      <span>{t('satellite')}</span>
+                      <input
+                        aria-label={t('satellite')}
+                        checked={isSatelliteVisible}
+                        role="switch"
+                        type="checkbox"
+                        onChange={(event) => {
+                          const visible = event.target.checked;
+                          setIsSatelliteVisible(visible);
+                          setSatelliteUnavailable(false);
+                          try {
+                            window.localStorage.setItem(
+                              satelliteStorageKey,
+                              String(visible),
+                            );
+                          } catch {
+                            // Keep the in-memory choice when storage is unavailable.
+                          }
+                        }}
+                      />
+                    </label>
+                    {satelliteUnavailable ? (
+                      <p className="map-layers-notice" role="status">
+                        {t('satelliteUnavailable')}
+                      </p>
+                    ) : null}
                     {isCycleNetworkAvailable ? (
                       <label className="map-layers-option">
                         <span>
@@ -8707,6 +8752,13 @@ export default function CycleParkingFinder() {
                       Terrain sources and licences
                     </a>
                     .
+                  </span>
+                  <span>
+                    Satellite imagery: ©{' '}
+                    <a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">
+                      Esri
+                    </a>
+                    , Vantor, Earthstar Geographics, and the GIS User Community.
                   </span>
                   <span>
                     Weather data by{' '}
