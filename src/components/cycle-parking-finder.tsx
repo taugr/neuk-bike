@@ -4674,7 +4674,7 @@ export default function CycleParkingFinder() {
   }
 
   function openNewRoutePlanner(
-    source: 'menu' | 'saved-routes' | 'map' | 'webmcp' = 'saved-routes',
+    source: 'saved-routes' | 'map' | 'webmcp' = 'saved-routes',
   ) {
     beginAnalyticsJourney(source, routeDraft !== null, routeDraft !== null);
     cancelLocationRequest();
@@ -5945,19 +5945,6 @@ export default function CycleParkingFinder() {
               <div className="settings-route-actions">
                 <motion.button
                   className="settings-action-button"
-                  data-testid="plan-route"
-                  type="button"
-                  whileTap={subtleTap}
-                  onClick={() => {
-                    setIsSettingsMenuOpen(false);
-                    openNewRoutePlanner('menu');
-                  }}
-                >
-                  <Route size={15} aria-hidden="true" />
-                  <span>{t(routeDraft ? 'resumeRoute' : 'planRoute')}</span>
-                </motion.button>
-                <motion.button
-                  className="settings-action-button"
                   data-testid="open-my-routes"
                   type="button"
                   whileTap={subtleTap}
@@ -6033,7 +6020,7 @@ export default function CycleParkingFinder() {
                 <option value="metric">{t('metricUnits')}</option>
                 <option value="imperial">{t('imperialUnits')}</option>
               </select>
-              <span className="settings-label">{t('app')}</span>
+              <span className="settings-label">{t('mapSection')}</span>
               <motion.button
                 className="settings-action-button"
                 data-testid="open-offline-areas"
@@ -6046,6 +6033,7 @@ export default function CycleParkingFinder() {
               </motion.button>
               {canInstall ? (
                 <Fragment key="install-app-action">
+                  <span className="settings-label">{t('app')}</span>
                   <motion.button
                     className="settings-action-button"
                     type="button"
@@ -7443,16 +7431,17 @@ export default function CycleParkingFinder() {
                       <div className="parking-details-toolbar">
                         <motion.button
                           className="parking-details-back"
+                          aria-label={
+                            parkingView === 'saved'
+                              ? t('backToMyNeuks')
+                              : `${t('bikeNeuks')}: ${t('backToNearbyNeuks')}`
+                          }
                           type="button"
                           whileTap={subtleTap}
                           onClick={closeParkingDetails}
                         >
                           <ChevronLeft size={17} aria-hidden="true" />
-                          {t(
-                            parkingView === 'saved'
-                              ? 'backToMyNeuks'
-                              : 'backToNearbyNeuks',
-                          )}
+                          {t(parkingView === 'saved' ? 'myNeuks' : 'bikeNeuks')}
                         </motion.button>
                         <div
                           className="parking-details-utilities"
@@ -7785,9 +7774,10 @@ export default function CycleParkingFinder() {
                                 type="button"
                                 whileTap={subtleTap}
                                 onClick={showNearby}
+                                aria-label={`${t('bikeNeuks')}: ${t('showNearby')}`}
                               >
                                 <ChevronLeft size={14} aria-hidden="true" />
-                                {t('showNearby')}
+                                {t('bikeNeuks')}
                               </motion.button>
                             ) : (
                               <motion.button

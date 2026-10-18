@@ -17,6 +17,16 @@ for (const width of [320, 390, 1440]) {
     });
     await expect(route).toHaveText('Plan a route');
     await expect(route).toBeVisible();
+    const menuTrigger = page.getByRole('button', {
+      name: width < 768 ? 'Bike Neuk menu' : 'Theme settings',
+      exact: true,
+    });
+    await menuTrigger.click();
+    const menu = page.getByRole('menu');
+    await expect(menu.getByTestId('plan-route')).toHaveCount(0);
+    await expect(menu.getByTestId('open-my-routes')).toBeVisible();
+    await expect(route).toHaveCount(1);
+    await menuTrigger.click();
     const searchForm = route.locator('..');
     await expect(searchForm).toHaveClass('place-search-form');
     const routeBox = await route.boundingBox();

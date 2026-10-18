@@ -433,7 +433,9 @@ test('changes language from the mobile menu and keeps the choice', async ({
   );
 });
 
-test('keeps route planning in the mobile Bike Neuk menu', async ({ page }) => {
+test('keeps My routes in the mobile menu and opens planning from New route', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?mockGps=55.9533,-3.1883,5');
   await expect(page.getByTestId('parking-list')).toBeVisible();
@@ -447,7 +449,7 @@ test('keeps route planning in the mobile Bike Neuk menu', async ({ page }) => {
   const mobileMenu = page.locator('.settings-menu--mobile');
   await mobileMenu.locator('.settings-trigger').click();
   await expect(mobileMenu.getByText('Routes', { exact: true })).toBeVisible();
-  await expect(mobileMenu.getByTestId('plan-route')).toBeVisible();
+  await expect(mobileMenu.getByTestId('plan-route')).toHaveCount(0);
   await expect(mobileMenu.getByTestId('open-my-routes')).toContainText(
     'My routes',
   );
@@ -464,7 +466,11 @@ test('keeps route planning in the mobile Bike Neuk menu', async ({ page }) => {
     Number.parseFloat(getComputedStyle(element).top),
   );
 
-  await mobileMenu.getByTestId('plan-route').click();
+  await mobileMenu.getByTestId('open-my-routes').click();
+  await page
+    .getByRole('region', { name: 'My routes', exact: true })
+    .getByRole('button', { name: 'New route', exact: true })
+    .click();
   await page
     .getByTestId('route-destination-search')
     .getByRole('button', { name: 'Back', exact: true })
@@ -656,8 +662,7 @@ test('adds map route points continuously and calculates while editing', async ({
     .evaluate((element) => Math.round(element.getBoundingClientRect().height));
 
   const mobileMenu = page.locator('.settings-menu--mobile');
-  await mobileMenu.locator('.settings-trigger').click();
-  await mobileMenu.getByTestId('plan-route').click();
+  await page.getByTestId('plan-route-mobile').click();
   await page
     .getByTestId('route-destination-search')
     .getByRole('button', { name: 'Back', exact: true })

@@ -446,12 +446,13 @@ export function RoutePlanner({
       <footer className="route-planner-footer">
         <button
           className="route-save-button"
+          aria-label={t('saveRoute')}
           disabled={!selectedRoute || status === 'loading'}
           type="button"
           onClick={onSave}
         >
           <Save size={18} aria-hidden="true" />
-          {t('saveRoute')}
+          {t('save')}
         </button>
       </footer>
     </section>

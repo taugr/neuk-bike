@@ -107,9 +107,7 @@ test('compares destination parking and replaces only the route finish', async ({
   await page.goto('/?mockGps=55.9533,-3.1883,5');
   await expect(page.getByTestId('parking-list')).toBeVisible();
 
-  const mobileMenu = page.locator('.settings-menu--mobile');
-  await mobileMenu.locator('.settings-trigger').click();
-  await mobileMenu.getByTestId('plan-route').click();
+  await page.getByTestId('plan-route-mobile').click();
   const planner = page.getByTestId('route-journey');
   const destinationSearch = page.getByRole('region', {
     name: 'Choose destination',

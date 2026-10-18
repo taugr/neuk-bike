@@ -289,10 +289,11 @@ export function SavedRoutesPanel({
               <button
                 type="button"
                 className="is-primary"
+                aria-label={t('editRoute')}
                 onClick={() => onEdit(selectedRoute)}
               >
                 <Pencil size={17} aria-hidden="true" />
-                {t('editRoute')}
+                {t('edit')}
               </button>
             ) : null}
             <button type="button" onClick={() => setShareOpen((open) => !open)}>
@@ -315,9 +316,13 @@ export function SavedRoutesPanel({
 
           <div className="saved-route-mobile-actions">
             {selectedRoute.kind === 'planned' ? (
-              <button type="button" onClick={() => onEdit(selectedRoute)}>
+              <button
+                type="button"
+                aria-label={t('editRoute')}
+                onClick={() => onEdit(selectedRoute)}
+              >
                 <Pencil size={17} aria-hidden="true" />
-                {t('editRoute')}
+                {t('edit')}
               </button>
             ) : null}
             <button
@@ -504,7 +509,7 @@ export function SavedRoutesPanel({
         </span>
         <button type="button" className="saved-routes-new" onClick={onNewRoute}>
           <Plus size={17} aria-hidden="true" />
-          {t('planRoute')}
+          {t('newRoute')}
         </button>
       </header>
 

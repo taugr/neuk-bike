@@ -382,8 +382,9 @@ the choice is remembered on this device. No ride controls appear while planning.
 If speech is blocked, the speaker button can retry from a tap. No route text is
 sent to a remote speech service.
 
-Open the Bike Neuk menu and use **Plan a route** to start a draft or **My
-routes** to reopen routes saved on the current device. The normal Nearby sheet
+Use the route button beside **My location** to plan or resume a route. Open
+**My routes** in the Bike Neuk menu to reopen routes saved on the current device;
+**New route** inside that screen opens the planner. The normal Nearby sheet
 remains dedicated to finding cycle parking and other cycling places.
 
 Armenia routing was verified with a live Yerevan journey that returned route

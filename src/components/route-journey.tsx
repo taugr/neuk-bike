@@ -410,9 +410,14 @@ export function RouteJourney({
             {t('myRoutes')}
           </button>
           {selectedRoute ? (
-            <button type="button" disabled={tracking} onClick={onSave}>
+            <button
+              type="button"
+              aria-label={t('saveRoute')}
+              disabled={tracking}
+              onClick={onSave}
+            >
               <Bookmark size={16} />
-              {t('saveRoute')}
+              {t('save')}
             </button>
           ) : null}
         </div>
