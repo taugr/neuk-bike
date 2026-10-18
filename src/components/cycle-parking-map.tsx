@@ -1,9 +1,23 @@
 'use client';
+import type { FillExtrusionLayerSpecification } from 'maplibre-gl';
 import type { UnitSystem } from '@/lib/units';
 import { useUnits } from '@/components/units-provider';
 
 import { improveDarkMapReadability } from '@/lib/map-readability';
 import { createMapRecovery } from '@/lib/map-recovery';
+import { useMapTerrain } from '@/components/use-map-terrain';
+import { terrainPitch } from '@/lib/map-terrain';
+import {
+  buildParkingModels,
+  parkingModelButtonOffset,
+  parkingModelsZoom,
+} from '@/lib/parking-models';
+import {
+  syncParkingModels,
+  getParkingModelRenderCount,
+  getParkingModelBadgeOffset,
+  pickParkingModel,
+} from '@/lib/parking-model-layer';
 
 import * as maplibregl from 'maplibre-gl';
 import type {
@@ -121,6 +135,7 @@ type CycleParkingMapProps = {
   savedPointKeys: string[];
   route: CycleRoute | null;
   routeWaypoints?: CycleRouteWaypoint[];
+  routeDestinationParkingPoint?: ParkingPoint | null;
   pendingRouteDestination?: CycleRouteWaypoint | null;
   activeRouteWaypointId?: string | null;
   isRouteWaypointPlacementActive?: boolean;
@@ -1986,6 +2001,7 @@ export default function CycleParkingMap({
   savedPointKeys,
   route,
   routeWaypoints = [],
+  routeDestinationParkingPoint = null,
   pendingRouteDestination = null,
   activeRouteWaypointId = null,
   isRouteWaypointPlacementActive = false,
@@ -2058,6 +2074,7 @@ export default function CycleParkingMap({
     center: [number, number];
     zoom: number;
     bearing: number;
+    pitch: number;
   } | null>(null);
   const initialBasemapThemeRef = useRef(theme);
   const initialLocaleRef = useRef(locale);
@@ -2071,17 +2088,32 @@ export default function CycleParkingMap({
   > | null>(null);
   const [renderedBasemapFeatureCount, setRenderedBasemapFeatureCount] =
     useState(0);
+  const [renderedModelFeatureCount, setRenderedModelFeatureCount] = useState(0);
   const [styleRevision, setStyleRevision] = useState(0);
+  const terrain = useMapTerrain(
+    map,
+    isMapLoaded,
+    styleRevision,
+    isOfflineBasemap,
+  );
+  // Camera transitions can interrupt a toggle animation. Always use its target
+  // pitch so a route fit or discovery restore cannot strand the map halfway.
+  const terrainPitchRef = useRef(0);
+  terrainPitchRef.current = terrain.enabled ? terrainPitch : 0;
   const [selectedCycleNetworkRouteKey, setSelectedCycleNetworkRouteKey] =
     useState<string | null>(null);
   const [viewport, setViewport] = useState<{
     bounds: ParkingMapBounds | null;
     center: [number, number] | null;
     zoom: number;
+    pitch: number;
+    terrainSource: string;
   }>({
     bounds: null,
     center: null,
     zoom: 13,
+    pitch: 0,
+    terrainSource: 'none',
   });
   const cycleNetworkBundles = useMemo(
     () => getCycleNetworkRouteBundles(cycleNetworkFeatures),
@@ -2116,8 +2148,12 @@ export default function CycleParkingMap({
       const center = mapCenter
         ? ([mapCenter.lng, mapCenter.lat] satisfies [number, number])
         : null;
+      const pitch = mapRef.current?.getPitch() ?? 0;
+      const terrainSource = mapRef.current?.getTerrain()?.source ?? 'none';
       setViewport((current) => {
         if (
+          current.pitch === pitch &&
+          current.terrainSource === terrainSource &&
           current.zoom === zoom &&
           current.center?.[0] === center?.[0] &&
           current.center?.[1] === center?.[1] &&
@@ -2129,7 +2165,7 @@ export default function CycleParkingMap({
           return current;
         }
 
-        return { bounds, center, zoom };
+        return { bounds, center, zoom, pitch, terrainSource };
       });
     },
     [],
@@ -2170,6 +2206,11 @@ export default function CycleParkingMap({
         .map((point, index) => [point.id, index + 1]),
     );
   }, [rankedPoints]);
+  const highlightRouteArrival = Boolean(
+    selectedInstruction &&
+    getRouteInstructionManeuver(selectedInstruction) === 'arrive' &&
+    (routeWaypoints.length >= 2 || (isDirectionsMode && selectedPoint)),
+  );
   const savedPointKeySet = useMemo(
     () => new Set(savedPointKeys),
     [savedPointKeys],
@@ -2248,6 +2289,48 @@ export default function CycleParkingMap({
     ],
   );
 
+  const routeModelPoint =
+    isDirectionsMode && !isDestinationParkingMode
+      ? isRoutePlanningMode
+        ? routeDestinationParkingPoint
+        : selectedPoint
+      : null;
+  const showParkingModels =
+    terrain.enabled &&
+    viewport.zoom >= parkingModelsZoom &&
+    (!isDirectionsMode || routeModelPoint !== null);
+
+  useEffect(() => {
+    if (!map || !isMapLoaded || !showParkingModels) return;
+    const originals: FillExtrusionLayerSpecification[] = [];
+    const flattenBuildings = () => {
+      for (const layer of map.getStyle().layers ?? []) {
+        if (layer.type !== 'fill-extrusion') continue;
+        originals.push(layer);
+        map.setPaintProperty(layer.id, 'fill-extrusion-height', 0);
+        map.setPaintProperty(layer.id, 'fill-extrusion-base', 0);
+      }
+    };
+    if (map.isStyleLoaded()) flattenBuildings();
+    else map.once('idle', flattenBuildings);
+    return () => {
+      map.off('idle', flattenBuildings);
+      for (const layer of originals) {
+        if (!map.getLayer(layer.id)) continue;
+        map.setPaintProperty(
+          layer.id,
+          'fill-extrusion-height',
+          layer.paint?.['fill-extrusion-height'],
+        );
+        map.setPaintProperty(
+          layer.id,
+          'fill-extrusion-base',
+          layer.paint?.['fill-extrusion-base'],
+        );
+      }
+    };
+  }, [map, isMapLoaded, styleRevision, showParkingModels]);
+
   useEffect(() => {
     mobileSheetStateRef.current = mobileSheetState;
   }, [mobileSheetState]);
@@ -2290,6 +2373,9 @@ export default function CycleParkingMap({
       const mapInstance = new maplibregl.Map({
         attributionControl: false,
         bearing: savedCameraRef.current?.bearing ?? 0,
+        pitch: savedCameraRef.current?.pitch ?? 0,
+        maxPitch: 60,
+        canvasContextAttributes: { antialias: true },
         center: savedCameraRef.current?.center ?? toLngLat(defaultCenter),
         container,
         dragRotate: true,
@@ -2392,6 +2478,15 @@ export default function CycleParkingMap({
         }
       });
       mapInstance.on('idle', () => {
+        // Terrain setup may finish after a reduced-motion camera update.
+        const terrainSource = mapInstance.getTerrain()?.source ?? 'none';
+        const pitch = mapInstance.getPitch();
+        setViewport((current) =>
+          current.terrainSource === terrainSource && current.pitch === pitch
+            ? current
+            : { ...current, terrainSource, pitch },
+        );
+        setRenderedModelFeatureCount(getParkingModelRenderCount(mapInstance));
         const count = mapInstance
           .queryRenderedFeatures()
           .filter(
@@ -2416,6 +2511,7 @@ export default function CycleParkingMap({
           zoom: mapInstance.getZoom(),
         });
       });
+      mapInstance.on('terrain', updateViewport);
       mapInstance.on('zoomend', () => {
         handleViewportChange({
           bounds: getVisibleMapBounds(mapInstance),
@@ -2482,6 +2578,7 @@ export default function CycleParkingMap({
           center: [center.lng, center.lat],
           zoom: nextMap.getZoom(),
           bearing: nextMap.getBearing(),
+          pitch: nextMap.getPitch(),
         };
         nextMap.remove();
       }
@@ -2732,11 +2829,14 @@ export default function CycleParkingMap({
         center: [center.lng, center.lat],
         zoom: map.getZoom(),
         bearing: map.getBearing(),
-        pitch: map.getPitch(),
+        pitch: terrainPitchRef.current,
       };
     } else if (discoveryCameraRef.current) {
       map.stop();
-      map.jumpTo(discoveryCameraRef.current);
+      map.jumpTo({
+        ...discoveryCameraRef.current,
+        pitch: terrainPitchRef.current,
+      });
       suppressParkingViewFocusRef.current = true;
     }
   }, [map, isRoutePlanningMode]);
@@ -2765,7 +2865,7 @@ export default function CycleParkingMap({
     if (previousView === 'saved' && parkingView === 'nearby') {
       const camera = nearbyCameraRef.current;
       if (camera) {
-        map.jumpTo(camera);
+        map.jumpTo({ ...camera, pitch: terrainPitchRef.current });
       }
     }
   }, [map, parkingView]);
@@ -2856,6 +2956,7 @@ export default function CycleParkingMap({
       window.requestAnimationFrame(() => keepPopupInVisibleMapArea(map, popup));
     };
     const handleLineClick = (event: maplibregl.MapLayerMouseEvent) => {
+      if (pickParkingModel(map, event.point)) return;
       // Combined shields are informational: selecting a route from the group
       // without a distinct hit target would silently favour one route.
       if (
@@ -3081,18 +3182,50 @@ export default function CycleParkingMap({
         markerIndex > 0 && index === displayedWaypoints.length - 1,
         waypoint.id === activeRouteWaypointId,
       );
+      if (highlightRouteArrival && index === displayedWaypoints.length - 1) {
+        element.classList.add('route-destination-arrival-selected');
+      }
       element.setAttribute('aria-label', waypoint.label);
       const marker = new maplibregl.Marker({ anchor: 'bottom', element })
         .setLngLat([waypoint.longitude, waypoint.latitude])
         .addTo(map);
       routeWaypointMarkerRefs.current.set(waypoint.id, { element, marker });
     });
+    const positionDestinationBadge = () => {
+      if (!routeModelPoint) return;
+      const destination = routeWaypointMarkerRefs.current.get(
+        routeModelPoint.id,
+      );
+      if (!destination?.element) return;
+      const offset = showParkingModels
+        ? getParkingModelBadgeOffset(map, routeModelPoint.id)
+        : null;
+      destination.element.classList.toggle(
+        'route-destination-model-badge',
+        offset !== null,
+      );
+      const y = offset ?? 0;
+      if (Math.abs(destination.marker.getOffset().y - y) > 0.25) {
+        destination.marker.setOffset([0, y]);
+      }
+    };
+    map.on('render', positionDestinationBadge);
+    positionDestinationBadge();
 
     return () => {
+      map.off('render', positionDestinationBadge);
       routeWaypointMarkerRefs.current.forEach(cleanupRenderedMarker);
       routeWaypointMarkerRefs.current.clear();
     };
-  }, [activeRouteWaypointId, map, routeWaypoints, pendingRouteDestination]);
+  }, [
+    activeRouteWaypointId,
+    map,
+    routeWaypoints,
+    pendingRouteDestination,
+    showParkingModels,
+    routeModelPoint,
+    highlightRouteArrival,
+  ]);
 
   useEffect(() => {
     if (!map) {
@@ -3135,7 +3268,7 @@ export default function CycleParkingMap({
     cleanupRenderedMarker(instructionMarkerRef.current);
     instructionMarkerRef.current = null;
 
-    if (!selectedInstruction) {
+    if (!selectedInstruction || highlightRouteArrival) {
       return;
     }
 
@@ -3157,7 +3290,7 @@ export default function CycleParkingMap({
       cleanupRenderedMarker(instructionMarkerRef.current);
       instructionMarkerRef.current = null;
     };
-  }, [map, selectedInstruction]);
+  }, [map, selectedInstruction, highlightRouteArrival]);
 
   useEffect(() => {
     if (!map) {
@@ -3175,6 +3308,40 @@ export default function CycleParkingMap({
       !visiblePoints.some((point) => point.id === selectedPoint.id)
         ? [selectedPoint, ...visiblePoints]
         : visiblePoints;
+    const models = buildParkingModels(
+      showParkingModels
+        ? routeModelPoint
+          ? [routeModelPoint]
+          : reconciledVisiblePoints
+        : [],
+      routeModelPoint?.id ?? selectedPoint?.id,
+    );
+    const modelButtons = new Map(
+      (isDirectionsMode ? [] : models).flatMap((model) => {
+        const members = [...model.members].sort(
+          (a, b) =>
+            (rankedPointRanks.get(a.id) ?? Infinity) -
+              (rankedPointRanks.get(b.id) ?? Infinity) ||
+            a.id.localeCompare(b.id),
+        );
+        return members.map(
+          (point, index) =>
+            [
+              point.id,
+              {
+                model,
+                offset: parkingModelButtonOffset(index, members.length),
+              },
+            ] as const,
+        );
+      }),
+    );
+    const updateModels = () => {
+      if (!isMapLoaded) return;
+      syncParkingModels(map, models);
+    };
+    if (map.isStyleLoaded()) updateModels();
+    else map.once('idle', updateModels);
     const visiblePointIds = new Set(
       reconciledVisiblePoints.map((point) => point.id),
     );
@@ -3202,6 +3369,18 @@ export default function CycleParkingMap({
         parkingView,
         rank,
       });
+      const modelButton = modelButtons.get(point.id);
+      if (isDirectionsMode && isSelected && highlightRouteArrival) {
+        presentation.className += ' route-destination-arrival-selected';
+      }
+      const modelKind = modelButton?.model.kind;
+      const markerPosition: [number, number] = modelButton
+        ? [modelButton.model.longitude, modelButton.model.latitude]
+        : [point.longitude, point.latitude];
+      const markerOffset: [number, number] = modelButton?.offset ?? [0, 0];
+      if (modelKind) {
+        presentation.className += ' parking-marker-model';
+      }
       if (pointCategory !== 'parking') {
         presentation.className = `${presentation.className} cycling-poi-marker cycling-poi-marker-${pointCategory}`;
       }
@@ -3246,7 +3425,7 @@ export default function CycleParkingMap({
         renderedMarker.element.style.zIndex = presentation.zIndex;
         renderedMarker.popupRoot.render(popupContent);
         renderedMarker.popup?.setOffset(presentation.offset);
-        renderedMarker.marker.setLngLat([point.longitude, point.latitude]);
+        renderedMarker.marker.setLngLat(markerPosition).setOffset(markerOffset);
       } else {
         const { popup, root } = createRenderedPopup(popupContent, {
           anchor: presentation.popupAnchor,
@@ -3262,7 +3441,8 @@ export default function CycleParkingMap({
           anchor: presentation.anchor,
           element,
         })
-          .setLngLat([point.longitude, point.latitude])
+          .setLngLat(markerPosition)
+          .setOffset(markerOffset)
           .setPopup(popup)
           .addTo(map);
 
@@ -3307,6 +3487,17 @@ export default function CycleParkingMap({
       markerElement.setAttribute('role', 'button');
       markerElement.setAttribute('title', point.name);
       markerElement.dataset.testid = `parking-marker-${point.id}`;
+      if (modelButton && modelKind) {
+        markerElement.dataset.model = modelKind;
+        markerElement.dataset.modelGroup = modelButton.model.members[0].id;
+        markerElement.dataset.modelGroupSize = String(
+          modelButton.model.members.length,
+        );
+      } else {
+        delete markerElement.dataset.model;
+        delete markerElement.dataset.modelGroup;
+        delete markerElement.dataset.modelGroupSize;
+      }
       if (isSaved) {
         markerElement.dataset.saved = 'true';
       } else {
@@ -3396,6 +3587,9 @@ export default function CycleParkingMap({
         ])
         .addTo(map);
     }
+    return () => {
+      map.off('idle', updateModels);
+    };
   }, [
     canRequestDirections,
     canShowStreetView,
@@ -3420,6 +3614,11 @@ export default function CycleParkingMap({
     selectedPoint,
     savedPointKeySet,
     visiblePoints,
+    showParkingModels,
+    routeModelPoint,
+    highlightRouteArrival,
+    isMapLoaded,
+    styleRevision,
   ]);
 
   useEffect(() => {
@@ -3472,6 +3671,14 @@ export default function CycleParkingMap({
             '.parking-marker, .route-waypoint-marker, .maplibregl-popup, .maplibregl-ctrl',
           ),
         );
+
+      const modelPointId = !isInteractiveTarget
+        ? pickParkingModel(map, event.point)
+        : null;
+      if (modelPointId) {
+        parkingMarkerRefs.current.get(modelPointId)?.element?.click();
+        return;
+      }
 
       if (isRouteWaypointPlacementActive && onPlaceRouteWaypoint) {
         if (isInteractiveTarget) {
@@ -3587,10 +3794,15 @@ export default function CycleParkingMap({
         }
         isAutomaticFocusAnimationRef.current = true;
         centeredExpandedPopupPointRef.current = selectedPoint.id;
+        const focusCamera =
+          terrainPitchRef.current > 0 && zoom >= parkingModelsZoom
+            ? map.easeTo.bind(map)
+            : map.flyTo.bind(map);
         // This explicit popup focus owns the selection camera. Background
         // nearby results must not replace its flight with an overview fit.
         hasCompletedNearbySelectionFocusRef.current = true;
-        map.flyTo({
+        focusCamera({
+          pitch: terrainPitchRef.current,
           center: getPopupFocusCenter(
             map,
             parkingPointToRoutePoint(selectedPoint),
@@ -3631,6 +3843,7 @@ export default function CycleParkingMap({
 
       isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
+        pitch: terrainPitchRef.current,
         duration: 700,
         maxZoom: 17,
         padding: getFocusPadding(map),
@@ -3746,6 +3959,7 @@ export default function CycleParkingMap({
 
       isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
+        pitch: terrainPitchRef.current,
         duration: 700,
         maxZoom: 17,
         padding: getFocusPadding(map),
@@ -3762,9 +3976,13 @@ export default function CycleParkingMap({
         return;
       }
 
+      const keepModelZoom =
+        terrainPitchRef.current > 0 && map.getZoom() >= parkingModelsZoom;
+      if (keepModelZoom) hasCompletedNearbySelectionFocusRef.current = true;
       if (
         selectedPoint.id === nearestPoint?.id &&
-        mobileSheetState === 'expanded'
+        mobileSheetState === 'expanded' &&
+        !keepModelZoom
       ) {
         if (focusPoints.length >= highlightedRankCount) {
           hasCompletedNearbySelectionFocusRef.current = true;
@@ -3776,6 +3994,7 @@ export default function CycleParkingMap({
 
         isAutomaticFocusAnimationRef.current = true;
         map.fitBounds(bounds, {
+          pitch: terrainPitchRef.current,
           duration: 700,
           maxZoom: 17,
           padding: getFocusPadding(map),
@@ -3786,7 +4005,12 @@ export default function CycleParkingMap({
       const zoom = Math.max(map.getZoom(), 16);
       const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
       isAutomaticFocusAnimationRef.current = true;
-      map.flyTo({
+      // A flight briefly zooms out, which would swap models back to pins.
+      const focusCamera = keepModelZoom
+        ? map.easeTo.bind(map)
+        : map.flyTo.bind(map);
+      focusCamera({
+        pitch: terrainPitchRef.current,
         center:
           window.matchMedia('(max-width: 820px)').matches &&
           mobileSheetState === 'expanded' &&
@@ -3819,6 +4043,7 @@ export default function CycleParkingMap({
 
       isAutomaticFocusAnimationRef.current = true;
       map.fitBounds(bounds, {
+        pitch: terrainPitchRef.current,
         duration: 700,
         maxZoom: 17,
         padding: getFocusPadding(map),
@@ -3828,6 +4053,7 @@ export default function CycleParkingMap({
 
     isAutomaticFocusAnimationRef.current = false;
     map.jumpTo({
+      pitch: terrainPitchRef.current,
       center: [userLocation.longitude, userLocation.latitude],
       zoom: 16,
     });
@@ -3892,6 +4118,7 @@ export default function CycleParkingMap({
 
     const zoom = Math.max(map.getZoom(), 16);
     map.flyTo({
+      pitch: terrainPitchRef.current,
       center: getMapPointFocusCenter(
         map,
         instruction.anchor,
@@ -3920,6 +4147,9 @@ export default function CycleParkingMap({
         data-map-south={viewport.bounds?.south}
         data-map-west={viewport.bounds?.west}
         data-map-zoom={viewport.zoom}
+        data-map-pitch={viewport.pitch}
+        data-map-terrain={viewport.terrainSource}
+        data-parking-model-features={renderedModelFeatureCount}
         data-rendered-basemap-features={renderedBasemapFeatureCount}
         data-cycle-network-enabled={isCycleNetworkVisible}
         data-cycle-network-presentation={
@@ -3947,6 +4177,24 @@ export default function CycleParkingMap({
         data-testid="parking-map"
         ref={mapContainerRef}
       />
+      <button
+        className="map-terrain-toggle"
+        type="button"
+        aria-label={translate(
+          locale,
+          terrain.enabled ? 'switchTo2d' : 'switchTo3d',
+        )}
+        title={translate(locale, terrain.enabled ? 'switchTo2d' : 'switchTo3d')}
+        disabled={!isMapLoaded || isOfflineBasemap}
+        onClick={terrain.toggle}
+      >
+        {terrain.enabled ? '2D' : '3D'}
+      </button>
+      {terrain.unavailable && !isOfflineBasemap ? (
+        <div className="terrain-unavailable-notice" role="status">
+          {translate(locale, 'terrainUnavailable')}
+        </div>
+      ) : null}
       {wind && map && isMapLoaded && !isOfflineBasemap ? (
         <WindMapOverlay
           map={map}

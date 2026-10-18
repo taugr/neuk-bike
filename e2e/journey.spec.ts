@@ -325,7 +325,10 @@ for (const [width, height] of [
     await steps.locator('button').last().click();
     await expect(
       page.locator('.selected-route-instruction-marker'),
-    ).toHaveCount(1);
+    ).toHaveCount(0);
+    await expect(page.locator('.route-waypoint-marker-finish')).toHaveClass(
+      /route-destination-arrival-selected/,
+    );
   });
 }
 

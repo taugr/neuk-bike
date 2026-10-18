@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Bike Neuk · Parking models</title>
+    <style>
+      :root {
+        font-family: system-ui, sans-serif;
+        color: #203d39;
+        background: #f3f5ef;
+        font-synthesis: none;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      header,
+      main,
+      footer {
+        max-width: 1440px;
+        margin: auto;
+        padding: 28px 32px;
+      }
+      header {
+        padding-bottom: 18px;
+      }
+      .eyebrow {
+        font-size: 12px;
+        font-weight: 750;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #49726b;
+      }
+      h1 {
+        font-size: clamp(28px, 4vw, 42px);
+        letter-spacing: -0.045em;
+        margin: 10px 0;
+      }
+      p {
+        line-height: 1.55;
+        color: #57706a;
+        margin: 8px 0;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        margin-top: 20px;
+      }
+      .controls label {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        font-size: 14px;
+        min-height: 44px;
+      }
+      input[type='checkbox'] {
+        width: 19px;
+        height: 19px;
+        accent-color: #28665d;
+      }
+      input[type='range'] {
+        width: 120px;
+        accent-color: #28665d;
+      }
+      select,
+      button {
+        font: inherit;
+        min-height: 42px;
+        border: 1px solid #c5d3cb;
+        border-radius: 9px;
+        padding: 8px 12px;
+        background: #fff;
+        color: #254a42;
+      }
+      a {
+        color: #28665d;
+      }
+      main {
+        padding-top: 0;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #d8e0d8;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+      .card canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        background: #e9eee5;
+      }
+      .card section {
+        padding: 15px 18px 18px;
+      }
+      .card h2 {
+        font-size: 17px;
+        letter-spacing: -0.02em;
+        margin: 0 0 6px;
+      }
+      .card p {
+        font-size: 13px;
+        margin: 0;
+        min-height: 40px;
+      }
+      .tag {
+        font-size: 10px;
+        font-weight: 750;
+        letter-spacing: 0.08em;
+        color: #678478;
+        text-transform: uppercase;
+        float: right;
+        line-height: 21px;
+      }
+      .aliases {
+        margin-top: 12px;
+        font-size: 11px;
+        color: #73837a;
+        line-height: 1.5;
+      }
+      details {
+        margin-top: 24px;
+        border-top: 1px solid #d8e0d8;
+        padding-top: 18px;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 650;
+      }
+      #unmapped {
+        font-size: 13px;
+        line-height: 1.8;
+      }
+      footer {
+        padding-top: 0;
+        font-size: 12px;
+      }
+      #status {
+        font-size: 13px;
+      }
+      .error {
+        color: #9b301b;
+      }
+      @media (max-width: 620px) {
+        header,
+        main,
+        footer {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+        .grid {
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        .controls {
+          gap: 8px 16px;
+        }
+      }
+      body.overview .grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+      }
+      body.overview .card section {
+        padding: 8px 9px 10px;
+      }
+      body.overview .card h2 {
+        font-size: 12px;
+        margin: 0;
+      }
+      body.overview .card p,
+      body.overview .aliases,
+      body.overview .tag {
+        display: none;
+      }
+      .grid.single,
+      body.overview .grid.single {
+        grid-template-columns: minmax(0, 480px);
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">Bike Neuk · Local design preview</div>
+      <h1>Parking model gallery</h1>
+      <p>
+        Illustrative models from the map. Rotate them, add a canopy, or
+        highlight a selection.
+      </p>
+      <div class="controls">
+        <label
+          >Show
+          <select id="family">
+            <option value="all">All models</option>
+          </select></label
+        >
+        <label><input id="cover" type="checkbox" /> Covered</label>
+        <label><input id="selected" type="checkbox" /> Selected</label>
+        <label
+          >Rotate
+          <input
+            id="rotation"
+            aria-label="Rotate models"
+            type="range"
+            min="0"
+            max="360"
+            value="28"
+        /></label>
+        <label
+          >Tilt
+          <input
+            id="tilt"
+            aria-label="Tilt models"
+            type="range"
+            min="15"
+            max="75"
+            value="32"
+        /></label>
+        <button id="reset">Reset view</button>
+        <button id="overview" aria-pressed="false">Overview</button>
+      </div>
+      <p id="status" role="status">Preparing models…</p>
+    </header>
+    <main>
+      <div class="grid" id="models"></div>
+      <details>
+        <summary>Dataset coverage and remaining pins</summary>
+        <p id="coverage"></p>
+        <p>
+          Unspecified, ambiguous and mixed types retain their normal map pins.
+          These examples do not claim surveyed dimensions, orientation or
+          capacity. A shelter has its own roof; enclosed stores and lockers do
+          not get an extra canopy.
+        </p>
+        <div id="unmapped"></div>
+      </details>
+    </main>
+    <footer>
+      <a href="http://127.0.0.1:4181/?mockGps=55.9533,-3.1883,5"
+        >Return to the map preview</a
+      >
+      · Shape definitions informed by
+      <a href="https://wiki.openstreetmap.org/wiki/Key:bicycle_parking"
+        >OpenStreetMap</a
+      >.
+    </footer>
+    <script type="module">
+      import { createParkingMesh } from './mesh.js';
+      import { parkingModelCatalog } from './catalog.js';
+      import { parkingVertexShader, parkingFragmentShader } from './shaders.js';
+      const status = document.querySelector('#status');
+      try {
+        // One WebGL context renders all cards; each card keeps a 2D snapshot.
+        const surface = document.createElement('canvas');
+        surface.width = 640;
+        surface.height = 420;
+        const gl = surface.getContext('webgl2', {
+          antialias: true,
+          alpha: false,
+          preserveDrawingBuffer: true,
+        });
+        if (!gl) throw new Error('WebGL is unavailable in this browser.');
+        const compile = (type, source) => {
+          const shader = gl.createShader(type);
+          gl.shaderSource(shader, source);
+          gl.compileShader(shader);
+          if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+            throw new Error(gl.getShaderInfoLog(shader));
+          return shader;
+        };
+        const program = gl.createProgram();
+        for (const [type, source] of [
+          [gl.VERTEX_SHADER, parkingVertexShader],
+          [gl.FRAGMENT_SHADER, parkingFragmentShader],
+        ]) {
+          const shader = compile(type, source);
+          gl.attachShader(program, shader);
+          gl.deleteShader(shader);
+        }
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+          throw new Error(gl.getProgramInfoLog(program));
+        gl.useProgram(program);
+        gl.bindVertexArray(gl.createVertexArray());
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        for (const [location, size, offset] of [
+          [0, 3, 0],
+          [1, 3, 12],
+          [2, 4, 24],
+        ]) {
+          gl.enableVertexAttribArray(location);
+          gl.vertexAttribPointer(location, size, gl.FLOAT, false, 40, offset);
+        }
+        const matrix = gl.getUniformLocation(program, 'u_matrix');
+        const view = gl.getUniformLocation(program, 'u_view');
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+        gl.disable(gl.CULL_FACE);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        gl.viewport(0, 0, surface.width, surface.height);
+        const cover = document.querySelector('#cover'),
+          selected = document.querySelector('#selected');
+        const rotation = document.querySelector('#rotation'),
+          tilt = document.querySelector('#tilt'),
+          family = document.querySelector('#family');
+        const grid = document.querySelector('#models');
+        const original = new Set([
+          'stands',
+          'loops',
+          'racks',
+          'lockers',
+          'shed',
+          'bollard',
+        ]);
+        const cards = parkingModelCatalog.map((model) => {
+          const option = document.createElement('option');
+          option.value = model.kind;
+          option.textContent = model.title;
+          family.append(option);
+          const card = document.createElement('article');
+          card.className = 'card';
+          card.dataset.model = model.kind;
+          const canvas = document.createElement('canvas');
+          canvas.width = surface.width;
+          canvas.height = surface.height;
+          canvas.setAttribute('role', 'img');
+          canvas.setAttribute('aria-label', model.title + ' 3D model');
+          const section = document.createElement('section'),
+            tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = original.has(model.kind) ? 'Updated' : 'New';
+          const h = document.createElement('h2');
+          h.textContent = model.title;
+          const p = document.createElement('p');
+          p.textContent = model.description;
+          const aliases = document.createElement('div');
+          aliases.className = 'aliases';
+          aliases.textContent =
+            model.aliases.slice(0, 4).join(' · ') +
+            (model.aliases.length > 4
+              ? ` · +${model.aliases.length - 4} aliases`
+              : '');
+          aliases.title = model.aliases.join(', ');
+          section.append(tag, h, p, aliases);
+          card.append(canvas, section);
+          grid.append(card);
+          return { model, card, canvas, context: canvas.getContext('2d') };
+        });
+        const cache = new Map();
+        function render() {
+          grid.classList.toggle('single', family.value !== 'all');
+          const a = (Number(rotation.value) * Math.PI) / 180,
+            e = (Number(tilt.value) * Math.PI) / 180;
+          const c = Math.cos(a),
+            s = Math.sin(a),
+            ce = Math.cos(e),
+            se = Math.sin(e);
+          gl.uniform3f(view, s * ce, -c * ce, se);
+          let count = 0;
+          for (const item of cards) {
+            item.card.hidden =
+              family.value !== 'all' && family.value !== item.model.kind;
+            if (item.card.hidden) continue;
+            const key = `${item.model.kind}/${cover.checked}/${selected.checked}`;
+            if (!cache.has(key))
+              cache.set(
+                key,
+                createParkingMesh(
+                  item.model.kind,
+                  cover.checked,
+                  selected.checked,
+                ),
+              );
+            const mesh = cache.get(key);
+            let left = Infinity,
+              right = -Infinity,
+              bottom = Infinity,
+              top = -Infinity;
+            for (const data of [mesh.opaque, mesh.glass])
+              for (let i = 0; i < data.length; i += 10) {
+                const x = c * data[i] + s * data[i + 1];
+                const y =
+                  -s * se * data[i] + c * se * data[i + 1] + ce * data[i + 2];
+                left = Math.min(left, x);
+                right = Math.max(right, x);
+                bottom = Math.min(bottom, y);
+                top = Math.max(top, y);
+              }
+            const aspect = surface.width / surface.height;
+            const sx = Math.min(
+                1.8 / (right - left),
+                1.8 / (aspect * (top - bottom)),
+              ),
+              sy = sx * aspect,
+              sz = 0.17;
+            gl.uniformMatrix4fv(
+              matrix,
+              false,
+              new Float32Array([
+                c * sx,
+                -s * se * sy,
+                -s * ce * sz,
+                0,
+                s * sx,
+                c * se * sy,
+                c * ce * sz,
+                0,
+                0,
+                ce * sy,
+                -se * sz,
+                0,
+                (-(left + right) / 2) * sx,
+                (-(bottom + top) / 2) * sy,
+                0,
+                1,
+              ]),
+            );
+
+            gl.depthMask(true);
+            gl.clearColor(0.914, 0.933, 0.898, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            for (const [data, opaque] of [
+              [mesh.opaque, true],
+              [mesh.glass, false],
+            ]) {
+              gl.depthMask(opaque);
+              gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
+              gl.drawArrays(gl.TRIANGLES, 0, data.length / 10);
+            }
+            item.context.clearRect(0, 0, surface.width, surface.height);
+            item.context.drawImage(surface, 0, 0);
+            count++;
+          }
+          status.textContent = `${count} of ${cards.length} models · ${cover.checked ? 'Covered' : 'Uncovered'} view`;
+        }
+        for (const control of [cover, selected, rotation, tilt, family])
+          control.addEventListener('input', render);
+        document.querySelector('#reset').addEventListener('click', () => {
+          cover.checked = false;
+          selected.checked = false;
+          rotation.value = '28';
+          tilt.value = '32';
+          family.value = 'all';
+          render();
+        });
+        document
+          .querySelector('#overview')
+          .addEventListener('click', (event) => {
+            const compact = document.body.classList.toggle('overview');
+            event.currentTarget.setAttribute('aria-pressed', String(compact));
+            event.currentTarget.textContent = compact
+              ? 'Show details'
+              : 'Overview';
+          });
+        render();
+        const report = await fetch('./coverage.json').then((r) => r.json());
+        document.querySelector('#coverage').textContent =
+          `${report.modeled.toLocaleString()} of ${report.total.toLocaleString()} parking records have a model. ${report.unspecified.toLocaleString()} records have no specified type.`;
+        document.querySelector('#unmapped').textContent =
+          'Other pins: ' +
+          report.unmapped.map((x) => `${x.type} (${x.count})`).join(' · ');
+      } catch (error) {
+        status.textContent = error.message;
+        status.classList.add('error');
+        throw error;
+      }
+    </script>
+  </body>
+</html>

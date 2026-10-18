@@ -40,7 +40,41 @@
 
 Use the compass below Map layers to see north: drag it to rotate the map,
 then tap it to face north again. Two-finger rotation on touch screens and
-right-button dragging on desktop also rotate the map. The map stays flat.
+right-button dragging on desktop also rotate the map. The 3D/2D button below
+the compass switches between a flat map and terrain at a 55° tilt, keeping
+the current location, zoom and bearing. The choice is remembered on this device;
+new visitors start in 2D. The compass faces north without changing the mode.
+3D uses [Mapzen terrain tiles](https://registry.opendata.aws/terrain-tiles/)
+with [source credits and licences](https://github.com/tilezen/joerd/blob/master/docs/attribution.md).
+At zoom 18 and closer, 3D mode shows enlarged, ground-anchored illustrations
+for recognized parking types. The catalogue includes stands, post hoops, wheel
+loops, supported loops, wheel racks, two-tier and upright racks, wave racks,
+anchors, ground slots, handlebar holders, saddle rails, railings, A-frames,
+scissor racks, lockers, streetpods, sheds, shelters, bollards, floor bays,
+trees, slotted logs, planters, bench hoops, lamp posts, and bicycle docks. Covered open fixtures have a continuous curved,
+translucent roof. Models are illustrative, not surveyed dimensions, orientation,
+or fixture counts. Case, spacing, hyphens and known aliases are normalized;
+unknown, access-only, capacity-only and mixed fixture types keep their pins.
+Building extrusions flatten at this close zoom so roofs do not hide the parking
+symbols. Zoom out or switch to 2D to restore all pins. Selection, ranking,
+saved badges, and keyboard access remain available. Matching types with the same
+covered status within an 18-metre group share one model; every original parking
+option keeps its normal numbered button in a spaced row beside the model.
+Groups have a bounded diameter so separate nearby sites do not chain together.
+During route planning and guidance, close zoom shows only the destination's
+parking model in the selected teal style, with its destination marker retained.
+The marker sits above the model with a short connecting line. Selecting the
+arrival instruction highlights this marker instead of adding a second pin.
+Ordinary place destinations and the route overview keep their simple markers.
+
+For a local visual catalogue, run `pnpm preview:parking-models`, then
+`python3 -m http.server 4190 --bind 127.0.0.1 --directory output/parking-model-gallery`.
+Open `http://127.0.0.1:4190/` to rotate every model, toggle covered and selected
+states, and inspect dataset coverage. The gallery uses the map's actual meshes
+and shaders; its generated output stays outside the production export.
+
+Elevation loads only in 3D and is not included in offline-area downloads.
+Unavailable elevation returns the map to 2D. Switching respects reduced motion.
 Map-source credits appear as a plain line at startup, below the search bar on
 phones and in the lower-right corner on desktop, then fade out after five
 seconds. Full attribution links remain available in the Attributions panel.

@@ -478,6 +478,9 @@ const en = {
   zoomIn: 'Zoom in',
   zoomOut: 'Zoom out',
   resetBearing: 'Reset bearing to north',
+  switchTo3d: 'Switch to 3D map',
+  switchTo2d: 'Switch to 2D map',
+  terrainUnavailable: '3D terrain unavailable. Showing 2D map.',
   closePopup: 'Close popup',
   toggleAttribution: 'Toggle attribution',
 } as const;
@@ -995,6 +998,9 @@ const gd: MessageCatalogue = {
   zoomIn: 'Sùm a-steach',
   zoomOut: 'Sùm a-mach',
   resetBearing: 'Ath-shuidhich gu tuath',
+  switchTo3d: 'Seall mapa 3D',
+  switchTo2d: 'Seall mapa 2D',
+  terrainUnavailable: 'Chan eil talamh 3D ri fhaighinn. A’ sealltainn mapa 2D.',
   closePopup: 'Dùin a’ phriob-uinneag',
   toggleAttribution: 'Seall no falaich aithneachaidhean',
 };
@@ -1488,6 +1494,9 @@ const es: MessageCatalogue = {
   zoomIn: 'Acercar',
   zoomOut: 'Alejar',
   resetBearing: 'Restablecer orientación al norte',
+  switchTo3d: 'Cambiar a mapa 3D',
+  switchTo2d: 'Cambiar a mapa 2D',
+  terrainUnavailable: 'Relieve 3D no disponible. Mostrando mapa 2D.',
   closePopup: 'Cerrar ventana',
   toggleAttribution: 'Mostrar u ocultar atribuciones',
 };
@@ -1980,6 +1989,9 @@ const hy: MessageCatalogue = {
   zoomIn: 'Մեծացնել',
   zoomOut: 'Փոքրացնել',
   resetBearing: 'Վերականգնել հյուսիսային ուղղությունը',
+  switchTo3d: 'Անցնել 3D քարտեզի',
+  switchTo2d: 'Անցնել 2D քարտեզի',
+  terrainUnavailable: '3D ռելիեֆը հասանելի չէ։ Ցուցադրվում է 2D քարտեզը։',
   closePopup: 'Փակել պատուհանը',
   toggleAttribution: 'Ցույց տալ կամ թաքցնել աղբյուրները',
 };

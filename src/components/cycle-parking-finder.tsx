@@ -2795,6 +2795,35 @@ export default function CycleParkingFinder() {
     routePlacementHasChanges
       ? (routeDraft.waypoints.at(-1)?.id ?? null)
       : null;
+  const routeParkingDestinationId =
+    routeWorkspaceWaypoints.at(-1)?.source === 'parking'
+      ? routeWorkspaceWaypoints.at(-1)!.id
+      : null;
+  const routeDestinationParkingPoint =
+    parkingPoints.find((point) => point.id === routeParkingDestinationId) ??
+    null;
+  useEffect(() => {
+    const client = parkingDataClient.current;
+    if (!client || !parkingManifest || !routeParkingDestinationId) return;
+    let cancelled = false;
+    void client
+      .loadPoint(routeParkingDestinationId)
+      .then(() => {
+        if (cancelled) return;
+        setParkingPoints((current) =>
+          keepParkingPointsWhenUnchanged(
+            current,
+            prepareDisplayPoints(client.getLoadedPoints(), localeRef.current),
+          ),
+        );
+      })
+      .catch(() => {
+        // The destination marker remains usable when its parking data is offline.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [parkingManifest, routeParkingDestinationId]);
   const displayedRoute = routeWorkspaceRoute ?? activeRoute;
   const mapUserLocation = locationState.location;
   const showRouteCurrentLocation = useMemo(
@@ -6335,6 +6364,7 @@ export default function CycleParkingFinder() {
             savedPointKeys={[...savedKeys]}
             route={displayedRoute}
             routeWaypoints={routeWorkspaceWaypoints}
+            routeDestinationParkingPoint={routeDestinationParkingPoint}
             pendingRouteDestination={
               routeWorkspaceView === 'planner'
                 ? pendingJourneyDestination
@@ -8674,6 +8704,17 @@ export default function CycleParkingFinder() {
                     {' · '}Data from{' '}
                     <a href="https://www.openstreetmap.org/copyright">
                       OpenStreetMap
+                    </a>
+                    .
+                  </span>
+                  <span>
+                    Elevation:{' '}
+                    <a href="https://registry.opendata.aws/terrain-tiles/">
+                      Mapzen terrain tiles
+                    </a>
+                    {' · '}
+                    <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">
+                      Terrain sources and licences
                     </a>
                     .
                   </span>
