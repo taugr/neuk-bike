@@ -295,6 +295,10 @@ function applyMapLibreLocale(map: MapLibreMap, locale: AppLocale) {
     localizedLabels['NavigationControl.ZoomOut'],
   );
   updateControlLabel(
+    '.maplibregl-ctrl-compass',
+    localizedLabels['NavigationControl.ResetBearing'],
+  );
+  updateControlLabel(
     '.maplibregl-ctrl-attrib-button',
     localizedLabels['AttributionControl.ToggleAttribution'],
   );
@@ -2053,6 +2057,7 @@ export default function CycleParkingMap({
   const savedCameraRef = useRef<{
     center: [number, number];
     zoom: number;
+    bearing: number;
   } | null>(null);
   const initialBasemapThemeRef = useRef(theme);
   const initialLocaleRef = useRef(locale);
@@ -2260,6 +2265,7 @@ export default function CycleParkingMap({
 
     const abortController = new AbortController();
     let nextMap: MapLibreMap | null = null;
+    let attributionHideTimer: number | undefined;
     let isDisposed = false;
     const stopAutomaticFocusOnInteraction = () => {
       if (selectedPointIdRef.current !== null) {
@@ -2283,9 +2289,10 @@ export default function CycleParkingMap({
 
       const mapInstance = new maplibregl.Map({
         attributionControl: false,
+        bearing: savedCameraRef.current?.bearing ?? 0,
         center: savedCameraRef.current?.center ?? toLngLat(defaultCenter),
         container,
-        dragRotate: false,
+        dragRotate: true,
         locale: getMapLibreLocale(initialLocaleRef.current),
         minZoom: 1,
         pitchWithRotate: false,
@@ -2296,7 +2303,6 @@ export default function CycleParkingMap({
       nextMap = mapInstance;
       basemapHasErrorsRef.current = offlineBasemap;
       setIsOfflineBasemap(offlineBasemap);
-      mapInstance.touchZoomRotate.disableRotation();
       container.addEventListener(
         'pointerdown',
         stopAutomaticFocusOnInteraction,
@@ -2312,12 +2318,20 @@ export default function CycleParkingMap({
       const navigationControl = new maplibregl.NavigationControl({
         showCompass: false,
       });
+      const compassControl = new maplibregl.NavigationControl({
+        showCompass: true,
+        showZoom: false,
+      });
       const attributionControl = new maplibregl.AttributionControl({
         compact: false,
       });
 
       mapInstance.addControl(navigationControl, 'top-left');
+      mapInstance.addControl(compassControl, 'top-right');
       mapInstance.addControl(attributionControl, 'bottom-right');
+      const attributionElement = container.querySelector<HTMLDetailsElement>(
+        '.maplibregl-ctrl-attrib',
+      );
       mapInstance.setMissingStyleImageResolver((id) => {
         if (mapInstance.hasImage(id)) {
           return;
@@ -2343,6 +2357,22 @@ export default function CycleParkingMap({
       mapInstance.on('load', () => {
         initiallyLoaded = true;
         handleMapReady();
+        // Keep credits readable at startup; full links remain available in the
+        // app's Attributions panel after the on-map line fades away.
+        attributionHideTimer = window.setTimeout(
+          () => attributionElement?.classList.add('map-attribution-hidden'),
+          5_000,
+        );
+        attributionElement?.addEventListener('focusin', () =>
+          window.clearTimeout(attributionHideTimer),
+        );
+        attributionElement?.addEventListener('focusout', (event) => {
+          if (
+            !attributionElement.contains(event.relatedTarget as Node | null)
+          ) {
+            attributionElement.classList.add('map-attribution-hidden');
+          }
+        });
       });
       mapInstance.on('style.load', () => {
         if (initiallyLoaded) handleMapReady();
@@ -2416,6 +2446,7 @@ export default function CycleParkingMap({
 
     return () => {
       isDisposed = true;
+      window.clearTimeout(attributionHideTimer);
       abortController.abort();
       container.removeEventListener(
         'pointerdown',
@@ -2450,6 +2481,7 @@ export default function CycleParkingMap({
         savedCameraRef.current = {
           center: [center.lng, center.lat],
           zoom: nextMap.getZoom(),
+          bearing: nextMap.getBearing(),
         };
         nextMap.remove();
       }

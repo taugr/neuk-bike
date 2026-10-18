@@ -8669,6 +8669,15 @@ export default function CycleParkingFinder() {
                 <DataFreshness locale={locale} />
                 <div className="attribution-details">
                   <span>
+                    <a href="https://openfreemap.org/">OpenFreeMap</a> ·{' '}
+                    <a href="https://www.openmaptiles.org/">© OpenMapTiles</a>
+                    {' · '}Data from{' '}
+                    <a href="https://www.openstreetmap.org/copyright">
+                      OpenStreetMap
+                    </a>
+                    .
+                  </span>
+                  <span>
                     Weather data by{' '}
                     <a href="https://open-meteo.com/">Open-Meteo</a> ·{' '}
                     <a href="https://open-meteo.com/en/licence">

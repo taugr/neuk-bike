@@ -103,8 +103,7 @@ test('arrows follow map rotation and keep their mobile-readable size through zoo
   const arrow = page.locator('.wind-map-arrow').first();
   await expect(arrow).toBeVisible();
   const before = Number(await arrow.getAttribute('data-bearing'));
-  // This app deliberately disables pointer/touch rotation. MapLibre's keyboard
-  // camera rotation exercises projected bearings without changing that UX.
+  // Keyboard rotation also keeps the wind direction aligned with the map.
   await page.locator('.maplibregl-canvas').focus();
   await page.keyboard.press('Shift+ArrowRight');
   await expect

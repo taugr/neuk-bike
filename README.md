@@ -36,6 +36,15 @@
   and National Cycle Network access
 - Use the interface in English, Scottish Gaelic, Spanish, or Armenian
 
+## Map controls
+
+Use the compass below Map layers to see north: drag it to rotate the map,
+then tap it to face north again. Two-finger rotation on touch screens and
+right-button dragging on desktop also rotate the map. The map stays flat.
+Map-source credits appear as a plain line at startup, below the search bar on
+phones and in the lower-right corner on desktop, then fade out after five
+seconds. Full attribution links remain available in the Attributions panel.
+
 ## Wind forecast
 
 **Wind forecast** is available in Map layers, off by default. The Layers
