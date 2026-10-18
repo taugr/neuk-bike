@@ -16,6 +16,9 @@ const captures: typeof CaptureType = JSON.parse(
 import { windRegion, parseRegionalWind } from '../src/lib/regional-wind';
 import { sampleProviderWind } from '../src/lib/provider-wind';
 const now = new Date('2026-10-16T16:50:00Z');
+// Local runs have no retries; preserve the original failure's network/timing
+// evidence instead of only recording a later retry that may pass.
+test.use({ trace: 'retain-on-failure' });
 async function enable(page: Page) {
   await page.getByTestId('map-layers-trigger').click();
   await page.getByTestId('wind-layer-toggle').check();
@@ -102,35 +105,100 @@ test('new region cannot reuse Edinburgh or another city; saved region survives r
 }) => {
   await installOfflineMapFixture(context);
   await page.clock.setFixedTime(now);
-  let requests = 0;
-  await page.route('https://api.open-meteo.com/v1/forecast*', (r) => {
-    requests++;
-    const q = new URL(r.request().url()).searchParams;
-    const lng = Number(q.get('longitude')!.split(',')[0]);
-    const capture = captures.find(
-      (c) => c.provenance.name === (lng > 40 ? 'Yerevan' : 'Madrid'),
-    )!;
-    return r.fulfill({ json: capture.response });
+  const cities = ['Yerevan', 'Madrid'].map((name) =>
+    captures.find((capture) => capture.provenance.name === name)!,
+  );
+  const requests: {
+    model: string | null;
+    latitude: number[];
+    longitude: number[];
+  }[] = [];
+  const requestGrid = (url: string) => {
+    const query = new URL(url).searchParams;
+    return {
+      model: query.get('models'),
+      latitude: (query.get('latitude') ?? '').split(',').map(Number),
+      longitude: (query.get('longitude') ?? '').split(',').map(Number),
+    };
+  };
+  await page.route('https://api.open-meteo.com/v1/forecast*', (route) => {
+    const grid = requestGrid(route.request().url());
+    requests.push(grid);
+    const capture = cities.find(
+      ({ provenance }) =>
+        JSON.stringify(requestGrid(provenance.url)) === JSON.stringify(grid),
+    );
+    // A request for an intermediate viewport must not receive another city's
+    // otherwise plausible fixture. The request list identifies any mismatch.
+    return capture
+      ? route.fulfill({ json: capture.response })
+      : route.fulfill({ status: 503, body: 'Unexpected forecast grid' });
   });
-  await page.goto('/?lat=40.1777&lng=44.5126');
-  await enable(page);
-  await expect(page.locator('.wind-map-arrow').first()).toBeVisible();
+  const visit = async (capture: (typeof cities)[number]) => {
+    const [longitude, latitude] = capture.provenance.point;
+    await page.goto(`/?lat=${latitude}&lng=${longitude}`);
+    await expect(page.getByTestId('parking-list')).toBeVisible();
+    // Wait for startup framing to reach the requested forecast region before
+    // enabling wind. A visible arrow alone does not identify its request grid.
+    const region = windRegion({
+      west: longitude - 0.01,
+      east: longitude + 0.01,
+      south: latitude - 0.01,
+      north: latitude + 0.01,
+    })!;
+    await expect
+      .poll(async () => {
+        const bounds = await page
+          .getByTestId('parking-map')
+          .evaluate((map) => ({
+            west: Number(map.getAttribute('data-map-west')),
+            east: Number(map.getAttribute('data-map-east')),
+            south: Number(map.getAttribute('data-map-south')),
+            north: Number(map.getAttribute('data-map-north')),
+          }));
+        return windRegion(bounds)?.key;
+      })
+      .toBe(region.key);
+    await enable(page);
+    await expect(page.getByTestId('wind-layer-status')).toHaveAttribute(
+      'data-state',
+      'available',
+    );
+    await expect(page.locator('.wind-map-arrow').first()).toBeVisible();
+    await expect
+      .poll(async () => {
+        const value = await page
+          .locator('.wind-map-arrow')
+          .first()
+          .getAttribute('data-longitude');
+        return value !== null && Math.abs(Number(value) - longitude) < 0.5;
+      })
+      .toBe(true);
+    // Verify persistence before leaving the page, not only rendered arrows.
+    await expect
+      .poll(() =>
+        page.evaluate((key) => {
+          const entries = JSON.parse(
+            sessionStorage.getItem('neuk-regional-wind-v1') ?? '[]',
+          );
+          return entries.some(
+            (entry: { key: string; capturedAt: number }) =>
+              entry.key === key && entry.capturedAt <= Date.now(),
+          );
+        }, region.key),
+      )
+      .toBe(true);
+  };
+  await visit(cities[0]);
+  expect(requests).toEqual([requestGrid(cities[0].provenance.url)]);
   await page.clock.setFixedTime(new Date(now.getTime() + 20000));
-  await page.goto('/?lat=40.4168&lng=-3.7038');
-  await page.clock.setFixedTime(new Date(now.getTime() + 20000));
-  await enable(page);
-  await expect(page.locator('.wind-map-arrow').first()).toBeVisible();
-  expect(
-    await page
-      .locator('.wind-map-arrow')
-      .first()
-      .getAttribute('data-longitude'),
-  ).toMatch(/^-/);
-  expect(requests).toBe(2);
-  await page.goto('/?lat=40.1777&lng=44.5126');
-  await enable(page);
-  await expect(page.locator('.wind-map-arrow').first()).toBeVisible();
-  expect(requests).toBe(2);
+  await visit(cities[1]);
+  const expectedRequests = cities.map(({ provenance }) =>
+    requestGrid(provenance.url),
+  );
+  expect(requests).toEqual(expectedRequests);
+  await visit(cities[0]);
+  expect(requests).toEqual(expectedRequests);
 });
 
 test('failed regional request has no Edinburgh fallback; cancelled request cannot repaint', async ({
