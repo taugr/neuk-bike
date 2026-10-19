@@ -25,6 +25,109 @@ test.beforeEach(async ({ context }) => {
   );
 });
 
+for (const [satellite, terrain] of [
+  [true, false],
+  [true, true],
+  [false, true],
+]) {
+  test(`saved ${satellite ? 'satellite' : 'street'} starts in ${terrain ? '3D' : '2D'} without a mode transition`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.addInitScript(
+      ({ satellite, terrain }) => {
+        localStorage.setItem('bike-neuk-map-satellite', String(satellite));
+        localStorage.setItem('bike-neuk-map-3d', String(terrain));
+        const frames: { satellite: string | undefined; pitch: number }[] = [];
+        Object.assign(window, { startupMapFrames: frames });
+        const sample = () => {
+          const map = document.querySelector<HTMLElement>('.bike-map');
+          const canvas = map?.querySelector('canvas');
+          if (canvas && getComputedStyle(canvas).visibility === 'visible') {
+            frames.push({
+              satellite: map?.dataset.mapSatellite,
+              pitch: Number(map?.dataset.mapPitch),
+            });
+          }
+          requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      },
+      { satellite, terrain },
+    );
+    let release: () => void = () => {};
+    const waiting = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let requested = false;
+    await page.route(
+      satellite
+        ? imageryPattern
+        : 'https://elevation-tiles-prod.s3.amazonaws.com/**',
+      async (route) => {
+        requested = true;
+        await waiting;
+        await route.fulfill({ contentType: 'image/png', path: tilePath });
+      },
+    );
+    try {
+      await page.goto(appUrl);
+      const map = page.getByTestId('parking-map');
+      await expect.poll(() => requested).toBe(true);
+      await expect(map).toHaveAttribute('data-map-initializing', 'true');
+      await expect(page.locator('.maplibregl-canvas')).toBeHidden();
+      release();
+      await expect(map).toHaveAttribute('data-map-initializing', 'false');
+      await expect(page.locator('.maplibregl-canvas')).toBeVisible();
+      await expect
+        .poll(async () =>
+          page.evaluate(
+            () =>
+              (window as unknown as { startupMapFrames: unknown[] })
+                .startupMapFrames.length,
+          ),
+        )
+        .toBeGreaterThan(0);
+      const frames = await page.evaluate(
+        () =>
+          (
+            window as unknown as {
+              startupMapFrames: { satellite: string; pitch: number }[];
+            }
+          ).startupMapFrames,
+      );
+      expect(
+        frames.every(
+          (frame) => frame.satellite === (satellite ? 'ready' : 'off'),
+        ),
+      ).toBe(true);
+      expect(
+        frames.every(
+          (frame) => Math.abs(frame.pitch - (terrain ? 55 : 0)) < 0.01,
+        ),
+      ).toBe(true);
+    } finally {
+      release();
+    }
+  });
+}
+
+test('saved satellite falls back visibly when imagery fails at startup', async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem('bike-neuk-map-satellite', 'true'),
+  );
+  await page.route(imageryPattern, (route) => route.fulfill({ status: 503 }));
+  await page.goto(appUrl);
+  await expect(page.getByTestId('parking-map')).toHaveAttribute(
+    'data-map-initializing',
+    'false',
+  );
+  await expectRenderedBasemap(page);
+  await expect(page.locator('.maplibregl-canvas')).toBeVisible();
+});
+
 for (const width of [320, 390, 1440]) {
   test(`satellite preserves camera, credits, overlays and preference at ${width}px`, async ({
     page,

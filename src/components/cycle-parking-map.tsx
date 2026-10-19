@@ -1944,6 +1944,8 @@ export default function CycleParkingMap({
   const activeBasemapThemeRef = useRef(theme);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isMapStyleLoaded, setIsMapStyleLoaded] = useState(false);
+  const [hasPresentedMap, setHasPresentedMap] = useState(false);
   const [isOfflineBasemap, setIsOfflineBasemap] = useState(false);
   const basemapHasErrorsRef = useRef(false);
   const basemapRecoveryRef = useRef<ReturnType<
@@ -1956,7 +1958,7 @@ export default function CycleParkingMap({
   const basemapLayerIdsRef = useRef<string[]>([]);
   const satelliteLoaded = useMapSatellite(
     map,
-    isMapLoaded,
+    isMapStyleLoaded,
     styleRevision,
     isOfflineBasemap,
     isSatelliteVisible,
@@ -1965,10 +1967,20 @@ export default function CycleParkingMap({
   );
   const terrain = useMapTerrain(
     map,
-    isMapLoaded,
+    isMapStyleLoaded,
     styleRevision,
     isOfflineBasemap,
   );
+  // Keep the initial loading background until the requested layers can render.
+  // Later user toggles retain the current view while their tiles arrive.
+  const isInitialViewReady =
+    isMapLoaded &&
+    (!isSatelliteVisible || satelliteLoaded) &&
+    (!terrain.enabled || terrain.loaded);
+  const isInitializing = !hasPresentedMap && !isInitialViewReady;
+  useEffect(() => {
+    if (isInitialViewReady) setHasPresentedMap(true);
+  }, [isInitialViewReady]);
   // Camera transitions can interrupt a toggle animation. Always use its target
   // pitch so a route fit or discovery restore cannot strand the map halfway.
   const terrainPitchRef = useRef(0);
@@ -2274,7 +2286,9 @@ export default function CycleParkingMap({
       const mapInstance = new maplibregl.Map({
         attributionControl: false,
         bearing: savedCameraRef.current?.bearing ?? 0,
-        pitch: savedCameraRef.current?.pitch ?? 0,
+        pitch:
+          savedCameraRef.current?.pitch ??
+          (offlineBasemap || !navigator.onLine ? 0 : terrainPitchRef.current),
         maxPitch: 60,
         canvasContextAttributes: { antialias: true },
         center: savedCameraRef.current?.center ?? toLngLat(defaultCenter),
@@ -2334,7 +2348,6 @@ export default function CycleParkingMap({
       });
       const handleMapReady = () => {
         setIsMapLoaded(true);
-        setStyleRevision((revision) => revision + 1);
         handleViewportChange({
           bounds: getVisibleMapBounds(mapInstance),
           zoom: mapInstance.getZoom(),
@@ -2364,9 +2377,16 @@ export default function CycleParkingMap({
         });
       });
       mapInstance.on('style.load', () => {
+        // Start optional tile requests as soon as the style exists; waiting for
+        // `load` downloads and renders the street map before requesting them.
+        setIsMapStyleLoaded(true);
+        setStyleRevision((revision) => revision + 1);
         if (initiallyLoaded) handleMapReady();
       });
-      mapInstance.on('webglcontextlost', () => setIsMapLoaded(false));
+      mapInstance.on('webglcontextlost', () => {
+        setIsMapLoaded(false);
+        setIsMapStyleLoaded(false);
+      });
       mapInstance.on('error', (event) => {
         const sourceId = 'sourceId' in event ? String(event.sourceId) : '';
         if (sourceId === satelliteSourceId) return;
@@ -2489,6 +2509,7 @@ export default function CycleParkingMap({
       mapRef.current = null;
       setMap(null);
       setIsMapLoaded(false);
+      setIsMapStyleLoaded(false);
       setRenderedBasemapFeatureCount(0);
     };
   }, [closeCycleNetworkPopup, handleViewportChange, updateViewport]);
@@ -2527,6 +2548,7 @@ export default function CycleParkingMap({
         if (signal.aborted) return;
         if (contextLost) throw new Error('Map context is still suspended.');
         setIsMapLoaded(false);
+        setIsMapStyleLoaded(false);
         setIsOfflineBasemap(false);
         setRenderedBasemapFeatureCount(0);
         basemapHasErrorsRef.current = false;
@@ -2652,7 +2674,6 @@ export default function CycleParkingMap({
 
       activeBasemapThemeRef.current = theme;
       setIsMapLoaded(true);
-      setStyleRevision((revision) => revision + 1);
       handleViewportChange({
         bounds: getVisibleMapBounds(map),
         zoom: map.getZoom(),
@@ -2667,6 +2688,7 @@ export default function CycleParkingMap({
       }
 
       setIsMapLoaded(false);
+      setIsMapStyleLoaded(false);
       setIsOfflineBasemap(offlineBasemap);
       basemapHasErrorsRef.current = offlineBasemap;
       if (offlineBasemap) basemapRecoveryRef.current?.fail();
@@ -4075,6 +4097,7 @@ export default function CycleParkingMap({
     <>
       <div
         className={`bike-map bike-map-${theme}`}
+        data-map-initializing={isInitializing}
         data-map-east={viewport.bounds?.east}
         data-map-center-latitude={viewport.center?.[1]}
         data-map-center-longitude={viewport.center?.[0]}
@@ -4119,6 +4142,9 @@ export default function CycleParkingMap({
         data-testid="parking-map"
         ref={mapContainerRef}
       />
+      {isInitializing ? (
+        <div className="map-loading">{translate(locale, 'loadingMap')}</div>
+      ) : null}
       <button
         className="map-terrain-toggle"
         type="button"

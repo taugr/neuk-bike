@@ -144,6 +144,16 @@ a {
   font-family: inherit;
 }
 
+.bike-map[data-map-initializing='true'] {
+  visibility: hidden;
+}
+
+.bike-map + .map-loading {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .offline-basemap-notice {
   background: var(--surface);
   border: 1px solid var(--subtle);

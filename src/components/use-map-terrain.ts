@@ -15,19 +15,21 @@ export function useMapTerrain(
   styleRevision: number,
   offlineBasemap: boolean,
 ) {
-  const [enabled, setEnabled] = useState(false);
+  // This hook lives in the client-only map. Restore before its first camera
+  // is created, rather than animating from the default flat view after mount.
+  const [enabled, setEnabled] = useState(() => {
+    try {
+      return window.localStorage.getItem(terrainStorageKey) === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [loaded, setLoaded] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const applied3dRef = useRef(false);
 
   useEffect(() => {
-    try {
-      setEnabled(window.localStorage.getItem(terrainStorageKey) === 'true');
-    } catch {
-      // Storage is optional; the control still works for this session.
-    }
-  }, []);
-
-  useEffect(() => {
+    setLoaded(false);
     if (!map || !ready) return;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let failed = false;
@@ -53,11 +55,21 @@ export function useMapTerrain(
         clearTimeout(timeout);
       }
     };
+    const onRender = () => {
+      if (
+        map.getTerrain()?.source === terrainSourceId &&
+        map.isSourceLoaded(terrainSourceId)
+      ) {
+        setLoaded(true);
+        map.off('render', onRender);
+      }
+    };
     const active = enabled && !offlineBasemap && navigator.onLine;
     if (enabled && !active) fail();
     if (active) {
       map.on('error', onError);
       map.on('sourcedata', onSourceData);
+      map.on('render', onRender);
       window.addEventListener('offline', fail);
       timeout = setTimeout(() => {
         if (!map.isSourceLoaded(terrainSourceId)) fail();
@@ -81,6 +93,7 @@ export function useMapTerrain(
       cancelTransition?.();
       map.off('error', onError);
       map.off('sourcedata', onSourceData);
+      map.off('render', onRender);
       window.removeEventListener('offline', fail);
     };
   }, [map, ready, styleRevision, enabled, offlineBasemap]);
@@ -96,5 +109,5 @@ export function useMapTerrain(
     }
   };
 
-  return { enabled, unavailable, toggle };
+  return { enabled, loaded, unavailable, toggle };
 }

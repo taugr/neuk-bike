@@ -40,8 +40,10 @@
 
 Map layers includes an optional Satellite switch using Esri World Imagery,
 with place labels, parking and route overlays retained in both 2D and 3D.
-The choice is remembered on this device. Imagery loads only when selected;
-until it is ready, the street map stays visible. A failed connection or going
+The choice is remembered on this device. On reopening, the loading background
+stays visible until the saved satellite and 3D view is ready, without first
+showing the ordinary flat map. Imagery loads only when selected; switching it
+on while browsing keeps the street map visible until it is ready. A failed connection or going
 offline returns to the street map. Satellite imagery is not included in offline
 area downloads. Detailed imagery falls back to coarser tiles where unavailable.
 Imagery credits use the same startup fade as the street map and remain available
@@ -69,7 +71,8 @@ Live routes follow the terrain while GPS progress, off-route detection and
 arrival work as in 2D. The heading cue follows map rotation and tilt, and the
 camera pans to keep the rider in the uncovered map area. It retains the chosen
 view rather than automatically turning or flying along the route.
-The map prepares elevation before smoothly tilting into 3D, and flattens before
+Switching to 3D prepares elevation before smoothly tilting; reopening a saved
+3D view starts at its tilted angle. The map flattens before
 removing terrain on the way back. Reduced-motion preferences skip the animation.
 3D uses [Mapzen terrain tiles](https://registry.opendata.aws/terrain-tiles/)
 with [source credits and licences](https://github.com/tilezen/joerd/blob/master/docs/attribution.md).
