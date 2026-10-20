@@ -1,5 +1,4 @@
 import { isCyclingPoiPoint, type ParkingPoint } from '@/lib/types';
-import { distanceMeters } from '@/lib/geo';
 
 export const parkingModelsZoom = 17;
 export const parkingModelScale = 3.4;
@@ -31,42 +30,21 @@ export function buildParkingModels(
   selectedId?: string,
 ): ParkingModel[] {
   const models: ParkingModel[] = [];
-  // Stable, bounded groups: never chain nearby sites into one long cluster.
   for (const point of [...points].sort((a, b) => a.id.localeCompare(b.id))) {
     const kind = parkingModelKind(point);
     if (!kind) continue;
-    const covered = parkingModelHasCover(
-      point.properties.bicycle_pa,
-      point.properties.covered,
-    );
-    const group = models.find(
-      (model) =>
-        model.kind === kind &&
-        model.covered === covered &&
-        model.members.every((member) => distanceMeters(member, point) <= 18),
-    );
-    if (group) group.members.push(point);
-    else
-      models.push({
-        point,
-        members: [point],
-        longitude: point.longitude,
-        latitude: point.latitude,
-        kind,
-        covered,
-        selected: false,
-      });
-  }
-  for (const model of models) {
-    const selected = model.members.find((point) => point.id === selectedId);
-    model.selected = Boolean(selected);
-    model.point = selected ?? model.members[0];
-    model.longitude =
-      model.members.reduce((sum, point) => sum + point.longitude, 0) /
-      model.members.length;
-    model.latitude =
-      model.members.reduce((sum, point) => sum + point.latitude, 0) /
-      model.members.length;
+    models.push({
+      point,
+      members: [point],
+      longitude: point.longitude,
+      latitude: point.latitude,
+      kind,
+      covered: parkingModelHasCover(
+        point.properties.bicycle_pa,
+        point.properties.covered,
+      ),
+      selected: point.id === selectedId,
+    });
   }
   return models;
 }

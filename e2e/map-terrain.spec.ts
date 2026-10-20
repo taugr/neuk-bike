@@ -9,7 +9,10 @@ import { installWindJourneyFixture, openWindJourney } from './wind-fixtures';
 test.use({ serviceWorkers: 'block', reducedMotion: 'reduce' });
 async function expectPitch(map: Locator, pitch: number) {
   await expect
-    .poll(async () => Number(await map.getAttribute('data-map-pitch')))
+    // Match the terrain loader's readiness budget, including software WebGL.
+    .poll(async () => Number(await map.getAttribute('data-map-pitch')), {
+      timeout: 15_000,
+    })
     .toBeCloseTo(pitch, 4);
 }
 const appUrl = '/?mockGps=55.9533,-3.1883,5';
@@ -597,11 +600,14 @@ test('recreates smooth model buffers after losing the WebGL context at close zoo
   });
 });
 
-test('Waverley shares one model for 4, 6 and 7 with separate standard numbered buttons', async ({
+test('Waverley shows separate bounded models with individually selectable buttons', async ({
   page,
 }) => {
   test.setTimeout(60_000);
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => {
+    localStorage.setItem('cycle-parking-cycle-network-visible', 'false');
+  });
   await page.goto(appUrl);
   await expectRenderedBasemap(page);
   const ids = ['cec:143', 'osm:node:13043142711', 'osm:node:13043142710'];
@@ -632,9 +638,22 @@ test('Waverley shares one model for 4, 6 and 7 with separate standard numbered b
       .poll(async () => Number(await map.getAttribute('data-map-zoom')))
       .toBeCloseTo(zoom + 1, 1);
   }
+  // Centre the middle site at the final zoom; the preceding zoom controls keep
+  // the camera centre fixed and can otherwise move the northern site offscreen.
+  await page
+    .getByRole('list', { name: 'Nearby bike neuks' })
+    .getByRole('button', {
+      name: 'Waverley drop-off point near Calton Road',
+      exact: true,
+    })
+    .nth(2)
+    .click();
+  await expect(buttons[2]).toHaveClass(/parking-marker-selected-ranked/);
   for (const button of buttons) {
-    await expect(button).toHaveAttribute('data-model-group', 'cec:143');
-    await expect(button).toHaveAttribute('data-model-group-size', '3');
+    await expect(button).toHaveAttribute('data-model-group-size', '1');
+    expect(
+      Number(await button.getAttribute('data-model-offset-metres')),
+    ).toBeLessThanOrEqual(8.001);
   }
   // Use a protected numbered neighbour: ordinary pins can be decluttered.
   await expect(page.getByTestId('parking-marker-cec:178')).toHaveAttribute(
@@ -642,16 +661,82 @@ test('Waverley shares one model for 4, 6 and 7 with separate standard numbered b
     '1',
   );
   expect(await style()).toEqual(originalStyle);
-  const boxes = await Promise.all(
-    buttons.map((button) => button.boundingBox()),
+  await expect
+    .poll(async () => {
+      const boxes = await Promise.all(
+        buttons.map((button) => button.boundingBox()),
+      );
+      if (boxes.some((box) => !box)) return false;
+      for (let i = 0; i < boxes.length; i++)
+        for (let j = i + 1; j < boxes.length; j++) {
+          const a = boxes[i]!,
+            b = boxes[j]!;
+          if (
+            !(
+              a.x + a.width <= b.x ||
+              b.x + b.width <= a.x ||
+              a.y + a.height <= b.y ||
+              b.y + b.height <= a.y
+            )
+          )
+            return false;
+        }
+      return true;
+    })
+    .toBe(true);
+  await expect
+    .poll(async () => {
+      const bounds = await Promise.all(
+        buttons.map(async (button) =>
+          JSON.parse((await button.getAttribute('data-model-bounds'))!),
+        ),
+      );
+      const collisions = [];
+      for (let i = 0; i < bounds.length; i++)
+        for (let j = i + 1; j < bounds.length; j++) {
+          const a = bounds[i],
+            b = bounds[j];
+          if (
+            !(
+              a.right <= b.left ||
+              b.right <= a.left ||
+              a.bottom <= b.top ||
+              b.bottom <= a.top
+            )
+          )
+            collisions.push([ids[i], ids[j], a, b]);
+        }
+      return collisions;
+    })
+    .toEqual([]);
+  await page.mouse.click(40, 850);
+  await expect(page.locator('.maplibregl-popup')).toHaveCount(0);
+  const meshBounds = JSON.parse(
+    (await buttons[1].getAttribute('data-model-bounds'))!,
   );
-  expect(boxes.every(Boolean)).toBe(true);
-  for (let i = 1; i < boxes.length; i++) {
-    expect(boxes[i]!.x - boxes[i - 1]!.x).toBeGreaterThanOrEqual(44);
-  }
+  await page.mouse.click(
+    (meshBounds.left + meshBounds.right) / 2,
+    meshBounds.top + (meshBounds.bottom - meshBounds.top) * 0.25,
+  );
+  await expect(buttons[1]).toHaveClass(/parking-marker-selected-ranked/);
   for (const button of buttons) {
-    // The popup can cover its neighbours; close it before choosing the next option.
-    await page.keyboard.press('Escape');
+    // Wait for popup centring before clicking the background. MapLibre ignores
+    // a pointer click during its animated pan, so an immediate click can be lost.
+    let lastCenter = '';
+    let stableSamples = 0;
+    await expect
+      .poll(
+        async () => {
+          const center = await map.getAttribute('data-map-center-latitude');
+          stableSamples = center === lastCenter ? stableSamples + 1 : 0;
+          lastCenter = center ?? '';
+          return stableSamples;
+        },
+        { intervals: [250], timeout: 5000 },
+      )
+      .toBeGreaterThanOrEqual(3);
+    await page.mouse.click(40, 850);
+    await expect(page.locator('.maplibregl-popup')).toHaveCount(0);
     await button.click();
     await expect(button).toHaveClass(/parking-marker-selected-ranked/);
     await expect(page.locator('.maplibregl-popup')).toBeVisible();

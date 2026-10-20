@@ -122,7 +122,7 @@ describe('smooth parking meshes', () => {
   });
 });
 
-describe('nearby model groups', () => {
+describe('individual nearby models', () => {
   const waverley = [
     ['cec:143', 55.9526307326375, -3.18713137747795],
     ['osm:node:13043142711', 55.9524831, -3.1872329],
@@ -134,18 +134,16 @@ describe('nearby model groups', () => {
     latitude: Number(latitude),
     longitude: Number(longitude),
   }));
-  it('shares one model for Waverley 4, 6 and 7 while keeping the farther site separate', () => {
+  it('retains one model per Waverley site with original coordinates and stable identity', () => {
     const models = buildParkingModels(waverley, waverley[1].id);
-    expect(models).toHaveLength(2);
-    expect(models[0].members.map((point) => point.id).sort()).toEqual(
-      waverley
-        .slice(0, 3)
-        .map((point) => point.id)
-        .sort(),
-    );
-    expect(models[0].point.id).toBe(waverley[1].id);
-    expect(models[0].selected).toBe(true);
-    expect(models[1].members).toEqual([waverley[3]]);
+    expect(models).toHaveLength(4);
+    for (const model of models) {
+      const original = waverley.find((point) => point.id === model.point.id)!;
+      expect(model.members).toEqual([original]);
+      expect(model.longitude).toBe(original.longitude);
+      expect(model.latitude).toBe(original.latitude);
+      expect(model.selected).toBe(original.id === waverley[1].id);
+    }
     expect(buildParkingModels([...waverley].reverse(), waverley[1].id)).toEqual(
       models,
     );
@@ -224,7 +222,7 @@ describe('dataset type aliases', () => {
     );
     expect(new Set(meshes).size).toBe(parkingModelCatalog.length);
   });
-  it('keeps alias groups together and distinct physical shapes apart', () => {
+  it('resolves aliases consistently without combining separate records', () => {
     const models = buildParkingModels(
       ['post_hoop', 'cyclehoop', 'hoop'].map((type, i) => ({
         ...point(type),
@@ -232,7 +230,8 @@ describe('dataset type aliases', () => {
       })),
     );
     expect(models.map((model) => [model.kind, model.members.length])).toEqual([
-      ['post-hoop', 2],
+      ['post-hoop', 1],
+      ['post-hoop', 1],
       ['stands', 1],
     ]);
   });

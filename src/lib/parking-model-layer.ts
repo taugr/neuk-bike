@@ -16,9 +16,47 @@ import {
   type ParkingModel,
 } from './parking-models';
 
+import {
+  placeParkingModels,
+  offsetModelLocation,
+  placeModelButtons,
+  type ModelBounds,
+  type ModelOffset,
+  type ModelPlacement,
+} from './parking-model-placement';
+
+export type ParkingModelDisplay = {
+  longitude: number;
+  latitude: number;
+  ground: { x: number; y: number };
+  anchor: { x: number; y: number };
+  bounds: ModelBounds;
+  offset: ModelOffset;
+  buttonOffset: [number, number];
+  groupId: string;
+  members: string[];
+  neutral: boolean;
+};
+
 export const parkingModelsLayer = 'parking-models-3d';
 const layers = new WeakMap<Map, ParkingLayer>();
-type GpuMesh = { mesh: ParkingMesh; opaque: WebGLBuffer; glass: WebGLBuffer };
+type MeshBounds = { min: number[]; max: number[] };
+type GpuMesh = {
+  mesh: ParkingMesh;
+  opaque: WebGLBuffer;
+  glass: WebGLBuffer;
+};
+function meshBounds(mesh: ParkingMesh): MeshBounds {
+  const min = [Infinity, Infinity, Infinity],
+    max = [-Infinity, -Infinity, -Infinity];
+  for (const data of [mesh.opaque, mesh.glass])
+    for (let i = 0; i < data.length; i += stride)
+      for (let axis = 0; axis < 3; axis++) {
+        min[axis] = Math.min(min[axis], data[i + axis]);
+        max[axis] = Math.max(max[axis], data[i + axis]);
+      }
+  return { min, max };
+}
 type PlacedMesh = {
   model: ParkingModel;
   gpu: GpuMesh;
@@ -76,7 +114,13 @@ class ParkingLayer implements CustomLayerInterface {
   renderingMode = '3d' as const;
   models: ParkingModel[] = [];
   satelliteContrast = false;
+  getVisibleArea?: () => ModelBounds;
   renderedCount = 0;
+  display = new globalThis.Map<string, ParkingModelDisplay>();
+  private layout: ModelPlacement[] = [];
+  private layoutKey = '';
+  private buttonOffsets = new globalThis.Map<string, [number, number]>();
+  private geometryBounds = new globalThis.Map<string, MeshBounds>();
   destinationBadgeOffset(pointId: string) {
     const placed = this.placed.find(({ model }) => model.point.id === pointId);
     if (!placed) return null;
@@ -95,8 +139,11 @@ class ParkingLayer implements CustomLayerInterface {
   private vao: WebGLVertexArrayObject | null = null;
   private buffers = new globalThis.Map<string, GpuMesh>();
   private placed: PlacedMesh[] = [];
+  private onCameraSettled = () => this.map.triggerRepaint();
   onAdd(map: Map, gl: WebGL2RenderingContext) {
     this.map = map;
+    map.on('moveend', this.onCameraSettled);
+    map.on('resize', this.onCameraSettled);
     this.initialize(gl);
   }
   private initialize(gl: WebGL2RenderingContext) {
@@ -151,13 +198,30 @@ class ParkingLayer implements CustomLayerInterface {
   render(gl: WebGL2RenderingContext, args: CustomRenderMethodInput) {
     this.renderedCount = 0;
     this.placed = [];
-    if (this.map.getZoom() < parkingModelsZoom || !this.models.length) return;
+    if (this.map.getZoom() < parkingModelsZoom || !this.models.length) {
+      this.display.clear();
+      this.layout = [];
+      this.layoutKey = '';
+      return;
+    }
     // Context restoration invalidates every GPU handle even when the style survives.
     if (!this.program || !gl.isProgram(this.program)) this.initialize(gl);
     const width = this.map.getCanvas().clientWidth,
       height = this.map.getCanvas().clientHeight;
-    for (const model of this.models) {
-      const lngLat: [number, number] = [model.longitude, model.latitude];
+    const modelById = new globalThis.Map(
+      this.models.map((model) => [model.point.id, model]),
+    );
+    const positions = new globalThis.Map<
+      string,
+      ReturnType<typeof projectModel>
+    >();
+    const projectModel = (model: ParkingModel, offset: ModelOffset) => {
+      const position = offsetModelLocation(
+        model.point.longitude,
+        model.point.latitude,
+        offset,
+      );
+      const lngLat: [number, number] = [position.longitude, position.latitude];
       const origin = MercatorCoordinate.fromLngLat(
         lngLat,
         this.map.queryTerrainElevation(lngLat) ?? 0,
@@ -167,33 +231,156 @@ class ParkingLayer implements CustomLayerInterface {
         origin,
         origin.meterInMercatorCoordinateUnits() * parkingModelScale,
       );
-      const center = project(matrix, 0, 0, 1, width, height);
-      if (
-        center.w <= 0 ||
-        center.x < -300 ||
-        center.y < -300 ||
-        center.x > width + 300 ||
-        center.y > height + 300
-      )
-        continue;
-      const corners = [-1.85, 1.85].flatMap((x) =>
-        [-1.55, 1.55].flatMap((y) =>
-          [0, 2.65].map((z) => project(matrix, x, y, z, width, height)),
+      const key = `${model.kind}:${model.covered}`;
+      // Always reserve the selected outline too, so selection never moves neighbours.
+      let extent = this.geometryBounds.get(key);
+      if (!extent) {
+        extent = meshBounds(createParkingMesh(model.kind, model.covered, true));
+        this.geometryBounds.set(key, extent);
+      }
+      const corners = [extent.min[0], extent.max[0]].flatMap((x) =>
+        [extent.min[1], extent.max[1]].flatMap((y) =>
+          [extent.min[2], extent.max[2]].map((z) =>
+            project(matrix, x, y, z, width, height),
+          ),
         ),
       );
-      this.placed.push({
-        model,
-        gpu: this.gpu(gl, model),
-        matrix,
-        depth: center.z,
-        bounds: {
-          left: Math.min(...corners.map((p) => p.x)),
-          right: Math.max(...corners.map((p) => p.x)),
-          top: Math.min(...corners.map((p) => p.y)),
-          bottom: Math.max(...corners.map((p) => p.y)),
-        },
+      const ground = project(matrix, 0, 0, 0, width, height);
+      // Reserve the satellite silhouette in both styles to avoid style-driven shuffling.
+      const padding = 2;
+      const bounds = {
+        left: Math.min(...corners.map((p) => p.x)) - padding,
+        right: Math.max(...corners.map((p) => p.x)) + padding,
+        top: Math.min(...corners.map((p) => p.y)) - padding,
+        bottom: Math.max(...corners.map((p) => p.y)) + padding,
+      };
+      return { ...position, ground, bounds, matrix };
+    };
+    const projection = (id: string, offset: ModelOffset) => {
+      const key = `${id}:${offset.east}:${offset.north}`;
+      let value = positions.get(key);
+      if (!value) {
+        value = projectModel(modelById.get(id)!, offset);
+        positions.set(key, value);
+      }
+      return value;
+    };
+    const zero = { east: 0, north: 0 };
+    const ids = this.models
+      .filter((model) => {
+        const { ground, bounds } = projection(model.point.id, zero);
+        return (
+          ground.w > 0 &&
+          Object.values(bounds).every(Number.isFinite) &&
+          ground.x >= -100 &&
+          ground.y >= -100 &&
+          ground.x <= width + 100 &&
+          ground.y <= height + 100
+        );
+      })
+      .map((model) => model.point.id);
+    const area = this.getVisibleArea?.() ?? {
+      left: 0,
+      right: width,
+      top: 0,
+      bottom: height,
+    };
+    const center = this.map.getCenter();
+    const key = JSON.stringify([
+      width,
+      height,
+      area.left,
+      area.right,
+      area.top,
+      area.bottom,
+      center.lng,
+      center.lat,
+      this.map.getZoom(),
+      this.map.getPitch(),
+      this.map.getBearing(),
+      ids.map((id) => {
+        const m = modelById.get(id)!;
+        return [id, m.point.longitude, m.point.latitude, m.kind, m.covered];
+      }),
+    ]);
+    const needsLayout =
+      key !== this.layoutKey && (!this.map.isMoving() || !this.layout.length);
+    if (needsLayout) {
+      const previous = new globalThis.Map(
+        this.layout
+          .filter((p) => p.members.length === 1)
+          .map((p) => [p.id, p.offset]),
+      );
+      this.layout = placeParkingModels({
+        ids,
+        previous,
+        project: (id, offset) => projection(id, offset).bounds,
       });
+      this.layoutKey = key;
+      this.buttonOffsets.clear();
     }
+    this.display.clear();
+    for (const placement of this.layout) {
+      const members = placement.members.filter((id) => modelById.has(id));
+      if (!members.length) continue;
+      const model = modelById.get(members[0])!;
+      const position = projection(model.point.id, placement.offset);
+      const neutral = members.some((id) => {
+        const other = modelById.get(id)!;
+        return other.kind !== model.kind || other.covered !== model.covered;
+      });
+      if (!neutral) {
+        const selected = members.some((id) => modelById.get(id)!.selected);
+        const rendered = { ...model, selected };
+        this.placed.push({
+          model: rendered,
+          gpu: this.gpu(gl, rendered),
+          matrix: position.matrix,
+          depth: position.ground.z,
+          bounds: position.bounds,
+        });
+      }
+      for (const [index, id] of members.entries()) {
+        const anchor = projection(id, zero).ground;
+        const preferredY = neutral
+          ? 26
+          : position.bounds.bottom - position.ground.y + 26;
+        const columns = Math.min(4, members.length);
+        const rowCount = Math.min(
+          columns,
+          members.length - Math.floor(index / columns) * columns,
+        );
+        const buttonOffset: [number, number] = [
+          ((index % columns) - (rowCount - 1) / 2) * 46,
+          preferredY + Math.floor(index / columns) * 46,
+        ];
+        this.display.set(id, {
+          ...position,
+          anchor,
+          offset: placement.offset,
+          buttonOffset,
+          groupId: members[0],
+          members,
+          neutral,
+        });
+      }
+    }
+    if (
+      needsLayout ||
+      [...this.display.keys()].some((id) => !this.buttonOffsets.has(id))
+    ) {
+      this.buttonOffsets = placeModelButtons(
+        [...this.display].map(([id, value]) => ({
+          id,
+          ground: value.ground,
+          preferred: value.buttonOffset,
+        })),
+        this.placed.map((p) => p.bounds),
+        area,
+      );
+    }
+    for (const [id, value] of this.display)
+      value.buttonOffset = this.buttonOffsets.get(id) ?? value.buttonOffset;
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
     gl.uniform2f(
@@ -330,6 +517,8 @@ class ParkingLayer implements CustomLayerInterface {
     return result;
   }
   onRemove(_map: Map, gl: WebGL2RenderingContext) {
+    this.map.off('moveend', this.onCameraSettled);
+    this.map.off('resize', this.onCameraSettled);
     for (const value of this.buffers.values()) {
       gl.deleteBuffer(value.opaque);
       gl.deleteBuffer(value.glass);
@@ -347,6 +536,7 @@ export function syncParkingModels(
   map: Map,
   models: ParkingModel[],
   satelliteContrast = false,
+  getVisibleArea?: () => ModelBounds,
 ) {
   let layer = layers.get(map);
   if (!map.getLayer(parkingModelsLayer)) {
@@ -355,6 +545,7 @@ export function syncParkingModels(
     map.addLayer(layer);
   }
   layer!.models = models;
+  layer!.getVisibleArea = getVisibleArea;
   layer!.satelliteContrast = satelliteContrast;
   map.triggerRepaint();
 }
@@ -364,3 +555,6 @@ export const getParkingModelBadgeOffset = (map: Map, pointId: string) =>
   layers.get(map)?.destinationBadgeOffset(pointId) ?? null;
 export const pickParkingModel = (map: Map, point: { x: number; y: number }) =>
   layers.get(map)?.pick(point) ?? null;
+
+export const getParkingModelDisplay = (map: Map, pointId: string) =>
+  layers.get(map)?.display.get(pointId);

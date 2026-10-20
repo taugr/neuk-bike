@@ -23,6 +23,7 @@ import {
   syncParkingModels,
   getParkingModelRenderCount,
   getParkingModelBadgeOffset,
+  getParkingModelDisplay,
   pickParkingModel,
 } from '@/lib/parking-model-layer';
 
@@ -2197,7 +2198,8 @@ export default function CycleParkingMap({
     map,
     points: candidatePoints,
     protectedIds: protectedPinIds,
-    enabled: terrain.enabled && !isDirectionsMode,
+    enabled:
+      terrain.enabled && viewport.zoom < parkingModelsZoom && !isDirectionsMode,
     getArea: getVisibleMapArea,
     layoutKey: `${mobileSheetState}:${styleRevision}`,
   });
@@ -3286,7 +3288,9 @@ export default function CycleParkingMap({
     );
     const updateModels = () => {
       if (!isMapLoaded) return;
-      syncParkingModels(map, models, satelliteLoaded);
+      syncParkingModels(map, models, satelliteLoaded, () =>
+        getVisibleMapArea(map),
+      );
     };
     if (map.isStyleLoaded()) updateModels();
     else map.once('idle', updateModels);
@@ -3440,6 +3444,7 @@ export default function CycleParkingMap({
         .join(', ');
       markerElement.setAttribute('aria-label', markerLabel);
       markerElement.setAttribute('role', 'button');
+      markerElement.style.visibility = '';
       markerElement.setAttribute('title', point.name);
       markerElement.dataset.testid = `parking-marker-${point.id}`;
       if (modelButton && modelKind) {
@@ -3472,7 +3477,7 @@ export default function CycleParkingMap({
             closeCycleNetworkPopup();
             closeMarkerPopups(point.id);
             renderedMarker.popup
-              ?.setLngLat([point.longitude, point.latitude])
+              ?.setLngLat(renderedMarker.marker.getLngLat())
               .addTo(map);
             if (
               pointCategory === 'parking' &&
@@ -3499,7 +3504,7 @@ export default function CycleParkingMap({
             closeCycleNetworkPopup();
             closeMarkerPopups(point.id);
             renderedMarker.popup
-              ?.setLngLat([point.longitude, point.latitude])
+              ?.setLngLat(renderedMarker.marker.getLngLat())
               .addTo(map);
             if (
               pointCategory === 'parking' &&
@@ -3522,6 +3527,139 @@ export default function CycleParkingMap({
       }
     });
 
+    const svgNamespace = 'http://www.w3.org/2000/svg';
+    const anchors = document.createElementNS(svgNamespace, 'svg');
+    anchors.classList.add('parking-model-anchors');
+    anchors.setAttribute('aria-hidden', 'true');
+    map.getContainer().appendChild(anchors);
+    const anchorElements = new Map<
+      string,
+      {
+        line: SVGLineElement;
+        controlLine: SVGLineElement;
+        dot: SVGCircleElement;
+        count: SVGTextElement;
+      }
+    >();
+    const updateModelControls = () => {
+      for (const model of models) {
+        const id = model.point.id;
+        const entry = parkingMarkerRefs.current.get(id);
+        const display = getParkingModelDisplay(map, id);
+        if (!entry?.element || isDirectionsMode) continue;
+        if (!display) {
+          // Keep offscreen controls keyboard reachable, as ordinary map pins are.
+          // Clear any old display offset when their mesh leaves the render area.
+          const location = entry.marker.getLngLat();
+          if (
+            location.lng !== model.point.longitude ||
+            location.lat !== model.point.latitude
+          )
+            entry.marker.setLngLat([
+              model.point.longitude,
+              model.point.latitude,
+            ]);
+          const offset = entry.marker.getOffset();
+          if (offset.x !== 0 || offset.y !== 26)
+            entry.marker.setOffset([0, 26]);
+          entry.element.dataset.modelGroup = id;
+          entry.element.dataset.modelGroupSize = '1';
+          entry.element.dataset.modelOffsetMetres = '0';
+          delete entry.element.dataset.modelBounds;
+          const previous = anchorElements.get(id);
+          if (previous) {
+            previous.line.style.display =
+              previous.controlLine.style.display =
+              previous.dot.style.display =
+                'none';
+            previous.count.textContent = '';
+          }
+          continue;
+        }
+        const {
+          longitude,
+          latitude,
+          buttonOffset,
+          members,
+          groupId,
+          ground,
+          anchor,
+          offset,
+        } = display;
+        const lngLat = entry.marker.getLngLat();
+        if (lngLat.lng !== longitude || lngLat.lat !== latitude)
+          entry.marker.setLngLat([longitude, latitude]);
+        const currentOffset = entry.marker.getOffset();
+        if (
+          currentOffset.x !== buttonOffset[0] ||
+          currentOffset.y !== buttonOffset[1]
+        )
+          entry.marker.setOffset(buttonOffset);
+        entry.element.dataset.modelGroup = groupId;
+        entry.element.dataset.modelGroupSize = String(members.length);
+        entry.element.dataset.modelOffsetMetres = Math.hypot(
+          offset.east,
+          offset.north,
+        ).toFixed(3);
+        entry.element.dataset.modelBounds = JSON.stringify(display.bounds);
+        let elements = anchorElements.get(id);
+        if (!elements) {
+          const line = document.createElementNS(svgNamespace, 'line');
+          const controlLine = document.createElementNS(svgNamespace, 'line');
+          controlLine.classList.add('parking-model-control-line');
+          const dot = document.createElementNS(svgNamespace, 'circle');
+          const count = document.createElementNS(svgNamespace, 'text');
+          dot.setAttribute('r', '3');
+          anchors.append(line, controlLine, dot, count);
+          elements = { line, controlLine, dot, count };
+          anchorElements.set(id, elements);
+        }
+        const displaced =
+          Math.hypot(anchor.x - ground.x, anchor.y - ground.y) > 2;
+        elements.line.style.display = elements.dot.style.display = displaced
+          ? ''
+          : 'none';
+        elements.line.setAttribute('x1', String(anchor.x));
+        elements.line.setAttribute('y1', String(anchor.y));
+        elements.line.setAttribute('x2', String(ground.x));
+        elements.line.setAttribute('y2', String(ground.y));
+        elements.dot.setAttribute('cx', String(anchor.x));
+        elements.dot.setAttribute('cy', String(anchor.y));
+        const controlX = ground.x + buttonOffset[0],
+          controlY = ground.y + buttonOffset[1];
+        const edgeX = Math.max(
+          display.bounds.left,
+          Math.min(display.bounds.right, controlX),
+        );
+        const edgeY = Math.max(
+          display.bounds.top,
+          Math.min(display.bounds.bottom, controlY),
+        );
+        const length = Math.hypot(controlX - edgeX, controlY - edgeY);
+        elements.controlLine.style.display =
+          !display.neutral && length > 30 ? '' : 'none';
+        elements.controlLine.setAttribute('x1', String(edgeX));
+        elements.controlLine.setAttribute('y1', String(edgeY));
+        elements.controlLine.setAttribute(
+          'x2',
+          String(controlX - ((controlX - edgeX) * 17) / Math.max(length, 1)),
+        );
+        elements.controlLine.setAttribute(
+          'y2',
+          String(controlY - ((controlY - edgeY) * 17) / Math.max(length, 1)),
+        );
+        elements.count.textContent =
+          members.length > 1 && id === groupId ? `×${members.length}` : '';
+        elements.count.setAttribute('x', String(ground.x));
+        elements.count.setAttribute(
+          'y',
+          String(display.neutral ? ground.y : display.bounds.top - 9),
+        );
+      }
+    };
+    map.on('render', updateModelControls);
+    updateModelControls();
+
     const currentSelectedPoint = selectedPoint;
     const selectedEntry = currentSelectedPoint
       ? parkingMarkerRefs.current.get(currentSelectedPoint.id)
@@ -3536,14 +3674,13 @@ export default function CycleParkingMap({
       closeCycleNetworkPopup();
       closeMarkerPopups(currentSelectedPoint.id);
       selectedEntry.popup
-        .setLngLat([
-          currentSelectedPoint.longitude,
-          currentSelectedPoint.latitude,
-        ])
+        .setLngLat(selectedEntry.marker.getLngLat())
         .addTo(map);
     }
     return () => {
       map.off('idle', updateModels);
+      map.off('render', updateModelControls);
+      anchors.remove();
     };
   }, [
     canRequestDirections,
@@ -3593,24 +3730,35 @@ export default function CycleParkingMap({
 
     // Keep this timer independent from marker reconciliation. The tray resize
     // changes the visible chunks while it animates and used to cancel the pan.
-    const timeoutId = window.setTimeout(
-      () => {
+    let focusFrame: number | undefined;
+    const focusPopup = () => {
+      if (map.isMoving()) {
+        map.once('moveend', focusPopup);
+        return;
+      }
+      // Measure after the final camera render and model-placement update. A
+      // rectangle sampled mid-flight can send the next pan far beyond the site.
+      focusFrame = window.requestAnimationFrame(() => {
         const popup = parkingMarkerRefs.current.get(selectedPoint.id)?.popup;
         if (
           !popup?.isOpen() ||
           (window.matchMedia('(max-width: 820px)').matches &&
             mobileSheetStateRef.current !== 'collapsed')
-        ) {
+        )
           return;
-        }
-
         centerPopupInVisibleMapArea(map, popup);
         centeredCollapsedPopupPointRef.current = selectedPoint.id;
-      },
+      });
+    };
+    const timeoutId = window.setTimeout(
+      focusPopup,
       isMobile ? collapsedSheetPopupFocusDelayMs : 100,
     );
-
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      window.clearTimeout(timeoutId);
+      map.off('moveend', focusPopup);
+      if (focusFrame !== undefined) window.cancelAnimationFrame(focusFrame);
+    };
   }, [isDestinationParkingMode, map, mobileSheetState, route, selectedPoint]);
 
   useEffect(() => {

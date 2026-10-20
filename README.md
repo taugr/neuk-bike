@@ -93,10 +93,14 @@ Case, spacing, hyphens and known aliases are normalized;
 unknown, access-only, capacity-only and mixed fixture types keep their pins.
 Building extrusions flatten at this close zoom so roofs do not hide the parking
 symbols. Zoom out or switch to 2D to return to pin symbols. Selection, ranking,
-saved badges, and keyboard access remain available. Matching types with the same
-covered status within an 18-metre group share one model; every original parking
-option keeps its normal numbered button in a spaced row beside the model.
-Groups have a bounded diameter so separate nearby sites do not chain together.
+saved badges, and keyboard access remain available. Nearby neuks have individual
+models, separated where possible by small display-only offsets of up to 8 metres.
+A ground dot and dotted connector show the real location of a displaced model.
+Placement settles after camera gestures and reserves room for roofs and selection
+outlines. Dense collisions retain a counted group with individual selection buttons;
+mixed types use a neutral count rather than a misleading shared illustration.
+Zooming closer retries separation. Directions, sharing and saved locations always
+use the original coordinates.
 During route planning and guidance, close zoom shows only the destination's
 parking model in the selected teal style, with its destination marker retained.
 The marker sits above the model with a short connecting line. Selecting the

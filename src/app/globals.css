@@ -7926,3 +7926,39 @@ a {
   outline-offset: 3px;
   border-radius: 8px;
 }
+
+/* Displaced illustrations keep a visible connection to the real parking location. */
+.parking-model-anchors {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.parking-model-anchors line {
+  stroke: var(--pin-accent, #14b8a6);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  opacity: 0.8;
+}
+.parking-model-anchors circle {
+  fill: var(--pin-accent, #14b8a6);
+  stroke: white;
+  stroke-width: 1.5;
+}
+.parking-model-anchors text {
+  fill: #134e4a;
+  stroke: white;
+  stroke-width: 5;
+  paint-order: stroke;
+  text-anchor: middle;
+  font:
+    700 13px system-ui,
+    sans-serif;
+}
+
+.parking-model-anchors .parking-model-control-line {
+  stroke-dasharray: none;
+  opacity: 0.45;
+}
