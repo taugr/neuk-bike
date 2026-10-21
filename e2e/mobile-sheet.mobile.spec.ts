@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { installOfflineMapFixture } from './offline-map-fixtures';
 
 test.use({ serviceWorkers: 'block', reducedMotion: 'reduce' });
@@ -41,6 +41,195 @@ async function drag(
     await page.mouse.up();
   }
 }
+
+async function dragTitleBothWays(
+  page: Page,
+  browserName: string,
+  title: Locator,
+  collapsedTitle = title,
+) {
+  const pane = page.locator('.control-pane');
+  await expect(title).toBeVisible();
+  const expanded = (await title.boundingBox())!;
+  await drag(
+    page,
+    browserName,
+    expanded.x + expanded.width / 2,
+    expanded.y + expanded.height / 2,
+    Math.min(830, expanded.y + 280),
+  );
+  await expect(pane).toHaveAttribute('data-mobile-sheet-state', 'collapsed');
+  const collapsed = (await collapsedTitle.boundingBox())!;
+  // Use the visible part of the title if a two-line heading reaches the fold.
+  const y = Math.min(collapsed.y + collapsed.height / 2, 825);
+  await drag(page, browserName, collapsed.x + collapsed.width / 2, y, y - 280);
+  await expect(pane).toHaveAttribute('data-mobile-sheet-state', 'expanded');
+  await expect(pane).not.toHaveAttribute('data-mobile-sheet-dragging', 'true');
+}
+
+async function installJourneyFixture(page: Page) {
+  await page.route('https://photon.komoot.io/api/**', (route) =>
+    route.fulfill({
+      json: {
+        features: [
+          {
+            geometry: { coordinates: [-3.189, 55.947] },
+            properties: {
+              name: 'National Museum',
+              country: 'United Kingdom',
+              osm_id: 2,
+              osm_type: 'N',
+            },
+          },
+        ],
+      },
+    }),
+  );
+  await page.route('https://api.cyclestreets.net/v2/journey.plan*', (route) => {
+    const url = new URL(route.request().url());
+    const coordinates = (url.searchParams.get('waypoints') ?? '')
+      .split('|')
+      .map((point) => point.split(',').slice(0, 2).map(Number));
+    return route.fulfill({
+      contentType: 'application/javascript',
+      body: `${url.searchParams.get('callback')}(${JSON.stringify({
+        type: 'FeatureCollection',
+        features: ['quietest', 'balanced', 'fastest'].map((plan) => ({
+          type: 'Feature',
+          properties: {
+            path: `plan/${plan}`,
+            plan,
+            lengthMetres: 1200,
+            timeSeconds: 420,
+          },
+          geometry: { type: 'LineString', coordinates },
+        })),
+      })});`,
+    });
+  });
+}
+
+test('route search, preview, planning and map-editing titles drag while controls remain usable', async ({
+  page,
+  browserName,
+}) => {
+  test.setTimeout(60_000);
+  await installJourneyFixture(page);
+  await page.getByTestId('plan-route-mobile').tap();
+  const search = page.getByTestId('route-destination-search');
+  await dragTitleBothWays(page, browserName, search.getByRole('heading'));
+  await search.getByRole('button', { name: 'Choose on map' }).tap();
+  const picker = page.getByTestId('route-endpoint-map-picker');
+  await dragTitleBothWays(page, browserName, picker.locator('header > strong'));
+  await picker.getByRole('button', { name: 'Cancel', exact: true }).tap();
+  await search.getByRole('combobox').fill('Museum');
+  await search.getByRole('option', { name: 'National Museum' }).tap();
+  const journey = page.getByTestId('route-journey');
+  await expect(
+    journey.getByRole('button', { name: 'Start route', exact: true }),
+  ).toBeVisible();
+  await dragTitleBothWays(
+    page,
+    browserName,
+    journey.locator('.journey-header h2'),
+    journey.locator('.journey-collapsed-destination'),
+  );
+  await journey.getByRole('button', { name: 'Edit route', exact: true }).tap();
+  const planner = page.locator('.route-planner');
+  await dragTitleBothWays(
+    page,
+    browserName,
+    planner.locator('.route-planner-title'),
+  );
+  await planner
+    .getByLabel('Route name', { exact: true })
+    .fill('Tray drag route');
+  await expect(planner.getByLabel('Route name', { exact: true })).toHaveValue(
+    'Tray drag route',
+  );
+  await planner.getByRole('button', { name: 'Add stop on map' }).tap();
+  const editor = page.getByTestId('route-map-editor');
+  await dragTitleBothWays(
+    page,
+    browserName,
+    editor.locator('.route-map-editor-title'),
+  );
+  await editor.getByRole('button', { name: 'Cancel', exact: true }).tap();
+  await expect(planner.getByLabel('Route name', { exact: true })).toHaveValue(
+    'Tray drag route',
+  );
+  await planner.getByRole('button', { name: 'Back', exact: true }).tap();
+  await journey.getByTestId('finish-at-bike-parking').tap();
+  const chooser = page.getByTestId('destination-parking-chooser');
+  await expect(
+    chooser.getByRole('button', { name: /Compare all/ }),
+  ).toBeVisible();
+  await dragTitleBothWays(
+    page,
+    browserName,
+    chooser.locator('.destination-parking-header strong'),
+  );
+  await chooser.getByRole('button', { name: /Compare all/ }).tap();
+  await expect(
+    chooser.locator('.destination-parking-list button').first(),
+  ).toBeVisible();
+  await chooser.getByRole('button', { name: 'Back', exact: true }).tap();
+  await expect(journey.getByTestId('journey-destination')).toContainText(
+    'National Museum',
+  );
+});
+
+test('saved routes, GPX review and route details drag without taking over rename inputs', async ({
+  page,
+  browserName,
+}) => {
+  test.setTimeout(60_000);
+  const pane = page.locator('.control-pane');
+  const menu = page.locator('.settings-menu--mobile');
+  await menu.locator('.settings-trigger').tap();
+  await menu.getByTestId('open-my-routes').tap();
+  const library = page.locator('.saved-routes-panel');
+  await dragTitleBothWays(
+    page,
+    browserName,
+    library.locator('.saved-routes-header strong'),
+  );
+  await library.locator('input[type="file"]').setInputFiles({
+    name: 'tray-route.gpx',
+    mimeType: 'application/gpx+xml',
+    buffer: Buffer.from(
+      `<gpx version="1.1" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>Tray route</name><trkseg><trkpt lat="55.9533" lon="-3.1883"/><trkpt lat="55.947" lon="-3.189"/></trkseg></trk></gpx>`,
+    ),
+  });
+  const review = page.locator('.gpx-import-review');
+  await dragTitleBothWays(page, browserName, review.locator('header > strong'));
+  await review.getByRole('button', { name: 'Add to My routes' }).tap();
+  const detail = page.locator('.saved-route-detail');
+  await dragTitleBothWays(
+    page,
+    browserName,
+    detail.getByRole('heading', { name: 'Tray route', exact: true }),
+  );
+  await detail.getByRole('button', { name: 'Edit route name' }).tap();
+  const input = detail.getByRole('textbox', { name: 'Route name' });
+  await input.fill('Renamed tray route');
+  await expect(input).toHaveValue('Renamed tray route');
+  expect(
+    await input.evaluate(
+      (element) =>
+        getComputedStyle(element.parentElement!.parentElement!).touchAction,
+    ),
+  ).toBe('auto');
+  await expect(pane).toHaveAttribute('data-mobile-sheet-state', 'expanded');
+  await detail.getByRole('button', { name: 'Save', exact: true }).tap();
+  await dragTitleBothWays(
+    page,
+    browserName,
+    detail.getByRole('heading', { name: 'Renamed tray route', exact: true }),
+  );
+  await detail.getByRole('button', { name: 'My routes', exact: true }).tap();
+  await expect(library).toContainText('Renamed tray route');
+});
 
 test('the compact tray handle receives touches without stealing content controls', async ({
   page,

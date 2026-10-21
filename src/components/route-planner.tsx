@@ -114,7 +114,7 @@ export function RoutePlanner({
         aria-label={t('editingRoute')}
         data-testid="route-map-editor"
       >
-        <header className="route-map-editor-header">
+        <header className="route-map-editor-header" data-sheet-drag-handle>
           <span className="route-map-editor-title">
             <span className="route-map-editor-icon" aria-hidden="true">
               <Pencil size={18} />
@@ -201,7 +201,7 @@ export function RoutePlanner({
 
   return (
     <section className="route-planner panel-view" aria-label={t('planRoute')}>
-      <header className="route-planner-header">
+      <header className="route-planner-header" data-sheet-drag-handle>
         <button type="button" className="route-planner-back" onClick={onBack}>
           <ChevronLeft size={17} aria-hidden="true" />
           {t('back')}

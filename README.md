@@ -52,8 +52,9 @@ Earthstar Geographics, and the GIS User Community ([World Imagery](https://www.a
 
 On mobile, tap the tray's handle or drag its handle and title area to expand or
 collapse it. The compact handle and title form a broad drag area;
-nearby, saved, filter and parking-detail headings accept drags. Header buttons
-keep their usual actions, and the results below scroll independently.
+titles in parking, directions and route trays accept drags. Header buttons and
+route-name inputs keep their usual actions, and the content below scrolls
+independently.
 
 Use the compass below Map layers to see north: drag it to rotate the map,
 then tap it to face north again. Two-finger rotation on touch screens and

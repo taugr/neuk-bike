@@ -139,7 +139,7 @@ export function DestinationParkingChooser({
       aria-label={t('finishAtBikeParking')}
       data-testid="destination-parking-chooser"
     >
-      <header className="destination-parking-header">
+      <header className="destination-parking-header" data-sheet-drag-handle>
         <button type="button" onClick={onBack}>
           <ChevronLeft size={18} aria-hidden="true" />
           {t('back')}

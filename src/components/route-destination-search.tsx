@@ -78,7 +78,10 @@ export function RouteDestinationSearch({
       aria-label={t(target === 'start' ? 'chooseStart' : 'chooseDestination')}
       data-testid="route-destination-search"
     >
-      <header className="route-destination-search-header">
+      <header
+        className="route-destination-search-header"
+        data-sheet-drag-handle
+      >
         <button type="button" onClick={onBack}>
           <ChevronLeft size={18} aria-hidden="true" />
           {t('back')}

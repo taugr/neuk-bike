@@ -28,7 +28,7 @@ export function GpxImportReview({
       className="gpx-import-review panel-view"
       aria-label={t('reviewGpx')}
     >
-      <header className="gpx-import-review-header">
+      <header className="gpx-import-review-header" data-sheet-drag-handle>
         <button type="button" onClick={onBack}>
           <ChevronLeft size={17} aria-hidden="true" />
           {t('myRoutes')}

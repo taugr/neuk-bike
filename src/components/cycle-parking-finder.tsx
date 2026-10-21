@@ -6864,7 +6864,10 @@ export default function CycleParkingFinder() {
                             : 'chooseDestination',
                         )}
                       >
-                        <header className="route-map-editor-header">
+                        <header
+                          className="route-map-editor-header"
+                          data-sheet-drag-handle
+                        >
                           <strong>
                             {t(
                               routeEndpointMapTarget === 'start'
@@ -7105,6 +7108,7 @@ export default function CycleParkingFinder() {
                       <motion.div
                         layout
                         className="directions-header-main"
+                        data-sheet-drag-handle
                         transition={rowLayoutTransition}
                       >
                         <motion.div

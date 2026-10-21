@@ -104,7 +104,7 @@ export function RouteJourney({
       aria-label={t('planRoute')}
       data-testid="route-journey"
     >
-      <header className="journey-header">
+      <header className="journey-header" data-sheet-drag-handle>
         <button
           type="button"
           className="journey-icon"

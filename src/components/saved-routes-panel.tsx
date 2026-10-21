@@ -186,6 +186,7 @@ export function SavedRoutesPanel({
         aria-label={selectedRoute.name}
       >
         <header
+          data-sheet-drag-handle={isRenaming ? undefined : true}
           className={[
             'saved-route-detail-toolbar',
             isRenaming ? 'is-renaming' : '',
@@ -498,7 +499,7 @@ export function SavedRoutesPanel({
       className="saved-routes-panel panel-view"
       aria-label={t('myRoutes')}
     >
-      <header className="saved-routes-header">
+      <header className="saved-routes-header" data-sheet-drag-handle>
         <button type="button" onClick={onBack}>
           <ChevronLeft size={17} aria-hidden="true" />
           {t('back')}
