@@ -374,7 +374,8 @@ const copiedMessageDurationMs = 1_800;
 const themeStorageKey = 'cycle-parking-theme';
 const cycleNetworkStorageKey = 'cycle-parking-cycle-network-visible';
 const drinkingWaterStorageKey = 'cycle-parking-drinking-water-visible';
-const mobileSheetCollapsedHeightRem = 5.4;
+// Content height excludes the bottom padding, which can grow for a home indicator.
+const mobileSheetCollapsedHeightRem = 5.25;
 const mobileSheetDragIntentThresholdPx = 6;
 const mobileSheetExpandedViewportRatio = 0.52;
 const mobileDetailsSheetExpandedViewportRatio = 0.68;
@@ -637,14 +638,18 @@ function ParkingFiltersPanel({
       aria-label={t('parkingFilters')}
       className="parking-filter-panel parking-filter-panel--overlay panel-view"
     >
-      <div className="mobile-sheet-summary" aria-hidden="true">
+      <div
+        className="mobile-sheet-summary"
+        aria-hidden="true"
+        data-sheet-drag-handle
+      >
         <span>
           <strong>{t('parkingFilters')}</strong>
           <small>{eligibleNeuksLabel}</small>
         </span>
       </div>
       <div className="mobile-sheet-body parking-filter-panel-body">
-        <header className="parking-filter-header">
+        <header className="parking-filter-header" data-sheet-drag-handle>
           <motion.button type="button" whileTap={buttonTap} onClick={onBack}>
             <ChevronLeft size={18} aria-hidden="true" />
             {t('back')}
@@ -1237,7 +1242,9 @@ export default function CycleParkingFinder() {
   });
   const restoringParkingViewScroll = useRef<ParkingView | null>(null);
   const mobileSheetDrag = useRef<{
+    captureTarget: HTMLElement;
     currentY: number;
+    fromGrip: boolean;
     lastTimestamp: number;
     lastY: number;
     pointerId: number;
@@ -3196,7 +3203,8 @@ export default function CycleParkingFinder() {
         window.visualViewport?.height ?? window.innerHeight;
       const collapsedHeight =
         (Number.isFinite(rootFontSize) ? rootFontSize : 16) *
-        mobileSheetCollapsedHeightRem;
+          mobileSheetCollapsedHeightRem +
+        (Number.isFinite(paddingBottom) ? paddingBottom : 8);
       const contentHeight =
         Math.ceil(
           contentBottom +
@@ -3389,22 +3397,48 @@ export default function CycleParkingFinder() {
           ? 'expanded'
           : 'collapsed';
 
-    ignoreNextSheetGripClick.current = true;
+    ignoreNextSheetGripClick.current = drag.fromGrip;
     setMobileSheetState(nextState);
     setIsMobileSheetDragging(false);
     animateMobileSheetTo(nextState);
   }
 
-  function handleSheetGripPointerDown(
-    event: ReactPointerEvent<HTMLButtonElement>,
-  ) {
+  function handleSheetDragPointerDown(event: ReactPointerEvent<HTMLElement>) {
+    if (
+      !event.isPrimary ||
+      event.button !== 0 ||
+      mobileSheetDrag.current ||
+      !window.matchMedia('(max-width: 820px)').matches
+    ) {
+      return;
+    }
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const dragHandle = target.closest<HTMLElement>('[data-sheet-drag-handle]');
+    if (!dragHandle || !event.currentTarget.contains(dragHandle)) return;
+
+    const fromGrip = dragHandle.classList.contains('mobile-sheet-grip');
+    // Header controls retain their own taps, focus and pointer gestures.
+    const control = target.closest(
+      'button, a, input, select, textarea, label, [role="button"], [role="link"], [contenteditable]:not([contenteditable="false"])',
+    );
+    if (control && !(fromGrip && control === dragHandle)) return;
+
+    ignoreNextSheetGripClick.current = false;
+    // Keep a title drag captured on the stable pane as its contents fade out.
+    // The grip captures its own pointer so a stationary tap still clicks it.
+    const captureTarget = fromGrip ? dragHandle : event.currentTarget;
     const rootFontSize = Number.parseFloat(
       window.getComputedStyle(document.documentElement).fontSize,
     );
     const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const paddingBottom = Number.parseFloat(
+      window.getComputedStyle(event.currentTarget).paddingBottom,
+    );
     const collapsedHeight =
       (Number.isFinite(rootFontSize) ? rootFontSize : 16) *
-      mobileSheetCollapsedHeightRem;
+        mobileSheetCollapsedHeightRem +
+      (Number.isFinite(paddingBottom) ? paddingBottom : 8);
     const expandedHeight =
       isContentSizedMobileSheet && mobileContentSheetExpandedHeightPx !== null
         ? mobileContentSheetExpandedHeightPx
@@ -3413,7 +3447,9 @@ export default function CycleParkingFinder() {
     const startProgress = mobileSheetState === 'expanded' ? 1 : 0;
 
     mobileSheetDrag.current = {
+      captureTarget,
       currentY: event.clientY,
+      fromGrip,
       lastTimestamp: event.timeStamp,
       lastY: event.clientY,
       pointerId: event.pointerId,
@@ -3425,12 +3461,10 @@ export default function CycleParkingFinder() {
     mobileSheetProgressValue.stop();
     mobileSheetProgressValue.set(startProgress);
     setIsMobileSheetDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
+    captureTarget.setPointerCapture(event.pointerId);
   }
 
-  function handleSheetGripPointerMove(
-    event: ReactPointerEvent<HTMLButtonElement>,
-  ) {
+  function handleSheetDragPointerMove(event: ReactPointerEvent<HTMLElement>) {
     const drag = mobileSheetDrag.current;
     if (!drag || drag.pointerId !== event.pointerId) {
       return;
@@ -3454,9 +3488,7 @@ export default function CycleParkingFinder() {
     mobileSheetProgressValue.set(dragProgress);
   }
 
-  function handleSheetGripPointerEnd(
-    event: ReactPointerEvent<HTMLButtonElement>,
-  ) {
+  function handleSheetDragPointerEnd(event: ReactPointerEvent<HTMLElement>) {
     const drag = mobileSheetDrag.current;
     if (!drag || drag.pointerId !== event.pointerId) {
       return;
@@ -3464,27 +3496,28 @@ export default function CycleParkingFinder() {
 
     mobileSheetDrag.current = null;
 
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+    if (drag.captureTarget.hasPointerCapture(event.pointerId)) {
+      drag.captureTarget.releasePointerCapture(event.pointerId);
     }
 
     snapMobileSheetFromDrag(drag, event.timeStamp);
   }
 
-  function handleSheetGripClick() {
+  function handleSheetGripClick(event: MouseEvent<HTMLButtonElement>) {
     if (ignoreNextSheetGripClick.current) {
       ignoreNextSheetGripClick.current = false;
-      return;
+      if (event.detail > 0) return;
     }
 
     toggleMobileSheet();
   }
 
-  function handleSheetGripPointerCancel(
-    event: ReactPointerEvent<HTMLButtonElement>,
-  ) {
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+  function handleSheetDragPointerCancel(event: ReactPointerEvent<HTMLElement>) {
+    const drag = mobileSheetDrag.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+
+    if (drag.captureTarget.hasPointerCapture(event.pointerId)) {
+      drag.captureTarget.releasePointerCapture(event.pointerId);
     }
 
     mobileSheetDrag.current = null;
@@ -6669,6 +6702,10 @@ export default function CycleParkingFinder() {
         <motion.aside
           className="control-pane"
           ref={controlPaneRef}
+          onPointerCancel={handleSheetDragPointerCancel}
+          onPointerDown={handleSheetDragPointerDown}
+          onPointerMove={handleSheetDragPointerMove}
+          onPointerUp={handleSheetDragPointerEnd}
           aria-label={t('nearestParking')}
           data-mobile-sheet-dragging={
             isMobileSheetDragging ? 'true' : undefined
@@ -6732,12 +6769,9 @@ export default function CycleParkingFinder() {
                   })
             }
             className="mobile-sheet-grip"
+            data-sheet-drag-handle
             type="button"
             onClick={handleSheetGripClick}
-            onPointerCancel={handleSheetGripPointerCancel}
-            onPointerDown={handleSheetGripPointerDown}
-            onPointerMove={handleSheetGripPointerMove}
-            onPointerUp={handleSheetGripPointerEnd}
             whileTap={subtleTap}
           >
             <span aria-hidden="true" />
@@ -7458,6 +7492,7 @@ export default function CycleParkingFinder() {
                     <div
                       className="mobile-sheet-summary mobile-sheet-summary--details"
                       aria-hidden="true"
+                      data-sheet-drag-handle
                     >
                       <strong className="mobile-sheet-summary-location">
                         {explicitSelectedPoint.name}
@@ -7473,7 +7508,10 @@ export default function CycleParkingFinder() {
                       className="mobile-sheet-body parking-detail-body"
                       data-parking-detail-id={explicitSelectedPoint.id}
                     >
-                      <div className="parking-details-toolbar">
+                      <div
+                        className="parking-details-toolbar"
+                        data-sheet-drag-handle
+                      >
                         <motion.button
                           className="parking-details-back"
                           aria-label={
@@ -7552,7 +7590,10 @@ export default function CycleParkingFinder() {
                         </div>
                       </div>
 
-                      <header className="parking-details-header">
+                      <header
+                        className="parking-details-header"
+                        data-sheet-drag-handle
+                      >
                         <h1>{explicitSelectedPoint.name}</h1>
                         {explicitSelectedPointDetails?.metrics[0] ? (
                           <span>
@@ -7719,7 +7760,11 @@ export default function CycleParkingFinder() {
                       {renderThemeSettings('settings-menu--desktop')}
                     </header>
 
-                    <div className="mobile-sheet-summary" aria-hidden="true">
+                    <div
+                      className="mobile-sheet-summary"
+                      aria-hidden="true"
+                      data-sheet-drag-handle
+                    >
                       <span>
                         <strong>
                           {t(
@@ -7781,7 +7826,10 @@ export default function CycleParkingFinder() {
                             ? renderPlaceSearchPanel('desktop')
                             : null}
 
-                          <div className="list-heading list-heading-actions">
+                          <div
+                            className="list-heading list-heading-actions"
+                            data-sheet-drag-handle
+                          >
                             <h2
                               ref={savedHeadingRef}
                               tabIndex={

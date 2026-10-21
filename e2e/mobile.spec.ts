@@ -1223,9 +1223,7 @@ test('keeps the collapsed parking details summary inside the sheet', async ({
     .toBeGreaterThan(40);
   await expect
     .poll(async () => {
-      const gripBounds = await page
-        .locator('.mobile-sheet-grip span')
-        .boundingBox();
+      const gripBounds = await page.locator('.mobile-sheet-grip').boundingBox();
       const toolbarBounds = await detailsToolbar.boundingBox();
       if (!gripBounds || !toolbarBounds) {
         return Number.POSITIVE_INFINITY;
@@ -1688,7 +1686,7 @@ test('uses at most one camera move when selecting a pin from collapsed details',
   );
   await expect
     .poll(async () => (await controlPane.boundingBox())?.height ?? 0)
-    .toBeLessThan(100);
+    .toBeCloseTo(92, 0);
   await page.waitForTimeout(1_100);
 
   await page.evaluate(() => {

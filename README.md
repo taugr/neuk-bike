@@ -50,6 +50,11 @@ Imagery credits use the same startup fade as the street map and remain available
 in the Attributions panel: © Esri, Vantor,
 Earthstar Geographics, and the GIS User Community ([World Imagery](https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9)).
 
+On mobile, tap the tray's handle or drag its handle and title area to expand or
+collapse it. The compact handle and title form a broad drag area;
+nearby, saved, filter and parking-detail headings accept drags. Header buttons
+keep their usual actions, and the results below scroll independently.
+
 Use the compass below Map layers to see north: drag it to rotate the map,
 then tap it to face north again. Two-finger rotation on touch screens and
 right-button dragging on desktop also rotate the map. The 3D/2D button below
