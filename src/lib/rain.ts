@@ -77,6 +77,15 @@ export function rainFresh(snapshot: RainSnapshot, now = Date.now()) {
     now - snapshot.validAt < RAIN_MAX_AGE
   );
 }
+/** Keep known rain while an overlapping viewport loads; never extend coverage. */
+export function rainOverlaps(snapshot: RainSnapshot, bounds: ParkingMapBounds) {
+  return (
+    snapshot.bounds.west < bounds.east &&
+    snapshot.bounds.east > bounds.west &&
+    snapshot.bounds.south < bounds.north &&
+    snapshot.bounds.north > bounds.south
+  );
+}
 export function parseRain(
   value: unknown,
   region: RainRegion,

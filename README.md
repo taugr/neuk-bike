@@ -141,6 +141,8 @@ Rain shares regional Wind's per-tab request budget and Retry-After handling.
 It refreshes every 15 minutes while visible, caches up to 12 areas in memory,
 and removes estimates older than 30 minutes or when offline. Weather is not
 added to offline downloads. Zoomed-out, unavailable and dry states are distinct.
+While panning, fresh rain stays visible inside its sampled coverage as the next
+area loads, and existing droplets continue smoothly when new data arrives.
 
 Data and provider credits are in Attributions. The same Open-Meteo
 non-commercial usage terms described below apply. Rain does not alter routes.

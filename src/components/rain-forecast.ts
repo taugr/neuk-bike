@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   rainFresh,
+  rainOverlaps,
   rainRegion,
   parseRain,
   RAIN_REFRESH,
@@ -90,7 +91,9 @@ export function useRainForecast(
             setSnapshot(cached);
             setState('ready');
           } else {
-            setSnapshot(null);
+            setSnapshot((previous) =>
+              previous && rainFresh(previous) ? previous : null,
+            );
             setState(navigator.onLine ? 'error' : 'offline');
           }
         }
@@ -99,7 +102,10 @@ export function useRainForecast(
         loading = false;
       }
     };
-    setSnapshot(null);
+    // Changing request grids must not unmount the renderer during the debounce,
+    // shared request budget, or network wait. Old data still has strict bounds.
+    const cached = cache.get(region.key);
+    if (cached && rainFresh(cached)) setSnapshot(cached);
     setState('loading');
     scheduled = setTimeout(() => void load(), 650);
     const tick = () => {
@@ -127,7 +133,9 @@ export function useRainForecast(
   const rain =
     enabled &&
     snapshot !== null &&
-    snapshot.key === key &&
+    region !== null &&
+    bounds !== null &&
+    rainOverlaps(snapshot, bounds) &&
     rainFresh(snapshot, now) &&
     state !== 'offline'
       ? snapshot

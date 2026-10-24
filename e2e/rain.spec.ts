@@ -256,3 +256,158 @@ test('rain and regional wind coexist and share a request budget', async ({
     weatherRequests[1].time - weatherRequests[0].time,
   ).toBeGreaterThanOrEqual(9500);
 });
+
+for (const terrain of [false, true]) {
+  test(`rain stays continuous while panning across grids in ${terrain ? '3D' : '2D'}`, async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.setViewportSize({ width: 1440, height: 844 });
+    const start = new Date('2026-10-24T12:00:00Z');
+    await page.clock.setFixedTime(start);
+    const requests = await fixture(page);
+    await page.goto(url);
+    await expectRenderedBasemap(page);
+    const map = page.getByTestId('parking-map');
+    // Let the initial nearby-results camera finish before choosing our view.
+    let lastZoom = '',
+      stableSince = Date.now();
+    await expect
+      .poll(async () => {
+        const zoom = await map.getAttribute('data-map-zoom');
+        if (zoom !== lastZoom) {
+          lastZoom = zoom!;
+          stableSince = Date.now();
+        }
+        return Date.now() - stableSince;
+      })
+      .toBeGreaterThan(600);
+    while (Number(await map.getAttribute('data-map-zoom')) > 14.5) {
+      const zoom = Number(await map.getAttribute('data-map-zoom'));
+      await page.getByRole('button', { name: 'Zoom out', exact: true }).click();
+      await expect
+        .poll(async () => Number(await map.getAttribute('data-map-zoom')))
+        .toBeLessThan(zoom - 0.8);
+    }
+    if (terrain) {
+      await page
+        .getByRole('button', { name: 'Switch to 3D map', exact: true })
+        .click();
+      await expect
+        .poll(async () => Number(await map.getAttribute('data-map-pitch')))
+        .toBeCloseTo(55);
+    }
+    await page.getByTestId('map-layers-trigger').click();
+    await page.getByRole('switch', { name: 'Rain', exact: true }).check();
+    const rain = page.getByTestId('rain-map-canvas');
+    await expect
+      .poll(async () => Number(await rain.getAttribute('data-rain-particles')))
+      .toBeGreaterThan(20);
+    await page.getByTestId('map-layers-trigger').click();
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let pending = false;
+    await page.route(
+      'https://api.open-meteo.com/v1/forecast*',
+      async (route) => {
+        if (!new URL(route.request().url()).searchParams.has('current'))
+          return route.fallback();
+        pending = true;
+        await held;
+        await route.fallback();
+      },
+    );
+    // Exercise an actual network wait without waiting for the shared throttle.
+    await page.clock.setFixedTime(new Date(start.getTime() + 20000));
+    await rain.evaluate((original) => {
+      original.setAttribute('data-continuity', 'original');
+      const root = document.documentElement;
+      root.dataset.rainSampling = 'true';
+      root.dataset.rainMissing = '0';
+      root.dataset.rainBlank = '0';
+      let last = 0;
+      const sample = (now: number) => {
+        if (root.dataset.rainSampling !== 'true') return;
+        if (!original.isConnected) root.dataset.rainMissing = '1';
+        if (now - last > 100) {
+          const c = original as HTMLCanvasElement;
+          const pixels = c
+            .getContext('2d')!
+            .getImageData(0, 0, c.width, c.height).data;
+          if (!pixels.some((v, i) => i % 4 === 3 && v > 0))
+            root.dataset.rainBlank = '1';
+          last = now;
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+    try {
+      const box = (await page.locator('.maplibregl-canvas').boundingBox())!;
+      // Cross the nearest grid boundary. A pitched viewport requests a wider
+      // grid, so always dragging west can require several unnecessary gestures.
+      const longitudes = new URL(requests.at(-1)!).searchParams
+        .get('longitude')!
+        .split(',')
+        .map(Number);
+      const gridCentre =
+        (Math.min(...longitudes) + Math.max(...longitudes)) / 2;
+      const viewCentre =
+        (Number(await map.getAttribute('data-map-west')) +
+          Number(await map.getAttribute('data-map-east'))) /
+        2;
+      const direction = viewCentre > gridCentre ? -1 : 1;
+      for (let i = 0; i < 5 && !pending; i++) {
+        const x = box.x + box.width * (direction > 0 ? 0.2 : 0.8),
+          y = box.y + box.height * 0.65;
+        await page.mouse.move(x, y);
+        await page.mouse.down();
+        await page.mouse.move(x + direction * box.width * 0.6, y, {
+          steps: 12,
+        });
+        await page.waitForTimeout(200); // release without inertial camera motion
+        await page.mouse.up();
+        // Viewport debounce (500ms) plus request debounce (650ms).
+        await page.waitForTimeout(1400);
+      }
+      expect(pending).toBe(true);
+      await expect(rain).toHaveAttribute('data-continuity', 'original');
+      await expect(page.locator('html')).toHaveAttribute(
+        'data-rain-missing',
+        '0',
+      );
+      await expect(page.locator('html')).toHaveAttribute(
+        'data-rain-blank',
+        '0',
+      );
+      release();
+      await expect.poll(() => requests.length).toBe(2);
+      await page.getByTestId('map-layers-trigger').click();
+      await expect(page.getByTestId('rain-layer-status')).toHaveAttribute(
+        'data-state',
+        'ready',
+      );
+      await expect(rain).toHaveAttribute('data-continuity', 'original');
+      await expect(page.locator('html')).toHaveAttribute(
+        'data-rain-missing',
+        '0',
+      );
+      await expect(page.locator('html')).toHaveAttribute(
+        'data-rain-blank',
+        '0',
+      );
+    } finally {
+      release();
+      if (!page.isClosed())
+        await page
+          .evaluate(() => {
+            document.documentElement.dataset.rainSampling = 'false';
+          })
+          .catch(() => {
+            /* The runner may already be closing a timed-out page. */
+          });
+    }
+  });
+}

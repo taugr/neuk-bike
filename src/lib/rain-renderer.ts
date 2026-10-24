@@ -12,6 +12,7 @@ type Drop = {
   ground: MercatorCoordinate;
   top: MercatorCoordinate;
   strength: number;
+  chance: number;
   phase: number;
   speed: number;
 };
@@ -27,6 +28,7 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let snapshot: RainSnapshot | null = null;
   let drops: Drop[] = [];
+  let activeDrops = 0;
   let matrix: number[] = [];
   let width = 0,
     height = 0,
@@ -40,9 +42,13 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
     type: 'custom',
     renderingMode: '3d',
     render(_gl, args) {
-      matrix = Array.from(args.defaultProjectionData.mainMatrix);
+      const nextMatrix = Array.from(args.defaultProjectionData.mainMatrix);
+      // Refill newly exposed areas on each camera frame, not just moveend.
+      // Rebuild only after receiving the matrix matching map.unproject().
+      if (nextMatrix.some((value, i) => value !== matrix[i])) dirty = true;
+      matrix = nextMatrix;
       draw(performance.now());
-      if (!raf && !document.hidden && !motion.matches && drops.length)
+      if (!raf && !document.hidden && !motion.matches && activeDrops)
         raf = requestAnimationFrame(tick);
     },
   };
@@ -78,6 +84,7 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
     dirty = false;
     if (!snapshot) {
       drops = [];
+      activeDrops = 0;
       return;
     }
     const occupied = new Map<string, number>();
@@ -86,7 +93,6 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
         rain = rainAt(snapshot!, d.longitude, d.latitude);
       if (
         !p ||
-        !rain ||
         p.x < -width * 0.2 ||
         p.x > width * 1.2 ||
         p.y < -height * 0.2 ||
@@ -97,9 +103,10 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
       const count = occupied.get(cell) ?? 0;
       if (count >= 5) return false;
       occupied.set(cell, count + 1);
-      d.strength = rainStrength(rain.rate);
-      Object.assign(d, anchor(d.longitude, d.latitude, rain.elevation));
-      return d.strength > 0;
+      const strength = rain ? rainStrength(rain.rate) : 0;
+      d.strength = d.chance <= strength ? strength : 0;
+      Object.assign(d, anchor(d.longitude, d.latitude, rain?.elevation ?? 0));
+      return true;
     });
     const limit = width < 700 ? 450 : 1000;
     const target = Math.min(limit, Math.round((width * height) / 850));
@@ -109,19 +116,22 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
       const sy = (random(id * 7 + 2) * 1.4 - 0.2) * height;
       const point = map.unproject([sx, sy]);
       const rain = rainAt(snapshot, point.lng, point.lat);
-      if (!rain) continue;
-      const strength = rainStrength(rain.rate);
-      if (!strength || random(id * 7 + 3) > strength) continue;
+      const strength = rain ? rainStrength(rain.rate) : 0;
+      const chance = random(id * 7 + 3);
+      // Retain invisible candidates too: repeated pans must not progressively
+      // turn light rain into heavy rain by rerolling the same density budget.
       drops.push({
         longitude: point.lng,
         latitude: point.lat,
-        ...anchor(point.lng, point.lat, rain.elevation),
-        strength,
+        ...anchor(point.lng, point.lat, rain?.elevation ?? 0),
+        strength: chance <= strength ? strength : 0,
+        chance,
         phase: random(id * 7 + 4),
         speed: 0.55 + random(id * 7 + 5) * 0.4,
       });
     }
-    canvas.dataset.rainParticles = String(drops.length);
+    activeDrops = drops.filter((d) => d.strength > 0).length;
+    canvas.dataset.rainParticles = String(activeDrops);
   }
   function draw(now: number) {
     if (!ctx || disposed || document.hidden) return;
@@ -147,6 +157,7 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
     canvas.dataset.motion = motion.matches ? 'static' : 'animated';
     ctx.lineCap = 'round';
     for (const d of drops) {
+      if (!d.strength) continue;
       const ground = project(d.ground);
       if (!ground) continue;
       const top = project(d.top) ?? { x: ground.x, y: ground.y - height * 0.5 };
@@ -191,13 +202,13 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
       draw(now);
       lastDraw = now;
     }
-    if (drops.length) raf = requestAnimationFrame(tick);
+    if (activeDrops) raf = requestAnimationFrame(tick);
   }
   const start = () => {
     cancelAnimationFrame(raf);
     raf = 0;
     draw(performance.now());
-    if (!document.hidden && !motion.matches && snapshot && drops.length)
+    if (!document.hidden && !motion.matches && snapshot && activeDrops)
       raf = requestAnimationFrame(tick);
   };
   const settled = () => {
@@ -220,7 +231,7 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
   return {
     update(next: RainSnapshot) {
       snapshot = next;
-      drops = [];
+      // Preserve geographic anchors and animation phases across fresh data.
       dirty = true;
       map.triggerRepaint();
       start();

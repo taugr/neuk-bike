@@ -3,6 +3,7 @@ import {
   parseRain,
   rainAt,
   rainFresh,
+  rainOverlaps,
   rainRegion,
   rainStrength,
   RAIN_MAX_AGE,
@@ -102,5 +103,23 @@ describe('current rain', () => {
       b = region.points[1];
     expect(rainAt(rain, (a[0] + b[0]) / 2, a[1])?.rate).toBeCloseTo(0.6);
     expect(rainAt(rain, region.bounds.east + 0.01, a[1])).toBeNull();
+  });
+  it('retains overlapping coverage across request grids but not distant areas', () => {
+    const rain = parseRain(payload(), region, now)!;
+    const adjacent = {
+      ...bounds,
+      west: region.bounds.east - 0.005,
+      east: region.bounds.east + 0.015,
+    };
+    expect(rainRegion(adjacent)?.key).not.toBe(region.key);
+    expect(rainOverlaps(rain, adjacent)).toBe(true);
+    expect(rainAt(rain, adjacent.east, adjacent.south)).toBeNull();
+    expect(
+      rainOverlaps(rain, {
+        ...adjacent,
+        west: region.bounds.east,
+      }),
+    ).toBe(false);
+    expect(rainOverlaps(rain, { ...bounds, south: 40, north: 41 })).toBe(false);
   });
 });
