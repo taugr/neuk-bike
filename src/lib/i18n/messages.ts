@@ -1,6 +1,17 @@
 import type { AppLocale } from '@/lib/i18n/locales';
 
 const en = {
+  rain: 'Rain',
+  rainEstimate: 'Estimated rain · {time}',
+  rainDry: 'No rain expected · {time}',
+  rainLoading: 'Loading rain…',
+  rainUnavailable: 'Rain unavailable',
+  rainOffline: 'Rain unavailable offline',
+  rainZoom: 'Zoom in to see rain',
+  rainStale: 'Rain estimate out of date',
+  rainAttribution:
+    'Rain is an illustrative estimate for now, based on weather models, not live radar.',
+
   windRegionalHour: 'Regional forecast · {date} UTC',
   windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
   windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',
@@ -492,6 +503,17 @@ const en = {
 type MessageCatalogue = { [Key in keyof typeof en]: string };
 
 const gd: MessageCatalogue = {
+  rain: 'Uisge',
+  rainEstimate: 'Tuairmse uisge · {time}',
+  rainDry: 'Chan eil dùil ri uisge · {time}',
+  rainLoading: 'A’ luchdachadh uisge…',
+  rainUnavailable: 'Uisge gun fhaighinn',
+  rainOffline: 'Uisge gun fhaighinn far loidhne',
+  rainZoom: 'Sùm a-steach gus uisge fhaicinn',
+  rainStale: 'Tuairmse uisge ro shean',
+  rainAttribution:
+    'Tha an t-uisge na thuairmse lèirsinneach airson an-dràsta, stèidhichte air modailean sìde, chan e radar beò.',
+
   windRegionalHour: 'Ro-shealladh roinneil · {date} UTC',
   windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
   windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',
@@ -1015,6 +1037,17 @@ const gd: MessageCatalogue = {
 };
 
 const es: MessageCatalogue = {
+  rain: 'Lluvia',
+  rainEstimate: 'Lluvia estimada · {time}',
+  rainDry: 'No se espera lluvia · {time}',
+  rainLoading: 'Cargando lluvia…',
+  rainUnavailable: 'Lluvia no disponible',
+  rainOffline: 'Lluvia no disponible sin conexión',
+  rainZoom: 'Acerca el mapa para ver la lluvia',
+  rainStale: 'Estimación de lluvia caducada',
+  rainAttribution:
+    'La lluvia es una estimación ilustrativa para el momento actual basada en modelos meteorológicos, no en radar en directo.',
+
   windRegionalHour: 'Pronóstico regional · {date} UTC',
   windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
   windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',
@@ -1515,6 +1548,17 @@ const es: MessageCatalogue = {
 };
 
 const hy: MessageCatalogue = {
+  rain: 'Անձրև',
+  rainEstimate: 'Անձրևի գնահատում · {time}',
+  rainDry: 'Անձրև չի սպասվում · {time}',
+  rainLoading: 'Անձրևի տվյալները բեռնվում են…',
+  rainUnavailable: 'Անձրևի տվյալները հասանելի չեն',
+  rainOffline: 'Անձրևի համար անհրաժեշտ է ինտերնետ',
+  rainZoom: 'Մոտեցրեք քարտեզը՝ անձրևը տեսնելու համար',
+  rainStale: 'Անձրևի գնահատումը հնացել է',
+  rainAttribution:
+    'Անձրևը եղանակային մոդելների վրա հիմնված ներկա պահի պատկերավոր գնահատում է, ոչ թե ուղիղ ռադար։',
+
   windRegionalHour: 'Տարածաշրջանային կանխատեսում · {date} UTC',
   windGridHour: 'UKV ~{resolution} forecast · {date} UTC',
   windFallbackHour: 'Area forecast (grid unavailable) · {date} UTC',

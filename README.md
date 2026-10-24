@@ -125,6 +125,26 @@ Map-source credits appear as a plain line at startup, below the search bar on
 phones and in the lower-right corner on desktop, then fade out after five
 seconds. Full attribution links remain available in the Attributions panel.
 
+## Current rain
+
+**Rain** in Map layers shows an animated estimate for now, with the valid local
+time in the layer menu. It is off initially and remembers your choice. Rain
+stays anchored to the map in 2D, 3D and satellite views; reduced motion uses
+static droplets. The effect is adapted from Trail Atlas and is illustrative,
+not live radar or a precise boundary between wet and dry streets.
+
+Open-Meteo supplies current liquid rain and showers (excluding snow) on a
+quantized 20-point viewport grid, with tighter spacing when zoomed in. The app
+normalizes the reported accumulation interval to control visual intensity.
+Requests contain public grid coordinates, never exact GPS or route points.
+Rain shares regional Wind's per-tab request budget and Retry-After handling.
+It refreshes every 15 minutes while visible, caches up to 12 areas in memory,
+and removes estimates older than 30 minutes or when offline. Weather is not
+added to offline downloads. Zoomed-out, unavailable and dry states are distinct.
+
+Data and provider credits are in Attributions. The same Open-Meteo
+non-commercial usage terms described below apply. Rain does not alter routes.
+
 ## Wind forecast
 
 **Wind forecast** is available in Map layers, off by default. The Layers

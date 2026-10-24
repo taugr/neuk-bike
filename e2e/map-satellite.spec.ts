@@ -77,7 +77,10 @@ for (const [satellite, terrain] of [
       await expect(map).toHaveAttribute('data-map-initializing', 'true');
       await expect(page.locator('.maplibregl-canvas')).toBeHidden();
       release();
-      await expect(map).toHaveAttribute('data-map-initializing', 'false');
+      // Match the terrain/imagery readiness budget, including software WebGL.
+      await expect(map).toHaveAttribute('data-map-initializing', 'false', {
+        timeout: 15_000,
+      });
       await expect(page.locator('.maplibregl-canvas')).toBeVisible();
       await expect
         .poll(async () =>

@@ -1,21 +1,17 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  parseRegionalWind,
-  reserveWindRequest,
-  type WindRegion,
-} from '@/lib/regional-wind';
+import { parseRegionalWind, type WindRegion } from '@/lib/regional-wind';
 import { PROVIDER_MAX_AGE, PROVIDER_REFRESH } from '@/lib/provider-wind';
+import {
+  reserveWeatherRequest,
+  deferWeatherRequests,
+} from '@/lib/weather-request-budget';
 import { windStatus } from '@/lib/wind';
 import { windAvailability, type WindLoadStatus } from '@/lib/wind-availability';
 
 type Entry = { key: string; hour: number; value: unknown; capturedAt: number };
 const cacheKey = 'neuk-regional-wind-v1';
-const budgetKey = 'neuk-wind-budget-v1';
-const retryKey = 'neuk-wind-retry-after-v1';
 let memoryCache: Entry[] = [];
-let requestHistory: number[] = [];
-let retryAfter = 0;
 function readCache() {
   try {
     const parsed: unknown = JSON.parse(
@@ -95,26 +91,7 @@ export function useRegionalWindForecast(
         setState({ key: currentRegion.key, status: 'loaded' });
         return;
       }
-      try {
-        const stored: unknown = JSON.parse(
-          sessionStorage.getItem(budgetKey) || 'null',
-        );
-        if (Array.isArray(stored))
-          requestHistory = stored.filter(
-            (t) => typeof t === 'number' && Number.isFinite(t),
-          );
-      } catch {
-        /* Use the in-memory limit. */
-      }
-      try {
-        const savedRetry = Number(sessionStorage.getItem(retryKey));
-        if (Number.isFinite(savedRetry))
-          retryAfter = Math.max(retryAfter, savedRetry);
-      } catch {
-        /* Keep the in-memory retry deadline. */
-      }
-      const budget = reserveWindRequest(requestHistory, stamp);
-      const wait = Math.max(budget.wait, retryAfter - stamp);
+      const wait = reserveWeatherRequest(stamp);
       if (wait > 0) {
         if (cached) {
           setSnapshot({ ...cached, cached: true });
@@ -128,12 +105,6 @@ export function useRegionalWindForecast(
         scheduled = setTimeout(() => void load(), wait + 10);
         return;
       }
-      requestHistory = budget.history;
-      try {
-        sessionStorage.setItem(budgetKey, JSON.stringify(requestHistory));
-      } catch {
-        /* In-memory limit remains. */
-      }
       loading = true;
       controller = new AbortController();
       const timeout = setTimeout(() => controller?.abort(), 10000);
@@ -146,21 +117,10 @@ export function useRegionalWindForecast(
           referrerPolicy: 'no-referrer',
         });
         if (response.status === 429) {
-          const header = response.headers.get('retry-after');
-          const delay =
-            header && /^\d+$/.test(header)
-              ? Number(header) * 1000
-              : header
-                ? Date.parse(header) - Date.now()
-                : 0;
-          retryAfter =
-            Date.now() +
-            Math.max(PROVIDER_REFRESH, Number.isFinite(delay) ? delay : 0);
-          try {
-            sessionStorage.setItem(retryKey, String(retryAfter));
-          } catch {
-            /* In-memory retry remains. */
-          }
+          deferWeatherRequests(
+            response.headers.get('retry-after'),
+            PROVIDER_REFRESH,
+          );
         }
         if (!response.ok) throw new Error('Forecast unavailable');
         const value: unknown = await response.json(),

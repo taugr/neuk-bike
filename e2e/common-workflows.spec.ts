@@ -217,6 +217,13 @@ test('switches and persists the interface language without moving the map', asyn
   await expectMapFocusedAt(page, 55.94155, -3.29625);
 
   const map = page.getByTestId('parking-map');
+  // The initial Edinburgh viewport can already contain this GPS point. Wait
+  // for the nearby-results focus before attributing its movement to language.
+  await expect
+    .poll(async () =>
+      Number(await map.getAttribute('data-map-center-longitude')),
+    )
+    .toBeCloseTo(-3.29625, 2);
   const mapCanvas = page.locator('.maplibregl-canvas');
   await mapCanvas.evaluate((canvas) => {
     canvas.setAttribute('data-language-switch-canvas', 'stable');

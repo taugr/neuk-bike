@@ -121,6 +121,8 @@ import {
   type CycleNetworkRouteIdentity,
 } from '@/lib/cycle-network-presentation';
 
+import { RainMapOverlay } from '@/components/rain-map-overlay';
+import type { RainSnapshot } from '@/lib/rain';
 import { WindMapOverlay } from '@/components/wind-map-overlay';
 import type { WindForecast } from '@/lib/wind';
 maplibregl.setWorkerUrl(
@@ -137,6 +139,7 @@ type CycleParkingMapProps = {
   onSatelliteUnavailable: () => void;
   wind?: WindForecast | null;
   windLabel?: string;
+  rain?: RainSnapshot | null;
   userLocation: UserLocation;
   referenceLocationLabel: string;
   isReferenceCurrentLocation: boolean;
@@ -1853,6 +1856,7 @@ export default function CycleParkingMap({
   onSatelliteUnavailable,
   wind = null,
   windLabel = '',
+  rain = null,
   userLocation,
   referenceLocationLabel,
   isReferenceCurrentLocation,
@@ -4310,6 +4314,9 @@ export default function CycleParkingMap({
         <div className="terrain-unavailable-notice" role="status">
           {translate(locale, 'terrainUnavailable')}
         </div>
+      ) : null}
+      {rain && map && isMapLoaded && !isOfflineBasemap ? (
+        <RainMapOverlay map={map} rain={rain} />
       ) : null}
       {wind && map && isMapLoaded && !isOfflineBasemap ? (
         <WindMapOverlay

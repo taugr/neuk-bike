@@ -1,4 +1,6 @@
 'use client';
+import { rainStorageKey } from '@/lib/rain';
+import { useRainForecast } from '@/components/rain-forecast';
 import { satelliteStorageKey } from '@/lib/map-satellite';
 import { resolveUnits } from '@/lib/units';
 import { useUnits } from '@/components/units-provider';
@@ -995,6 +997,14 @@ export default function CycleParkingFinder() {
       );
     } catch {
       // The layer still works when preference storage is unavailable.
+    }
+  }, []);
+  const [isRainVisible, setIsRainVisible] = useState(false);
+  useEffect(() => {
+    try {
+      setIsRainVisible(window.localStorage.getItem(rainStorageKey) === 'true');
+    } catch {
+      /* Optional preference storage. */
     }
   }, []);
   const [manualWindVisible, setManualWindVisible] = useState(false);
@@ -2656,6 +2666,34 @@ export default function CycleParkingFinder() {
       ? (mapPoints.find((point) => point.id === directionsState.parkingId) ??
         null)
       : null;
+  const { rain, status: rainStatus } = useRainForecast(
+    isRainVisible,
+    windViewport,
+  );
+  const rainTime = rain
+    ? new Intl.DateTimeFormat(formattingLocale, {
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(rain.validAt)
+    : '';
+  const rainLabel = rain
+    ? t(
+        rain.samples.some((sample) => sample.rate >= 0.05)
+          ? 'rainEstimate'
+          : 'rainDry',
+        { time: rainTime },
+      )
+    : t(
+        rainStatus === 'offline'
+          ? 'rainOffline'
+          : rainStatus === 'zoom'
+            ? 'rainZoom'
+            : rainStatus === 'stale'
+              ? 'rainStale'
+              : rainStatus === 'error'
+                ? 'rainUnavailable'
+                : 'rainLoading',
+      );
   const isWindVisible = WIND_ENABLED && manualWindVisible;
   const windTarget = useMemo(() => {
     if (!windViewport || !parkingManifest) return null;
@@ -6487,6 +6525,7 @@ export default function CycleParkingFinder() {
             onSatelliteUnavailable={handleSatelliteUnavailable}
             wind={isWindVisible && windFreshness !== 'stale' ? wind : null}
             windLabel={windLabel}
+            rain={rain}
           />
           {isDestinationParkingMode ? (
             <div
@@ -6651,6 +6690,42 @@ export default function CycleParkingFinder() {
                         onChange={(event) =>
                           setDrinkingWaterVisibility(event.target.checked)
                         }
+                      />
+                    </label>
+                    <label className="map-layers-option">
+                      <span>
+                        {t('rain')}
+                        {isRainVisible ? (
+                          <small
+                            id="rain-layer-status"
+                            role="status"
+                            data-testid="rain-layer-status"
+                            data-state={rainStatus}
+                          >
+                            {rainLabel}
+                          </small>
+                        ) : null}
+                      </span>
+                      <input
+                        aria-label={t('rain')}
+                        aria-describedby={
+                          isRainVisible ? 'rain-layer-status' : undefined
+                        }
+                        checked={isRainVisible}
+                        data-testid="rain-layer-toggle"
+                        role="switch"
+                        type="checkbox"
+                        onChange={(event) => {
+                          setIsRainVisible(event.target.checked);
+                          try {
+                            window.localStorage.setItem(
+                              rainStorageKey,
+                              String(event.target.checked),
+                            );
+                          } catch {
+                            /* Keep the in-memory preference. */
+                          }
+                        }}
                       />
                     </label>
                     {WIND_ENABLED ? (
@@ -8818,8 +8893,8 @@ export default function CycleParkingFinder() {
                     <a href="https://open-meteo.com/en/licence">
                       CC BY 4.0 and model-provider credits
                     </a>
-                    . Wind vectors interpolated by Bike Neuks. Edinburgh UKV: UK
-                    Met Office ·{' '}
+                    . {t('rainAttribution')} Wind vectors interpolated by Bike
+                    Neuks. Edinburgh UKV: UK Met Office ·{' '}
                     <a href="https://creativecommons.org/licenses/by-sa/4.0/">
                       CC BY-SA 4.0
                     </a>
