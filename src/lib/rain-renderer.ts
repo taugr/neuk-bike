@@ -167,7 +167,17 @@ export function createRainRenderer(map: LibreMap, canvas: HTMLCanvasElement) {
       }
       let dx = ground.x - top.x,
         dy = ground.y - top.y;
-      const span = Math.hypot(dx, dy);
+      let span = Math.hypot(dx, dy);
+      // At country scale a physical cloud height projects to only a few pixels.
+      // Keep this illustrative effect legible without moving its ground anchor.
+      if (span < 60) {
+        const scale = 60 / Math.max(0.001, span);
+        dx = span < 0.001 ? 0 : dx * scale;
+        dy = span < 0.001 ? 60 : dy * scale;
+        top.x = ground.x - dx;
+        top.y = ground.y - dy;
+        span = 60;
+      }
       if (span > height * 0.65) {
         const scale = (height * 0.65) / span;
         top.x = ground.x - dx * scale;

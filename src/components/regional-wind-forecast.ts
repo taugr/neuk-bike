@@ -8,6 +8,7 @@ import {
 } from '@/lib/weather-request-budget';
 import { windStatus } from '@/lib/wind';
 import { windAvailability, type WindLoadStatus } from '@/lib/wind-availability';
+import { weatherBoundsOverlap } from '@/lib/weather-grid';
 
 type Entry = { key: string; hour: number; value: unknown; capturedAt: number };
 const cacheKey = 'neuk-regional-wind-v1';
@@ -47,7 +48,7 @@ export function useRegionalWindForecast(
   region: WindRegion | null,
 ) {
   const [snapshot, setSnapshot] = useState<
-    (Entry & { cached: boolean }) | null
+    (Entry & { cached: boolean; region: WindRegion }) | null
   >(null);
   const [state, setState] = useState<{
     key: string | null;
@@ -87,14 +88,14 @@ export function useRegionalWindForecast(
             parseRegionalWind(e.value, currentRegion, e.capturedAt, stamp),
         );
       if (cached && stamp - cached.capturedAt < PROVIDER_REFRESH) {
-        setSnapshot({ ...cached, cached: false });
+        setSnapshot({ ...cached, cached: false, region: currentRegion });
         setState({ key: currentRegion.key, status: 'loaded' });
         return;
       }
       const wait = reserveWeatherRequest(stamp);
       if (wait > 0) {
         if (cached) {
-          setSnapshot({ ...cached, cached: true });
+          setSnapshot({ ...cached, cached: true, region: currentRegion });
           setState({ key: currentRegion.key, status: 'loaded' });
         } else
           setState({
@@ -135,16 +136,15 @@ export function useRegionalWindForecast(
           capturedAt,
         };
         storeEntry(entry);
-        setSnapshot({ ...entry, cached: false });
+        setSnapshot({ ...entry, cached: false, region: currentRegion });
         setNow(capturedAt);
         setState({ key: currentRegion.key, status: 'loaded' });
       } catch {
         if (stopped) return;
         if (cached) {
-          setSnapshot({ ...cached, cached: true });
+          setSnapshot({ ...cached, cached: true, region: currentRegion });
           setState({ key: currentRegion.key, status: 'loaded' });
         } else {
-          setSnapshot(null);
           setState({ key: currentRegion.key, status: 'error' });
         }
       } finally {
@@ -171,10 +171,12 @@ export function useRegionalWindForecast(
   const hour = Math.floor(now / 3600000);
   const wind = useMemo(
     () =>
-      snapshot && region && snapshot.key === key
+      snapshot &&
+      region &&
+      weatherBoundsOverlap(snapshot.region.bounds, region.bounds)
         ? parseRegionalWind(
             snapshot.value,
-            region,
+            snapshot.region,
             snapshot.capturedAt,
             hour * 3600000,
           )

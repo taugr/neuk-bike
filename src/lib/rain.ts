@@ -1,4 +1,5 @@
 import type { ParkingMapBounds } from './map-pins';
+import { weatherBoundsOverlap, weatherGridBounds } from './weather-grid';
 
 export const rainStorageKey = 'bike-neuk-map-rain';
 export const RAIN_REFRESH = 15 * 60000;
@@ -25,33 +26,16 @@ export type RainSnapshot = {
 
 /** Public, quantized viewport grid. Never send exact GPS or route coordinates. */
 export function rainRegion(bounds: ParkingMapBounds): RainRegion | null {
-  const { west, east, south, north } = bounds;
-  if (
-    ![west, east, south, north].every(Number.isFinite) ||
-    west >= east ||
-    south >= north ||
-    west < -180 ||
-    east > 180 ||
-    south < -80 ||
-    north > 80
-  )
-    return null;
-  const extent = Math.max(east - west, north - south);
-  if (extent > 1.5) return null;
-  const span =
-    extent <= 0.04 ? 0.08 : extent <= 0.15 ? 0.3 : extent <= 0.5 ? 1 : 2;
-  const step = span / 4;
-  const lng = Math.round((west + east) / 2 / step) * step;
-  const lat = Math.round((south + north) / 2 / step) * step;
-  const area = {
-    west: lng - span / 2,
-    east: lng + span / 2,
-    south: lat - span / 2,
-    north: lat + span / 2,
-  };
+  const area = weatherGridBounds(bounds);
+  if (!area) return null;
   const points: [number, number][] = Array.from({ length: 20 }, (_, i) => [
-    Number((area.west + ((i % 5) * span) / 4).toFixed(5)),
-    Number((area.south + (Math.floor(i / 5) * span) / 3).toFixed(5)),
+    Number((area.west + ((i % 5) * (area.east - area.west)) / 4).toFixed(5)),
+    Number(
+      (
+        area.south +
+        (Math.floor(i / 5) * (area.north - area.south)) / 3
+      ).toFixed(5),
+    ),
   ]);
   const query = new URLSearchParams({
     latitude: points.map((p) => p[1]).join(','),
@@ -63,7 +47,7 @@ export function rainRegion(bounds: ParkingMapBounds): RainRegion | null {
     precipitation_unit: 'mm',
   });
   return {
-    key: `rain-v1:${lng.toFixed(5)}:${lat.toFixed(5)}:${span}`,
+    key: `rain-v2:${area.west}:${area.south}:${area.east}:${area.north}`,
     bounds: area,
     points,
     url: `https://api.open-meteo.com/v1/forecast?${query}`,
@@ -79,12 +63,7 @@ export function rainFresh(snapshot: RainSnapshot, now = Date.now()) {
 }
 /** Keep known rain while an overlapping viewport loads; never extend coverage. */
 export function rainOverlaps(snapshot: RainSnapshot, bounds: ParkingMapBounds) {
-  return (
-    snapshot.bounds.west < bounds.east &&
-    snapshot.bounds.east > bounds.west &&
-    snapshot.bounds.south < bounds.north &&
-    snapshot.bounds.north > bounds.south
-  );
+  return weatherBoundsOverlap(snapshot.bounds, bounds);
 }
 export function parseRain(
   value: unknown,

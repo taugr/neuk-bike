@@ -8,7 +8,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function fixture(rate = 4) {
+function fixture(rate = 4, pitch = 0) {
   vi.stubGlobal('window', {
     devicePixelRatio: 1,
     matchMedia: () => ({
@@ -50,7 +50,7 @@ function fixture(rate = 4) {
     getContainer: () => ({ clientWidth: 800, clientHeight: 600 }),
     getTerrain: () => null,
     getZoom: () => 14,
-    getPitch: () => 0,
+    getPitch: () => pitch,
     unproject: ([x, y]: number[]) =>
       new MercatorCoordinate(
         centre + (x / 800 - 0.5) * span,
@@ -125,6 +125,17 @@ function fixture(rate = 4) {
 }
 
 describe('rain animation continuity', () => {
+  it('keeps rain strokes legible when projected cloud height collapses at country scale', () => {
+    const f = fixture(4, 55);
+    f.ctx.moveTo.mockClear();
+    f.frame();
+    const lengths = f.ctx.lineTo.mock.calls.map(([x, y], i) => {
+      const [startX, startY] = f.ctx.moveTo.mock.calls[i];
+      return Math.hypot(x - startX, y - startY);
+    });
+    expect(lengths.filter((length) => length > 6).length).toBeGreaterThan(100);
+    f.renderer.destroy();
+  });
   it('fills the visible map during a pan before moveend', () => {
     const f = fixture();
     f.pan();

@@ -169,6 +169,7 @@ import {
   windRequestBounds,
   useEdinburghGrid,
 } from '@/lib/regional-wind';
+import { weatherBoundsOverlap } from '@/lib/weather-grid';
 import { useWindForecast } from '@/components/wind-forecast';
 import { WIND_ENABLED } from '@/lib/features';
 import { RouteJourney } from '@/components/route-journey';
@@ -2708,7 +2709,13 @@ export default function CycleParkingFinder() {
       latitude: (bounds.south + bounds.north) / 2,
       longitude: (bounds.west + bounds.east) / 2,
     };
-    if (!isLocationInParkingCoverage(centre, parkingManifest)) return null;
+    if (
+      !isLocationInParkingCoverage(centre, parkingManifest) &&
+      !parkingManifest.coverage.areas.some((area) =>
+        weatherBoundsOverlap(bounds, area.bounds),
+      )
+    )
+      return null;
     return useEdinburghGrid(bounds, routes.length > 0)
       ? undefined
       : windRegion(bounds);
@@ -2718,7 +2725,11 @@ export default function CycleParkingFinder() {
     availability: loadedWindAvailability,
     freshness: windFreshness,
     provider: windProvider,
-  } = useWindForecast(isWindVisible && windViewport !== null, windTarget);
+  } = useWindForecast(
+    isWindVisible && windViewport !== null,
+    windTarget,
+    windViewport,
+  );
   const windAvailability =
     !windViewport && isWindVisible ? 'loading' : loadedWindAvailability;
   const windBaseLabel =

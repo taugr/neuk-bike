@@ -34,7 +34,7 @@ describe('bounded regional wind', () => {
       'wind_speed_10m,wind_direction_10m',
     );
     expect(new URL(region.url).searchParams.get('models')).toBe('best_match');
-    expect(windRegion({ ...bounds, east: 47 })).toBeNull();
+    expect(windRegion({ ...bounds, east: 47 })?.points).toHaveLength(20);
     expect(windRegion({ ...bounds, west: NaN })).toBeNull();
   });
   it('preserves every original vector and refuses extrapolation', () => {
@@ -122,6 +122,15 @@ describe('bounded regional wind', () => {
     expect(scoreWindRoute(inside, wind)).toBeNull();
   });
   it('covers all candidate route bounds and bounds long journeys to the current map', () => {
+    const country = { west: 43, east: 47, south: 38, north: 42 };
+    expect(
+      windRequestBounds(country, [
+        [
+          [44.4, 40.1],
+          [44.7, 40.3],
+        ],
+      ]),
+    ).toEqual(country);
     expect(
       windRequestBounds(bounds, [
         [

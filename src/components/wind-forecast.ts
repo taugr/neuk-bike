@@ -3,6 +3,8 @@ import { useRegionalWindForecast } from './regional-wind-forecast';
 import type { WindRegion } from '@/lib/regional-wind';
 import { windAvailability } from '@/lib/wind-availability';
 import { WIND_ENABLED } from '@/lib/features';
+import type { ParkingMapBounds } from '@/lib/map-pins';
+import { weatherBoundsOverlap } from '@/lib/weather-grid';
 
 import {
   parseProviderWind,
@@ -11,9 +13,18 @@ import {
   PROVIDER_REFRESH,
 } from '@/lib/provider-wind';
 import { useEffect, useMemo, useState } from 'react';
-import { EDINBURGH_WIND_URL, parseOpenMeteoWind, windStatus } from '@/lib/wind';
+import {
+  EDINBURGH_WIND_URL,
+  parseOpenMeteoWind,
+  windStatus,
+  type WindForecast,
+} from '@/lib/wind';
 
-export function useWindForecast(enabled: boolean, region?: WindRegion | null) {
+export function useWindForecast(
+  enabled: boolean,
+  region?: WindRegion | null,
+  bounds?: ParkingMapBounds | null,
+) {
   const permitted = WIND_ENABLED;
   const regional = region !== undefined && permitted;
   const regionalForecast = useRegionalWindForecast(
@@ -188,7 +199,32 @@ export function useWindForecast(enabled: boolean, region?: WindRegion | null) {
   const loadStatus =
     status === 'loading' && !enabled ? (snapshot ? 'loaded' : 'idle') : status;
   const freshness = windStatus(wind, now);
-  if (regional) return regionalForecast;
+  const current = regional ? regionalForecast.wind : wind;
+  const [retained, setRetained] = useState<WindForecast | null>(null);
+  useEffect(() => {
+    if (enabled && current && windStatus(current) === 'fresh')
+      setRetained(current);
+  }, [enabled, current]);
+  // Keep geographically valid samples while switching between the fine
+  // Edinburgh grid and country coverage. Never borrow another area's weather.
+  const pending =
+    !current &&
+    enabled &&
+    region !== null &&
+    bounds &&
+    retained &&
+    weatherBoundsOverlap(retained.coverage, bounds) &&
+    windStatus(retained, now) === 'fresh'
+      ? retained
+      : null;
+  if (regional)
+    return {
+      ...regionalForecast,
+      wind: current ?? pending,
+      freshness: pending
+        ? windStatus(pending, now)
+        : regionalForecast.freshness,
+    };
   if (!permitted)
     return {
       wind: null,
@@ -198,10 +234,10 @@ export function useWindForecast(enabled: boolean, region?: WindRegion | null) {
       provider: undefined,
     };
   return {
-    wind,
+    wind: wind ?? pending,
     status: loadStatus,
     availability: windAvailability(loadStatus, freshness),
-    freshness,
+    freshness: pending ? windStatus(pending, now) : freshness,
     provider: snapshot?.provider,
   };
 }

@@ -50,7 +50,7 @@ describe('current rain', () => {
           north: latitude + 0.02,
         }),
       ).not.toBeNull();
-    expect(rainRegion({ ...bounds, east: 0 })).toBeNull();
+    expect(rainRegion({ ...bounds, east: 0 })?.points).toHaveLength(20);
     expect(rainRegion({ ...bounds, north: NaN })).toBeNull();
   });
   it('normalizes the actual accumulation interval without including snow', () => {

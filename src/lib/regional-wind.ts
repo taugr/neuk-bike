@@ -1,4 +1,5 @@
 import type { ParkingMapBounds } from './map-pins';
+import { weatherGridBounds } from './weather-grid';
 import type { WindForecast, WindPoint } from './wind';
 import {
   cross,
@@ -17,33 +18,29 @@ export type WindRegion = {
 const rounded = (n: number) => Math.round(n * 1e6) / 1e6;
 
 /** Quantized public map grid, never exact GPS, stops or route coordinates.
- * One 20-location request; at most a two-degree region, including padding. */
+ * One 20-location request, from local to country-wide views. */
 export function windRegion(bounds: ParkingMapBounds): WindRegion | null {
   const { west, east, south, north } = bounds;
-  if (
-    ![west, east, south, north].every(Number.isFinite) ||
-    west >= east ||
-    south >= north ||
-    west < -180 ||
-    east > 180 ||
-    south < -80 ||
-    north > 80 ||
-    east - west > 1.5 ||
-    north - south > 1.5
-  )
-    return null;
-  const span = Math.max(east - west, north - south) > 0.5 ? 2 : 1;
+  const wideArea = weatherGridBounds(bounds);
+  if (!wideArea) return null;
+  const extent = Math.max(east - west, north - south);
+  const span = extent > 0.5 ? 2 : 1;
   const lng = Math.floor((west + east) / 2 / 0.5) * 0.5 + 0.25;
   const lat = Math.floor((south + north) / 2 / 0.5) * 0.5 + 0.25;
-  const area = {
-    west: lng - span / 2,
-    east: lng + span / 2,
-    south: lat - span / 2,
-    north: lat + span / 2,
-  };
+  // Preserve local request cells and their cached forecasts. Country scales
+  // use the same padded, adaptive coverage as rain.
+  const area =
+    extent > 1.5
+      ? wideArea
+      : {
+          west: Math.max(-180, lng - span / 2),
+          east: Math.min(180, lng + span / 2),
+          south: Math.max(-80, lat - span / 2),
+          north: Math.min(80, lat + span / 2),
+        };
   const points: WindPoint[] = Array.from({ length: 20 }, (_, i) => [
-    rounded(area.west + ((i % 5) * span) / 4),
-    rounded(area.south + (Math.floor(i / 5) * span) / 3),
+    rounded(area.west + ((i % 5) * (area.east - area.west)) / 4),
+    rounded(area.south + (Math.floor(i / 5) * (area.north - area.south)) / 3),
   ]);
   const query = new URLSearchParams({
     latitude: points.map((p) => p[1]).join(','),
@@ -57,7 +54,10 @@ export function windRegion(bounds: ParkingMapBounds): WindRegion | null {
     cell_selection: 'nearest',
   });
   return {
-    key: `best-match-v1:${lng}:${lat}:${span}`,
+    key:
+      extent <= 1.5
+        ? `best-match-v1:${lng}:${lat}:${span}`
+        : `best-match-v2:${area.west}:${area.south}:${area.east}:${area.north}`,
     points,
     bounds: area,
     url: 'https://api.open-meteo.com/v1/forecast?' + query.toString(),
@@ -231,10 +231,10 @@ export function windRequestBounds(
   return east - west > 1.5 || north - south > 1.5
     ? view
     : {
-        west: west - 0.01,
-        east: east + 0.01,
-        south: south - 0.01,
-        north: north + 0.01,
+        west: Math.min(view.west, west - 0.01),
+        east: Math.max(view.east, east + 0.01),
+        south: Math.min(view.south, south - 0.01),
+        north: Math.max(view.north, north + 0.01),
       };
 }
 

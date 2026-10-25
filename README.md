@@ -134,7 +134,9 @@ static droplets. The effect is adapted from Trail Atlas and is illustrative,
 not live radar or a precise boundary between wet and dry streets.
 
 Open-Meteo supplies current liquid rain and showers (excluding snow) on a
-quantized 20-point viewport grid, with tighter spacing when zoomed in. The app
+quantized 20-point viewport grid, from local streets to whole-country views,
+with tighter spacing when zoomed in. Wider views show a coarser illustration
+of regional rain, not additional forecast detail. The app
 normalizes the reported accumulation interval to control visual intensity.
 Requests contain public grid coordinates, never exact GPS or route points.
 Rain shares regional Wind's per-tab request budget and Retry-After handling.
@@ -184,7 +186,11 @@ resolution varies by region and is not presented as street-level detail.
 The existing fine Edinburgh UKV grid remains for local Edinburgh views/journeys.
 
 The app requests one 4×5 grid around the viewed area or all candidate routes,
-with centres quantized to half-degree tiles and a one- or two-degree extent.
+with centres quantized to half-degree tiles for local views. Country views
+spread the same 20 samples across a larger, padded grid; zooming back in loads
+the finer local grid. Views overlapping a supported country work even when
+the map centre is offshore. Valid overlapping forecasts remain visible while
+the next grid loads, without extending their sampled coverage.
 Only hourly 10 m wind speed/direction for the current day are requested.
 These are map-region coordinates, never exact GPS fixes or route stops, although
 requests reveal the broad region being viewed. Actual returned cells are
