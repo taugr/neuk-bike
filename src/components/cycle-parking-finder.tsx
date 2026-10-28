@@ -1,5 +1,5 @@
 'use client';
-import { rainStorageKey } from '@/lib/rain';
+import { rainStorageKey, weatherSummary } from '@/lib/rain';
 import { useRainForecast } from '@/components/rain-forecast';
 import { satelliteStorageKey } from '@/lib/map-satellite';
 import { resolveUnits } from '@/lib/units';
@@ -2677,13 +2677,26 @@ export default function CycleParkingFinder() {
         minute: '2-digit',
       }).format(rain.validAt)
     : '';
+  const rainCondition = rain ? weatherSummary(rain, windViewport) : 'dry';
+  const rainConditionLabel = {
+    dry: '',
+    drizzle: t('weatherDrizzle'),
+    lightRain: t('weatherLightRain'),
+    rain: t('weatherRain'),
+    heavyRain: t('weatherHeavyRain'),
+    snow: t('weatherSnow'),
+    heavySnow: t('weatherHeavySnow'),
+    fog: t('weatherFog'),
+    sleet: t('weatherSleet'),
+    freezingRain: t('weatherFreezingRain'),
+    thunderstorm: t('weatherThunderstorm'),
+    hail: t('weatherHail'),
+  }[rainCondition];
   const rainLabel = rain
-    ? t(
-        rain.samples.some((sample) => sample.rate >= 0.05)
-          ? 'rainEstimate'
-          : 'rainDry',
-        { time: rainTime },
-      )
+    ? t(rainCondition === 'dry' ? 'rainDry' : 'rainEstimate', {
+        time: rainTime,
+        condition: rainConditionLabel,
+      })
     : t(
         rainStatus === 'offline'
           ? 'rainOffline'

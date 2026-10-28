@@ -98,12 +98,16 @@ for (const scenario of [
               interval: 'seconds',
               rain: 'mm',
               showers: 'mm',
+              snowfall: 'cm',
+              weather_code: 'wmo code',
             },
             current: {
               time: Math.floor(now / 900000) * 900,
               interval: 900,
               rain: 0.5 + (i % 5) / 4,
               showers: 0,
+              snowfall: 0,
+              weather_code: 63,
             },
             hourly_units: { wind_speed_10m: 'm/s', wind_direction_10m: '°' },
             hourly: {
@@ -143,7 +147,7 @@ for (const scenario of [
         .toBeGreaterThan(50);
     }
     await page.getByTestId('map-layers-trigger').click();
-    await page.getByRole('switch', { name: 'Rain', exact: true }).check();
+    await page.getByRole('switch', { name: 'Weather', exact: true }).check();
     await page.getByTestId('wind-layer-toggle').check();
     await expect(page.getByTestId('rain-layer-status')).toContainText(
       'Estimated rain',

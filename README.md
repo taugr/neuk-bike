@@ -125,21 +125,31 @@ Map-source credits appear as a plain line at startup, below the search bar on
 phones and in the lower-right corner on desktop, then fade out after five
 seconds. Full attribution links remain available in the Attributions panel.
 
-## Current rain
+## Current weather
 
-**Rain** in Map layers shows an animated estimate for now, with the valid local
-time in the layer menu. It is off initially and remembers your choice. Rain
+**Weather** in Map layers shows an animated estimate for now, with the condition
+and valid local time in the layer menu. It is off initially and remembers your
+existing Rain preference. Drizzle, light, moderate and heavy rain vary in density,
+streak length and falling speed. Snow falls as soft flakes and slowly tumbling six-armed crystals; mixed rain and snow,
+freezing rain and thunderstorm hail have distinct particles. Thunderstorms show
+an occasional branching white-blue lightning bolt within the forecast storm area, without
+sound or full-screen flashes. Weather
 stays anchored to the map in 2D, 3D and satellite views; reduced motion uses
-static droplets. The effect is adapted from Trail Atlas and is illustrative,
-not live radar or a precise boundary between wet and dry streets.
+static particles, fog and a static bolt. Fog and depositing-rime fog (WMO 45/48)
+show gently drifting translucent wisps in the sampled fog areas, without
+obscuring map controls. The effect is adapted from Trail
+Atlas and is illustrative, not live radar, detected lightning strikes or a
+precise boundary between weather conditions.
 
-Open-Meteo supplies current liquid rain and showers (excluding snow) on a
+Open-Meteo supplies current liquid rain, showers, snowfall and WMO weather codes on a
 quantized 20-point viewport grid, from local streets to whole-country views,
 with tighter spacing when zoomed in. Wider views show a coarser illustration
-of regional rain, not additional forecast detail. The app
-normalizes the reported accumulation interval to control visual intensity.
+of regional weather, not additional forecast detail. The app
+normalizes liquid rain (mm) and snowfall (cm) separately using the reported
+accumulation interval to control visual intensity. Weather codes use the nearest
+sample rather than numeric interpolation, so a storm stays in its sampled area.
 Requests contain public grid coordinates, never exact GPS or route points.
-Rain shares regional Wind's per-tab request budget and Retry-After handling.
+Weather shares regional Wind's per-tab request budget and Retry-After handling.
 It refreshes every 15 minutes while visible, caches up to 12 areas in memory,
 and removes estimates older than 30 minutes or when offline. Weather is not
 added to offline downloads. Zoomed-out, unavailable and dry states are distinct.
@@ -147,7 +157,7 @@ While panning, fresh rain stays visible inside its sampled coverage as the next
 area loads, and existing droplets continue smoothly when new data arrives.
 
 Data and provider credits are in Attributions. The same Open-Meteo
-non-commercial usage terms described below apply. Rain does not alter routes.
+non-commercial usage terms described below apply. Weather does not alter routes.
 
 ## Wind forecast
 
