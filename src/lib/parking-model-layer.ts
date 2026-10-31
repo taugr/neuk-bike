@@ -46,6 +46,18 @@ type GpuMesh = {
   opaque: WebGLBuffer;
   glass: WebGLBuffer;
 };
+const uniformNames = [
+  'u_viewport',
+  'u_satellite',
+  'u_expand',
+  'u_outline',
+  'u_view',
+  'u_matrix',
+] as const;
+type ShaderUniforms = Record<
+  (typeof uniformNames)[number],
+  WebGLUniformLocation | null
+>;
 function meshBounds(mesh: ParkingMesh): MeshBounds {
   const min = [Infinity, Infinity, Infinity],
     max = [-Infinity, -Infinity, -Infinity];
@@ -136,14 +148,25 @@ class ParkingLayer implements CustomLayerInterface {
   }
   private map!: Map;
   private program: WebGLProgram | null = null;
+  private uniforms: ShaderUniforms | null = null;
   private vao: WebGLVertexArrayObject | null = null;
   private buffers = new globalThis.Map<string, GpuMesh>();
   private placed: PlacedMesh[] = [];
   private onCameraSettled = () => this.map.triggerRepaint();
+  private onContextRestored = () => {
+    // A restored context invalidates all handles. Rebuild lazily if MapLibre
+    // retained this layer; style replacement instead removes and re-adds it.
+    this.program = null;
+    this.uniforms = null;
+    this.vao = null;
+    this.buffers.clear();
+    this.map.triggerRepaint();
+  };
   onAdd(map: Map, gl: WebGL2RenderingContext) {
     this.map = map;
     map.on('moveend', this.onCameraSettled);
     map.on('resize', this.onCameraSettled);
+    map.on('webglcontextrestored', this.onContextRestored);
     this.initialize(gl);
   }
   private initialize(gl: WebGL2RenderingContext) {
@@ -169,6 +192,12 @@ class ParkingLayer implements CustomLayerInterface {
     gl.deleteShader(fragment);
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS))
       throw new Error('Parking shader could not link');
+    this.uniforms = Object.fromEntries(
+      uniformNames.map((name) => [
+        name,
+        gl.getUniformLocation(this.program!, name),
+      ]),
+    ) as ShaderUniforms;
     this.vao = gl.createVertexArray();
   }
   private gpu(gl: WebGL2RenderingContext, model: ParkingModel) {
@@ -204,8 +233,9 @@ class ParkingLayer implements CustomLayerInterface {
       this.layoutKey = '';
       return;
     }
-    // Context restoration invalidates every GPU handle even when the style survives.
-    if (!this.program || !gl.isProgram(this.program)) this.initialize(gl);
+    // Do not query GPU program validity on each frame: it can stall the CPU
+    // waiting for the GPU. Context restoration explicitly invalidates handles.
+    if (!this.program) this.initialize(gl);
     const width = this.map.getCanvas().clientWidth,
       height = this.map.getCanvas().clientHeight;
     const modelById = new globalThis.Map(
@@ -383,17 +413,15 @@ class ParkingLayer implements CustomLayerInterface {
       value.buttonOffset = this.buttonOffsets.get(id) ?? value.buttonOffset;
     gl.useProgram(this.program);
     gl.bindVertexArray(this.vao);
+    const uniforms = this.uniforms!;
     gl.uniform2f(
-      gl.getUniformLocation(this.program!, 'u_viewport'),
+      uniforms.u_viewport,
       gl.drawingBufferWidth,
       gl.drawingBufferHeight,
     );
-    gl.uniform1i(
-      gl.getUniformLocation(this.program!, 'u_satellite'),
-      Number(this.satelliteContrast),
-    );
-    const expandLocation = gl.getUniformLocation(this.program!, 'u_expand');
-    const outlineLocation = gl.getUniformLocation(this.program!, 'u_outline');
+    gl.uniform1i(uniforms.u_satellite, Number(this.satelliteContrast));
+    const expandLocation = uniforms.u_expand;
+    const outlineLocation = uniforms.u_outline;
     const pixelRatio = gl.drawingBufferWidth / Math.max(1, width);
     // Give subpixel tubes a little more body at the first model zooms.
     const expansion = this.satelliteContrast
@@ -409,12 +437,12 @@ class ParkingLayer implements CustomLayerInterface {
     const bearing = (this.map.getBearing() * Math.PI) / 180,
       pitch = (this.map.getPitch() * Math.PI) / 180;
     gl.uniform3f(
-      gl.getUniformLocation(this.program!, 'u_view'),
+      uniforms.u_view,
       Math.sin(bearing) * Math.sin(pitch),
       -Math.cos(bearing) * Math.sin(pitch),
       Math.cos(pitch),
     );
-    const matrixLocation = gl.getUniformLocation(this.program!, 'u_matrix');
+    const matrixLocation = uniforms.u_matrix;
     const draw = (placed: PlacedMesh, glass: boolean) => {
       const data = glass ? placed.gpu.mesh.glass : placed.gpu.mesh.opaque;
       if (!data.length) return;
@@ -519,6 +547,7 @@ class ParkingLayer implements CustomLayerInterface {
   onRemove(_map: Map, gl: WebGL2RenderingContext) {
     this.map.off('moveend', this.onCameraSettled);
     this.map.off('resize', this.onCameraSettled);
+    this.map.off('webglcontextrestored', this.onContextRestored);
     for (const value of this.buffers.values()) {
       gl.deleteBuffer(value.opaque);
       gl.deleteBuffer(value.glass);
@@ -530,6 +559,7 @@ class ParkingLayer implements CustomLayerInterface {
     gl.deleteProgram(this.program);
     this.vao = null;
     this.program = null;
+    this.uniforms = null;
   }
 }
 export function syncParkingModels(
