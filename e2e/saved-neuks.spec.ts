@@ -542,7 +542,9 @@ test('keeps available saved neuks when another saved data chunk fails', async ({
   await page.getByTestId('open-my-neuks').click();
 
   await expect(
-    page.getByTestId(`parking-row-${edinburghParking.id}`),
+    page
+      .getByRole('list', { name: 'My neuks', exact: true })
+      .getByTestId(`parking-row-${edinburghParking.id}`),
   ).toBeVisible();
   await expect(
     page.getByText('Some saved neuks could not be loaded.'),

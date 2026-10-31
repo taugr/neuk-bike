@@ -400,6 +400,8 @@ Reopening the PWA or reconnecting restarts recovery for outstanding failures;
 healthy maps only resize and repaint. Recovery preserves the camera and app
 state. A stalled style request falls back to the local background after 12
 seconds. Offline streets still require a downloaded area.
+After a WebGL context reset, the map rebuilds its GPU resources and restores the
+camera, selected parking, map layers and active route without reloading the page.
 MapLibre workers and their shared module use versioned URLs generated during
 install and Next.js startup/build, so a PWA update cannot reuse workers from a
 different MapLibre release.
