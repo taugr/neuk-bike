@@ -48,6 +48,13 @@ Saved routes emit `route_saved` only after local persistence succeeds; route
 sharing records `route_link_shared.method=copied|shared` and GPX sharing records
 `route_gpx_shared.method=downloaded|shared`.
 
+Layer switches emit `map_layer_changed` with `layer` set to
+`national_cycle_network`, `drinking_water`, `weather` or `wind`, and a boolean
+`visible`. Count explicit on/off actions; restoring a saved preference or
+refreshing a forecast does not emit a switch event. These events measure control
+use, not whether a forecast successfully loaded or a weather effect rendered.
+No forecast values, map bounds or location data accompany them.
+
 ## Weekly report contract
 
 Use a half-open seven-day window ending Friday 17:00 Asia/Yerevan (13:00 UTC),

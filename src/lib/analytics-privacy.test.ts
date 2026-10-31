@@ -47,4 +47,23 @@ describe('analytics privacy boundary', () => {
   it('fails closed for malformed URLs', () => {
     expect(redactAnalyticsUrl('private location')).toBe('');
   });
+  it.each(['weather', 'wind'])(
+    'accepts the bounded %s layer without weather or location payloads',
+    (layer) => {
+      expect(
+        sanitizeAnalyticsProperties({
+          layer,
+          visible: true,
+          latitude: 55.95,
+          forecast: { rain: 1 },
+        }),
+      ).toEqual({ layer, visible: true });
+      expect(
+        sanitizeAnalyticsProperties({
+          layer: 'private forecast',
+          visible: 'true',
+        }),
+      ).toEqual({});
+    },
+  );
 });

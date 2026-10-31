@@ -6741,6 +6741,10 @@ export default function CycleParkingFinder() {
                         type="checkbox"
                         onChange={(event) => {
                           setIsRainVisible(event.target.checked);
+                          captureAnalyticsEvent('map_layer_changed', {
+                            layer: 'weather',
+                            visible: event.target.checked,
+                          });
                           try {
                             window.localStorage.setItem(
                               rainStorageKey,
@@ -6772,9 +6776,13 @@ export default function CycleParkingFinder() {
                           data-testid="wind-layer-toggle"
                           role="switch"
                           type="checkbox"
-                          onChange={(event) =>
-                            setManualWindVisible(event.target.checked)
-                          }
+                          onChange={(event) => {
+                            setManualWindVisible(event.target.checked);
+                            captureAnalyticsEvent('map_layer_changed', {
+                              layer: 'wind',
+                              visible: event.target.checked,
+                            });
+                          }}
                         />
                       </label>
                     ) : null}

@@ -84,6 +84,58 @@ test.beforeEach(async ({ context, page }) => {
   await mockRouteServices(page);
 });
 
+test('records explicit weather and wind switches without counting restored preferences', async ({
+  page,
+}) => {
+  const events = await recordEvents(page);
+  await page.addInitScript(() => {
+    localStorage.setItem('bike-neuk-map-rain', 'true');
+  });
+  await page.route('https://api.open-meteo.com/**', (route) =>
+    route.fulfill({ status: 503, body: 'Unavailable in this analytics test' }),
+  );
+  await page.goto('/?mockGps=55.9533,-3.1883,5&analyticsTest=1');
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await page.getByTestId('map-layers-trigger').click();
+  const weather = page.getByTestId('rain-layer-toggle');
+  const wind = page.getByTestId('wind-layer-toggle');
+  await expect(weather).toBeChecked();
+  await weather.uncheck();
+  await weather.check();
+  await wind.check();
+  await wind.uncheck();
+  const changes = () =>
+    events.filter(({ event }) => event === 'map_layer_changed');
+  await expect.poll(() => changes().length, { timeout: 15_000 }).toBe(4);
+  await page.reload();
+  await expect(page.getByTestId('parking-list')).toBeVisible();
+  await page.getByTestId('map-layers-trigger').click();
+  await expect(weather).toBeChecked();
+  await expect
+    .poll(() => events.filter(({ event }) => event === '$pageview').length, {
+      timeout: 15_000,
+    })
+    .toBe(2);
+  expect(
+    changes().map(({ properties: { layer, visible } }) => ({ layer, visible })),
+  ).toEqual([
+    { layer: 'weather', visible: false },
+    { layer: 'weather', visible: true },
+    { layer: 'wind', visible: true },
+    { layer: 'wind', visible: false },
+  ]);
+  for (const { properties } of changes()) {
+    expect(properties).toMatchObject({
+      app: 'neuk-bike',
+      analytics_schema_version: 2,
+      is_test: true,
+    });
+    expect(JSON.stringify(properties)).not.toMatch(
+      /mockGps=|55\.9533|latitude|longitude/,
+    );
+  }
+});
+
 test('pairs automatic location and API/cache results without leaking destinations', async ({
   page,
 }) => {

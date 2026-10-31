@@ -69,7 +69,7 @@ const values: Record<string, readonly string[]> = {
   theme: ['system', 'light', 'dark'],
   language: ['en', 'gd', 'es', 'hy'],
   sort_mode: ['nearest', 'best-match'],
-  layer: ['national_cycle_network', 'drinking_water'],
+  layer: ['national_cycle_network', 'drinking_water', 'weather', 'wind'],
 };
 const idProperties = new Set(['journey_id', 'attempt_id', 'ride_id']);
 const uuidPattern =
