@@ -570,8 +570,8 @@ The attribution panel shows underlying source dates;
 See [data maintenance](docs/data-maintenance.md) for scheduled review artifacts,
 refresh recovery and validation.
 The weekly source check runs Friday at 06:23 UTC; GitHub may delay scheduled
-runs. See the [25 September review](docs/weekly-review-action-plan-2026-09-25.md)
-for maintenance changes, analytics verification and the next-sprint recommendation.
+runs. See the [30 October review](docs/weekly-review-action-plan-2026-10-30.md)
+for the latest maintenance findings, weather measurement and security updates.
 
 The cycling-place release keeps bicycle shops, repair facilities, hire
 locations, and drinking-water points in a separate lazy-loaded release under
