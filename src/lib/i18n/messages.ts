@@ -2112,10 +2112,8 @@ export function translate(
   key: MessageKey,
   values: MessageValues = {},
 ) {
-  return catalogues[locale][key].replaceAll(
-    /\{(\w+)\}/g,
-    (placeholder, name) =>
-      Object.hasOwn(values, name) ? String(values[name]) : placeholder,
+  return catalogues[locale][key].replaceAll(/\{(\w+)\}/g, (placeholder, name) =>
+    Object.hasOwn(values, name) ? String(values[name]) : placeholder,
   );
 }
 
