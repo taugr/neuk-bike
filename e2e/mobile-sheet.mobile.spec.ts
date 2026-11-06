@@ -59,12 +59,32 @@ async function dragTitleBothWays(
     Math.min(830, expanded.y + 280),
   );
   await expect(pane).toHaveAttribute('data-mobile-sheet-state', 'collapsed');
+  await expectCollapsedClearance(page, collapsedTitle);
   const collapsed = (await collapsedTitle.boundingBox())!;
   // Use the visible part of the title if a two-line heading reaches the fold.
   const y = Math.min(collapsed.y + collapsed.height / 2, 825);
   await drag(page, browserName, collapsed.x + collapsed.width / 2, y, y - 280);
   await expect(pane).toHaveAttribute('data-mobile-sheet-state', 'expanded');
   await expect(pane).not.toHaveAttribute('data-mobile-sheet-dragging', 'true');
+}
+
+async function expectCollapsedClearance(page: Page, content: Locator) {
+  await expect
+    .poll(async () => {
+      const pane = (await page.locator('.control-pane').boundingBox())!;
+      const bounds = (await content.boundingBox())!;
+      const safeArea = await page
+        .locator('.control-pane')
+        .evaluate((element) =>
+          Number.parseFloat(
+            getComputedStyle(element).getPropertyValue(
+              '--mobile-sheet-safe-area-bottom',
+            ),
+          ),
+        );
+      return pane.y + pane.height - bounds.y - bounds.height - safeArea;
+    })
+    .toBeGreaterThanOrEqual(16);
 }
 
 async function installJourneyFixture(page: Page) {
@@ -113,7 +133,7 @@ test('route search, preview, planning and map-editing titles drag while controls
   page,
   browserName,
 }) => {
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
   await installJourneyFixture(page);
   await page.getByTestId('plan-route-mobile').tap();
   const search = page.getByTestId('route-destination-search');
@@ -330,14 +350,85 @@ test('scrolling results leaves the tray expanded and its header fixed', async ({
   expect(headerAfter.y).toBeCloseTo(headerBefore.y, 1);
 });
 
-test('the collapsed summary stays above the home indicator inset', async ({
+for (const width of [320, 390]) {
+  for (const inset of [0, 34]) {
+    test(`collapsed trays leave breathing room at ${width}px with a ${inset}px safe area`, async ({
+      page,
+    }, testInfo) => {
+      await page.setViewportSize({ width, height: 844 });
+      const pane = page.locator('.control-pane');
+      await pane.evaluate(
+        (element, inset) =>
+          (element as HTMLElement).style.setProperty(
+            '--mobile-sheet-safe-area-bottom',
+            `${inset}px`,
+          ),
+        inset,
+      );
+      await expect(pane).toHaveCSS('padding-bottom', `${16 + inset}px`);
+
+      async function checkSummary() {
+        await page.locator('.mobile-sheet-grip').tap();
+        await expect(pane).toHaveAttribute(
+          'data-mobile-sheet-state',
+          'collapsed',
+        );
+        await expectCollapsedClearance(
+          page,
+          pane.locator('.mobile-sheet-summary').last(),
+        );
+        await page.screenshot({
+          path: testInfo.outputPath(
+            `collapsed-${await pane.getAttribute('data-panel-view')}-${await pane.getAttribute('data-parking-view')}.png`,
+          ),
+        });
+        const grip = (await page.locator('.mobile-sheet-grip').boundingBox())!;
+        expect(grip.height).toBe(36);
+        await page.locator('.mobile-sheet-grip').tap();
+        await expect(pane).toHaveAttribute(
+          'data-mobile-sheet-state',
+          'expanded',
+        );
+      }
+
+      // Nearby, empty saved library, and filters share the same bottom clearance.
+      await checkSummary();
+      await page.getByTestId('open-my-neuks').tap();
+      await checkSummary();
+      await page.locator('.parking-view-button').tap();
+      await page
+        .getByRole('button', { name: 'Parking filters', exact: true })
+        .tap();
+      await checkSummary();
+      await page
+        .getByRole('region', { name: 'Parking filters', exact: true })
+        .getByRole('button', { name: 'Back', exact: true })
+        .tap();
+
+      const row = page.locator('[data-testid^="parking-row-"]').nth(3);
+      const parkingName = (await row.locator('strong').innerText()).trim();
+      await row.tap();
+      await checkSummary();
+      await page
+        .getByRole('button', { name: `View details for ${parkingName}` })
+        .tap();
+      await checkSummary();
+      await page.getByTestId('parking-detail-save').tap();
+      await page.locator('.parking-details-back').tap();
+      await page.getByTestId('open-my-neuks').tap();
+      await checkSummary();
+    });
+  }
+}
+
+test('the collapsed summary can expand above the home indicator inset', async ({
   page,
   browserName,
 }) => {
   const pane = page.locator('.control-pane');
   await pane.evaluate((element) =>
     (element as HTMLElement).style.setProperty(
-      '--mobile-sheet-bottom-padding',
+      '--mobile-sheet-safe-area-bottom',
       '34px',
     ),
   );
@@ -347,7 +438,7 @@ test('the collapsed summary stays above the home indicator inset', async ({
     .locator('.finder-panel-content > .mobile-sheet-summary')
     .boundingBox())!;
   expect(summary.y + summary.height).toBeLessThanOrEqual(
-    bounds.y + bounds.height - 34,
+    bounds.y + bounds.height - 34 - 16,
   );
   const grip = (await page.locator('.mobile-sheet-grip').boundingBox())!;
   expect(grip.height).toBe(36);

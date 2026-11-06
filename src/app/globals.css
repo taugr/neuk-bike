@@ -6108,7 +6108,10 @@ a {
   .control-pane {
     --mobile-sheet-body-offset: 0px;
     --mobile-sheet-body-opacity: 1;
-    --mobile-sheet-bottom-padding: max(0.5rem, env(safe-area-inset-bottom));
+    --mobile-sheet-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-sheet-bottom-padding: calc(
+      1rem + var(--mobile-sheet-safe-area-bottom)
+    );
     --mobile-sheet-collapsed-height: calc(
       5.25rem + var(--mobile-sheet-bottom-padding)
     );
@@ -6538,7 +6541,9 @@ a {
 
   .mobile-sheet-summary > span:first-child {
     display: grid;
+    flex-shrink: 0;
     gap: 0.15rem;
+    max-width: 70%;
   }
 
   .control-pane[data-mobile-sheet-state='collapsed']
@@ -6548,6 +6553,9 @@ a {
 
   .mobile-sheet-summary strong {
     font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .mobile-sheet-summary small,

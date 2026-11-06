@@ -512,7 +512,7 @@ test('keeps My routes in the mobile menu and opens planning from New route', asy
       }
       return pane.y + pane.height - (editorBounds.y + editorBounds.height);
     })
-    .toBeLessThanOrEqual(16);
+    .toBeLessThanOrEqual(24);
   const routeAttributionTop = await mapAttribution.evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).top),
   );
@@ -1265,7 +1265,7 @@ test('keeps the collapsed parking details summary inside the sheet', async ({
         (actionsBounds.y + actionsBounds.height)
       );
     })
-    .toBeLessThanOrEqual(16);
+    .toBeLessThanOrEqual(24);
   await page
     .getByRole('button', { name: 'Collapse parking details panel' })
     .click();
@@ -1686,7 +1686,7 @@ test('uses at most one camera move when selecting a pin from collapsed details',
   );
   await expect
     .poll(async () => (await controlPane.boundingBox())?.height ?? 0)
-    .toBeCloseTo(92, 0);
+    .toBeCloseTo(100, 0);
   await page.waitForTimeout(1_100);
 
   await page.evaluate(() => {
