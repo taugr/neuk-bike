@@ -57,20 +57,23 @@ async function ready(page: Page) {
     'ready',
     { timeout: 20_000 },
   );
-  // Attributes update at camera moveend. Also let any popup centring finish.
+  // Attributes update at camera moveend. Require 1.2s of stable observations so
+  // slow browser evaluations do not turn a settled camera into a polling timeout.
   let last = '';
-  let stable = 0;
+  let stableSince = Date.now();
   await expect
     .poll(
       async () => {
         const next = JSON.stringify(await camera(page));
-        stable = next === last ? stable + 1 : 0;
-        last = next;
-        return stable;
+        if (next !== last) {
+          last = next;
+          stableSince = Date.now();
+        }
+        return Date.now() - stableSince;
       },
       { intervals: [300], timeout: 15_000 },
     )
-    .toBeGreaterThanOrEqual(4);
+    .toBeGreaterThanOrEqual(1200);
 }
 
 async function expectBlueImagery(page: Page) {

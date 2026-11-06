@@ -319,9 +319,20 @@ for (const [width, height] of [
     await expect(start).toBeInViewport({ ratio: 1 });
     const footer = await journey.locator('.journey-footer').boundingBox();
     const pane = await page.locator('.control-pane').boundingBox();
+    const bottomInset = await page
+      .locator('.control-pane')
+      .evaluate((element) => {
+        const style = getComputedStyle(element);
+        return (
+          parseFloat(style.paddingBottom) + parseFloat(style.borderBottomWidth)
+        );
+      });
+    // Anchor to the content edge, preserving the tray's intentional safe-area padding.
     expect(
-      pane!.y + pane!.height - (footer!.y + footer!.height),
-    ).toBeLessThanOrEqual(14);
+      Math.abs(
+        pane!.y + pane!.height - bottomInset - (footer!.y + footer!.height),
+      ),
+    ).toBeLessThanOrEqual(1);
     await steps.locator('button').last().click();
     await expect(
       page.locator('.selected-route-instruction-marker'),

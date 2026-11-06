@@ -723,18 +723,20 @@ test('Waverley shows separate bounded models with individually selectable button
     // Wait for popup centring before clicking the background. MapLibre ignores
     // a pointer click during its animated pan, so an immediate click can be lost.
     let lastCenter = '';
-    let stableSamples = 0;
+    let stableSince = Date.now();
     await expect
       .poll(
         async () => {
           const center = await map.getAttribute('data-map-center-latitude');
-          stableSamples = center === lastCenter ? stableSamples + 1 : 0;
-          lastCenter = center ?? '';
-          return stableSamples;
+          if (center !== lastCenter) {
+            lastCenter = center ?? '';
+            stableSince = Date.now();
+          }
+          return Date.now() - stableSince;
         },
-        { intervals: [250], timeout: 5000 },
+        { intervals: [250], timeout: 15_000 },
       )
-      .toBeGreaterThanOrEqual(3);
+      .toBeGreaterThanOrEqual(750);
     await page.mouse.click(40, 850);
     await expect(page.locator('.maplibregl-popup')).toHaveCount(0);
     await button.click();
