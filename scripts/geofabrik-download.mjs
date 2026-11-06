@@ -48,6 +48,15 @@ export function describeDownloadError(error) {
   return messages.join(': ');
 }
 
+export function isRetryableSourceError(error) {
+  return (
+    error.retryable === true ||
+    error instanceof TypeError ||
+    error.name === 'TimeoutError' ||
+    error.name === 'AbortError'
+  );
+}
+
 // Redirects are explicit: the proxy's erroneous .pbf/ redirect must never be
 // followed, and extract requests cannot leave the official region's paths.
 async function request(url, init, paths, options) {
@@ -96,6 +105,7 @@ async function request(url, init, paths, options) {
           const error = new Error(
             `HTTP ${response.status} ${response.statusText} at ${current}`,
           );
+          error.httpStatus = response.status;
           error.retryable = response.status >= 500 || response.status === 429;
           throw error;
         }
@@ -177,8 +187,15 @@ export function parsePublication(html, latestUrl, now = Date.now()) {
         ([, href]) => new URL(href, latest).href === dated.href,
       ),
   );
-  if (rows.length !== 1)
-    throw new Error(`Missing or ambiguous current dated publication: ${dated}`);
+  if (rows.length !== 1) {
+    const error = new Error(
+      `Missing or ambiguous current dated publication: ${dated}`,
+    );
+    // The latest cutoff can advance before its dated file appears. Duplicate
+    // rows remain an integrity error and must not enter the readiness loop.
+    error.retryable = rows.length === 0;
+    throw error;
+  }
   const cells = [...rows[0][1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(
     ([, cell]) => cell.replace(/<[^>]*>/g, '').trim(),
   );
@@ -391,7 +408,14 @@ export async function resolveGeofabrikExtract(latestUrl, options = {}) {
       );
     }
   }
-  return probe(publication, publication.datedUrl, options);
+  try {
+    return await probe(publication, publication.datedUrl, options);
+  } catch (error) {
+    // An announced, exact dated file can still be propagating to download
+    // servers. This does not permit another date, URL, or unverified PBF.
+    if (error.httpStatus === 404) error.retryable = true;
+    throw error;
+  }
 }
 
 export async function downloadGeofabrikExtract(

@@ -567,6 +567,15 @@ probes verify that cutoff, and full downloads must pass size, PBF framing and
 compressed-block validation before replacing a cached input. Stale, future,
 mixed-age or incomplete OSM releases cannot replace the current release.
 
+Monthly refreshes start at 21:23 UTC on the first and use
+`pnpm refresh:data --wait-for-sources` to wait up to four hours for temporary
+publication/download availability problems. Every attempt revalidates all 70
+inputs before pinning a complete plan; its two-hour
+expiry starts with that successful attempt. Weekly upstream checks use
+`pnpm check:data --upstream --wait-for-sources` to retry for up to one hour.
+The job has a six-hour total limit. A failed or incomplete refresh keeps the
+previous release, produces diagnostics, and never packages a partial release.
+
 The attribution panel shows underlying source dates;
 `public/data/freshness.json` records per-input dates, hashes and retrieval times.
 See [data maintenance](docs/data-maintenance.md) for scheduled review artifacts,

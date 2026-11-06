@@ -4,6 +4,7 @@ import {
   downloadGeofabrikExtract,
   resolveGeofabrikExtract,
   validatePinnedPublication,
+  isRetryableSourceError,
 } from './geofabrik-download.mjs';
 import {
   assertFreshOsmRelease,
@@ -81,10 +82,17 @@ export async function createPublicationPlan(
   };
   for (const input of inputs) {
     (options.log ?? console.log)(`Preflight: ${input.id}`);
-    const source = await resolveGeofabrikExtract(input.url, {
-      ...options,
-      preferDated: true,
-    });
+    let source;
+    try {
+      source = await resolveGeofabrikExtract(input.url, {
+        ...options,
+        preferDated: true,
+      });
+    } catch (error) {
+      error.sourceId = input.id;
+      error.retryable = isRetryableSourceError(error);
+      throw error;
+    }
     plan.sources.push({
       ...source,
       id: input.id,

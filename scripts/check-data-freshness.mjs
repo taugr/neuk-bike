@@ -5,8 +5,10 @@ import {
   resolveGeofabrikExtract,
   maximumSourceAgeDays,
   describeDownloadError,
+  isRetryableSourceError,
 } from './geofabrik-download.mjs';
 import { osmInputs } from './parking-data-sources.mjs';
+import { waitForSources } from './source-readiness.mjs';
 
 export async function checkDataFreshness(
   freshness,
@@ -44,7 +46,11 @@ export async function checkDataFreshness(
           const response = await fetcher(`${input.sourceUrl}?f=json`, {
             signal: AbortSignal.timeout(30_000),
           });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          if (!response.ok) {
+            const error = new Error(`HTTP ${response.status}`);
+            error.retryable = response.status === 429 || response.status >= 500;
+            throw error;
+          }
           const layer = await response.json();
           const edited = layer.editingInfo?.dataLastEditDate;
           if (!Number.isFinite(edited))
@@ -80,6 +86,7 @@ export async function checkDataFreshness(
         upstream.set(input.sourceUrl, {
           id: input.id,
           error: describeDownloadError(error),
+          retryable: isRetryableSourceError(error),
         });
       }
     }
@@ -102,16 +109,43 @@ if (
   const freshness = JSON.parse(
     await readFile(resolve(root, 'public/data/freshness.json'), 'utf8'),
   );
-  const report = await checkDataFreshness(freshness, {
-    checkUpstream: process.argv.includes('--upstream'),
-  });
   const output = resolve(
     root,
     process.argv.find((arg) => arg.startsWith('--output='))?.slice(9) ??
       '.cache/source-status.json',
   );
   await mkdir(dirname(output), { recursive: true });
-  await writeFile(output, JSON.stringify(report, null, 2) + '\n');
+  const check = async () => {
+    const report = await checkDataFreshness(freshness, {
+      checkUpstream: process.argv.includes('--upstream'),
+    });
+    // Preserve every attempt's diagnostics, including a final failed check.
+    await writeFile(output, JSON.stringify(report, null, 2) + '\n');
+    const failures = report.upstream.filter((input) => input.error);
+    if (process.argv.includes('--wait-for-sources') && failures.length) {
+      const error = new Error(
+        failures.map((input) => `${input.id}: ${input.error}`).join('; '),
+      );
+      error.sourceId = failures.map((input) => input.id).join(', ');
+      error.retryable = failures.every((input) => input.retryable);
+      throw error;
+    }
+    return report;
+  };
+  const report = process.argv.includes('--wait-for-sources')
+    ? await waitForSources(check, {
+        timeoutMs: 60 * 60_000,
+        intervalMs: 5 * 60_000,
+        onStatus: async (status) => {
+          const review = resolve(root, '.cache/review');
+          await mkdir(review, { recursive: true });
+          await writeFile(
+            resolve(review, 'source-readiness.json'),
+            JSON.stringify(status, null, 2) + '\n',
+          );
+        },
+      })
+    : await check();
   console.log(JSON.stringify(report, null, 2));
   if (
     report.datasets.some(

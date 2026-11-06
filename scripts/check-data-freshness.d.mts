@@ -31,6 +31,7 @@ export function checkDataFreshness(
   upstream: {
     id: string;
     error?: string;
+    retryable?: boolean;
     sourceTimestamp?: string;
     newerPublication?: boolean;
     downloadUrl?: string;

@@ -4,7 +4,8 @@ on:
   schedule:
     # Avoid the busy start of the hour; GitHub schedules are best-effort.
     - cron: '23 6 * * 5'
-    - cron: '23 2 1 * *'
+    # Allow the day's regional publications to finish before monthly preflight.
+    - cron: '23 21 1 * *'
   workflow_dispatch:
     inputs:
       refresh:
@@ -22,7 +23,9 @@ concurrency:
 jobs:
   sources:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # Includes a bounded upstream wait and validated build within GitHub's
+    # six-hour total job limit. This workflow never deploys.
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6.1.0
@@ -32,17 +35,34 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Build monthly or requested release
-        if: github.event.schedule == '23 2 1 * *' || inputs.refresh == true
-        run: pnpm refresh:data
+        if: github.event.schedule == '23 21 1 * *' || inputs.refresh == true
+        run: pnpm refresh:data --wait-for-sources
       - name: Review current upstream publications (check-only run)
-        if: github.event.schedule != '23 2 1 * *' && inputs.refresh != true
-        run: pnpm check:data --upstream
+        if: github.event.schedule != '23 21 1 * *' && inputs.refresh != true
+        run: pnpm check:data --upstream --wait-for-sources
       - name: Verify installed release source age (refresh run)
-        if: github.event.schedule == '23 2 1 * *' || inputs.refresh == true
+        if: github.event.schedule == '23 21 1 * *' || inputs.refresh == true
         run: pnpm check:data --output=.cache/review/installed-source-status.json
       - name: Summarize source check
         if: always()
         run: |
+          if [ -f .cache/review/source-readiness.json ]; then
+            {
+              echo '## Upstream readiness'
+              echo 'All configured sources must validate before a release is built. Waiting never publishes partial data.'
+              echo '```json'
+              cat .cache/review/source-readiness.json
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f .cache/review/refresh-failure.json ]; then
+            {
+              echo '## Refresh failure'
+              echo '```json'
+              cat .cache/review/refresh-failure.json
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
           if [ -f .cache/source-status.json ]; then
             {
               echo '## Source freshness check'
@@ -53,7 +73,7 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Package the reviewed changes
-        if: github.event.schedule == '23 2 1 * *' || inputs.refresh == true
+        if: github.event.schedule == '23 21 1 * *' || inputs.refresh == true
         run: |
           mkdir -p .cache/review
           git add --intent-to-add public/data src/data

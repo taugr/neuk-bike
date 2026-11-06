@@ -35,6 +35,7 @@ import {
   validatePublicationPlan,
 } from '../../scripts/publication-plan.mjs';
 import { osmInputs } from '../../scripts/parking-data-sources.mjs';
+import { waitForSources } from '../../scripts/source-readiness.mjs';
 
 const latest =
   'https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf';
@@ -675,6 +676,40 @@ describe('validated download and release fixtures', () => {
 });
 
 describe('upstream freshness uses the shared resolver and actual OSM cutoff', () => {
+  it.each([429, 503, 403])(
+    'classifies NCN HTTP %s for bounded upstream waiting',
+    async (status) => {
+      const report = await checkDataFreshness(
+        {
+          osmInputsMatch: true,
+          datasets: [
+            {
+              id: 'cycle-network',
+              releaseId: 'fixture',
+              complete: true,
+              mixedAge: false,
+              oldestSourceAt: timestamp,
+              inputs: [
+                {
+                  id: 'ncn',
+                  sourceUrl: 'https://example.test/ncn',
+                  sourceTimestamp: timestamp,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          now,
+          checkUpstream: true,
+          fetcher: async () => new Response(null, { status }),
+        },
+      );
+      expect(report.upstream).toEqual([
+        { id: 'ncn', error: `HTTP ${status}`, retryable: status !== 403 },
+      ]);
+    },
+  );
   it.each([null, 'invalid', '2026-07-30', '2026-10-02'])(
     'flags missing, invalid, stale or future local cutoff %s',
     async (oldestSourceAt) => {
@@ -792,6 +827,95 @@ describe('upstream freshness uses the shared resolver and actual OSM cutoff', ()
 
 describe('one-invocation publication plan', () => {
   const inputs = [{ id: 'berkshire', url: latest }];
+  it.each(['missing row', 'dated 404', 'timeout'])(
+    'rechecks every source after %s and starts a new plan lifetime',
+    async (failure) => {
+      let clock = now;
+      let ready = false;
+      const sources = [
+        ...inputs,
+        { id: 'bristol', url: latest.replace('berkshire', 'bristol') },
+      ];
+      const fetcher = vi.fn(
+        async (input: RequestInfo | URL, init?: RequestInit) => {
+          const url = String(input);
+          if (url.includes('bristol') && !ready) {
+            if (failure === 'timeout')
+              throw new DOMException('Publication timed out', 'TimeoutError');
+            if (failure === 'dated 404' && url.endsWith('.osm.pbf'))
+              return new Response(null, { status: 404 });
+          }
+          if (url.endsWith('.html')) {
+            const region = url.includes('bristol') ? 'bristol' : 'berkshire';
+            const publication =
+              region === 'bristol' && !ready && failure === 'missing row'
+                ? html().replace(/<tr>[\s\S]*$/, '')
+                : html();
+            return new Response(publication.replaceAll('berkshire', region), {
+              headers: { 'content-type': 'text/html' },
+            });
+          }
+          return upstream()(url.replaceAll('bristol', 'berkshire'), init);
+        },
+      );
+      const sleep = vi.fn(async (ms: number) => {
+        clock += ms;
+        ready = true;
+      });
+      const { plan, context } = await waitForSources(
+        () =>
+          createPublicationPlan(
+            'a'.repeat(40),
+            { ...options(fetcher), now: clock },
+            sources,
+          ),
+        {
+          now: () => clock,
+          sleep,
+          timeoutMs: 2_000,
+          intervalMs: 1_000,
+          log: vi.fn(),
+        },
+      );
+      expect(sleep).toHaveBeenCalledExactlyOnceWith(1_000);
+      expect(plan.sources.map((source) => source.id)).toEqual([
+        'berkshire',
+        'bristol',
+      ]);
+      expect(plan.createdAt).toBe(new Date(now + 1_000).toISOString());
+      expect(Date.parse(plan.expiresAt) - Date.parse(plan.createdAt)).toBe(
+        120 * 60_000,
+      );
+      expect(validatePublicationPlan(plan, context, clock, sources)).toBe(plan);
+      expect(
+        fetcher.mock.calls.filter(([url]) => String(url) === page),
+      ).toHaveLength(2);
+      expect(
+        fetcher.mock.calls.every(
+          ([url, init]) =>
+            String(url).endsWith('.html') ||
+            init?.method === 'HEAD' ||
+            (init?.headers as Record<string, string>)?.Range,
+        ),
+      ).toBe(true);
+    },
+  );
+
+  it('does not wait on ambiguous publication metadata or create a partial plan', async () => {
+    const sleep = vi.fn(async () => {});
+    await expect(
+      waitForSources(
+        () =>
+          createPublicationPlan(
+            'a'.repeat(40),
+            options(upstream(undefined, html() + html())),
+            inputs,
+          ),
+        { sleep },
+      ),
+    ).rejects.toMatchObject({ sourceId: 'berkshire', retryable: false });
+    expect(sleep).not.toHaveBeenCalled();
+  });
   async function fixture() {
     const fetcher = upstream();
     const { plan, context } = await createPublicationPlan(

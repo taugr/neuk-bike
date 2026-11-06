@@ -20,6 +20,7 @@ export type GeofabrikSource = GeofabrikPublication & {
 };
 export const maximumSourceAgeDays: number;
 export function describeDownloadError(error: unknown): string;
+export function isRetryableSourceError(error: unknown): boolean;
 export function validateSourceTimestamp(
   timestamp: string | undefined,
   now?: number,

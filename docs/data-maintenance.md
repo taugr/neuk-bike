@@ -72,7 +72,27 @@ fails rather than selecting an arbitrary older file. Inspect the logged source
 URL and error before retrying; do not manually relabel cached data as fresh.
 
 The **Data maintenance** GitHub workflow runs metadata checks every Friday at
-06:23 UTC and a complete refresh on the first of each month at 02:23 UTC.
+06:23 UTC and a complete refresh on the first of each month at 21:23 UTC,
+after the daytime publication window.
+Refresh runs pass `--wait-for-sources`: when a dated publication row is missing,
+an announced dated file returns HTTP 404, or metadata/probes exhaust transient
+network retries, the job waits 15 minutes and revalidates **all 70 inputs**.
+It waits up to four hours, then fails if a complete valid plan is still unavailable.
+Partial attempts are discarded; no dataset extraction starts before the whole
+plan validates. The successful attempt starts a fresh two-hour plan lifetime,
+so waiting does not consume the pinned build window. Duplicate/ambiguous rows,
+invalid metadata, unsafe redirects, and PBF integrity errors fail immediately.
+The six-hour total job limit includes setup, waiting, building and artifact upload.
+
+Weekly check-only runs also pass `--wait-for-sources`, retrying temporary
+upstream failures every five minutes for up to one hour. They preserve the latest
+source report even when no attempt succeeds. Both modes write their readiness
+state, blocked source, last error, attempt and deadline to
+`.cache/review/source-readiness.json`; refresh failures also write
+`.cache/review/refresh-failure.json`. These diagnostics appear in the job summary
+and are uploaded even when preflight fails before a publication plan exists.
+The same flags are available locally; omit them for a single immediate check.
+
 The earlier Friday check leaves more time before the weekly report. GitHub
 schedules are best-effort and may be delayed; check the actual run before
 reporting a missed check. Each run includes its source report in the job summary.

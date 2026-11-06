@@ -12,6 +12,7 @@ import {
   openPublicationPlan,
 } from './publication-plan.mjs';
 import { checkDataFreshness } from './check-data-freshness.mjs';
+import { waitForSources } from './source-readiness.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const definitions = {
@@ -22,11 +23,17 @@ const definitions = {
 const [selection = 'all', ...args] = process.argv.slice(2);
 if (
   !(selection === 'all' || selection in definitions) ||
-  args.some((arg) => !['--cached', '--force-download'].includes(arg)) ||
-  (args.includes('--cached') && args.includes('--force-download'))
+  args.some(
+    (arg) =>
+      !['--cached', '--force-download', '--wait-for-sources'].includes(arg),
+  ) ||
+  (args.includes('--cached') &&
+    (args.includes('--force-download') ||
+      args.includes('--wait-for-sources'))) ||
+  (selection === 'network' && args.includes('--wait-for-sources'))
 ) {
   throw new Error(
-    'Usage: refresh-data-release.mjs [all|parking|pois|network] [--cached|--force-download]. Partial region releases are not supported.',
+    'Usage: refresh-data-release.mjs [all|parking|pois|network] [--cached|--force-download] [--wait-for-sources]. Partial region releases are not supported.',
   );
 }
 const cache = resolve(root, '.cache');
@@ -55,12 +62,22 @@ try {
   let planEnv = {};
   let publicationPlan;
   const review = resolve(cache, 'review');
+  await mkdir(review, { recursive: true });
   if (selected.some((id) => id !== 'network') && !args.includes('--cached')) {
     const revision = execFileSync('git', ['rev-parse', 'HEAD'], {
       cwd: root,
       encoding: 'utf8',
     }).trim();
-    const { plan, context } = await createPublicationPlan(revision);
+    const createPlan = () => createPublicationPlan(revision);
+    const { plan, context } = args.includes('--wait-for-sources')
+      ? await waitForSources(createPlan, {
+          onStatus: (status) =>
+            writeFile(
+              resolve(review, 'source-readiness.json'),
+              JSON.stringify(status, null, 2) + '\n',
+            ),
+        })
+      : await createPlan();
     const planPath = resolve(staging, 'publication-plan.json');
     await writeFile(planPath, JSON.stringify(plan, null, 2) + '\n');
     planEnv = {
@@ -190,6 +207,21 @@ try {
     `Verified release installed. Previous files retained at ${resolve(staging, '.previous')}`,
   );
 } catch (error) {
+  await mkdir(resolve(cache, 'review'), { recursive: true });
+  await writeFile(
+    resolve(cache, 'review/refresh-failure.json'),
+    JSON.stringify(
+      {
+        failedAt: new Date().toISOString(),
+        previousReleasePreserved: true,
+        staging: staging ?? null,
+        sourceId: error.sourceId ?? null,
+        error: error.message,
+      },
+      null,
+      2,
+    ) + '\n',
+  );
   console.error(
     `Refresh failed; previous release preserved. Staging: ${staging ?? 'not created'}`,
   );
