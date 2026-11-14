@@ -71,12 +71,12 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "osm-pbf-parser-node": "1.1.4",
-    "oxfmt": "^0.76.0",
+    "oxfmt": "^0.78.0",
     "oxlint": "^1.91.0",
     "oxlint-tsgolint": "^7.0.2006",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0",
-    "wrangler": "4.158.0"
+    "wrangler": "4.161.0"
   },
   "lint-staged": {
     "*": "oxfmt --no-error-on-unmatched-pattern"
