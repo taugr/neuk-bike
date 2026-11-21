@@ -1,5 +1,5 @@
 {
-  "chunkCount": 4451,
+  "chunkCount": 4463,
   "chunkZoom": 12,
   "councilRecordCount": 1454,
   "duplicateMatches": [
@@ -1400,7 +1400,7 @@
     },
     {
       "councilId": "cec:1257",
-      "distanceMeters": 0.98,
+      "distanceMeters": 3.19,
       "osmId": "osm:node:9583792727"
     },
     {
@@ -3205,7 +3205,7 @@
     },
     {
       "councilId": "cec:290",
-      "distanceMeters": 0.78,
+      "distanceMeters": 1.55,
       "osmId": "osm:node:2072229262"
     },
     {
@@ -3280,7 +3280,7 @@
     },
     {
       "councilId": "cec:303",
-      "distanceMeters": 0.35,
+      "distanceMeters": 10.61,
       "osmId": "osm:node:2366237315"
     },
     {
@@ -4645,7 +4645,7 @@
     },
     {
       "councilId": "cec:558",
-      "distanceMeters": 0.75,
+      "distanceMeters": 4.81,
       "osmId": "osm:node:3925643742"
     },
     {
@@ -5790,7 +5790,7 @@
     },
     {
       "councilId": "cec:771",
-      "distanceMeters": 12.05,
+      "distanceMeters": 9.8,
       "osmId": "osm:node:4874693770"
     },
     {
@@ -6175,7 +6175,7 @@
     },
     {
       "councilId": "cec:841",
-      "distanceMeters": 0.19,
+      "distanceMeters": 2.04,
       "osmId": "osm:node:5665018509"
     },
     {
@@ -7010,7 +7010,7 @@
     }
   ],
   "duplicateRegionIds": {
-    "count": 221,
+    "count": 222,
     "samples": [
       "osm:node:10106701261",
       "osm:node:10282007314",
@@ -7069,6 +7069,7 @@
       "osm:node:14075323022",
       "osm:node:14103852253",
       "osm:node:14162326797",
+      "osm:node:14397148753",
       "osm:node:1461440949",
       "osm:node:1461440953",
       "osm:node:1538769367",
@@ -7110,31 +7111,30 @@
       "osm:node:3559661694",
       "osm:node:3657150630",
       "osm:node:3659515928",
-      "osm:node:366948370",
-      "osm:node:3729795514"
+      "osm:node:366948370"
     ]
   },
   "generatedAssets": {
-    "fileCount": 4453,
-    "largestAssetBytes": 3318179,
-    "manifestBytes": 917224,
-    "maximumInitialCompressedBytes": 496240,
-    "parkingDataBytes": 28668698,
-    "pointIndexBytes": 3318179
+    "fileCount": 4465,
+    "largestAssetBytes": 3329872,
+    "manifestBytes": 919588,
+    "maximumInitialCompressedBytes": 496178,
+    "parkingDataBytes": 28767014,
+    "pointIndexBytes": 3329872
   },
   "assetMetricsRuntime": {
-    "node": "v24.14.0",
-    "zlib": "1.3.1-e00f703"
+    "node": "v24.22.1",
+    "zlib": "1.3.2.1-motley-285e94b"
   },
-  "mergedRecordCount": 89501,
+  "mergedRecordCount": 89809,
   "naming": {
     "counts": {
       "generic": 0,
-      "junction": 60841,
-      "landmark": 15060,
-      "place": 1040,
-      "source": 1766,
-      "street": 10794
+      "junction": 61033,
+      "landmark": 15138,
+      "place": 1042,
+      "source": 1770,
+      "street": 10826
     },
     "genericPercent": 0,
     "samples": [
@@ -7263,31 +7263,31 @@
   "osm": {
     "completeness": {
       "name": {
-        "count": 89448,
+        "count": 89756,
         "percent": 100
       },
       "capacity": {
-        "count": 74964,
+        "count": 75235,
         "percent": 83.8
       },
       "covered": {
-        "count": 64542,
-        "percent": 72.2
+        "count": 64914,
+        "percent": 72.3
       },
       "access": {
-        "count": 24000,
-        "percent": 26.8
+        "count": 24149,
+        "percent": 26.9
       },
       "bicycle_pa": {
-        "count": 76258,
-        "percent": 85.3
+        "count": 76616,
+        "percent": 85.4
       },
       "cargo_bike": {
-        "count": 201,
+        "count": 205,
         "percent": 0.2
       },
       "capacity_cargo_bike": {
-        "count": 52,
+        "count": 54,
         "percent": 0.1
       }
     },
@@ -7296,31 +7296,31 @@
       "way": 0
     },
     "geometryCounts": {
-      "node": 84906,
-      "relation": 6,
-      "way": 4757
+      "node": 85193,
+      "relation": 7,
+      "way": 4778
     },
     "inputs": [
       {
         "completeness": {
           "name": {
-            "count": 5680,
+            "count": 5689,
             "percent": 100
           },
           "capacity": {
-            "count": 4987,
+            "count": 4996,
             "percent": 87.8
           },
           "covered": {
-            "count": 4661,
+            "count": 4669,
             "percent": 82.1
           },
           "access": {
-            "count": 1417,
-            "percent": 24.9
+            "count": 1420,
+            "percent": 25
           },
           "bicycle_pa": {
-            "count": 5007,
+            "count": 5018,
             "percent": 88.2
           },
           "cargo_bike": {
@@ -7337,63 +7337,63 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 141.6,
+        "elapsedSeconds": 656.1,
         "geometryCounts": {
-          "node": 5357,
+          "node": 5365,
           "relation": 2,
-          "way": 321
+          "way": 322
         },
         "id": "scotland",
         "label": "Scotland",
         "naming": {
           "contextCounts": {
-            "junctions": 26410,
-            "landmarks": 36603,
-            "nearbyNodes": 3732975,
-            "places": 21674,
-            "roadSamples": 315201
+            "junctions": 26481,
+            "landmarks": 36685,
+            "nearbyNodes": 3745154,
+            "places": 21689,
+            "roadSamples": 316019
           },
           "counts": {
             "generic": 0,
-            "junction": 4100,
-            "landmark": 1613,
-            "place": 151,
+            "junction": 4106,
+            "landmark": 1624,
+            "place": 148,
             "source": 59,
-            "street": 1211
+            "street": 1206
           }
         },
-        "pbfSha256": "78e4af755b2ec8259ba57c142ffe2579c392cb8b7955ef55d04b1ff1da857480",
-        "retrievedAt": "2026-10-30T22:54:42.822Z",
-        "peakRssBytes": 849707008,
-        "recordCount": 5680,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "f1da1f7b0edd9a4dc23ced265fd7774ed004916b3df3aac8d57cc4c2c1af3e38",
+        "retrievedAt": "2026-11-21T04:34:01.951Z",
+        "peakRssBytes": 1834532864,
+        "recordCount": 5689,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:34.785Z",
-        "publishedAt": "2026-10-30T15:12:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/scotland/scotland-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:31:53.448Z",
+        "publishedAt": "2026-11-21T00:33:19.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 270,
+            "count": 271,
             "percent": 100
           },
           "capacity": {
-            "count": 206,
-            "percent": 76.3
+            "count": 207,
+            "percent": 76.4
           },
           "covered": {
-            "count": 215,
-            "percent": 79.6
+            "count": 216,
+            "percent": 79.7
           },
           "access": {
-            "count": 75,
-            "percent": 27.8
+            "count": 78,
+            "percent": 28.8
           },
           "bicycle_pa": {
-            "count": 228,
-            "percent": 84.4
+            "count": 230,
+            "percent": 84.9
           },
           "cargo_bike": {
             "count": 1,
@@ -7409,9 +7409,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 4.1,
+        "elapsedSeconds": 4.5,
         "geometryCounts": {
-          "node": 234,
+          "node": 235,
           "relation": 0,
           "way": 36
         },
@@ -7419,31 +7419,31 @@
         "label": "Bedfordshire",
         "naming": {
           "contextCounts": {
-            "junctions": 1311,
-            "landmarks": 2709,
-            "nearbyNodes": 148549,
+            "junctions": 1323,
+            "landmarks": 2723,
+            "nearbyNodes": 149818,
             "places": 388,
-            "roadSamples": 15062
+            "roadSamples": 15218
           },
           "counts": {
             "generic": 0,
-            "junction": 109,
+            "junction": 110,
             "landmark": 92,
             "place": 2,
             "source": 12,
             "street": 55
           }
         },
-        "pbfSha256": "4530b1e51d6eed7ddd006dbe2bdeeb45baafd8e4f9d02cc3f804556aac6dbe99",
-        "retrievedAt": "2026-10-30T22:57:09.081Z",
-        "peakRssBytes": 769556480,
-        "recordCount": 270,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "43a844bbfedf9669b2d381c0623698322a17ffd97e9e3c4de0ff3f80c15a12b6",
+        "retrievedAt": "2026-11-21T04:45:19.371Z",
+        "peakRssBytes": 1757511680,
+        "recordCount": 271,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:35.511Z",
-        "publishedAt": "2026-10-30T16:28:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bedfordshire/bedfordshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:31:54.691Z",
+        "publishedAt": "2026-11-21T00:33:48.000Z"
       },
       {
         "completeness": {
@@ -7456,16 +7456,16 @@
             "percent": 71.5
           },
           "covered": {
-            "count": 453,
-            "percent": 76.5
+            "count": 454,
+            "percent": 76.7
           },
           "access": {
             "count": 125,
             "percent": 21.1
           },
           "bicycle_pa": {
-            "count": 450,
-            "percent": 76
+            "count": 451,
+            "percent": 76.2
           },
           "cargo_bike": {
             "count": 0,
@@ -7481,7 +7481,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 6.5,
+        "elapsedSeconds": 7,
         "geometryCounts": {
           "node": 540,
           "relation": 0,
@@ -7492,52 +7492,52 @@
         "naming": {
           "contextCounts": {
             "junctions": 3189,
-            "landmarks": 4388,
-            "nearbyNodes": 339964,
+            "landmarks": 4391,
+            "nearbyNodes": 340315,
             "places": 690,
-            "roadSamples": 44852
+            "roadSamples": 44859
           },
           "counts": {
             "generic": 0,
             "junction": 303,
             "landmark": 164,
-            "place": 21,
+            "place": 20,
             "source": 10,
-            "street": 94
+            "street": 95
           }
         },
-        "pbfSha256": "b6a8f1f25a831583884cba80ca49f3dab6e344dff5d48d2a434e022174d20e36",
-        "retrievedAt": "2026-10-30T22:57:15.753Z",
-        "peakRssBytes": 823754752,
+        "pbfSha256": "ca9a561d9205fd7bf6b1603ed534a3c678f5bd17277db4c8d04a8ae4424007de",
+        "retrievedAt": "2026-11-21T04:45:25.388Z",
+        "peakRssBytes": 1768996864,
         "recordCount": 592,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:36.180Z",
-        "publishedAt": "2026-10-30T16:07:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/berkshire/berkshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:31:55.981Z",
+        "publishedAt": "2026-11-21T00:34:36.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1239,
+            "count": 1240,
             "percent": 100
           },
           "capacity": {
-            "count": 1129,
-            "percent": 91.1
+            "count": 1131,
+            "percent": 91.2
           },
           "covered": {
-            "count": 1061,
-            "percent": 85.6
+            "count": 1063,
+            "percent": 85.7
           },
           "access": {
             "count": 111,
             "percent": 9
           },
           "bicycle_pa": {
-            "count": 1077,
-            "percent": 86.9
+            "count": 1079,
+            "percent": 87
           },
           "cargo_bike": {
             "count": 0,
@@ -7553,9 +7553,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 6.9,
+        "elapsedSeconds": 7.4,
         "geometryCounts": {
-          "node": 1170,
+          "node": 1171,
           "relation": 0,
           "way": 69
         },
@@ -7563,53 +7563,53 @@
         "label": "Bristol",
         "naming": {
           "contextCounts": {
-            "junctions": 4662,
-            "landmarks": 5797,
-            "nearbyNodes": 647800,
-            "places": 124,
-            "roadSamples": 44632
+            "junctions": 4646,
+            "landmarks": 5795,
+            "nearbyNodes": 648146,
+            "places": 125,
+            "roadSamples": 44558
           },
           "counts": {
             "generic": 0,
             "junction": 992,
-            "landmark": 152,
+            "landmark": 154,
             "place": 2,
             "source": 2,
-            "street": 91
+            "street": 90
           }
         },
-        "pbfSha256": "bb1328d3c0ba6005444626745590e01133f60934594a111c89b4f537c0662cf1",
-        "retrievedAt": "2026-10-30T22:57:23.554Z",
-        "peakRssBytes": 837156864,
-        "recordCount": 1239,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "eec4559748f73c0aecc36a87f14d3d38b7c905280611c21fb9dfd405ab7598d8",
+        "retrievedAt": "2026-11-21T04:45:33.716Z",
+        "peakRssBytes": 1807794176,
+        "recordCount": 1240,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:37.179Z",
-        "publishedAt": "2026-10-30T15:55:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/bristol/bristol-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:31:57.198Z",
+        "publishedAt": "2026-11-21T00:34:36.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 359,
+            "count": 360,
             "percent": 100
           },
           "capacity": {
             "count": 245,
-            "percent": 68.2
+            "percent": 68.1
           },
           "covered": {
             "count": 180,
-            "percent": 50.1
+            "percent": 50
           },
           "access": {
             "count": 48,
-            "percent": 13.4
+            "percent": 13.3
           },
           "bicycle_pa": {
             "count": 254,
-            "percent": 70.8
+            "percent": 70.6
           },
           "cargo_bike": {
             "count": 0,
@@ -7625,62 +7625,62 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 6.3,
+        "elapsedSeconds": 6.6,
         "geometryCounts": {
           "node": 308,
           "relation": 0,
-          "way": 51
+          "way": 52
         },
         "id": "buckinghamshire",
         "label": "Buckinghamshire",
         "naming": {
           "contextCounts": {
-            "junctions": 1920,
-            "landmarks": 3554,
-            "nearbyNodes": 207844,
+            "junctions": 1943,
+            "landmarks": 3563,
+            "nearbyNodes": 208654,
             "places": 758,
-            "roadSamples": 22629
+            "roadSamples": 22921
           },
           "counts": {
             "generic": 0,
-            "junction": 168,
+            "junction": 169,
             "landmark": 121,
             "place": 9,
             "source": 5,
             "street": 56
           }
         },
-        "pbfSha256": "741dfa331e9844dfa659a119c55fd2d20bd06701da9ec99640bd757af8b31886",
-        "retrievedAt": "2026-10-30T22:57:32.816Z",
-        "peakRssBytes": 832897024,
-        "recordCount": 359,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "2a6b2bdf6cde8160fec1fd345e16174fecb54d48caca74b815b2bf8049ded3f8",
+        "retrievedAt": "2026-11-21T04:45:42.766Z",
+        "peakRssBytes": 1786576896,
+        "recordCount": 360,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:37.769Z",
-        "publishedAt": "2026-10-30T15:58:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/buckinghamshire/buckinghamshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:31:58.482Z",
+        "publishedAt": "2026-11-21T00:34:18.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 2397,
+            "count": 2432,
             "percent": 100
           },
           "capacity": {
-            "count": 1960,
-            "percent": 81.8
+            "count": 1991,
+            "percent": 81.9
           },
           "covered": {
-            "count": 1726,
-            "percent": 72
+            "count": 1749,
+            "percent": 71.9
           },
           "access": {
-            "count": 973,
-            "percent": 40.6
+            "count": 995,
+            "percent": 40.9
           },
           "bicycle_pa": {
-            "count": 2025,
+            "count": 2056,
             "percent": 84.5
           },
           "cargo_bike": {
@@ -7697,62 +7697,62 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 12.2,
+        "elapsedSeconds": 43.3,
         "geometryCounts": {
-          "node": 2051,
+          "node": 2082,
           "relation": 0,
-          "way": 346
+          "way": 350
         },
         "id": "cambridgeshire",
         "label": "Cambridgeshire",
         "naming": {
           "contextCounts": {
-            "junctions": 5268,
-            "landmarks": 5566,
-            "nearbyNodes": 767226,
+            "junctions": 5346,
+            "landmarks": 5585,
+            "nearbyNodes": 773451,
             "places": 1027,
-            "roadSamples": 63473
+            "roadSamples": 64711
           },
           "counts": {
             "generic": 0,
-            "junction": 1246,
-            "landmark": 554,
+            "junction": 1271,
+            "landmark": 557,
             "place": 42,
             "source": 14,
-            "street": 541
+            "street": 548
           }
         },
-        "pbfSha256": "b9105d78198b24b0f318cc51f222e2854fa02fecdf79bfac781832d0711c4965",
-        "retrievedAt": "2026-10-30T22:57:45.772Z",
-        "peakRssBytes": 872087552,
-        "recordCount": 2397,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "17a689e3b4fda282e993f424fa42ef86dcb55abf058b0419d04278f1a6551ea3",
+        "retrievedAt": "2026-11-21T04:45:51.462Z",
+        "peakRssBytes": 1782300672,
+        "recordCount": 2432,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:38.623Z",
-        "publishedAt": "2026-10-30T16:28:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cambridgeshire/cambridgeshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:31:59.837Z",
+        "publishedAt": "2026-11-21T00:34:08.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 585,
+            "count": 586,
             "percent": 100
           },
           "capacity": {
-            "count": 488,
+            "count": 489,
             "percent": 83.4
           },
           "covered": {
-            "count": 480,
+            "count": 481,
             "percent": 82.1
           },
           "access": {
             "count": 218,
-            "percent": 37.3
+            "percent": 37.2
           },
           "bicycle_pa": {
-            "count": 513,
+            "count": 514,
             "percent": 87.7
           },
           "cargo_bike": {
@@ -7769,21 +7769,21 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 12.4,
+        "elapsedSeconds": 19.4,
         "geometryCounts": {
           "node": 540,
           "relation": 0,
-          "way": 45
+          "way": 46
         },
         "id": "cheshire",
         "label": "Cheshire",
         "naming": {
           "contextCounts": {
-            "junctions": 4622,
-            "landmarks": 6415,
-            "nearbyNodes": 477692,
-            "places": 1117,
-            "roadSamples": 54231
+            "junctions": 4629,
+            "landmarks": 6447,
+            "nearbyNodes": 479328,
+            "places": 1119,
+            "roadSamples": 54346
           },
           "counts": {
             "generic": 0,
@@ -7791,40 +7791,40 @@
             "landmark": 136,
             "place": 7,
             "source": 40,
-            "street": 83
+            "street": 84
           }
         },
-        "pbfSha256": "a25df64f1ad53f28633817cabc97bc9d1714998d2f3125d5928a891ca6e4d214",
-        "retrievedAt": "2026-10-30T22:58:03.883Z",
-        "peakRssBytes": 872054784,
-        "recordCount": 585,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "7e1a7fba233c4966da26d39f77eb1229d54f13c6aca7cdab202928eae4fde7e6",
+        "retrievedAt": "2026-11-21T04:46:37.945Z",
+        "peakRssBytes": 476168192,
+        "recordCount": 586,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:39.239Z",
-        "publishedAt": "2026-10-30T16:15:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cheshire/cheshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:02.146Z",
+        "publishedAt": "2026-11-21T00:34:11.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 279,
+            "count": 280,
             "percent": 100
           },
           "capacity": {
-            "count": 206,
-            "percent": 73.8
+            "count": 207,
+            "percent": 73.9
           },
           "covered": {
-            "count": 217,
-            "percent": 77.8
+            "count": 218,
+            "percent": 77.9
           },
           "access": {
             "count": 44,
-            "percent": 15.8
+            "percent": 15.7
           },
           "bicycle_pa": {
-            "count": 239,
+            "count": 240,
             "percent": 85.7
           },
           "cargo_bike": {
@@ -7841,9 +7841,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 10.7,
+        "elapsedSeconds": 13.4,
         "geometryCounts": {
-          "node": 260,
+          "node": 261,
           "relation": 0,
           "way": 19
         },
@@ -7851,31 +7851,31 @@
         "label": "Cornwall",
         "naming": {
           "contextCounts": {
-            "junctions": 1775,
-            "landmarks": 3046,
-            "nearbyNodes": 238112,
-            "places": 2412,
-            "roadSamples": 22214
+            "junctions": 1788,
+            "landmarks": 3141,
+            "nearbyNodes": 245486,
+            "places": 2435,
+            "roadSamples": 22513
           },
           "counts": {
             "generic": 0,
-            "junction": 126,
+            "junction": 127,
             "landmark": 105,
             "place": 7,
             "source": 0,
             "street": 41
           }
         },
-        "pbfSha256": "3341b432a643b4f01e99c08e7015702e0646ed82beb9034410e057ca10bdf4e0",
-        "retrievedAt": "2026-10-30T22:58:20.141Z",
-        "peakRssBytes": 780173312,
-        "recordCount": 279,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "e29fa8384f7c50148a1c4396d21bf427a62e24d21f146a47e98f8e4e684be785",
+        "retrievedAt": "2026-11-21T04:47:01.149Z",
+        "peakRssBytes": 478625792,
+        "recordCount": 280,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:39.991Z",
-        "publishedAt": "2026-10-30T16:20:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cornwall/cornwall-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:03.401Z",
+        "publishedAt": "2026-11-21T00:34:40.000Z"
       },
       {
         "completeness": {
@@ -7913,7 +7913,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 14.5,
+        "elapsedSeconds": 18.1,
         "geometryCounts": {
           "node": 346,
           "relation": 0,
@@ -7924,10 +7924,10 @@
         "naming": {
           "contextCounts": {
             "junctions": 2567,
-            "landmarks": 4446,
-            "nearbyNodes": 255945,
-            "places": 5841,
-            "roadSamples": 27162
+            "landmarks": 4449,
+            "nearbyNodes": 258884,
+            "places": 5835,
+            "roadSamples": 27216
           },
           "counts": {
             "generic": 0,
@@ -7938,38 +7938,38 @@
             "street": 56
           }
         },
-        "pbfSha256": "49c7a178bd229a54e3448d33b77bb825443adeaa514234a8d06feb94086c3fc9",
-        "retrievedAt": "2026-10-30T22:58:39.064Z",
-        "peakRssBytes": 597098496,
+        "pbfSha256": "2c6210874d709b31de15dc97c4f52616512118ded9a9e4cae69059d797ca3f7a",
+        "retrievedAt": "2026-11-21T04:47:19.225Z",
+        "peakRssBytes": 513212416,
         "recordCount": 381,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:40.546Z",
-        "publishedAt": "2026-10-30T16:09:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/cumbria/cumbria-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:04.693Z",
+        "publishedAt": "2026-11-21T00:33:59.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 537,
+            "count": 536,
             "percent": 100
           },
           "capacity": {
-            "count": 378,
-            "percent": 70.4
+            "count": 377,
+            "percent": 70.3
           },
           "covered": {
-            "count": 337,
-            "percent": 62.8
+            "count": 340,
+            "percent": 63.4
           },
           "access": {
             "count": 136,
-            "percent": 25.3
+            "percent": 25.4
           },
           "bicycle_pa": {
-            "count": 413,
-            "percent": 76.9
+            "count": 415,
+            "percent": 77.4
           },
           "cargo_bike": {
             "count": 0,
@@ -7985,9 +7985,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 16.1,
+        "elapsedSeconds": 16.2,
         "geometryCounts": {
-          "node": 522,
+          "node": 521,
           "relation": 0,
           "way": 15
         },
@@ -7996,52 +7996,52 @@
         "naming": {
           "contextCounts": {
             "junctions": 3242,
-            "landmarks": 5744,
-            "nearbyNodes": 412869,
-            "places": 1053,
-            "roadSamples": 41311
+            "landmarks": 5747,
+            "nearbyNodes": 413912,
+            "places": 1054,
+            "roadSamples": 41322
           },
           "counts": {
             "generic": 0,
             "junction": 267,
-            "landmark": 167,
+            "landmark": 166,
             "place": 13,
             "source": 8,
             "street": 82
           }
         },
-        "pbfSha256": "b84d1a0fcc74f8273e786c7023e39993728223639f7470d211d35cbf05bd2fa6",
-        "retrievedAt": "2026-10-30T22:58:56.671Z",
-        "peakRssBytes": 438059008,
-        "recordCount": 537,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "67dbeeb599f29aca439bfaa175d5eac12f62dc5b08512dd875f5f12624b25cd0",
+        "retrievedAt": "2026-11-21T04:47:42.477Z",
+        "peakRssBytes": 495173632,
+        "recordCount": 536,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:41.107Z",
-        "publishedAt": "2026-10-30T16:24:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/derbyshire/derbyshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:05.978Z",
+        "publishedAt": "2026-11-21T00:34:12.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 921,
+            "count": 944,
             "percent": 100
           },
           "capacity": {
-            "count": 711,
-            "percent": 77.2
+            "count": 739,
+            "percent": 78.3
           },
           "covered": {
-            "count": 706,
-            "percent": 76.7
+            "count": 707,
+            "percent": 74.9
           },
           "access": {
-            "count": 256,
-            "percent": 27.8
+            "count": 263,
+            "percent": 27.9
           },
           "bicycle_pa": {
-            "count": 753,
-            "percent": 81.8
+            "count": 778,
+            "percent": 82.4
           },
           "cargo_bike": {
             "count": 0,
@@ -8057,41 +8057,41 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 17.7,
+        "elapsedSeconds": 24.1,
         "geometryCounts": {
-          "node": 868,
-          "relation": 0,
-          "way": 53
+          "node": 889,
+          "relation": 1,
+          "way": 54
         },
         "id": "devon",
         "label": "Devon",
         "naming": {
           "contextCounts": {
-            "junctions": 5632,
-            "landmarks": 6921,
-            "nearbyNodes": 670081,
-            "places": 3919,
-            "roadSamples": 71042
+            "junctions": 5649,
+            "landmarks": 6939,
+            "nearbyNodes": 675080,
+            "places": 3921,
+            "roadSamples": 71333
           },
           "counts": {
             "generic": 0,
-            "junction": 523,
-            "landmark": 225,
+            "junction": 544,
+            "landmark": 220,
             "place": 14,
             "source": 5,
-            "street": 154
+            "street": 161
           }
         },
-        "pbfSha256": "7a546dbe1d03f1ff9930496758cdbd0f40dd327aa37a53a678c30ed3ab4158d7",
-        "retrievedAt": "2026-10-30T22:59:36.164Z",
-        "peakRssBytes": 505905152,
-        "recordCount": 921,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "f4bd2090ca7b549463d86c14b10e0bf163682b785c2b59906ed143974981d4d6",
+        "retrievedAt": "2026-11-21T04:48:06.002Z",
+        "peakRssBytes": 514965504,
+        "recordCount": 944,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:41.672Z",
-        "publishedAt": "2026-10-30T16:29:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/devon/devon-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:07.188Z",
+        "publishedAt": "2026-11-21T00:34:35.000Z"
       },
       {
         "completeness": {
@@ -8129,7 +8129,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 8.8,
+        "elapsedSeconds": 10.2,
         "geometryCounts": {
           "node": 503,
           "relation": 0,
@@ -8139,11 +8139,11 @@
         "label": "Dorset",
         "naming": {
           "contextCounts": {
-            "junctions": 2908,
-            "landmarks": 5223,
-            "nearbyNodes": 315817,
-            "places": 1240,
-            "roadSamples": 30015
+            "junctions": 2910,
+            "landmarks": 5232,
+            "nearbyNodes": 315926,
+            "places": 1241,
+            "roadSamples": 30029
           },
           "counts": {
             "generic": 0,
@@ -8154,38 +8154,38 @@
             "street": 66
           }
         },
-        "pbfSha256": "d2fc87caf7de80703f8276ddbc021b8c46022e7bc47ca6adfac013a29d93df00",
-        "retrievedAt": "2026-10-30T23:00:01.199Z",
-        "peakRssBytes": 533741568,
+        "pbfSha256": "e09acba9e03dd4497a2c0d2f37d41cb43dc941b4afb5ccfd55a54a06f84f75c2",
+        "retrievedAt": "2026-11-21T04:48:34.203Z",
+        "peakRssBytes": 522158080,
         "recordCount": 528,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:42.238Z",
-        "publishedAt": "2026-10-30T16:10:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/dorset/dorset-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:08.466Z",
+        "publishedAt": "2026-11-21T00:33:52.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 380,
+            "count": 383,
             "percent": 100
           },
           "capacity": {
-            "count": 308,
-            "percent": 81.1
+            "count": 309,
+            "percent": 80.7
           },
           "covered": {
-            "count": 277,
-            "percent": 72.9
+            "count": 280,
+            "percent": 73.1
           },
           "access": {
-            "count": 94,
-            "percent": 24.7
+            "count": 95,
+            "percent": 24.8
           },
           "bicycle_pa": {
-            "count": 288,
-            "percent": 75.8
+            "count": 291,
+            "percent": 76
           },
           "cargo_bike": {
             "count": 0,
@@ -8201,41 +8201,41 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 6.3,
+        "elapsedSeconds": 7.2,
         "geometryCounts": {
-          "node": 355,
+          "node": 356,
           "relation": 0,
-          "way": 25
+          "way": 27
         },
         "id": "durham",
         "label": "Durham",
         "naming": {
           "contextCounts": {
-            "junctions": 2453,
-            "landmarks": 4123,
-            "nearbyNodes": 217619,
-            "places": 1771,
-            "roadSamples": 26770
+            "junctions": 2462,
+            "landmarks": 4137,
+            "nearbyNodes": 218168,
+            "places": 1772,
+            "roadSamples": 26896
           },
           "counts": {
             "generic": 0,
-            "junction": 162,
+            "junction": 164,
             "landmark": 135,
             "place": 11,
             "source": 6,
-            "street": 66
+            "street": 67
           }
         },
-        "pbfSha256": "58c5569065c0f486bb319a9da6102432adde677d93ec7a52ed91d605f0fcfe45",
-        "retrievedAt": "2026-10-30T23:00:13.215Z",
-        "peakRssBytes": 519208960,
-        "recordCount": 380,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "f40eb6936b2300582c6e0758fe7a889258150c9f30522a9b38e0e69f4ec26c61",
+        "retrievedAt": "2026-11-21T04:48:48.796Z",
+        "peakRssBytes": 505626624,
+        "recordCount": 383,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:42.899Z",
-        "publishedAt": "2026-10-30T16:20:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/durham/durham-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:09.669Z",
+        "publishedAt": "2026-11-21T00:33:46.000Z"
       },
       {
         "completeness": {
@@ -8273,7 +8273,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 6,
+        "elapsedSeconds": 7,
         "geometryCounts": {
           "node": 235,
           "relation": 0,
@@ -8284,10 +8284,10 @@
         "naming": {
           "contextCounts": {
             "junctions": 1602,
-            "landmarks": 3334,
-            "nearbyNodes": 232160,
+            "landmarks": 3333,
+            "nearbyNodes": 233276,
             "places": 978,
-            "roadSamples": 18364
+            "roadSamples": 18379
           },
           "counts": {
             "generic": 0,
@@ -8298,38 +8298,38 @@
             "street": 38
           }
         },
-        "pbfSha256": "efd24982ad4598ceba9948a820d0bce161630c0b9d712fa969a2c56767c5890e",
-        "retrievedAt": "2026-10-30T23:00:21.698Z",
-        "peakRssBytes": 518111232,
+        "pbfSha256": "5d78a201a2b3a2b02fe136d9a9e117ddb70bbb2adb4f17eb449f59194dcdb31b",
+        "retrievedAt": "2026-11-21T04:48:59.082Z",
+        "peakRssBytes": 506445824,
         "recordCount": 251,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:43.469Z",
-        "publishedAt": "2026-10-30T16:07:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-sussex/east-sussex-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:32.741Z",
+        "publishedAt": "2026-11-21T00:34:34.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 229,
+            "count": 230,
             "percent": 100
           },
           "capacity": {
-            "count": 195,
+            "count": 196,
             "percent": 85.2
           },
           "covered": {
-            "count": 197,
-            "percent": 86
+            "count": 198,
+            "percent": 86.1
           },
           "access": {
-            "count": 20,
-            "percent": 8.7
+            "count": 21,
+            "percent": 9.1
           },
           "bicycle_pa": {
-            "count": 197,
-            "percent": 86
+            "count": 199,
+            "percent": 86.5
           },
           "cargo_bike": {
             "count": 0,
@@ -8345,9 +8345,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 5.3,
+        "elapsedSeconds": 6.4,
         "geometryCounts": {
-          "node": 219,
+          "node": 220,
           "relation": 0,
           "way": 10
         },
@@ -8355,53 +8355,53 @@
         "label": "East Yorkshire with Hull",
         "naming": {
           "contextCounts": {
-            "junctions": 1765,
-            "landmarks": 1884,
-            "nearbyNodes": 147526,
+            "junctions": 1768,
+            "landmarks": 1898,
+            "nearbyNodes": 147966,
             "places": 1206,
-            "roadSamples": 14818
+            "roadSamples": 14849
           },
           "counts": {
             "generic": 0,
-            "junction": 155,
+            "junction": 156,
             "landmark": 44,
             "place": 5,
             "source": 0,
             "street": 25
           }
         },
-        "pbfSha256": "757f5e39f974d59189af8e0335a9cd8a3305370fd95155e9f011c80a4bdacd5e",
-        "retrievedAt": "2026-10-30T23:00:34.053Z",
-        "peakRssBytes": 517881856,
-        "recordCount": 229,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "23155ef32ad54d8848f55831558a30f5b453f792ca06ac4e9bee712c93835e00",
+        "retrievedAt": "2026-11-21T04:49:08.471Z",
+        "peakRssBytes": 506314752,
+        "recordCount": 230,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:44.031Z",
-        "publishedAt": "2026-10-30T16:19:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/east-yorkshire-with-hull/east-yorkshire-with-hull-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:35.735Z",
+        "publishedAt": "2026-11-21T00:33:42.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 751,
+            "count": 758,
             "percent": 100
           },
           "capacity": {
-            "count": 522,
-            "percent": 69.5
+            "count": 524,
+            "percent": 69.1
           },
           "covered": {
-            "count": 524,
-            "percent": 69.8
+            "count": 530,
+            "percent": 69.9
           },
           "access": {
-            "count": 219,
-            "percent": 29.2
+            "count": 223,
+            "percent": 29.4
           },
           "bicycle_pa": {
-            "count": 532,
-            "percent": 70.8
+            "count": 536,
+            "percent": 70.7
           },
           "cargo_bike": {
             "count": 2,
@@ -8417,9 +8417,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 13.7,
+        "elapsedSeconds": 23.5,
         "geometryCounts": {
-          "node": 692,
+          "node": 699,
           "relation": 0,
           "way": 59
         },
@@ -8427,53 +8427,53 @@
         "label": "Essex",
         "naming": {
           "contextCounts": {
-            "junctions": 4449,
-            "landmarks": 6486,
-            "nearbyNodes": 465733,
-            "places": 1227,
-            "roadSamples": 55028
+            "junctions": 4492,
+            "landmarks": 6514,
+            "nearbyNodes": 472221,
+            "places": 1228,
+            "roadSamples": 55698
           },
           "counts": {
             "generic": 0,
-            "junction": 357,
-            "landmark": 203,
+            "junction": 359,
+            "landmark": 204,
             "place": 18,
-            "source": 12,
-            "street": 161
+            "source": 13,
+            "street": 164
           }
         },
-        "pbfSha256": "c5c41b612eb8e148f0db9673eb1b00aa6146f613df035fda5b797f7bc879db1c",
-        "retrievedAt": "2026-10-30T23:01:10.296Z",
-        "peakRssBytes": 529481728,
-        "recordCount": 751,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "8f102f79ef158979bb10ab8402a050811568c640ca682cc38cacbe8c4b9416f7",
+        "retrievedAt": "2026-11-21T04:49:20.051Z",
+        "peakRssBytes": 523075584,
+        "recordCount": 758,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:44.921Z",
-        "publishedAt": "2026-10-30T16:16:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/essex/essex-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:38.765Z",
+        "publishedAt": "2026-11-21T00:34:31.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 966,
+            "count": 973,
             "percent": 100
           },
           "capacity": {
-            "count": 781,
+            "count": 786,
             "percent": 80.8
           },
           "covered": {
-            "count": 794,
-            "percent": 82.2
+            "count": 802,
+            "percent": 82.4
           },
           "access": {
-            "count": 188,
-            "percent": 19.5
+            "count": 189,
+            "percent": 19.4
           },
           "bicycle_pa": {
-            "count": 801,
-            "percent": 82.9
+            "count": 811,
+            "percent": 83.4
           },
           "cargo_bike": {
             "count": 0,
@@ -8489,9 +8489,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 13.2,
+        "elapsedSeconds": 14,
         "geometryCounts": {
-          "node": 877,
+          "node": 884,
           "relation": 0,
           "way": 89
         },
@@ -8499,53 +8499,53 @@
         "label": "Gloucestershire",
         "naming": {
           "contextCounts": {
-            "junctions": 4262,
-            "landmarks": 6116,
-            "nearbyNodes": 676166,
-            "places": 1411,
-            "roadSamples": 57398
+            "junctions": 4265,
+            "landmarks": 6127,
+            "nearbyNodes": 682760,
+            "places": 1413,
+            "roadSamples": 57765
           },
           "counts": {
             "generic": 0,
-            "junction": 518,
-            "landmark": 256,
-            "place": 14,
+            "junction": 519,
+            "landmark": 258,
+            "place": 19,
             "source": 0,
-            "street": 178
+            "street": 177
           }
         },
-        "pbfSha256": "bd7d9cbad6790b6aade427f481dad36be20e75f67522ca396ff92236e2f96f75",
-        "retrievedAt": "2026-10-30T23:01:26.595Z",
-        "peakRssBytes": 545144832,
-        "recordCount": 966,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "18c591a611d22452759a795318b8c537997b25883f471c3497082d9bc9a44c57",
+        "retrievedAt": "2026-11-21T04:49:49.735Z",
+        "peakRssBytes": 525975552,
+        "recordCount": 973,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:45.483Z",
-        "publishedAt": "2026-10-30T16:22:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/gloucestershire/gloucestershire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:39.480Z",
+        "publishedAt": "2026-11-21T00:34:24.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 27359,
+            "count": 27361,
             "percent": 100
           },
           "capacity": {
-            "count": 25695,
-            "percent": 93.9
+            "count": 25711,
+            "percent": 94
           },
           "covered": {
-            "count": 17274,
-            "percent": 63.1
+            "count": 17382,
+            "percent": 63.5
           },
           "access": {
-            "count": 5188,
+            "count": 5201,
             "percent": 19
           },
           "bicycle_pa": {
-            "count": 25246,
-            "percent": 92.3
+            "count": 25270,
+            "percent": 92.4
           },
           "cargo_bike": {
             "count": 17,
@@ -8561,62 +8561,62 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 99.6,
+        "elapsedSeconds": 113.8,
         "geometryCounts": {
-          "node": 26817,
+          "node": 26816,
           "relation": 1,
-          "way": 541
+          "way": 544
         },
         "id": "greater-london",
         "label": "Greater London",
         "naming": {
           "contextCounts": {
-            "junctions": 67840,
-            "landmarks": 87920,
-            "nearbyNodes": 7297629,
-            "places": 1084,
-            "roadSamples": 780505
+            "junctions": 67943,
+            "landmarks": 88036,
+            "nearbyNodes": 7329709,
+            "places": 1085,
+            "roadSamples": 782900
           },
           "counts": {
             "generic": 0,
             "junction": 22787,
-            "landmark": 2308,
+            "landmark": 2310,
             "place": 99,
-            "source": 207,
-            "street": 1958
+            "source": 206,
+            "street": 1959
           }
         },
-        "pbfSha256": "f1cf9c34b33c1bb2a322dc2b6103bc3406e0a8aaeb94ceaf4d61b727d152e610",
-        "retrievedAt": "2026-10-30T23:02:04.715Z",
-        "peakRssBytes": 1428291584,
-        "recordCount": 27359,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "1de0354f13fe2d637e8aad677221c7d0062dfe174029a50dfdfad07cedec2a8d",
+        "retrievedAt": "2026-11-21T04:50:21.330Z",
+        "peakRssBytes": 1492369408,
+        "recordCount": 27361,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:46.220Z",
-        "publishedAt": "2026-10-30T16:02:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-london/greater-london-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:40.684Z",
+        "publishedAt": "2026-11-21T00:33:36.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1260,
+            "count": 1264,
             "percent": 100
           },
           "capacity": {
-            "count": 944,
-            "percent": 74.9
+            "count": 946,
+            "percent": 74.8
           },
           "covered": {
-            "count": 979,
-            "percent": 77.7
+            "count": 985,
+            "percent": 77.9
           },
           "access": {
             "count": 431,
-            "percent": 34.2
+            "percent": 34.1
           },
           "bicycle_pa": {
-            "count": 1145,
+            "count": 1149,
             "percent": 90.9
           },
           "cargo_bike": {
@@ -8633,9 +8633,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 17,
+        "elapsedSeconds": 17.3,
         "geometryCounts": {
-          "node": 1136,
+          "node": 1140,
           "relation": 0,
           "way": 124
         },
@@ -8643,53 +8643,53 @@
         "label": "Greater Manchester",
         "naming": {
           "contextCounts": {
-            "junctions": 11321,
-            "landmarks": 11518,
-            "nearbyNodes": 839798,
-            "places": 781,
-            "roadSamples": 105640
+            "junctions": 11377,
+            "landmarks": 11581,
+            "nearbyNodes": 845455,
+            "places": 783,
+            "roadSamples": 106309
           },
           "counts": {
             "generic": 0,
-            "junction": 850,
-            "landmark": 200,
+            "junction": 852,
+            "landmark": 202,
             "place": 14,
             "source": 25,
             "street": 171
           }
         },
-        "pbfSha256": "9c0368aad7df40a47fa51f813baabbbc8c1c0aa0beb3aeb3e1eed989a539ab41",
-        "retrievedAt": "2026-10-30T23:04:08.211Z",
-        "peakRssBytes": 1330790400,
-        "recordCount": 1260,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "a15828afddbb3ad905a80deb6f31542f8013e4a4793994a4f857dc8094597443",
+        "retrievedAt": "2026-11-21T04:52:19.369Z",
+        "peakRssBytes": 1449361408,
+        "recordCount": 1264,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:46.776Z",
-        "publishedAt": "2026-10-30T16:06:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/greater-manchester/greater-manchester-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:41.581Z",
+        "publishedAt": "2026-11-21T00:34:09.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1644,
+            "count": 1648,
             "percent": 100
           },
           "capacity": {
-            "count": 1373,
-            "percent": 83.5
+            "count": 1375,
+            "percent": 83.4
           },
           "covered": {
-            "count": 1414,
+            "count": 1417,
             "percent": 86
           },
           "access": {
-            "count": 269,
+            "count": 270,
             "percent": 16.4
           },
           "bicycle_pa": {
-            "count": 1409,
-            "percent": 85.7
+            "count": 1417,
+            "percent": 86
           },
           "cargo_bike": {
             "count": 1,
@@ -8705,9 +8705,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 20,
+        "elapsedSeconds": 20.7,
         "geometryCounts": {
-          "node": 1466,
+          "node": 1470,
           "relation": 0,
           "way": 178
         },
@@ -8715,53 +8715,53 @@
         "label": "Hampshire",
         "naming": {
           "contextCounts": {
-            "junctions": 8919,
-            "landmarks": 10904,
-            "nearbyNodes": 1133343,
-            "places": 4358,
-            "roadSamples": 122225
+            "junctions": 8927,
+            "landmarks": 10908,
+            "nearbyNodes": 1139708,
+            "places": 4393,
+            "roadSamples": 122785
           },
           "counts": {
             "generic": 0,
-            "junction": 935,
-            "landmark": 378,
-            "place": 23,
+            "junction": 933,
+            "landmark": 382,
+            "place": 24,
             "source": 45,
-            "street": 263
+            "street": 264
           }
         },
-        "pbfSha256": "8e62c28b09c22c1d0b85ef2a390a6799735f65b952fa89ebd77ee384f8dd4a2a",
-        "retrievedAt": "2026-10-30T23:04:47.495Z",
-        "peakRssBytes": 1360314368,
-        "recordCount": 1644,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "9df75dfb1b492ef7b70d3c3041202e8ba8e169344e8b4b75cdcc7328a0f77364",
+        "retrievedAt": "2026-11-21T04:52:41.414Z",
+        "peakRssBytes": 1474215936,
+        "recordCount": 1648,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:47.322Z",
-        "publishedAt": "2026-10-30T16:28:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hampshire/hampshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:42.434Z",
+        "publishedAt": "2026-11-21T00:34:21.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 49,
+            "count": 54,
             "percent": 100
           },
           "capacity": {
-            "count": 39,
-            "percent": 79.6
+            "count": 41,
+            "percent": 75.9
           },
           "covered": {
-            "count": 36,
-            "percent": 73.5
+            "count": 41,
+            "percent": 75.9
           },
           "access": {
             "count": 4,
-            "percent": 8.2
+            "percent": 7.4
           },
           "bicycle_pa": {
-            "count": 41,
-            "percent": 83.7
+            "count": 46,
+            "percent": 85.2
           },
           "cargo_bike": {
             "count": 0,
@@ -8777,9 +8777,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 2.9,
+        "elapsedSeconds": 3.1,
         "geometryCounts": {
-          "node": 45,
+          "node": 50,
           "relation": 0,
           "way": 4
         },
@@ -8787,53 +8787,53 @@
         "label": "Herefordshire",
         "naming": {
           "contextCounts": {
-            "junctions": 364,
-            "landmarks": 792,
-            "nearbyNodes": 33375,
+            "junctions": 365,
+            "landmarks": 887,
+            "nearbyNodes": 33842,
             "places": 648,
-            "roadSamples": 3557
+            "roadSamples": 3578
           },
           "counts": {
             "generic": 0,
-            "junction": 33,
+            "junction": 38,
             "landmark": 9,
             "place": 1,
             "source": 0,
             "street": 6
           }
         },
-        "pbfSha256": "6843094e86a3182a13c5e874490659dc60bdd6cdca08d511e95d585fe0e8b6c0",
-        "retrievedAt": "2026-10-30T23:05:11.520Z",
-        "peakRssBytes": 1294860288,
-        "recordCount": 49,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "6d5c40f3fb4f55fcc12b145aa423cca4444644b4c243170746202bde773b91eb",
+        "retrievedAt": "2026-11-21T04:53:03.747Z",
+        "peakRssBytes": 1379516416,
+        "recordCount": 54,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:48.174Z",
-        "publishedAt": "2026-10-30T15:59:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/herefordshire/herefordshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:43.755Z",
+        "publishedAt": "2026-11-21T00:34:10.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 594,
+            "count": 597,
             "percent": 100
           },
           "capacity": {
-            "count": 422,
-            "percent": 71
+            "count": 427,
+            "percent": 71.5
           },
           "covered": {
-            "count": 458,
-            "percent": 77.1
+            "count": 463,
+            "percent": 77.6
           },
           "access": {
-            "count": 115,
+            "count": 116,
             "percent": 19.4
           },
           "bicycle_pa": {
-            "count": 486,
-            "percent": 81.8
+            "count": 491,
+            "percent": 82.2
           },
           "cargo_bike": {
             "count": 0,
@@ -8849,9 +8849,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 11.9,
+        "elapsedSeconds": 12.4,
         "geometryCounts": {
-          "node": 512,
+          "node": 515,
           "relation": 0,
           "way": 82
         },
@@ -8859,53 +8859,53 @@
         "label": "Hertfordshire",
         "naming": {
           "contextCounts": {
-            "junctions": 3284,
-            "landmarks": 5151,
-            "nearbyNodes": 515254,
+            "junctions": 3305,
+            "landmarks": 5192,
+            "nearbyNodes": 519551,
             "places": 781,
-            "roadSamples": 46000
+            "roadSamples": 46475
           },
           "counts": {
             "generic": 0,
             "junction": 325,
-            "landmark": 141,
+            "landmark": 143,
             "place": 5,
             "source": 28,
-            "street": 95
+            "street": 96
           }
         },
-        "pbfSha256": "68115d07c8e96d059ff842c764f27a457be0424c9a9d5d6ce527daa3c5294817",
-        "retrievedAt": "2026-10-30T23:05:26.542Z",
-        "peakRssBytes": 1327677440,
-        "recordCount": 594,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "b2daea57dd54f3dff5005876c94a702a1cab7b14f4914c394a41e6d2874aba6a",
+        "retrievedAt": "2026-11-21T04:53:08.717Z",
+        "peakRssBytes": 1410121728,
+        "recordCount": 597,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:48.730Z",
-        "publishedAt": "2026-10-30T15:59:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/hertfordshire/hertfordshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:44.719Z",
+        "publishedAt": "2026-11-21T00:34:31.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 174,
+            "count": 176,
             "percent": 100
           },
           "capacity": {
             "count": 138,
-            "percent": 79.3
+            "percent": 78.4
           },
           "covered": {
-            "count": 143,
-            "percent": 82.2
+            "count": 145,
+            "percent": 82.4
           },
           "access": {
             "count": 38,
-            "percent": 21.8
+            "percent": 21.6
           },
           "bicycle_pa": {
-            "count": 135,
-            "percent": 77.6
+            "count": 136,
+            "percent": 77.3
           },
           "cargo_bike": {
             "count": 0,
@@ -8921,9 +8921,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 2.3,
+        "elapsedSeconds": 2.4,
         "geometryCounts": {
-          "node": 172,
+          "node": 174,
           "relation": 0,
           "way": 2
         },
@@ -8931,53 +8931,53 @@
         "label": "Isle of Wight",
         "naming": {
           "contextCounts": {
-            "junctions": 897,
-            "landmarks": 2002,
-            "nearbyNodes": 133452,
+            "junctions": 913,
+            "landmarks": 2026,
+            "nearbyNodes": 136171,
             "places": 421,
-            "roadSamples": 10289
+            "roadSamples": 10527
           },
           "counts": {
             "generic": 0,
-            "junction": 104,
-            "landmark": 38,
+            "junction": 105,
+            "landmark": 39,
             "place": 11,
             "source": 1,
             "street": 20
           }
         },
-        "pbfSha256": "813d8497769ac1d9c478f0926d0b91bf6b29bed3a89d895558b64eca5bf75a6e",
-        "retrievedAt": "2026-10-30T23:05:39.825Z",
-        "peakRssBytes": 1312145408,
-        "recordCount": 174,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "2d4977f1df279cc990f1d506102690a4c7a243b3c70abd3c2c6b9fa210876ab1",
+        "retrievedAt": "2026-11-21T04:53:22.499Z",
+        "peakRssBytes": 1390673920,
+        "recordCount": 176,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:49.290Z",
-        "publishedAt": "2026-10-30T16:15:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/isle-of-wight/isle-of-wight-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:45.578Z",
+        "publishedAt": "2026-11-21T00:34:31.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1391,
+            "count": 1402,
             "percent": 100
           },
           "capacity": {
-            "count": 1220,
-            "percent": 87.7
+            "count": 1228,
+            "percent": 87.6
           },
           "covered": {
-            "count": 1173,
-            "percent": 84.3
+            "count": 1183,
+            "percent": 84.4
           },
           "access": {
-            "count": 200,
-            "percent": 14.4
+            "count": 205,
+            "percent": 14.6
           },
           "bicycle_pa": {
-            "count": 1143,
-            "percent": 82.2
+            "count": 1154,
+            "percent": 82.3
           },
           "cargo_bike": {
             "count": 0,
@@ -8993,9 +8993,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 16.4,
+        "elapsedSeconds": 16.9,
         "geometryCounts": {
-          "node": 1333,
+          "node": 1344,
           "relation": 0,
           "way": 58
         },
@@ -9003,52 +9003,52 @@
         "label": "Kent",
         "naming": {
           "contextCounts": {
-            "junctions": 7075,
-            "landmarks": 9830,
-            "nearbyNodes": 836984,
-            "places": 1620,
-            "roadSamples": 92260
+            "junctions": 7104,
+            "landmarks": 9878,
+            "nearbyNodes": 844798,
+            "places": 1621,
+            "roadSamples": 92816
           },
           "counts": {
             "generic": 0,
-            "junction": 763,
-            "landmark": 404,
-            "place": 22,
+            "junction": 765,
+            "landmark": 410,
+            "place": 21,
             "source": 15,
-            "street": 187
+            "street": 191
           }
         },
-        "pbfSha256": "05ee9e69e66a2db0fc5285b493aabe23a2c2f951b817b53470775048614172d7",
-        "retrievedAt": "2026-10-30T23:05:44.593Z",
-        "peakRssBytes": 1361297408,
-        "recordCount": 1391,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "308ce0758786b5062488c39b59166b55826e011d21c85ee112c89057c60193c0",
+        "retrievedAt": "2026-11-21T04:53:27.269Z",
+        "peakRssBytes": 1418575872,
+        "recordCount": 1402,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:50.402Z",
-        "publishedAt": "2026-10-30T16:07:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/kent/kent-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:46.456Z",
+        "publishedAt": "2026-11-21T00:34:21.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 664,
+            "count": 665,
             "percent": 100
           },
           "capacity": {
-            "count": 570,
-            "percent": 85.8
+            "count": 571,
+            "percent": 85.9
           },
           "covered": {
-            "count": 582,
+            "count": 583,
             "percent": 87.7
           },
           "access": {
             "count": 381,
-            "percent": 57.4
+            "percent": 57.3
           },
           "bicycle_pa": {
-            "count": 629,
+            "count": 630,
             "percent": 94.7
           },
           "cargo_bike": {
@@ -9065,9 +9065,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 12.2,
+        "elapsedSeconds": 12.4,
         "geometryCounts": {
-          "node": 591,
+          "node": 592,
           "relation": 0,
           "way": 73
         },
@@ -9075,52 +9075,52 @@
         "label": "Lancashire",
         "naming": {
           "contextCounts": {
-            "junctions": 5017,
-            "landmarks": 5752,
-            "nearbyNodes": 394508,
-            "places": 1339,
-            "roadSamples": 44721
+            "junctions": 5019,
+            "landmarks": 5766,
+            "nearbyNodes": 399433,
+            "places": 1342,
+            "roadSamples": 44816
           },
           "counts": {
             "generic": 0,
             "junction": 386,
-            "landmark": 179,
+            "landmark": 180,
             "place": 10,
             "source": 2,
             "street": 87
           }
         },
-        "pbfSha256": "8c972e58f100081925c507b7d852d206ce3fb34456b05173363fe0db497cf079",
-        "retrievedAt": "2026-10-30T23:06:05.905Z",
-        "peakRssBytes": 1357168640,
-        "recordCount": 664,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "1d075124e3781652e760b45f34a07cf39badb22151c79e34478c0e1c3e432b7b",
+        "retrievedAt": "2026-11-21T04:53:46.775Z",
+        "peakRssBytes": 1414479872,
+        "recordCount": 665,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:51.267Z",
-        "publishedAt": "2026-10-30T16:13:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lancashire/lancashire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:47.505Z",
+        "publishedAt": "2026-11-21T00:34:34.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 414,
+            "count": 415,
             "percent": 100
           },
           "capacity": {
             "count": 285,
-            "percent": 68.8
+            "percent": 68.7
           },
           "covered": {
-            "count": 325,
-            "percent": 78.5
+            "count": 326,
+            "percent": 78.6
           },
           "access": {
-            "count": 81,
-            "percent": 19.6
+            "count": 82,
+            "percent": 19.8
           },
           "bicycle_pa": {
-            "count": 324,
+            "count": 325,
             "percent": 78.3
           },
           "cargo_bike": {
@@ -9141,37 +9141,37 @@
         "geometryCounts": {
           "node": 352,
           "relation": 0,
-          "way": 62
+          "way": 63
         },
         "id": "leicestershire",
         "label": "Leicestershire",
         "naming": {
           "contextCounts": {
-            "junctions": 2642,
-            "landmarks": 3697,
-            "nearbyNodes": 207996,
-            "places": 777,
-            "roadSamples": 26639
+            "junctions": 2650,
+            "landmarks": 3714,
+            "nearbyNodes": 209236,
+            "places": 778,
+            "roadSamples": 26892
           },
           "counts": {
             "generic": 0,
-            "junction": 247,
-            "landmark": 71,
+            "junction": 248,
+            "landmark": 72,
             "place": 13,
-            "source": 9,
-            "street": 74
+            "source": 10,
+            "street": 72
           }
         },
-        "pbfSha256": "5d31b07934258a6858b900a347daccddfa8f4c2f63680c193c400caf5dbc50fc",
-        "retrievedAt": "2026-10-30T23:06:25.187Z",
-        "peakRssBytes": 1339736064,
-        "recordCount": 414,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "385b30864f57ad5563e24cff46e6b5f7e83bed25af253c2eb3bb0fd01c09d880",
+        "retrievedAt": "2026-11-21T04:54:00.908Z",
+        "peakRssBytes": 1397063680,
+        "recordCount": 415,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:51.834Z",
-        "publishedAt": "2026-10-30T16:24:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/leicestershire/leicestershire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:49.248Z",
+        "publishedAt": "2026-11-21T00:34:14.000Z"
       },
       {
         "completeness": {
@@ -9184,8 +9184,8 @@
             "percent": 72.6
           },
           "covered": {
-            "count": 203,
-            "percent": 62.5
+            "count": 204,
+            "percent": 62.8
           },
           "access": {
             "count": 97,
@@ -9209,7 +9209,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 12.1,
+        "elapsedSeconds": 12.2,
         "geometryCounts": {
           "node": 288,
           "relation": 0,
@@ -9219,11 +9219,11 @@
         "label": "Lincolnshire",
         "naming": {
           "contextCounts": {
-            "junctions": 2311,
-            "landmarks": 4132,
-            "nearbyNodes": 260803,
+            "junctions": 2312,
+            "landmarks": 4134,
+            "nearbyNodes": 261185,
             "places": 11319,
-            "roadSamples": 25795
+            "roadSamples": 25935
           },
           "counts": {
             "generic": 0,
@@ -9234,16 +9234,16 @@
             "street": 52
           }
         },
-        "pbfSha256": "3776da4a8005aea3119802553c5e2f6e8fdbce81da7acd9dea1b08f6a24297c5",
-        "retrievedAt": "2026-10-30T23:06:33.598Z",
-        "peakRssBytes": 1339801600,
+        "pbfSha256": "fd235ddc7055cb1d1c1f50aa345ac081a6445384d3a916d63f0ad0d98ec0f964",
+        "retrievedAt": "2026-11-21T04:54:09.172Z",
+        "peakRssBytes": 1397276672,
         "recordCount": 325,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:52.708Z",
-        "publishedAt": "2026-10-30T16:15:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/lincolnshire/lincolnshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:50.129Z",
+        "publishedAt": "2026-11-21T00:33:53.000Z"
       },
       {
         "completeness": {
@@ -9252,20 +9252,20 @@
             "percent": 100
           },
           "capacity": {
-            "count": 342,
-            "percent": 74.2
+            "count": 343,
+            "percent": 74.4
           },
           "covered": {
-            "count": 309,
-            "percent": 67
+            "count": 310,
+            "percent": 67.2
           },
           "access": {
             "count": 166,
             "percent": 36
           },
           "bicycle_pa": {
-            "count": 364,
-            "percent": 79
+            "count": 365,
+            "percent": 79.2
           },
           "cargo_bike": {
             "count": 0,
@@ -9291,44 +9291,44 @@
         "label": "Merseyside",
         "naming": {
           "contextCounts": {
-            "junctions": 3744,
-            "landmarks": 4682,
-            "nearbyNodes": 336495,
+            "junctions": 3742,
+            "landmarks": 4696,
+            "nearbyNodes": 336632,
             "places": 288,
-            "roadSamples": 31316
+            "roadSamples": 31319
           },
           "counts": {
             "generic": 0,
             "junction": 297,
-            "landmark": 90,
+            "landmark": 91,
             "place": 8,
             "source": 9,
-            "street": 57
+            "street": 56
           }
         },
-        "pbfSha256": "46566003da5646cfebf4eb663047eb9049869adf839e981f71e423432b22d9d8",
-        "retrievedAt": "2026-10-30T23:06:48.082Z",
-        "peakRssBytes": 1354727424,
+        "pbfSha256": "d3af96e3640594d636f8715437b75798f6adcd40f49b883b82d5ec52c059836a",
+        "retrievedAt": "2026-11-21T04:54:23.196Z",
+        "peakRssBytes": 1412268032,
         "recordCount": 461,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:53.433Z",
-        "publishedAt": "2026-10-30T16:03:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/merseyside/merseyside-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:51.099Z",
+        "publishedAt": "2026-11-21T00:34:33.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 918,
+            "count": 919,
             "percent": 100
           },
           "capacity": {
             "count": 792,
-            "percent": 86.3
+            "percent": 86.2
           },
           "covered": {
-            "count": 740,
+            "count": 741,
             "percent": 80.6
           },
           "access": {
@@ -9336,7 +9336,7 @@
             "percent": 10.1
           },
           "bicycle_pa": {
-            "count": 735,
+            "count": 736,
             "percent": 80.1
           },
           "cargo_bike": {
@@ -9355,7 +9355,7 @@
         },
         "elapsedSeconds": 13.3,
         "geometryCounts": {
-          "node": 881,
+          "node": 882,
           "relation": 0,
           "way": 37
         },
@@ -9363,60 +9363,60 @@
         "label": "Norfolk",
         "naming": {
           "contextCounts": {
-            "junctions": 4615,
-            "landmarks": 6887,
-            "nearbyNodes": 560201,
-            "places": 2010,
-            "roadSamples": 61771
+            "junctions": 4626,
+            "landmarks": 6924,
+            "nearbyNodes": 563328,
+            "places": 2009,
+            "roadSamples": 61974
           },
           "counts": {
             "generic": 0,
-            "junction": 439,
-            "landmark": 218,
+            "junction": 440,
+            "landmark": 220,
             "place": 11,
             "source": 117,
-            "street": 133
+            "street": 131
           }
         },
-        "pbfSha256": "9d2bdda46be5f958155f5a25494810dfb1a97356dfea2e76ec0b86a109bec905",
-        "retrievedAt": "2026-10-30T23:07:12.197Z",
-        "peakRssBytes": 1323155456,
-        "recordCount": 918,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "dac356111c53944dd986baa24179f79f315d0f9cbbf5f010e9db216d888fe560",
+        "retrievedAt": "2026-11-21T04:54:35.975Z",
+        "peakRssBytes": 1439170560,
+        "recordCount": 919,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:53.988Z",
-        "publishedAt": "2026-10-30T16:24:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/norfolk/norfolk-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:52.064Z",
+        "publishedAt": "2026-11-21T00:34:17.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1326,
+            "count": 1330,
             "percent": 100
           },
           "capacity": {
-            "count": 1192,
-            "percent": 89.9
+            "count": 1194,
+            "percent": 89.8
           },
           "covered": {
-            "count": 1203,
+            "count": 1206,
             "percent": 90.7
           },
           "access": {
-            "count": 766,
+            "count": 769,
             "percent": 57.8
           },
           "bicycle_pa": {
-            "count": 1249,
+            "count": 1253,
             "percent": 94.2
           },
           "cargo_bike": {
-            "count": 2,
+            "count": 3,
             "percent": 0.2
           },
           "capacity_cargo_bike": {
-            "count": 2,
+            "count": 3,
             "percent": 0.2
           }
         },
@@ -9427,7 +9427,7 @@
         },
         "elapsedSeconds": 18,
         "geometryCounts": {
-          "node": 1187,
+          "node": 1191,
           "relation": 0,
           "way": 139
         },
@@ -9435,52 +9435,52 @@
         "label": "North Yorkshire",
         "naming": {
           "contextCounts": {
-            "junctions": 5516,
-            "landmarks": 8065,
-            "nearbyNodes": 640084,
-            "places": 5900,
-            "roadSamples": 59549
+            "junctions": 5521,
+            "landmarks": 8074,
+            "nearbyNodes": 641536,
+            "places": 5898,
+            "roadSamples": 59697
           },
           "counts": {
             "generic": 0,
-            "junction": 640,
-            "landmark": 391,
+            "junction": 643,
+            "landmark": 395,
             "place": 12,
-            "source": 36,
-            "street": 247
+            "source": 37,
+            "street": 243
           }
         },
-        "pbfSha256": "c645be63c7675897f29c57f9a9961b6293fd6002d730d0ce7fe98be5b1c0d622",
-        "retrievedAt": "2026-10-30T23:07:28.533Z",
-        "peakRssBytes": 1145929728,
-        "recordCount": 1326,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "75d8900f5997ff4657e65a744847dbcb6c5f7a1608b647335c276f2f35f27c1c",
+        "retrievedAt": "2026-11-21T04:54:54.565Z",
+        "peakRssBytes": 1419984896,
+        "recordCount": 1330,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:54.536Z",
-        "publishedAt": "2026-10-30T16:21:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/north-yorkshire/north-yorkshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:32:52.920Z",
+        "publishedAt": "2026-11-21T00:34:00.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 316,
+            "count": 317,
             "percent": 100
           },
           "capacity": {
-            "count": 279,
+            "count": 280,
             "percent": 88.3
           },
           "covered": {
-            "count": 273,
+            "count": 274,
             "percent": 86.4
           },
           "access": {
-            "count": 213,
-            "percent": 67.4
+            "count": 214,
+            "percent": 67.5
           },
           "bicycle_pa": {
-            "count": 272,
+            "count": 273,
             "percent": 86.1
           },
           "cargo_bike": {
@@ -9499,7 +9499,7 @@
         },
         "elapsedSeconds": 6.4,
         "geometryCounts": {
-          "node": 304,
+          "node": 305,
           "relation": 0,
           "way": 12
         },
@@ -9507,31 +9507,31 @@
         "label": "Northamptonshire",
         "naming": {
           "contextCounts": {
-            "junctions": 1617,
-            "landmarks": 3284,
-            "nearbyNodes": 182012,
-            "places": 549,
-            "roadSamples": 20613
+            "junctions": 1629,
+            "landmarks": 3308,
+            "nearbyNodes": 184064,
+            "places": 548,
+            "roadSamples": 20813
           },
           "counts": {
             "generic": 0,
-            "junction": 161,
+            "junction": 162,
             "landmark": 108,
             "place": 3,
             "source": 2,
             "street": 42
           }
         },
-        "pbfSha256": "f608e64dc6a656185a61838ce3e3bdc70a49bf1473e6ff029776ec23fa6db3a8",
-        "retrievedAt": "2026-10-30T23:07:53.319Z",
-        "peakRssBytes": 1078149120,
-        "recordCount": 316,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "62bbcd1dfab19aae223fdb7707e2d0203eea586a14554945fc89fc7ee0a2a6ba",
+        "retrievedAt": "2026-11-21T04:55:14.716Z",
+        "peakRssBytes": 1401831424,
+        "recordCount": 317,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:55.164Z",
-        "publishedAt": "2026-10-30T16:20:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northamptonshire/northamptonshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:22.726Z",
+        "publishedAt": "2026-11-21T00:34:38.000Z"
       },
       {
         "completeness": {
@@ -9569,7 +9569,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 7,
+        "elapsedSeconds": 6.9,
         "geometryCounts": {
           "node": 163,
           "relation": 0,
@@ -9579,11 +9579,11 @@
         "label": "Northumberland",
         "naming": {
           "contextCounts": {
-            "junctions": 979,
+            "junctions": 980,
             "landmarks": 1962,
-            "nearbyNodes": 119510,
-            "places": 3495,
-            "roadSamples": 11156
+            "nearbyNodes": 119647,
+            "places": 3494,
+            "roadSamples": 11184
           },
           "counts": {
             "generic": 0,
@@ -9594,16 +9594,16 @@
             "street": 29
           }
         },
-        "pbfSha256": "9ede89b01126856a511d7baa797c9a90fb75d2fabe61d5180bc21df26d34fb64",
-        "retrievedAt": "2026-10-30T23:08:01.571Z",
-        "peakRssBytes": 1065746432,
+        "pbfSha256": "6fd2cf439a82db5df433d299f53535034b790167e3434e34e1167db8a2dd43c0",
+        "retrievedAt": "2026-11-21T04:55:23.776Z",
+        "peakRssBytes": 1392984064,
         "recordCount": 180,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:55.852Z",
-        "publishedAt": "2026-10-30T15:52:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/northumberland/northumberland-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:23.557Z",
+        "publishedAt": "2026-11-21T00:34:28.000Z"
       },
       {
         "completeness": {
@@ -9624,8 +9624,8 @@
             "percent": 28.4
           },
           "bicycle_pa": {
-            "count": 694,
-            "percent": 78.5
+            "count": 695,
+            "percent": 78.6
           },
           "cargo_bike": {
             "count": 0,
@@ -9641,7 +9641,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 12.3,
+        "elapsedSeconds": 12.1,
         "geometryCounts": {
           "node": 802,
           "relation": 0,
@@ -9651,11 +9651,11 @@
         "label": "Nottinghamshire",
         "naming": {
           "contextCounts": {
-            "junctions": 5167,
-            "landmarks": 7615,
-            "nearbyNodes": 710203,
+            "junctions": 5169,
+            "landmarks": 7612,
+            "nearbyNodes": 710367,
             "places": 1001,
-            "roadSamples": 59114
+            "roadSamples": 59159
           },
           "counts": {
             "generic": 0,
@@ -9666,38 +9666,38 @@
             "street": 132
           }
         },
-        "pbfSha256": "da7a37cd38d9ae40f3489937c4327243bec3d8240c5309e6ef3470c79d338c57",
-        "retrievedAt": "2026-10-30T23:08:11.593Z",
-        "peakRssBytes": 1048608768,
+        "pbfSha256": "de6ef75e3cf9c0ad9bbe8be9ade1cc5d9a9b4368584d05c624ea1467bf82205a",
+        "retrievedAt": "2026-11-21T04:55:34.216Z",
+        "peakRssBytes": 1443086336,
         "recordCount": 884,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:56.410Z",
-        "publishedAt": "2026-10-30T16:23:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/nottinghamshire/nottinghamshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:24.129Z",
+        "publishedAt": "2026-11-21T00:34:15.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1365,
+            "count": 1371,
             "percent": 100
           },
           "capacity": {
-            "count": 1019,
-            "percent": 74.7
+            "count": 1018,
+            "percent": 74.3
           },
           "covered": {
-            "count": 970,
-            "percent": 71.1
+            "count": 973,
+            "percent": 71
           },
           "access": {
-            "count": 322,
+            "count": 324,
             "percent": 23.6
           },
           "bicycle_pa": {
-            "count": 1056,
-            "percent": 77.4
+            "count": 1058,
+            "percent": 77.2
           },
           "cargo_bike": {
             "count": 0,
@@ -9715,7 +9715,7 @@
         },
         "elapsedSeconds": 9.5,
         "geometryCounts": {
-          "node": 1153,
+          "node": 1159,
           "relation": 0,
           "way": 212
         },
@@ -9724,30 +9724,30 @@
         "naming": {
           "contextCounts": {
             "junctions": 4295,
-            "landmarks": 5312,
-            "nearbyNodes": 635995,
-            "places": 841,
-            "roadSamples": 58096
+            "landmarks": 5316,
+            "nearbyNodes": 637980,
+            "places": 842,
+            "roadSamples": 58226
           },
           "counts": {
             "generic": 0,
-            "junction": 782,
-            "landmark": 319,
+            "junction": 787,
+            "landmark": 320,
             "place": 22,
             "source": 13,
             "street": 229
           }
         },
-        "pbfSha256": "dfb602610fc6718712d637807cb8fb3ee347a70a859f2f8b383fe958076ab1c9",
-        "retrievedAt": "2026-10-30T23:08:31.572Z",
-        "peakRssBytes": 1028145152,
-        "recordCount": 1365,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "30985bc1639004f894989bd7cc44474867bf69bf8a840875a450347cc88c2dcc",
+        "retrievedAt": "2026-11-21T04:55:49.811Z",
+        "peakRssBytes": 1448493056,
+        "recordCount": 1371,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:56.976Z",
-        "publishedAt": "2026-10-30T16:10:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/oxfordshire/oxfordshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:24.714Z",
+        "publishedAt": "2026-11-21T00:33:42.000Z"
       },
       {
         "completeness": {
@@ -9797,9 +9797,9 @@
           "contextCounts": {
             "junctions": 65,
             "landmarks": 204,
-            "nearbyNodes": 4379,
+            "nearbyNodes": 4383,
             "places": 349,
-            "roadSamples": 776
+            "roadSamples": 777
           },
           "counts": {
             "generic": 0,
@@ -9810,16 +9810,16 @@
             "street": 1
           }
         },
-        "pbfSha256": "eb7395cafb10cbd323d9e60d6e661c30aa41be268d9bfa2553b25d12a07d451d",
-        "retrievedAt": "2026-10-30T23:08:42.099Z",
-        "peakRssBytes": 981401600,
+        "pbfSha256": "6cd740d67ae55d1e53e6e3fe7033b4b5ec67d01a9d77a7a5f29a2fb91d0885b8",
+        "retrievedAt": "2026-11-21T04:56:00.288Z",
+        "peakRssBytes": 1417674752,
         "recordCount": 8,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:58.047Z",
-        "publishedAt": "2026-10-30T16:12:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/rutland/rutland-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:25.295Z",
+        "publishedAt": "2026-11-21T00:33:32.000Z"
       },
       {
         "completeness": {
@@ -9857,7 +9857,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 7.1,
+        "elapsedSeconds": 7,
         "geometryCounts": {
           "node": 237,
           "relation": 0,
@@ -9867,11 +9867,11 @@
         "label": "Shropshire",
         "naming": {
           "contextCounts": {
-            "junctions": 1470,
-            "landmarks": 2579,
-            "nearbyNodes": 167889,
-            "places": 1330,
-            "roadSamples": 18675
+            "junctions": 1471,
+            "landmarks": 2589,
+            "nearbyNodes": 168183,
+            "places": 1335,
+            "roadSamples": 18686
           },
           "counts": {
             "generic": 0,
@@ -9882,38 +9882,38 @@
             "street": 25
           }
         },
-        "pbfSha256": "dcc463d45384d25c5f590c99833e1872a5d178cab36905ac2fc213a9dcd0b5f0",
-        "retrievedAt": "2026-10-30T23:08:45.191Z",
-        "peakRssBytes": 936280064,
+        "pbfSha256": "f6667f0c9c5984976a7dee436cd4227d9aab59ecd141a3050c42c67497a94128",
+        "retrievedAt": "2026-11-21T04:56:01.892Z",
+        "peakRssBytes": 1400487936,
         "recordCount": 250,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:58.668Z",
-        "publishedAt": "2026-10-30T16:10:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/shropshire/shropshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:25.888Z",
+        "publishedAt": "2026-11-21T00:34:11.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 825,
+            "count": 827,
             "percent": 100
           },
           "capacity": {
-            "count": 715,
+            "count": 717,
             "percent": 86.7
           },
           "covered": {
-            "count": 643,
-            "percent": 77.9
+            "count": 645,
+            "percent": 78
           },
           "access": {
             "count": 164,
-            "percent": 19.9
+            "percent": 19.8
           },
           "bicycle_pa": {
-            "count": 676,
-            "percent": 81.9
+            "count": 678,
+            "percent": 82
           },
           "cargo_bike": {
             "count": 1,
@@ -9929,9 +9929,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 15.6,
+        "elapsedSeconds": 15.4,
         "geometryCounts": {
-          "node": 752,
+          "node": 754,
           "relation": 0,
           "way": 73
         },
@@ -9939,57 +9939,57 @@
         "label": "Somerset",
         "naming": {
           "contextCounts": {
-            "junctions": 3831,
-            "landmarks": 5698,
-            "nearbyNodes": 595934,
+            "junctions": 3841,
+            "landmarks": 5707,
+            "nearbyNodes": 598968,
             "places": 1989,
-            "roadSamples": 54153
+            "roadSamples": 54321
           },
           "counts": {
             "generic": 0,
-            "junction": 491,
-            "landmark": 185,
+            "junction": 493,
+            "landmark": 186,
             "place": 26,
             "source": 5,
-            "street": 118
+            "street": 117
           }
         },
-        "pbfSha256": "f27722e3a447aa65ff908460022ca7ae95a3d36a30c8af368a0c264d07fbcd11",
-        "retrievedAt": "2026-10-30T23:08:55.444Z",
-        "peakRssBytes": 970833920,
-        "recordCount": 825,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "808d15c68467855d23697718d67200a4041036f09da83088490312d86824cc41",
+        "retrievedAt": "2026-11-21T04:56:11.603Z",
+        "peakRssBytes": 1443987456,
+        "recordCount": 827,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:52:59.237Z",
-        "publishedAt": "2026-10-30T16:27:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/somerset/somerset-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:26.465Z",
+        "publishedAt": "2026-11-21T00:34:29.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 938,
+            "count": 975,
             "percent": 100
           },
           "capacity": {
-            "count": 812,
-            "percent": 86.6
+            "count": 846,
+            "percent": 86.8
           },
           "covered": {
-            "count": 810,
-            "percent": 86.4
+            "count": 843,
+            "percent": 86.5
           },
           "access": {
-            "count": 477,
-            "percent": 50.9
+            "count": 501,
+            "percent": 51.4
           },
           "bicycle_pa": {
-            "count": 835,
-            "percent": 89
+            "count": 872,
+            "percent": 89.4
           },
           "cargo_bike": {
-            "count": 4,
-            "percent": 0.4
+            "count": 5,
+            "percent": 0.5
           },
           "capacity_cargo_bike": {
             "count": 1,
@@ -10003,39 +10003,39 @@
         },
         "elapsedSeconds": 9.3,
         "geometryCounts": {
-          "node": 906,
+          "node": 941,
           "relation": 0,
-          "way": 32
+          "way": 34
         },
         "id": "south-yorkshire",
         "label": "South Yorkshire",
         "naming": {
           "contextCounts": {
-            "junctions": 5165,
-            "landmarks": 7290,
-            "nearbyNodes": 509491,
-            "places": 937,
-            "roadSamples": 57116
+            "junctions": 5280,
+            "landmarks": 7401,
+            "nearbyNodes": 521951,
+            "places": 939,
+            "roadSamples": 58242
           },
           "counts": {
             "generic": 0,
-            "junction": 657,
-            "landmark": 153,
-            "place": 4,
+            "junction": 681,
+            "landmark": 164,
+            "place": 5,
             "source": 7,
-            "street": 117
+            "street": 118
           }
         },
-        "pbfSha256": "44fa5c0b14f2a781585088dba9c78c23ae741932be3ed15e1eeb31b93d05eeb9",
-        "retrievedAt": "2026-10-30T23:09:20.452Z",
-        "peakRssBytes": 898220032,
-        "recordCount": 938,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "85ca996a952898b9637179f62132ba8c14646e37691b407d31706d5a96462535",
+        "retrievedAt": "2026-11-21T04:56:29.480Z",
+        "peakRssBytes": 1411530752,
+        "recordCount": 975,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:01.021Z",
-        "publishedAt": "2026-10-30T16:22:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/south-yorkshire/south-yorkshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:27.041Z",
+        "publishedAt": "2026-11-21T00:34:04.000Z"
       },
       {
         "completeness": {
@@ -10048,16 +10048,16 @@
             "percent": 78.1
           },
           "covered": {
-            "count": 237,
-            "percent": 83.7
+            "count": 238,
+            "percent": 84.1
           },
           "access": {
-            "count": 109,
-            "percent": 38.5
+            "count": 113,
+            "percent": 39.9
           },
           "bicycle_pa": {
-            "count": 234,
-            "percent": 82.7
+            "count": 236,
+            "percent": 83.4
           },
           "cargo_bike": {
             "count": 1,
@@ -10073,63 +10073,63 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 8.5,
+        "elapsedSeconds": 8.4,
         "geometryCounts": {
-          "node": 268,
+          "node": 267,
           "relation": 0,
-          "way": 15
+          "way": 16
         },
         "id": "staffordshire",
         "label": "Staffordshire",
         "naming": {
           "contextCounts": {
-            "junctions": 2326,
-            "landmarks": 3167,
-            "nearbyNodes": 186961,
-            "places": 854,
-            "roadSamples": 22997
+            "junctions": 2323,
+            "landmarks": 3200,
+            "nearbyNodes": 188106,
+            "places": 856,
+            "roadSamples": 23153
           },
           "counts": {
             "generic": 0,
-            "junction": 150,
-            "landmark": 80,
+            "junction": 149,
+            "landmark": 82,
             "place": 2,
             "source": 5,
-            "street": 46
+            "street": 45
           }
         },
-        "pbfSha256": "6837064485631f55c0c00e600ecfe13cecaad185a13eb35a2c0fa0e12628c6c6",
-        "retrievedAt": "2026-10-30T23:09:32.848Z",
-        "peakRssBytes": 888307712,
+        "pbfSha256": "48d679f7075d183c59abea27ce5d497368345ff5b379ab1117b375a4580cb547",
+        "retrievedAt": "2026-11-21T04:56:40.751Z",
+        "peakRssBytes": 1402339328,
         "recordCount": 283,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:01.589Z",
-        "publishedAt": "2026-10-30T16:22:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/staffordshire/staffordshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:27.530Z",
+        "publishedAt": "2026-11-21T00:34:30.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 471,
+            "count": 475,
             "percent": 100
           },
           "capacity": {
-            "count": 364,
-            "percent": 77.3
+            "count": 368,
+            "percent": 77.5
           },
           "covered": {
-            "count": 343,
+            "count": 346,
             "percent": 72.8
           },
           "access": {
-            "count": 73,
-            "percent": 15.5
+            "count": 75,
+            "percent": 15.8
           },
           "bicycle_pa": {
-            "count": 374,
-            "percent": 79.4
+            "count": 378,
+            "percent": 79.6
           },
           "cargo_bike": {
             "count": 0,
@@ -10145,9 +10145,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 9.7,
+        "elapsedSeconds": 9.6,
         "geometryCounts": {
-          "node": 437,
+          "node": 441,
           "relation": 0,
           "way": 34
         },
@@ -10155,53 +10155,53 @@
         "label": "Suffolk",
         "naming": {
           "contextCounts": {
-            "junctions": 2631,
-            "landmarks": 4503,
-            "nearbyNodes": 331805,
+            "junctions": 2668,
+            "landmarks": 4522,
+            "nearbyNodes": 336723,
             "places": 1055,
-            "roadSamples": 32571
+            "roadSamples": 32999
           },
           "counts": {
             "generic": 0,
-            "junction": 249,
-            "landmark": 141,
+            "junction": 250,
+            "landmark": 144,
             "place": 9,
             "source": 9,
             "street": 63
           }
         },
-        "pbfSha256": "44346bcdd8135b4f01f00b826a3aefa74bb457b85b18c9860e63eb18a95d7ffd",
-        "retrievedAt": "2026-10-30T23:09:44.956Z",
-        "peakRssBytes": 902709248,
-        "recordCount": 471,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "8b4145d968577ab18b01153ceb0bec0ddd6f326f4073e07d71e0421edd049315",
+        "retrievedAt": "2026-11-21T04:56:51.116Z",
+        "peakRssBytes": 1416871936,
+        "recordCount": 475,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:02.139Z",
-        "publishedAt": "2026-10-30T16:22:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/suffolk/suffolk-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:28.027Z",
+        "publishedAt": "2026-11-21T00:34:25.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 725,
+            "count": 731,
             "percent": 100
           },
           "capacity": {
-            "count": 541,
-            "percent": 74.6
+            "count": 546,
+            "percent": 74.7
           },
           "covered": {
-            "count": 526,
-            "percent": 72.6
+            "count": 528,
+            "percent": 72.2
           },
           "access": {
-            "count": 141,
-            "percent": 19.4
+            "count": 146,
+            "percent": 20
           },
           "bicycle_pa": {
-            "count": 562,
-            "percent": 77.5
+            "count": 568,
+            "percent": 77.7
           },
           "cargo_bike": {
             "count": 9,
@@ -10219,7 +10219,7 @@
         },
         "elapsedSeconds": 12.4,
         "geometryCounts": {
-          "node": 652,
+          "node": 658,
           "relation": 0,
           "way": 73
         },
@@ -10227,44 +10227,44 @@
         "label": "Surrey",
         "naming": {
           "contextCounts": {
-            "junctions": 4036,
-            "landmarks": 6324,
-            "nearbyNodes": 572032,
+            "junctions": 4049,
+            "landmarks": 6358,
+            "nearbyNodes": 574115,
             "places": 1385,
-            "roadSamples": 59240
+            "roadSamples": 59508
           },
           "counts": {
             "generic": 0,
-            "junction": 420,
-            "landmark": 197,
+            "junction": 424,
+            "landmark": 199,
             "place": 7,
-            "source": 10,
-            "street": 91
+            "source": 9,
+            "street": 92
           }
         },
-        "pbfSha256": "3d1de0226b5168c44789a4dace2b215720fdc7867ba6ac0c59ba68f215cf64c0",
-        "retrievedAt": "2026-10-30T23:10:01.628Z",
-        "peakRssBytes": 934985728,
-        "recordCount": 725,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "2092d51de4dd39559989e29acc706b010100909933e93c0f0d6e569421cb8bf0",
+        "retrievedAt": "2026-11-21T04:57:03.016Z",
+        "peakRssBytes": 1443954688,
+        "recordCount": 731,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:02.683Z",
-        "publishedAt": "2026-10-30T16:03:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/surrey/surrey-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:28.525Z",
+        "publishedAt": "2026-11-21T00:34:15.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 752,
+            "count": 753,
             "percent": 100
           },
           "capacity": {
-            "count": 645,
+            "count": 646,
             "percent": 85.8
           },
           "covered": {
-            "count": 615,
+            "count": 616,
             "percent": 81.8
           },
           "access": {
@@ -10272,7 +10272,7 @@
             "percent": 32.4
           },
           "bicycle_pa": {
-            "count": 670,
+            "count": 671,
             "percent": 89.1
           },
           "cargo_bike": {
@@ -10289,9 +10289,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 6.1,
+        "elapsedSeconds": 6,
         "geometryCounts": {
-          "node": 733,
+          "node": 734,
           "relation": 0,
           "way": 19
         },
@@ -10299,44 +10299,44 @@
         "label": "Tyne and Wear",
         "naming": {
           "contextCounts": {
-            "junctions": 4093,
-            "landmarks": 6283,
-            "nearbyNodes": 298121,
+            "junctions": 4106,
+            "landmarks": 6308,
+            "nearbyNodes": 300482,
             "places": 290,
-            "roadSamples": 39641
+            "roadSamples": 39827
           },
           "counts": {
             "generic": 0,
-            "junction": 429,
+            "junction": 430,
             "landmark": 208,
             "place": 8,
             "source": 5,
             "street": 102
           }
         },
-        "pbfSha256": "4fbfb499bc32938b622ff3b9c818d2cc63c4b9942d17826e5e7b8bf75d06f4ca",
-        "retrievedAt": "2026-10-30T23:10:19.957Z",
-        "peakRssBytes": 887160832,
-        "recordCount": 752,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "1ebcb68d99dd8dca447fb0efb53d81c6a87b1e8a41c584da0873fd758502d8b2",
+        "retrievedAt": "2026-11-21T04:57:17.333Z",
+        "peakRssBytes": 1417625600,
+        "recordCount": 753,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:03.282Z",
-        "publishedAt": "2026-10-30T15:51:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/tyne-and-wear/tyne-and-wear-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:29.019Z",
+        "publishedAt": "2026-11-21T00:34:21.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 369,
+            "count": 370,
             "percent": 100
           },
           "capacity": {
-            "count": 309,
-            "percent": 83.7
+            "count": 310,
+            "percent": 83.8
           },
           "covered": {
-            "count": 318,
+            "count": 319,
             "percent": 86.2
           },
           "access": {
@@ -10345,7 +10345,7 @@
           },
           "bicycle_pa": {
             "count": 317,
-            "percent": 85.9
+            "percent": 85.7
           },
           "cargo_bike": {
             "count": 2,
@@ -10361,9 +10361,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 7.2,
+        "elapsedSeconds": 7.1,
         "geometryCounts": {
-          "node": 329,
+          "node": 330,
           "relation": 0,
           "way": 40
         },
@@ -10371,52 +10371,52 @@
         "label": "Warwickshire",
         "naming": {
           "contextCounts": {
-            "junctions": 1786,
-            "landmarks": 3081,
-            "nearbyNodes": 265338,
+            "junctions": 1788,
+            "landmarks": 3083,
+            "nearbyNodes": 266244,
             "places": 509,
-            "roadSamples": 28040
+            "roadSamples": 28069
           },
           "counts": {
             "generic": 0,
             "junction": 159,
-            "landmark": 126,
+            "landmark": 127,
             "place": 22,
             "source": 11,
             "street": 51
           }
         },
-        "pbfSha256": "2cb625ab3b1e4d8fe14bcad2a12e0c18c63953933d1090833585b8376bbc77d5",
-        "retrievedAt": "2026-10-30T23:10:28.065Z",
-        "peakRssBytes": 877297664,
-        "recordCount": 369,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "f3cba68e84f9c2c26d2b1fbf9ee83574befc9bbef3052a24975ed9550a8bc2ac",
+        "retrievedAt": "2026-11-21T04:57:25.027Z",
+        "peakRssBytes": 1413627904,
+        "recordCount": 370,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:04.202Z",
-        "publishedAt": "2026-10-30T16:29:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/warwickshire/warwickshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:29.514Z",
+        "publishedAt": "2026-11-21T00:34:38.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1600,
+            "count": 1601,
             "percent": 100
           },
           "capacity": {
-            "count": 1367,
+            "count": 1368,
             "percent": 85.4
           },
           "covered": {
-            "count": 1173,
+            "count": 1174,
             "percent": 73.3
           },
           "access": {
-            "count": 413,
-            "percent": 25.8
+            "count": 415,
+            "percent": 25.9
           },
           "bicycle_pa": {
-            "count": 1238,
+            "count": 1239,
             "percent": 77.4
           },
           "cargo_bike": {
@@ -10433,62 +10433,62 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 18.5,
+        "elapsedSeconds": 18.2,
         "geometryCounts": {
           "node": 1474,
           "relation": 0,
-          "way": 126
+          "way": 127
         },
         "id": "west-midlands",
         "label": "West Midlands",
         "naming": {
           "contextCounts": {
-            "junctions": 8387,
-            "landmarks": 14644,
-            "nearbyNodes": 1096581,
+            "junctions": 8411,
+            "landmarks": 14667,
+            "nearbyNodes": 1099167,
             "places": 681,
-            "roadSamples": 99889
+            "roadSamples": 100225
           },
           "counts": {
             "generic": 0,
             "junction": 860,
-            "landmark": 335,
+            "landmark": 336,
             "place": 12,
-            "source": 185,
-            "street": 208
+            "source": 184,
+            "street": 209
           }
         },
-        "pbfSha256": "f9afafd5caa40d4382434bc57583124a5413cf9d0ee904c32adc9170b0418c1c",
-        "retrievedAt": "2026-10-30T23:10:41.967Z",
-        "peakRssBytes": 831668224,
-        "recordCount": 1600,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "79395ca757a04d05bbb83a723dd6c05d7f6722fb236feae7087298c36d5d9cab",
+        "retrievedAt": "2026-11-21T04:57:34.950Z",
+        "peakRssBytes": 1453948928,
+        "recordCount": 1601,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:04.751Z",
-        "publishedAt": "2026-10-30T16:11:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-midlands/west-midlands-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:30.005Z",
+        "publishedAt": "2026-11-21T00:34:24.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1013,
+            "count": 1015,
             "percent": 100
           },
           "capacity": {
-            "count": 775,
+            "count": 776,
             "percent": 76.5
           },
           "covered": {
-            "count": 782,
-            "percent": 77.2
+            "count": 783,
+            "percent": 77.1
           },
           "access": {
-            "count": 243,
+            "count": 244,
             "percent": 24
           },
           "bicycle_pa": {
-            "count": 850,
+            "count": 852,
             "percent": 83.9
           },
           "cargo_bike": {
@@ -10505,9 +10505,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 16.9,
+        "elapsedSeconds": 16.7,
         "geometryCounts": {
-          "node": 866,
+          "node": 868,
           "relation": 0,
           "way": 147
         },
@@ -10515,53 +10515,53 @@
         "label": "West Sussex",
         "naming": {
           "contextCounts": {
-            "junctions": 4998,
-            "landmarks": 8937,
-            "nearbyNodes": 845407,
-            "places": 1903,
-            "roadSamples": 61132
+            "junctions": 4999,
+            "landmarks": 8969,
+            "nearbyNodes": 847431,
+            "places": 1906,
+            "roadSamples": 61203
           },
           "counts": {
             "generic": 0,
-            "junction": 665,
+            "junction": 667,
             "landmark": 158,
             "place": 6,
             "source": 53,
             "street": 131
           }
         },
-        "pbfSha256": "e820d07450f9d9208cf1cca07015f6c26b73d5c68e5650be40a6de50babc70ee",
-        "retrievedAt": "2026-10-30T23:11:11.133Z",
-        "peakRssBytes": 739475456,
-        "recordCount": 1013,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "4b943013a680aba7ccb87eb5efba96508d6d68a961109faad6100f5ac19bd95f",
+        "retrievedAt": "2026-11-21T04:57:55.843Z",
+        "peakRssBytes": 1449934848,
+        "recordCount": 1015,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:05.313Z",
-        "publishedAt": "2026-10-30T16:12:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-sussex/west-sussex-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:30.579Z",
+        "publishedAt": "2026-11-21T00:34:17.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 945,
+            "count": 948,
             "percent": 100
           },
           "capacity": {
-            "count": 758,
-            "percent": 80.2
+            "count": 761,
+            "percent": 80.3
           },
           "covered": {
-            "count": 763,
-            "percent": 80.7
+            "count": 768,
+            "percent": 81
           },
           "access": {
-            "count": 370,
+            "count": 372,
             "percent": 39.2
           },
           "bicycle_pa": {
-            "count": 842,
-            "percent": 89.1
+            "count": 846,
+            "percent": 89.2
           },
           "cargo_bike": {
             "count": 0,
@@ -10577,9 +10577,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 18.5,
+        "elapsedSeconds": 18.6,
         "geometryCounts": {
-          "node": 798,
+          "node": 801,
           "relation": 1,
           "way": 146
         },
@@ -10587,31 +10587,31 @@
         "label": "West Yorkshire",
         "naming": {
           "contextCounts": {
-            "junctions": 9395,
-            "landmarks": 11684,
-            "nearbyNodes": 605319,
-            "places": 1816,
-            "roadSamples": 76915
+            "junctions": 9389,
+            "landmarks": 11690,
+            "nearbyNodes": 607745,
+            "places": 1817,
+            "roadSamples": 77163
           },
           "counts": {
             "generic": 0,
-            "junction": 627,
-            "landmark": 190,
+            "junction": 625,
+            "landmark": 193,
             "place": 7,
             "source": 23,
-            "street": 98
+            "street": 100
           }
         },
-        "pbfSha256": "879d8cbbc1637332420b1e239a8da395ae2ae3c7fd6580d68021aaa61c3fb861",
-        "retrievedAt": "2026-10-30T23:11:41.206Z",
-        "peakRssBytes": 745619456,
-        "recordCount": 945,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "3c92ce9b0a7cdb8bea6c8a5defe84f2e50225b58cda8ce37fd0e75bfa4503bb6",
+        "retrievedAt": "2026-11-21T04:58:15.301Z",
+        "peakRssBytes": 1432387584,
+        "recordCount": 948,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:06.490Z",
-        "publishedAt": "2026-10-30T16:03:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/west-yorkshire/west-yorkshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:31.063Z",
+        "publishedAt": "2026-11-21T00:34:39.000Z"
       },
       {
         "completeness": {
@@ -10649,7 +10649,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 11.3,
+        "elapsedSeconds": 11,
         "geometryCounts": {
           "node": 337,
           "relation": 0,
@@ -10659,53 +10659,53 @@
         "label": "Wiltshire",
         "naming": {
           "contextCounts": {
-            "junctions": 2553,
-            "landmarks": 3299,
-            "nearbyNodes": 381411,
-            "places": 1490,
-            "roadSamples": 46318
+            "junctions": 2554,
+            "landmarks": 3298,
+            "nearbyNodes": 382811,
+            "places": 1492,
+            "roadSamples": 46483
           },
           "counts": {
             "generic": 0,
-            "junction": 181,
-            "landmark": 127,
+            "junction": 185,
+            "landmark": 123,
             "place": 10,
             "source": 1,
             "street": 64
           }
         },
-        "pbfSha256": "2f6f900f2c38322e471d728b6ed395b1331dd13180906e78e8cedf531fe4cbe8",
-        "retrievedAt": "2026-10-30T23:12:03.339Z",
-        "peakRssBytes": 719290368,
+        "pbfSha256": "0aaa87313d7277c76b05d6f695f1cdafbc47f406f91e20d1074f6fec8cb31485",
+        "retrievedAt": "2026-11-21T04:58:36.324Z",
+        "peakRssBytes": 1422180352,
         "recordCount": 383,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:07.349Z",
-        "publishedAt": "2026-10-30T16:22:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/wiltshire/wiltshire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:31.549Z",
+        "publishedAt": "2026-11-21T00:34:22.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 261,
+            "count": 263,
             "percent": 100
           },
           "capacity": {
-            "count": 219,
-            "percent": 83.9
+            "count": 221,
+            "percent": 84
           },
           "covered": {
-            "count": 185,
-            "percent": 70.9
+            "count": 187,
+            "percent": 71.1
           },
           "access": {
             "count": 32,
-            "percent": 12.3
+            "percent": 12.2
           },
           "bicycle_pa": {
-            "count": 193,
-            "percent": 73.9
+            "count": 195,
+            "percent": 74.1
           },
           "cargo_bike": {
             "count": 0,
@@ -10723,7 +10723,7 @@
         },
         "elapsedSeconds": 5.8,
         "geometryCounts": {
-          "node": 247,
+          "node": 249,
           "relation": 0,
           "way": 14
         },
@@ -10731,53 +10731,53 @@
         "label": "Worcestershire",
         "naming": {
           "contextCounts": {
-            "junctions": 1527,
-            "landmarks": 2543,
-            "nearbyNodes": 158017,
+            "junctions": 1555,
+            "landmarks": 2544,
+            "nearbyNodes": 160069,
             "places": 654,
-            "roadSamples": 17061
+            "roadSamples": 17306
           },
           "counts": {
             "generic": 0,
-            "junction": 137,
+            "junction": 139,
             "landmark": 76,
             "place": 5,
             "source": 1,
             "street": 42
           }
         },
-        "pbfSha256": "9926edfd20dc40dd90a8628d27a26b173258990ed1eab195e4eb4d7b8a42e1bf",
-        "retrievedAt": "2026-10-30T23:12:16.247Z",
-        "peakRssBytes": 700907520,
-        "recordCount": 261,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "a5582e365df4e244c86b4e930f1095cc7cda55a1814101c51960e69c5f8cd14f",
+        "retrievedAt": "2026-11-21T04:58:51.347Z",
+        "peakRssBytes": 1401765888,
+        "recordCount": 263,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:07.900Z",
-        "publishedAt": "2026-10-30T16:11:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/england/worcestershire/worcestershire-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:32.043Z",
+        "publishedAt": "2026-11-21T00:34:39.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1263,
+            "count": 1271,
             "percent": 100
           },
           "capacity": {
-            "count": 923,
-            "percent": 73.1
+            "count": 926,
+            "percent": 72.9
           },
           "covered": {
-            "count": 795,
-            "percent": 62.9
+            "count": 803,
+            "percent": 63.2
           },
           "access": {
-            "count": 290,
-            "percent": 23
+            "count": 296,
+            "percent": 23.3
           },
           "bicycle_pa": {
-            "count": 884,
-            "percent": 70
+            "count": 892,
+            "percent": 70.2
           },
           "cargo_bike": {
             "count": 1,
@@ -10793,9 +10793,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 47.7,
+        "elapsedSeconds": 47.4,
         "geometryCounts": {
-          "node": 1121,
+          "node": 1129,
           "relation": 0,
           "way": 142
         },
@@ -10803,53 +10803,53 @@
         "label": "Wales",
         "naming": {
           "contextCounts": {
-            "junctions": 7215,
-            "landmarks": 13539,
-            "nearbyNodes": 1167060,
-            "places": 5297,
-            "roadSamples": 91244
+            "junctions": 7242,
+            "landmarks": 13630,
+            "nearbyNodes": 1202135,
+            "places": 5308,
+            "roadSamples": 92081
           },
           "counts": {
             "generic": 0,
-            "junction": 612,
+            "junction": 619,
             "landmark": 339,
-            "place": 26,
+            "place": 27,
             "source": 82,
             "street": 204
           }
         },
-        "pbfSha256": "523ee6ba4ce0dcc8345c1474a4c1a9909394d5fb22adbf3fa9babf2c7898239e",
-        "retrievedAt": "2026-10-30T23:12:58.670Z",
-        "peakRssBytes": 729579520,
-        "recordCount": 1263,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "0222367cecf46bf7041bc1b868f5a427dab37e227a6b5547560af477e681e214",
+        "retrievedAt": "2026-11-21T04:59:19.530Z",
+        "peakRssBytes": 1494499328,
+        "recordCount": 1271,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/wales-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:08.482Z",
-        "publishedAt": "2026-10-30T15:35:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/united-kingdom/wales/wales-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:32.603Z",
+        "publishedAt": "2026-11-21T00:33:28.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 4563,
+            "count": 4585,
             "percent": 100
           },
           "capacity": {
-            "count": 3554,
+            "count": 3573,
             "percent": 77.9
           },
           "covered": {
-            "count": 3670,
-            "percent": 80.4
+            "count": 3692,
+            "percent": 80.5
           },
           "access": {
-            "count": 2019,
-            "percent": 44.2
+            "count": 2034,
+            "percent": 44.4
           },
           "bicycle_pa": {
-            "count": 3810,
-            "percent": 83.5
+            "count": 3837,
+            "percent": 83.7
           },
           "cargo_bike": {
             "count": 15,
@@ -10865,63 +10865,63 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 137.2,
+        "elapsedSeconds": 141.8,
         "geometryCounts": {
-          "node": 4120,
+          "node": 4141,
           "relation": 0,
-          "way": 443
+          "way": 444
         },
         "id": "ireland-and-northern-ireland",
         "label": "Ireland and Northern Ireland",
         "naming": {
           "contextCounts": {
-            "junctions": 18844,
-            "landmarks": 34626,
-            "nearbyNodes": 3823224,
-            "places": 17991,
-            "roadSamples": 267797
+            "junctions": 18870,
+            "landmarks": 34766,
+            "nearbyNodes": 3836997,
+            "places": 18008,
+            "roadSamples": 268532
           },
           "counts": {
             "generic": 0,
-            "junction": 2545,
-            "landmark": 1043,
-            "place": 109,
+            "junction": 2552,
+            "landmark": 1053,
+            "place": 110,
             "source": 40,
-            "street": 826
+            "street": 830
           }
         },
-        "pbfSha256": "7292b261d6d3c5245fbaf27503a795621620d4b2f8bb842515da2bf04e8bc17c",
-        "retrievedAt": "2026-10-30T23:15:13.953Z",
-        "peakRssBytes": 1025802240,
-        "recordCount": 4563,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "28a45c647af58940a3992f1962681e4de4784ebfa9df6f57b61c3bf8fa92a4fb",
+        "retrievedAt": "2026-11-21T05:00:32.239Z",
+        "peakRssBytes": 1573191680,
+        "recordCount": 4585,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:09.466Z",
-        "publishedAt": "2026-10-30T12:47:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/ireland-and-northern-ireland/ireland-and-northern-ireland-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:33.173Z",
+        "publishedAt": "2026-11-21T00:23:29.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 2113,
+            "count": 2117,
             "percent": 100
           },
           "capacity": {
-            "count": 1507,
+            "count": 1510,
             "percent": 71.3
           },
           "covered": {
-            "count": 1500,
+            "count": 1503,
             "percent": 71
           },
           "access": {
             "count": 944,
-            "percent": 44.7
+            "percent": 44.6
           },
           "bicycle_pa": {
             "count": 1612,
-            "percent": 76.3
+            "percent": 76.1
           },
           "cargo_bike": {
             "count": 5,
@@ -10937,9 +10937,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 69.9,
+        "elapsedSeconds": 64.6,
         "geometryCounts": {
-          "node": 2038,
+          "node": 2042,
           "relation": 0,
           "way": 75
         },
@@ -10947,52 +10947,52 @@
         "label": "Andalucía",
         "naming": {
           "contextCounts": {
-            "junctions": 27031,
-            "landmarks": 26285,
-            "nearbyNodes": 2143775,
-            "places": 65952,
-            "roadSamples": 189041
+            "junctions": 27106,
+            "landmarks": 26446,
+            "nearbyNodes": 2164422,
+            "places": 65975,
+            "roadSamples": 189703
           },
           "counts": {
             "generic": 0,
-            "junction": 1467,
-            "landmark": 297,
+            "junction": 1470,
+            "landmark": 298,
             "place": 24,
             "source": 29,
             "street": 296
           }
         },
-        "pbfSha256": "1b1eb1f1a6f8344bf79952e5d1304bf4195a7117184b9ee12c630976ac9a235e",
-        "retrievedAt": "2026-10-30T23:18:29.636Z",
-        "peakRssBytes": 763183104,
-        "recordCount": 2113,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "181d93382d9381bad3ec0e538fc4f105cf6d1412b9f7b11e2bfc8708fc76ba50",
+        "retrievedAt": "2026-11-21T05:03:03.412Z",
+        "peakRssBytes": 1556758528,
+        "recordCount": 2117,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/andalucia-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/andalucia-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:10.119Z",
-        "publishedAt": "2026-10-30T19:51:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/andalucia/andalucia-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:33.661Z",
+        "publishedAt": "2026-11-21T00:41:38.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1195,
+            "count": 1197,
             "percent": 100
           },
           "capacity": {
-            "count": 950,
-            "percent": 79.5
+            "count": 951,
+            "percent": 79.4
           },
           "covered": {
-            "count": 762,
-            "percent": 63.8
+            "count": 766,
+            "percent": 64
           },
           "access": {
             "count": 380,
-            "percent": 31.8
+            "percent": 31.7
           },
           "bicycle_pa": {
-            "count": 1028,
+            "count": 1029,
             "percent": 86
           },
           "cargo_bike": {
@@ -11009,9 +11009,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 32.5,
+        "elapsedSeconds": 30.4,
         "geometryCounts": {
-          "node": 1188,
+          "node": 1190,
           "relation": 0,
           "way": 7
         },
@@ -11019,53 +11019,53 @@
         "label": "Aragón",
         "naming": {
           "contextCounts": {
-            "junctions": 8982,
-            "landmarks": 10031,
-            "nearbyNodes": 595377,
-            "places": 43418,
-            "roadSamples": 92503
+            "junctions": 9005,
+            "landmarks": 10058,
+            "nearbyNodes": 596379,
+            "places": 43469,
+            "roadSamples": 92679
           },
           "counts": {
             "generic": 0,
-            "junction": 956,
+            "junction": 958,
             "landmark": 105,
             "place": 17,
             "source": 2,
             "street": 115
           }
         },
-        "pbfSha256": "9be869119e458cbe54c57a9aa3e3542ae3cb68e1905a46f9b8a0c8a7398d8b8a",
-        "retrievedAt": "2026-10-30T23:20:07.010Z",
-        "peakRssBytes": 793559040,
-        "recordCount": 1195,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "b2974aaceb313d0630bc5e610c62339f9570c1562c5d906dee257a98bce10c80",
+        "retrievedAt": "2026-11-21T05:04:12.897Z",
+        "peakRssBytes": 1494433792,
+        "recordCount": 1197,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/aragon-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/aragon-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:10.692Z",
-        "publishedAt": "2026-10-30T19:51:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/aragon/aragon-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:34.141Z",
+        "publishedAt": "2026-11-21T00:41:13.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 359,
+            "count": 362,
             "percent": 100
           },
           "capacity": {
-            "count": 278,
-            "percent": 77.4
+            "count": 283,
+            "percent": 78.2
           },
           "covered": {
-            "count": 293,
-            "percent": 81.6
+            "count": 295,
+            "percent": 81.5
           },
           "access": {
-            "count": 37,
-            "percent": 10.3
+            "count": 39,
+            "percent": 10.8
           },
           "bicycle_pa": {
-            "count": 299,
-            "percent": 83.3
+            "count": 303,
+            "percent": 83.7
           },
           "cargo_bike": {
             "count": 0,
@@ -11081,9 +11081,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 11.2,
+        "elapsedSeconds": 10.6,
         "geometryCounts": {
-          "node": 357,
+          "node": 360,
           "relation": 0,
           "way": 2
         },
@@ -11091,31 +11091,31 @@
         "label": "Asturias",
         "naming": {
           "contextCounts": {
-            "junctions": 4158,
-            "landmarks": 6094,
-            "nearbyNodes": 272622,
-            "places": 31101,
-            "roadSamples": 40636
+            "junctions": 4163,
+            "landmarks": 6137,
+            "nearbyNodes": 274450,
+            "places": 31145,
+            "roadSamples": 40745
           },
           "counts": {
             "generic": 0,
-            "junction": 254,
-            "landmark": 59,
+            "junction": 256,
+            "landmark": 60,
             "place": 3,
             "source": 0,
             "street": 43
           }
         },
-        "pbfSha256": "325df0c6a5187372e3935209f542ef7cbea24440d5ead708bae21de9b5e80126",
-        "retrievedAt": "2026-10-30T23:20:51.334Z",
-        "peakRssBytes": 636043264,
-        "recordCount": 359,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "8bc435fcd2ad096c99b10a37cd15276d8c1be8c410e38ac477135102a109143f",
+        "retrievedAt": "2026-11-21T05:04:45.793Z",
+        "peakRssBytes": 1455063040,
+        "recordCount": 362,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/asturias-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/asturias-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:11.243Z",
-        "publishedAt": "2026-10-30T19:38:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/asturias/asturias-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:34.659Z",
+        "publishedAt": "2026-11-21T00:41:29.000Z"
       },
       {
         "completeness": {
@@ -11153,7 +11153,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 11,
+        "elapsedSeconds": 10.2,
         "geometryCounts": {
           "node": 173,
           "relation": 0,
@@ -11163,11 +11163,11 @@
         "label": "Cantabria",
         "naming": {
           "contextCounts": {
-            "junctions": 1963,
-            "landmarks": 4307,
-            "nearbyNodes": 294199,
-            "places": 10535,
-            "roadSamples": 28238
+            "junctions": 1966,
+            "landmarks": 4315,
+            "nearbyNodes": 294593,
+            "places": 10547,
+            "roadSamples": 28278
           },
           "counts": {
             "generic": 0,
@@ -11178,16 +11178,16 @@
             "street": 21
           }
         },
-        "pbfSha256": "c6645973abc4f0f1686ee65594414bfe0f3df3f64637ba59246985f34dc13b21",
-        "retrievedAt": "2026-10-30T23:21:08.609Z",
-        "peakRssBytes": 640958464,
+        "pbfSha256": "47569d5cc60bbec473abdad0b715cd3e9e542da578054b25e6525e49cd25721e",
+        "retrievedAt": "2026-11-21T05:04:58.462Z",
+        "peakRssBytes": 1453195264,
         "recordCount": 177,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/cantabria-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/cantabria-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:11.881Z",
-        "publishedAt": "2026-10-30T19:43:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/cantabria/cantabria-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:35.253Z",
+        "publishedAt": "2026-11-21T00:41:21.000Z"
       },
       {
         "completeness": {
@@ -11200,8 +11200,8 @@
             "percent": 89.6
           },
           "covered": {
-            "count": 365,
-            "percent": 88.2
+            "count": 367,
+            "percent": 88.6
           },
           "access": {
             "count": 69,
@@ -11225,7 +11225,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 37.4,
+        "elapsedSeconds": 34.5,
         "geometryCounts": {
           "node": 404,
           "relation": 0,
@@ -11235,53 +11235,53 @@
         "label": "Castilla-La Mancha",
         "naming": {
           "contextCounts": {
-            "junctions": 4943,
-            "landmarks": 5417,
-            "nearbyNodes": 321535,
-            "places": 78775,
-            "roadSamples": 36887
+            "junctions": 5197,
+            "landmarks": 5427,
+            "nearbyNodes": 326296,
+            "places": 78779,
+            "roadSamples": 38564
           },
           "counts": {
             "generic": 0,
             "junction": 322,
-            "landmark": 37,
+            "landmark": 36,
             "place": 1,
             "source": 7,
-            "street": 47
+            "street": 48
           }
         },
-        "pbfSha256": "0f3d5a8c42cfac24cf43f350b1e8a77341f44eb0008157d59a9b72e6bdfaf7cc",
-        "retrievedAt": "2026-10-30T23:21:37.571Z",
-        "peakRssBytes": 470564864,
+        "pbfSha256": "e9495ac976d1428c809fe3a849ac60ddf4604aeb5cf560dead556564cfb40227",
+        "retrievedAt": "2026-11-21T05:05:13.001Z",
+        "peakRssBytes": 1458388992,
         "recordCount": 414,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:12.567Z",
-        "publishedAt": "2026-10-30T19:36:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/castilla-la-mancha/castilla-la-mancha-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:35.774Z",
+        "publishedAt": "2026-11-21T00:41:36.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1807,
+            "count": 1812,
             "percent": 100
           },
           "capacity": {
-            "count": 1605,
-            "percent": 88.8
+            "count": 1610,
+            "percent": 88.9
           },
           "covered": {
-            "count": 1429,
+            "count": 1434,
             "percent": 79.1
           },
           "access": {
-            "count": 484,
-            "percent": 26.8
+            "count": 487,
+            "percent": 26.9
           },
           "bicycle_pa": {
-            "count": 1544,
-            "percent": 85.4
+            "count": 1549,
+            "percent": 85.5
           },
           "cargo_bike": {
             "count": 37,
@@ -11297,9 +11297,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 62.2,
+        "elapsedSeconds": 56.8,
         "geometryCounts": {
-          "node": 1781,
+          "node": 1786,
           "relation": 0,
           "way": 26
         },
@@ -11307,60 +11307,60 @@
         "label": "Castilla y León",
         "naming": {
           "contextCounts": {
-            "junctions": 15804,
-            "landmarks": 17518,
-            "nearbyNodes": 1179143,
-            "places": 172431,
-            "roadSamples": 143923
+            "junctions": 15865,
+            "landmarks": 17618,
+            "nearbyNodes": 1181043,
+            "places": 172477,
+            "roadSamples": 144484
           },
           "counts": {
             "generic": 0,
-            "junction": 1162,
+            "junction": 1167,
             "landmark": 316,
             "place": 22,
             "source": 45,
             "street": 262
           }
         },
-        "pbfSha256": "e108a25994b24c1fd5a6cf669630e22bfba78fe355bd800f76cb666df23dfe88",
-        "retrievedAt": "2026-10-30T23:23:01.182Z",
-        "peakRssBytes": 556990464,
-        "recordCount": 1807,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "2a7544107af4fe2646d8d0adcb49ae095fe5bd572efcd92f3b16f06a8fb83ca2",
+        "retrievedAt": "2026-11-21T05:05:54.676Z",
+        "peakRssBytes": 1495269376,
+        "recordCount": 1812,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:13.255Z",
-        "publishedAt": "2026-10-30T19:53:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/castilla-y-leon/castilla-y-leon-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:36.295Z",
+        "publishedAt": "2026-11-21T00:41:10.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 5734,
+            "count": 5770,
             "percent": 100
           },
           "capacity": {
-            "count": 3813,
-            "percent": 66.5
+            "count": 3848,
+            "percent": 66.7
           },
           "covered": {
-            "count": 3843,
-            "percent": 67
+            "count": 3878,
+            "percent": 67.2
           },
           "access": {
-            "count": 1401,
-            "percent": 24.4
+            "count": 1404,
+            "percent": 24.3
           },
           "bicycle_pa": {
-            "count": 4098,
-            "percent": 71.5
+            "count": 4156,
+            "percent": 72
           },
           "cargo_bike": {
-            "count": 39,
+            "count": 41,
             "percent": 0.7
           },
           "capacity_cargo_bike": {
-            "count": 3,
+            "count": 4,
             "percent": 0.1
           }
         },
@@ -11369,41 +11369,41 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 135,
+        "elapsedSeconds": 124.2,
         "geometryCounts": {
-          "node": 5632,
+          "node": 5667,
           "relation": 1,
-          "way": 101
+          "way": 102
         },
         "id": "spain-cataluna",
         "label": "Cataluña",
         "naming": {
           "contextCounts": {
-            "junctions": 68076,
-            "landmarks": 50023,
-            "nearbyNodes": 3499032,
-            "places": 53332,
-            "roadSamples": 568375
+            "junctions": 68589,
+            "landmarks": 50401,
+            "nearbyNodes": 3524610,
+            "places": 53431,
+            "roadSamples": 572966
           },
           "counts": {
             "generic": 0,
-            "junction": 4674,
-            "landmark": 385,
+            "junction": 4701,
+            "landmark": 381,
             "place": 34,
-            "source": 296,
-            "street": 345
+            "source": 297,
+            "street": 357
           }
         },
-        "pbfSha256": "6d976b12d30b20510447f56dc33ad21a1e6d00278eec74e722c5f4a6f2a145ed",
-        "retrievedAt": "2026-10-30T23:24:54.432Z",
-        "peakRssBytes": 1004634112,
-        "recordCount": 5734,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "33f70f498ea13a8bc38eaccc6baae8d5ed4f8529c8cbfab613cf3b2448fba4c1",
+        "retrievedAt": "2026-11-21T05:07:06.307Z",
+        "peakRssBytes": 1425522688,
+        "recordCount": 5770,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/cataluna-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/cataluna-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:13.836Z",
-        "publishedAt": "2026-10-30T19:35:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/cataluna/cataluna-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:36.834Z",
+        "publishedAt": "2026-11-21T00:41:26.000Z"
       },
       {
         "completeness": {
@@ -11466,16 +11466,16 @@
             "street": 0
           }
         },
-        "pbfSha256": "be5c8ed062783615f24657261da0bc71a236c639b14cc3fc155602c8be58a288",
-        "retrievedAt": "2026-10-30T23:27:12.952Z",
-        "peakRssBytes": 998490112,
+        "pbfSha256": "c5125e396e69e905e079b860e40a24605e8b34728773e92fcd8e008e35a4bd38",
+        "retrievedAt": "2026-11-21T05:09:12.899Z",
+        "peakRssBytes": 1204387840,
         "recordCount": 1,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/ceuta-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/ceuta-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:14.424Z",
-        "publishedAt": "2026-10-30T19:37:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/ceuta/ceuta-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:37.348Z",
+        "publishedAt": "2026-11-21T00:41:17.000Z"
       },
       {
         "completeness": {
@@ -11513,7 +11513,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 12.1,
+        "elapsedSeconds": 11.4,
         "geometryCounts": {
           "node": 52,
           "relation": 0,
@@ -11524,10 +11524,10 @@
         "naming": {
           "contextCounts": {
             "junctions": 959,
-            "landmarks": 689,
-            "nearbyNodes": 61639,
+            "landmarks": 690,
+            "nearbyNodes": 61872,
             "places": 29692,
-            "roadSamples": 6983
+            "roadSamples": 6993
           },
           "counts": {
             "generic": 0,
@@ -11538,16 +11538,16 @@
             "street": 11
           }
         },
-        "pbfSha256": "4191ed9346c90f024e557583931b8a9ee59dabe857bdb46ba812f34f3c2371ba",
-        "retrievedAt": "2026-10-30T23:27:18.367Z",
-        "peakRssBytes": 1008664576,
+        "pbfSha256": "bc94c6d18391f118a319c1fa703a3a20337891171c30673eb690f7008024b98a",
+        "retrievedAt": "2026-11-21T05:09:14.671Z",
+        "peakRssBytes": 1205108736,
         "recordCount": 56,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/extremadura-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/extremadura-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:15.680Z",
-        "publishedAt": "2026-10-30T19:25:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/extremadura/extremadura-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:37.874Z",
+        "publishedAt": "2026-11-21T00:41:23.000Z"
       },
       {
         "completeness": {
@@ -11556,8 +11556,8 @@
             "percent": 100
           },
           "capacity": {
-            "count": 1098,
-            "percent": 89
+            "count": 1099,
+            "percent": 89.1
           },
           "covered": {
             "count": 1122,
@@ -11568,7 +11568,7 @@
             "percent": 82.3
           },
           "bicycle_pa": {
-            "count": 1141,
+            "count": 1142,
             "percent": 92.5
           },
           "cargo_bike": {
@@ -11585,7 +11585,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 35.2,
+        "elapsedSeconds": 34.1,
         "geometryCounts": {
           "node": 1211,
           "relation": 0,
@@ -11595,11 +11595,11 @@
         "label": "Galicia",
         "naming": {
           "contextCounts": {
-            "junctions": 11003,
-            "landmarks": 16247,
-            "nearbyNodes": 879690,
-            "places": 104255,
-            "roadSamples": 114231
+            "junctions": 11017,
+            "landmarks": 16315,
+            "nearbyNodes": 883451,
+            "places": 104282,
+            "roadSamples": 114488
           },
           "counts": {
             "generic": 0,
@@ -11610,38 +11610,38 @@
             "street": 186
           }
         },
-        "pbfSha256": "8f0bbdf3080ff917be14387ad9b66b9c99aa2c900190ea746e360dd507d4e8ca",
-        "retrievedAt": "2026-10-30T23:27:56.078Z",
-        "peakRssBytes": 1066811392,
+        "pbfSha256": "7b3ea84778cbe74bb488d2e5f9f596fbe667c9ad5fc8c5120a4f48a30efd1cad",
+        "retrievedAt": "2026-11-21T05:09:31.399Z",
+        "peakRssBytes": 1260896256,
         "recordCount": 1234,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/galicia-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:16.271Z",
-        "publishedAt": "2026-10-30T19:39:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/galicia/galicia-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:38.380Z",
+        "publishedAt": "2026-11-21T00:41:12.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 365,
+            "count": 369,
             "percent": 100
           },
           "capacity": {
-            "count": 250,
-            "percent": 68.5
+            "count": 251,
+            "percent": 68
           },
           "covered": {
-            "count": 295,
-            "percent": 80.8
+            "count": 297,
+            "percent": 80.5
           },
           "access": {
-            "count": 116,
-            "percent": 31.8
+            "count": 118,
+            "percent": 32
           },
           "bicycle_pa": {
-            "count": 305,
-            "percent": 83.6
+            "count": 307,
+            "percent": 83.2
           },
           "cargo_bike": {
             "count": 7,
@@ -11657,9 +11657,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 13.7,
+        "elapsedSeconds": 13.4,
         "geometryCounts": {
-          "node": 345,
+          "node": 349,
           "relation": 0,
           "way": 20
         },
@@ -11667,31 +11667,31 @@
         "label": "Islas Baleares",
         "naming": {
           "contextCounts": {
-            "junctions": 4959,
-            "landmarks": 5631,
-            "nearbyNodes": 405379,
+            "junctions": 5052,
+            "landmarks": 5737,
+            "nearbyNodes": 409306,
             "places": 7918,
-            "roadSamples": 31190
+            "roadSamples": 31700
           },
           "counts": {
             "generic": 0,
-            "junction": 263,
-            "landmark": 54,
+            "junction": 266,
+            "landmark": 55,
             "place": 4,
             "source": 13,
             "street": 31
           }
         },
-        "pbfSha256": "af734d14529f3bb7c07c01f2027d84291d9417284847ea29d62d625f694d5490",
-        "retrievedAt": "2026-10-30T23:28:38.463Z",
-        "peakRssBytes": 1050411008,
-        "recordCount": 365,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "6a37a88c1f4eae9e150597461e8c85b24ee88d04c28bd4141317ccb6f8265510",
+        "retrievedAt": "2026-11-21T05:10:08.476Z",
+        "peakRssBytes": 1220755456,
+        "recordCount": 369,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/islas-baleares-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/islas-baleares-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:18.323Z",
-        "publishedAt": "2026-10-30T19:41:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/islas-baleares/islas-baleares-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:38.975Z",
+        "publishedAt": "2026-11-21T00:41:37.000Z"
       },
       {
         "completeness": {
@@ -11729,7 +11729,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 4.6,
+        "elapsedSeconds": 4.7,
         "geometryCounts": {
           "node": 226,
           "relation": 0,
@@ -11739,11 +11739,11 @@
         "label": "La Rioja",
         "naming": {
           "contextCounts": {
-            "junctions": 967,
-            "landmarks": 1184,
-            "nearbyNodes": 94574,
-            "places": 7068,
-            "roadSamples": 9684
+            "junctions": 968,
+            "landmarks": 1185,
+            "nearbyNodes": 94540,
+            "places": 7071,
+            "roadSamples": 9685
           },
           "counts": {
             "generic": 0,
@@ -11754,37 +11754,37 @@
             "street": 33
           }
         },
-        "pbfSha256": "43a3e7f59a0e9a349c55f9e48a9b6b93e4f1e225dff94684d1e2cef63d9733a3",
-        "retrievedAt": "2026-10-30T23:28:54.828Z",
-        "peakRssBytes": 1024770048,
+        "pbfSha256": "85a3a65f1a73ac40d0fce1722134734a6fb4dbb04662e24e7e0eb9a32210122b",
+        "retrievedAt": "2026-11-21T05:10:23.439Z",
+        "peakRssBytes": 1205764096,
         "recordCount": 233,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/la-rioja-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:19.011Z",
-        "publishedAt": "2026-10-30T19:22:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/la-rioja/la-rioja-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:39.465Z",
+        "publishedAt": "2026-11-21T00:41:16.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 2065,
+            "count": 2067,
             "percent": 100
           },
           "capacity": {
-            "count": 1731,
+            "count": 1732,
             "percent": 83.8
           },
           "covered": {
-            "count": 1157,
+            "count": 1158,
             "percent": 56
           },
           "access": {
-            "count": 501,
+            "count": 502,
             "percent": 24.3
           },
           "bicycle_pa": {
-            "count": 1722,
+            "count": 1724,
             "percent": 83.4
           },
           "cargo_bike": {
@@ -11801,9 +11801,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 28.8,
+        "elapsedSeconds": 28.1,
         "geometryCounts": {
-          "node": 2031,
+          "node": 2033,
           "relation": 0,
           "way": 34
         },
@@ -11811,31 +11811,31 @@
         "label": "Madrid",
         "naming": {
           "contextCounts": {
-            "junctions": 21480,
-            "landmarks": 31905,
-            "nearbyNodes": 1885864,
-            "places": 11844,
-            "roadSamples": 199411
+            "junctions": 21475,
+            "landmarks": 31996,
+            "nearbyNodes": 1897483,
+            "places": 11849,
+            "roadSamples": 199591
           },
           "counts": {
             "generic": 0,
-            "junction": 1377,
-            "landmark": 290,
+            "junction": 1376,
+            "landmark": 293,
             "place": 21,
-            "source": 47,
-            "street": 330
+            "source": 48,
+            "street": 329
           }
         },
-        "pbfSha256": "f01856261bb9be0cef4aa3ab18e29b5d71f117321607acd973360e3721fc3dab",
-        "retrievedAt": "2026-10-30T23:29:05.630Z",
-        "peakRssBytes": 1105887232,
-        "recordCount": 2065,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "718d5746af79cca4aad69bc621c777c19395d0fd88fad5946439eb2a09876073",
+        "retrievedAt": "2026-11-21T05:10:31.764Z",
+        "peakRssBytes": 1254998016,
+        "recordCount": 2067,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/madrid-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/madrid-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:19.578Z",
-        "publishedAt": "2026-10-30T19:45:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/madrid/madrid-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:39.985Z",
+        "publishedAt": "2026-11-21T00:41:07.000Z"
       },
       {
         "completeness": {
@@ -11885,7 +11885,7 @@
           "contextCounts": {
             "junctions": 463,
             "landmarks": 106,
-            "nearbyNodes": 10652,
+            "nearbyNodes": 10653,
             "places": 17,
             "roadSamples": 2485
           },
@@ -11898,37 +11898,37 @@
             "street": 0
           }
         },
-        "pbfSha256": "041f101cd9aebddf6f467b45db5c412fee1f9816cf335192ceef63d966b1cffc",
-        "retrievedAt": "2026-10-30T23:29:35.625Z",
-        "peakRssBytes": 1100333056,
+        "pbfSha256": "62b2810614f811c15dd7235528032b7685cd1478a99f32a757411307cc051f58",
+        "retrievedAt": "2026-11-21T05:11:00.974Z",
+        "peakRssBytes": 1255505920,
         "recordCount": 18,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/melilla-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/melilla-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:20.243Z",
-        "publishedAt": "2026-10-30T19:25:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/melilla/melilla-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:40.519Z",
+        "publishedAt": "2026-11-21T00:41:31.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 449,
+            "count": 451,
             "percent": 100
           },
           "capacity": {
-            "count": 375,
-            "percent": 83.5
+            "count": 377,
+            "percent": 83.6
           },
           "covered": {
-            "count": 316,
-            "percent": 70.4
+            "count": 319,
+            "percent": 70.7
           },
           "access": {
-            "count": 181,
-            "percent": 40.3
+            "count": 183,
+            "percent": 40.6
           },
           "bicycle_pa": {
-            "count": 427,
+            "count": 429,
             "percent": 95.1
           },
           "cargo_bike": {
@@ -11945,9 +11945,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 11.9,
+        "elapsedSeconds": 11.5,
         "geometryCounts": {
-          "node": 446,
+          "node": 448,
           "relation": 0,
           "way": 3
         },
@@ -11955,53 +11955,53 @@
         "label": "Murcia",
         "naming": {
           "contextCounts": {
-            "junctions": 5377,
-            "landmarks": 3466,
-            "nearbyNodes": 205217,
+            "junctions": 5411,
+            "landmarks": 3509,
+            "nearbyNodes": 207595,
             "places": 7607,
-            "roadSamples": 36397
+            "roadSamples": 36623
           },
           "counts": {
             "generic": 0,
-            "junction": 325,
-            "landmark": 75,
-            "place": 5,
+            "junction": 329,
+            "landmark": 76,
+            "place": 3,
             "source": 2,
-            "street": 42
+            "street": 41
           }
         },
-        "pbfSha256": "f7f7d29ba6b7440f0f86c20bf479da08024d14aa6ec23636acde17b3af71b95a",
-        "retrievedAt": "2026-10-30T23:29:40.636Z",
-        "peakRssBytes": 1038041088,
-        "recordCount": 449,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "36107e7b838de5753755d87c12d745c091848b980b215939f4a14fe746355f43",
+        "retrievedAt": "2026-11-21T05:11:02.364Z",
+        "peakRssBytes": 1192837120,
+        "recordCount": 451,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/murcia-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/murcia-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:20.829Z",
-        "publishedAt": "2026-10-30T19:24:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/murcia/murcia-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:41.009Z",
+        "publishedAt": "2026-11-21T00:41:13.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 244,
+            "count": 245,
             "percent": 100
           },
           "capacity": {
             "count": 189,
-            "percent": 77.5
+            "percent": 77.1
           },
           "covered": {
             "count": 196,
-            "percent": 80.3
+            "percent": 80
           },
           "access": {
             "count": 52,
-            "percent": 21.3
+            "percent": 21.2
           },
           "bicycle_pa": {
             "count": 193,
-            "percent": 79.1
+            "percent": 78.8
           },
           "cargo_bike": {
             "count": 0,
@@ -12017,9 +12017,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 11.3,
+        "elapsedSeconds": 11.1,
         "geometryCounts": {
-          "node": 235,
+          "node": 236,
           "relation": 0,
           "way": 9
         },
@@ -12027,57 +12027,57 @@
         "label": "Navarra",
         "naming": {
           "contextCounts": {
-            "junctions": 2303,
-            "landmarks": 2486,
-            "nearbyNodes": 135858,
-            "places": 20410,
-            "roadSamples": 23857
+            "junctions": 2325,
+            "landmarks": 2494,
+            "nearbyNodes": 136646,
+            "places": 20408,
+            "roadSamples": 24044
           },
           "counts": {
             "generic": 0,
-            "junction": 151,
+            "junction": 152,
             "landmark": 40,
             "place": 1,
             "source": 14,
             "street": 38
           }
         },
-        "pbfSha256": "80334de0baadf64d820d0ad17d668b55306bf06d076329bbd9ec902db593e96a",
-        "retrievedAt": "2026-10-30T23:29:56.770Z",
-        "peakRssBytes": 1038712832,
-        "recordCount": 244,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "b29378d05f6bf8bd284f5244407cdf3e44de73be2c422ab30f8298e55b70427a",
+        "retrievedAt": "2026-11-21T05:11:15.971Z",
+        "peakRssBytes": 1193656320,
+        "recordCount": 245,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/navarra-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:21.432Z",
-        "publishedAt": "2026-10-30T19:47:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/navarra/navarra-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:41.518Z",
+        "publishedAt": "2026-11-21T00:41:15.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1141,
+            "count": 1149,
             "percent": 100
           },
           "capacity": {
             "count": 703,
-            "percent": 61.6
+            "percent": 61.2
           },
           "covered": {
-            "count": 801,
-            "percent": 70.2
+            "count": 810,
+            "percent": 70.5
           },
           "access": {
-            "count": 326,
-            "percent": 28.6
+            "count": 328,
+            "percent": 28.5
           },
           "bicycle_pa": {
-            "count": 833,
-            "percent": 73
+            "count": 835,
+            "percent": 72.7
           },
           "cargo_bike": {
             "count": 4,
-            "percent": 0.4
+            "percent": 0.3
           },
           "capacity_cargo_bike": {
             "count": 0,
@@ -12089,9 +12089,9 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 22.6,
+        "elapsedSeconds": 21.9,
         "geometryCounts": {
-          "node": 1081,
+          "node": 1089,
           "relation": 0,
           "way": 60
         },
@@ -12099,53 +12099,53 @@
         "label": "País Vasco",
         "naming": {
           "contextCounts": {
-            "junctions": 7102,
-            "landmarks": 16604,
-            "nearbyNodes": 708046,
-            "places": 17426,
-            "roadSamples": 95564
+            "junctions": 7149,
+            "landmarks": 16687,
+            "nearbyNodes": 708647,
+            "places": 17584,
+            "roadSamples": 96549
           },
           "counts": {
             "generic": 0,
-            "junction": 774,
+            "junction": 778,
             "landmark": 186,
             "place": 5,
             "source": 38,
-            "street": 138
+            "street": 142
           }
         },
-        "pbfSha256": "f9c178a8c568bbe5977f2093dbd01daf556629a187418ae5168820ed9635dc22",
-        "retrievedAt": "2026-10-30T23:30:16.381Z",
-        "peakRssBytes": 1098252288,
-        "recordCount": 1141,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "6849e7fa0920e19db5bf8804666361d2031e692c6a9a88d20506ab88031a9a12",
+        "retrievedAt": "2026-11-21T05:11:30.135Z",
+        "peakRssBytes": 1241972736,
+        "recordCount": 1149,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/pais-vasco-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/pais-vasco-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:22.540Z",
-        "publishedAt": "2026-10-30T19:40:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/pais-vasco/pais-vasco-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:42.030Z",
+        "publishedAt": "2026-11-21T00:41:39.000Z"
       },
       {
         "completeness": {
           "name": {
-            "count": 1484,
+            "count": 1503,
             "percent": 100
           },
           "capacity": {
-            "count": 1176,
-            "percent": 79.2
+            "count": 1199,
+            "percent": 79.8
           },
           "covered": {
-            "count": 1040,
+            "count": 1054,
             "percent": 70.1
           },
           "access": {
-            "count": 565,
-            "percent": 38.1
+            "count": 570,
+            "percent": 37.9
           },
           "bicycle_pa": {
-            "count": 1227,
-            "percent": 82.7
+            "count": 1248,
+            "percent": 83
           },
           "cargo_bike": {
             "count": 40,
@@ -12161,41 +12161,41 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 44.5,
+        "elapsedSeconds": 45.5,
         "geometryCounts": {
-          "node": 1457,
+          "node": 1475,
           "relation": 0,
-          "way": 27
+          "way": 28
         },
         "id": "spain-valencia",
         "label": "Valencia",
         "naming": {
           "contextCounts": {
-            "junctions": 16482,
-            "landmarks": 15675,
-            "nearbyNodes": 1275996,
-            "places": 27863,
-            "roadSamples": 120153
+            "junctions": 16624,
+            "landmarks": 15822,
+            "nearbyNodes": 1289418,
+            "places": 27897,
+            "roadSamples": 121412
           },
           "counts": {
             "generic": 0,
-            "junction": 1131,
-            "landmark": 178,
+            "junction": 1142,
+            "landmark": 185,
             "place": 13,
-            "source": 15,
-            "street": 147
+            "source": 17,
+            "street": 146
           }
         },
-        "pbfSha256": "db148138d3fd0ab6d732b513e1aacee147bdbd88daa65725e3d87f623ab23fbe",
-        "retrievedAt": "2026-10-30T23:31:01.925Z",
-        "peakRssBytes": 1149435904,
-        "recordCount": 1484,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "pbfSha256": "72035e29235ba06143271058f531adcecc9d9ea0fb0f9902724ba4e185f7cc9d",
+        "retrievedAt": "2026-11-21T05:11:58.504Z",
+        "peakRssBytes": 1231454208,
+        "recordCount": 1503,
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/europe/spain/valencia-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/europe/spain/valencia-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:24.964Z",
-        "publishedAt": "2026-10-30T19:42:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/europe/spain/valencia/valencia-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:42.523Z",
+        "publishedAt": "2026-11-21T00:41:33.000Z"
       },
       {
         "completeness": {
@@ -12208,16 +12208,16 @@
             "percent": 67.8
           },
           "covered": {
-            "count": 151,
-            "percent": 72.6
+            "count": 152,
+            "percent": 73.1
           },
           "access": {
             "count": 61,
             "percent": 29.3
           },
           "bicycle_pa": {
-            "count": 149,
-            "percent": 71.6
+            "count": 150,
+            "percent": 72.1
           },
           "cargo_bike": {
             "count": 0,
@@ -12233,7 +12233,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 17.9,
+        "elapsedSeconds": 17.5,
         "geometryCounts": {
           "node": 206,
           "relation": 0,
@@ -12244,10 +12244,10 @@
         "naming": {
           "contextCounts": {
             "junctions": 2843,
-            "landmarks": 5697,
-            "nearbyNodes": 254854,
-            "places": 4906,
-            "roadSamples": 23179
+            "landmarks": 5718,
+            "nearbyNodes": 255133,
+            "places": 4910,
+            "roadSamples": 23224
           },
           "counts": {
             "generic": 0,
@@ -12258,16 +12258,16 @@
             "street": 33
           }
         },
-        "pbfSha256": "76904778ddc8b6a4a3f3d3a3ae5e9fcea31b0025357e7d658e8d26c74f15be64",
-        "retrievedAt": "2026-10-30T23:31:57.009Z",
-        "peakRssBytes": 1049247744,
+        "pbfSha256": "14d3b91ab34c26f0d2943f27f45551565d7afccf7f0b11a953a58c3344994b69",
+        "retrievedAt": "2026-11-21T05:12:47.647Z",
+        "peakRssBytes": 1125040128,
         "recordCount": 208,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/africa/canary-islands-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/africa/canary-islands-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:25.722Z",
-        "publishedAt": "2026-10-30T03:01:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/africa/canary-islands/canary-islands-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:43.020Z",
+        "publishedAt": "2026-11-20T23:53:53.000Z"
       },
       {
         "completeness": {
@@ -12305,7 +12305,7 @@
           "relation": 0,
           "way": 0
         },
-        "elapsedSeconds": 13.6,
+        "elapsedSeconds": 13.3,
         "geometryCounts": {
           "node": 54,
           "relation": 0,
@@ -12316,39 +12316,39 @@
         "naming": {
           "contextCounts": {
             "junctions": 325,
-            "landmarks": 2723,
-            "nearbyNodes": 69579,
-            "places": 1198,
-            "roadSamples": 4099
+            "landmarks": 2728,
+            "nearbyNodes": 69721,
+            "places": 1197,
+            "roadSamples": 4100
           },
           "counts": {
             "generic": 0,
             "junction": 35,
-            "landmark": 11,
+            "landmark": 12,
             "place": 0,
             "source": 0,
-            "street": 8
+            "street": 7
           }
         },
-        "pbfSha256": "17c8e619f4843e8c87120ebf9c31b61fa7d2cef7e8375eb14d8bd59fc7de04be",
-        "retrievedAt": "2026-10-30T23:32:21.902Z",
-        "peakRssBytes": 949960704,
+        "pbfSha256": "a55667676f33857a9b4a595533edf607034aa07468442c9ed4396c334fae5282",
+        "retrievedAt": "2026-11-21T05:13:07.987Z",
+        "peakRssBytes": 1109049344,
         "recordCount": 54,
-        "sourceTimestamp": "2026-10-29T21:21:26.000Z",
+        "sourceTimestamp": "2026-11-20T21:21:21.000Z",
         "sourceUrl": "https://download.geofabrik.de/asia/armenia-latest.osm.pbf",
-        "downloadUrl": "https://download.geofabrik.de/asia/armenia-261029.osm.pbf",
-        "publicationPlanId": "2e85fade-6601-4f69-b3cd-6ecbcdfab5ca",
-        "publicationValidatedAt": "2026-10-30T22:53:26.466Z",
-        "publishedAt": "2026-10-30T05:21:00.000Z"
+        "downloadUrl": "https://download.geofabrik.de/asia/armenia/armenia-261120.osm.pbf",
+        "publicationPlanId": "bb67af4c-15fd-4409-906c-9cb21bf0c621",
+        "publicationValidatedAt": "2026-11-21T04:33:43.566Z",
+        "publishedAt": "2026-11-21T00:04:21.000Z"
       }
     ],
-    "recordCount": 89448
+    "recordCount": 89756
   },
-  "releaseId": "sha256-5172d9d8895893b57c26b98349e41025c6c9b01c445c5c432d192c75d0c6548a",
-  "refreshedAt": "2026-10-30T22:53:26.534Z",
+  "releaseId": "sha256-eca87b73f57cf7674e345f660983e852042017e1ce2cd54aff406b068f059448",
+  "refreshedAt": "2026-11-21T04:33:43.747Z",
   "resourceUsage": {
-    "elapsedSeconds": 2353.7,
-    "peakRssBytes": 1428291584
+    "elapsedSeconds": 2381.7,
+    "peakRssBytes": 1842380800
   },
   "schemaVersion": 2
 }
