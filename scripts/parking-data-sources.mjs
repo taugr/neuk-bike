@@ -127,37 +127,37 @@ export const coverageInputs = [
   {
     id: 'england',
     label: 'England',
-    url: `${geofabrikUkRoot}/england.poly`,
+    url: `${geofabrikUkRoot}/england/england.poly`,
   },
   {
     id: 'scotland',
     label: 'Scotland',
-    url: `${geofabrikUkRoot}/scotland.poly`,
+    url: `${geofabrikUkRoot}/scotland/scotland.poly`,
   },
   {
     id: 'wales',
     label: 'Wales',
-    url: `${geofabrikUkRoot}/wales.poly`,
+    url: `${geofabrikUkRoot}/wales/wales.poly`,
   },
   {
     id: 'ireland-and-northern-ireland',
     label: 'Ireland and Northern Ireland',
-    url: `${geofabrikEuropeRoot}/ireland-and-northern-ireland.poly`,
+    url: `${geofabrikEuropeRoot}/ireland-and-northern-ireland/ireland-and-northern-ireland.poly`,
   },
   {
     id: 'spain',
     label: 'Spain',
-    url: `${geofabrikEuropeRoot}/spain.poly`,
+    url: `${geofabrikEuropeRoot}/spain/spain.poly`,
   },
   {
     id: 'canary-islands',
     label: 'Canary Islands',
-    url: `${geofabrikAfricaRoot}/canary-islands.poly`,
+    url: `${geofabrikAfricaRoot}/canary-islands/canary-islands.poly`,
   },
   {
     id: 'armenia',
     label: 'Armenia',
-    url: `${geofabrikAsiaRoot}/armenia.poly`,
+    url: `${geofabrikAsiaRoot}/armenia/armenia.poly`,
   },
 ];
 
