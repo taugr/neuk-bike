@@ -147,7 +147,7 @@ async function request(url, init, paths, options) {
   }
 }
 
-async function boundedBody(response, maximum) {
+async function boundedBody(response, maximum, prefixOnly = false) {
   if (!response.body) throw new Error('Missing response body');
   const chunks = [];
   let length = 0;
@@ -156,10 +156,13 @@ async function boundedBody(response, maximum) {
     for (;;) {
       const { value, done } = await reader.read();
       if (done) break;
-      length += value.length;
-      if (length > maximum)
+      const available = maximum - length;
+      if (!prefixOnly && value.length > available)
         throw new Error(`Response exceeds ${maximum} bytes`);
-      chunks.push(Buffer.from(value));
+      const chunk = Buffer.from(value.subarray(0, available));
+      chunks.push(chunk);
+      length += chunk.length;
+      if (prefixOnly && length === maximum) break;
     }
   } finally {
     await reader.cancel();
@@ -318,20 +321,36 @@ async function probe(publication, value, options) {
     throw new Error('Missing or invalid exact PBF size');
   binaryHeaders(head.response, bytes);
   const end = Math.min(probeBytes, bytes) - 1;
-  const range = await request(
-    head.url,
-    { headers: { Range: `bytes=0-${end}` } },
-    paths,
-    options,
-  );
+  let sample;
+  let prefixOnly = false;
   try {
-    binaryHeaders(range.response, bytes, true);
+    sample = await request(
+      head.url,
+      { headers: { Range: `bytes=0-${end}` } },
+      paths,
+      publication.bytes === null ? { ...options, timeoutMs: 10_000 } : options,
+    );
+  } catch (error) {
+    if (publication.bytes !== null || error.name !== 'TimeoutError')
+      throw error;
+    // Cold Geofabrik mirrors sometimes stall on ranges but stream the file.
+    // Verify the ordinary response length and cancel after the bounded prefix.
+    sample = await request(head.url, {}, paths, {
+      ...options,
+      timeoutMs: 45_000,
+    });
+    prefixOnly = true;
+  }
+  try {
+    binaryHeaders(sample.response, bytes, !prefixOnly);
     if (
-      range.response.status !== 206 ||
-      range.response.headers.get('content-range') !== `bytes 0-${end}/${bytes}`
+      !prefixOnly &&
+      (sample.response.status !== 206 ||
+        sample.response.headers.get('content-range') !==
+          `bytes 0-${end}/${bytes}`)
     )
       throw new Error('Missing or mismatched bounded PBF Content-Range');
-    const prefix = await boundedBody(range.response, end + 1);
+    const prefix = await boundedBody(sample.response, end + 1, prefixOnly);
     if (prefix.length !== end + 1) throw new Error('Truncated PBF probe');
     if (
       (await pbfSourceTimestamp(prefix, options.now)) !==
@@ -341,7 +360,7 @@ async function probe(publication, value, options) {
         'PBF source timestamp does not match official publication',
       );
   } finally {
-    if (!range.response.bodyUsed) await range.response.body?.cancel();
+    if (!sample.response.bodyUsed) await sample.response.body?.cancel();
   }
   const { latestUrl, datedUrl, sourceTimestamp, publishedAt } = publication;
   return {
@@ -350,10 +369,10 @@ async function probe(publication, value, options) {
     sourceTimestamp,
     publishedAt,
     bytes,
-    downloadUrl: range.url,
+    downloadUrl: sample.url,
     lastModified: head.response.headers.get('last-modified'),
     etag: head.response.headers.get('etag'),
-    fallback: range.url === datedUrl,
+    fallback: sample.url === datedUrl,
   };
 }
 

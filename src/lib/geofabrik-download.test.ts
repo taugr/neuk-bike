@@ -159,7 +159,7 @@ async function output() {
 }
 
 describe('official Geofabrik resolution', () => {
-  it.each(['valid', 'inconsistent range total'])(
+  it.each(['valid', 'inconsistent range total', 'range timeout'])(
     'validates the redirected catalogue with rounded sizes and %s metadata',
     async (scenario) => {
       const publication = html()
@@ -184,8 +184,13 @@ describe('official Geofabrik resolution', () => {
             headers: { 'content-type': 'text/html' },
           });
         if (url !== nestedDated) throw new Error(`Unexpected request: ${url}`);
+        if (
+          scenario === 'range timeout' &&
+          new Headers(init.headers).has('Range')
+        )
+          throw new DOMException('Range timed out', 'TimeoutError');
         const response = await servePbf(dated, init);
-        if (scenario !== 'valid' && response.status === 206)
+        if (scenario === 'inconsistent range total' && response.status === 206)
           response.headers.set(
             'content-range',
             `bytes 0-${body.length - 1}/${body.length + 1}`,
@@ -196,7 +201,7 @@ describe('official Geofabrik resolution', () => {
         ...options(fetcher),
         preferDated: true,
       });
-      if (scenario === 'valid') {
+      if (scenario !== 'inconsistent range total') {
         expect(await resolution).toMatchObject({
           latestUrl: latest,
           datedUrl: nestedDated,
