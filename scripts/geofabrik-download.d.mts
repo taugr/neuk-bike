@@ -29,7 +29,11 @@ export function parsePublication(
   html: string,
   latestUrl: string,
   now?: number,
-): GeofabrikPublication;
+  pageUrl?: string,
+): Omit<GeofabrikPublication, 'bytes'> & {
+  latestExtractUrl: string;
+  bytes: number | null;
+};
 export function validatePinnedPublication(
   source: GeofabrikSource,
   latestUrl: string,

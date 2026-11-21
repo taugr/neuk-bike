@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, rename, rm, stat } from 'node:fs/promises';
-import { dirname } from 'node:path';
+import { basename, dirname } from 'node:path';
 import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { inflateSync } from 'node:zlib';
@@ -33,6 +33,20 @@ function sourceUrls(value) {
     throw new Error(`Expected a Geofabrik latest extract URL: ${latest}`);
   const stem = latest.pathname.replace(/-latest\.osm\.pbf$/, '');
   return { latest, stem, page: new URL(`${stem}.html`, origin) };
+}
+
+function extractUrls(stem, suffix) {
+  const filename = `${basename(stem)}-${suffix}.osm.pbf`;
+  return [
+    new URL(`${stem}-${suffix}.osm.pbf`, origin).href,
+    new URL(`${stem}/${filename}`, origin).href,
+  ];
+}
+
+function extractLink(html, page, urls) {
+  return [...html.matchAll(/href="([^"]+)"/gi)]
+    .map(([, href]) => new URL(href, page).href)
+    .find((href) => urls.includes(href));
 }
 
 export function describeDownloadError(error) {
@@ -166,55 +180,57 @@ export function validateSourceTimestamp(timestamp, now = Date.now()) {
   return new Date(time).toISOString();
 }
 
-export function parsePublication(html, latestUrl, now = Date.now()) {
-  const { latest, stem } = sourceUrls(latestUrl);
+export function parsePublication(html, latestUrl, now = Date.now(), pageUrl) {
+  const { latest, stem, page } = sourceUrls(latestUrl);
+  const base = pageUrl ?? page;
+  const latestLinks = extractUrls(stem, 'latest');
   // Bind the cutoff to the correct latest link, not another format or region.
   const item = [...html.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)].find(
-    ([, value]) =>
-      [...value.matchAll(/href="([^"]+)"/gi)].some(
-        ([, href]) => new URL(href, latest).href === latest.href,
-      ),
+    ([, value]) => extractLink(value, base, latestLinks),
   )?.[1];
   const timestamp = item?.match(
-    /contains all OSM data up to (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)/,
+    /contains all OSM data up to\s+(?:<time\b[^>]*\bdatetime=")?(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2}))(?=[".\s<]|$)/i,
   )?.[1];
   const sourceTimestamp = validateSourceTimestamp(timestamp, now);
   const suffix = sourceTimestamp.slice(2, 10).replaceAll('-', '');
-  const dated = new URL(`${stem}-${suffix}.osm.pbf`, origin);
+  const datedLinks = extractUrls(stem, suffix);
   const rows = [...html.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].filter(
-    ([, row]) =>
-      [...row.matchAll(/href="([^"]+)"/gi)].some(
-        ([, href]) => new URL(href, latest).href === dated.href,
-      ),
+    ([, row]) => extractLink(row, base, datedLinks),
   );
   if (rows.length !== 1) {
     const error = new Error(
-      `Missing or ambiguous current dated publication: ${dated}`,
+      `Missing or ambiguous current dated publication: ${datedLinks.join(' or ')}`,
     );
     // The latest cutoff can advance before its dated file appears. Duplicate
     // rows remain an integrity error and must not enter the readiness loop.
     error.retryable = rows.length === 0;
     throw error;
   }
-  const cells = [...rows[0][1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(
-    ([, cell]) => cell.replace(/<[^>]*>/g, '').trim(),
+  const row = rows[0][1];
+  const cells = [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(
+    ([, cell]) => cell.trim(),
   );
-  const bytes = Number(cells[2]);
-  const publishedAt = Date.parse(`${cells[1]?.replace(' ', 'T')}:00Z`);
+  const size = cells[2];
+  const roundedSize = /^\d+(?:\.\d+)?(?:&nbsp;|\s)+[KMGT]?B$/i.test(size);
+  const bytes = /^\d+$/.test(size) ? Number(size) : null;
+  const date = cells[1]?.match(/<time\b[^>]*\bdatetime="([^"]+)"/i)?.[1];
+  const publishedAt = Date.parse(date ?? `${cells[1]?.replace(' ', 'T')}:00Z`);
+  const datedUrl = extractLink(row, base, datedLinks);
   if (
     cells.length !== 3 ||
-    !/^\d+$/.test(cells[2]) ||
-    !Number.isSafeInteger(bytes) ||
-    bytes <= 0 ||
+    (bytes === null
+      ? !roundedSize
+      : !Number.isSafeInteger(bytes) || bytes <= 0) ||
     !Number.isFinite(publishedAt) ||
     publishedAt < Date.parse(sourceTimestamp) ||
     publishedAt > now ||
     publishedAt - Date.parse(sourceTimestamp) > 2 * day
   )
-    throw new Error(`Invalid dated publication size/date: ${dated}`);
+    throw new Error(`Invalid dated publication size/date: ${datedUrl}`);
   return {
     latestUrl: latest.href,
-    datedUrl: dated.href,
+    latestExtractUrl: extractLink(item, base, latestLinks),
+    datedUrl,
     sourceTimestamp,
     bytes,
     publishedAt: new Date(publishedAt).toISOString(),
@@ -225,15 +241,12 @@ export function parsePublication(html, latestUrl, now = Date.now()) {
 export function validatePinnedPublication(source, latestUrl, now = Date.now()) {
   const { latest, stem } = sourceUrls(latestUrl);
   const timestamp = validateSourceTimestamp(source.sourceTimestamp, now);
-  const dated = new URL(
-    `${stem}-${timestamp.slice(2, 10).replaceAll('-', '')}.osm.pbf`,
-    origin,
-  ).href;
+  const dated = extractUrls(stem, timestamp.slice(2, 10).replaceAll('-', ''));
   const published = Date.parse(source.publishedAt);
   if (
     source.latestUrl !== latest.href ||
-    source.datedUrl !== dated ||
-    source.downloadUrl !== dated ||
+    !dated.includes(source.datedUrl) ||
+    source.downloadUrl !== source.datedUrl ||
     !Number.isSafeInteger(source.bytes) ||
     source.bytes <= 0 ||
     !Number.isFinite(published) ||
@@ -293,12 +306,18 @@ async function pbfSourceTimestamp(prefix, now = Date.now()) {
 
 async function probe(publication, value, options) {
   const paths = [
-    new URL(publication.latestUrl).pathname,
+    new URL(value).pathname,
     new URL(publication.datedUrl).pathname,
   ];
   const head = await request(value, { method: 'HEAD' }, paths, options);
-  binaryHeaders(head.response, publication.bytes);
-  const end = Math.min(probeBytes, publication.bytes) - 1;
+  // The current catalogue displays rounded sizes. Require the exact HEAD
+  // length to agree with the range total and, when present, the catalogue.
+  const length = head.response.headers.get('content-length');
+  const bytes = publication.bytes ?? Number(length);
+  if (!/^\d+$/.test(length) || !Number.isSafeInteger(bytes) || bytes <= 0)
+    throw new Error('Missing or invalid exact PBF size');
+  binaryHeaders(head.response, bytes);
+  const end = Math.min(probeBytes, bytes) - 1;
   const range = await request(
     head.url,
     { headers: { Range: `bytes=0-${end}` } },
@@ -306,11 +325,10 @@ async function probe(publication, value, options) {
     options,
   );
   try {
-    binaryHeaders(range.response, publication.bytes, true);
+    binaryHeaders(range.response, bytes, true);
     if (
       range.response.status !== 206 ||
-      range.response.headers.get('content-range') !==
-        `bytes 0-${end}/${publication.bytes}`
+      range.response.headers.get('content-range') !== `bytes 0-${end}/${bytes}`
     )
       throw new Error('Missing or mismatched bounded PBF Content-Range');
     const prefix = await boundedBody(range.response, end + 1);
@@ -325,12 +343,17 @@ async function probe(publication, value, options) {
   } finally {
     if (!range.response.bodyUsed) await range.response.body?.cancel();
   }
+  const { latestUrl, datedUrl, sourceTimestamp, publishedAt } = publication;
   return {
-    ...publication,
+    latestUrl,
+    datedUrl,
+    sourceTimestamp,
+    publishedAt,
+    bytes,
     downloadUrl: range.url,
     lastModified: head.response.headers.get('last-modified'),
     etag: head.response.headers.get('etag'),
-    fallback: range.url !== publication.latestUrl,
+    fallback: range.url === datedUrl,
   };
 }
 
@@ -381,27 +404,33 @@ export async function validatePbfFile(
 }
 
 export async function resolveGeofabrikExtract(latestUrl, options = {}) {
-  const { latest, page } = sourceUrls(latestUrl);
-  const metadata = await request(page.href, {}, [page.pathname], {
-    ...options,
-    timeoutMs: 30_000,
-    metadata: true,
-    consumeResponse: async (response) => {
-      if (!response.headers.get('content-type')?.startsWith('text/html')) {
-        await response.body?.cancel();
-        throw new Error('Expected official Geofabrik publication HTML');
-      }
-      return boundedBody(response, 2 * 1024 * 1024);
+  const { latest, stem, page } = sourceUrls(latestUrl);
+  const metadata = await request(
+    page.href,
+    {},
+    [page.pathname, `${stem}/index.html`],
+    {
+      ...options,
+      timeoutMs: 30_000,
+      metadata: true,
+      consumeResponse: async (response) => {
+        if (!response.headers.get('content-type')?.startsWith('text/html')) {
+          await response.body?.cancel();
+          throw new Error('Expected official Geofabrik publication HTML');
+        }
+        return boundedBody(response, 2 * 1024 * 1024);
+      },
     },
-  });
+  );
   const publication = parsePublication(
     metadata.body.toString('utf8'),
     latest.href,
     options.now,
+    metadata.url,
   );
   if (!options.preferDated) {
     try {
-      return await probe(publication, latest.href, options);
+      return await probe(publication, publication.latestExtractUrl, options);
     } catch (error) {
       (options.log ?? console.warn)(
         `Geofabrik latest failed: ${describeDownloadError(error)}; validating dated publication ${publication.datedUrl}`,
@@ -483,7 +512,7 @@ export async function downloadGeofabrikExtract(
         const paths = publication
           ? [new URL(publication.datedUrl).pathname]
           : [
-              new URL(source.latestUrl).pathname,
+              new URL(source.downloadUrl).pathname,
               new URL(source.datedUrl).pathname,
             ];
         const { response, url: downloadUrl } = await request(
@@ -495,7 +524,7 @@ export async function downloadGeofabrikExtract(
         source = {
           ...source,
           downloadUrl,
-          fallback: downloadUrl !== source.latestUrl,
+          fallback: downloadUrl === source.datedUrl,
         };
         try {
           binaryHeaders(response, source.bytes);

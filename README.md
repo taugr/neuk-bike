@@ -561,9 +561,10 @@ parking/POI input mismatches. Partial region releases are rejected.
 
 Geofabrik downloads and upstream checks share a validated dated-file fallback
 when a `-latest.osm.pbf` alias fails or redirects incorrectly. The region's
-official publication page supplies the current dated filename, exact byte count
-and OSM cutoff; the date is never guessed from the current day. Bounded header
-probes verify that cutoff, and full downloads must pass size, PBF framing and
+official publication page supplies the current dated filename and OSM cutoff.
+When the catalogue displays a rounded size, the exact `Content-Length` must
+agree with the range response's total. Bounded header probes verify the cutoff,
+and full downloads must pass size, PBF framing and
 compressed-block validation before replacing a cached input. Stale, future,
 mixed-age or incomplete OSM releases cannot replace the current release.
 

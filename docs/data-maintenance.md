@@ -44,7 +44,10 @@ publication appears during the build. Dates are never advanced to the build day.
 
 The shared resolver supplies the plan and also powers standalone upstream checks.
 A failed latest alias falls back only to the current dated extract
-identified on that region's official Geofabrik page. The resolver rejects
+identified on that region's official Geofabrik page. It accepts the legacy
+page and its same-region `index.html` redirect. If the catalogue uses rounded
+sizes, the exact HEAD `Content-Length` must agree with the range response's
+total before the plan pins the dated file. The resolver rejects
 foreign hosts, other regions/dates, stale or future cutoffs, missing/ambiguous
 publication records, malformed redirects, HTML bodies and mismatched sizes or
 PBF timestamps. Redirects and transient retries are bounded, with URL, status,

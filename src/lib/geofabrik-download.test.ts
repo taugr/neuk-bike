@@ -41,6 +41,9 @@ const latest =
   'https://download.geofabrik.de/europe/united-kingdom/england/berkshire-latest.osm.pbf';
 const dated = latest.replace('latest', '260930');
 const page = latest.replace('-latest.osm.pbf', '.html');
+const indexPage = page.replace('.html', '/index.html');
+const nestedLatest = latest.replace('/berkshire-', '/berkshire/berkshire-');
+const nestedDated = nestedLatest.replace('latest', '260930');
 const timestamp = '2026-09-30T20:22:42.000Z';
 const now = Date.parse('2026-10-01T12:00:00Z');
 const temporary: string[] = [];
@@ -156,6 +159,72 @@ async function output() {
 }
 
 describe('official Geofabrik resolution', () => {
+  it.each(['valid', 'inconsistent range total'])(
+    'validates the redirected catalogue with rounded sizes and %s metadata',
+    async (scenario) => {
+      const publication = html()
+        .replace(
+          timestamp.replace('.000Z', 'Z'),
+          '<time title="Cutoff" datetime="2026-09-30T20:22:42+00:00">Yesterday</time>',
+        )
+        .replace(
+          '2026-10-01 02:01',
+          '<time datetime="2026-10-01T02:01:12+00:00">Today</time>',
+        )
+        .replace(`<td>${body.length}</td>`, '<td>1.2&nbsp;MB</td>');
+      const servePbf = upstream();
+      const fetcher = upstream(async (url, init) => {
+        if (url === page)
+          return new Response(null, {
+            status: 301,
+            headers: { location: indexPage },
+          });
+        if (url === indexPage)
+          return new Response(publication, {
+            headers: { 'content-type': 'text/html' },
+          });
+        if (url !== nestedDated) throw new Error(`Unexpected request: ${url}`);
+        const response = await servePbf(dated, init);
+        if (scenario !== 'valid' && response.status === 206)
+          response.headers.set(
+            'content-range',
+            `bytes 0-${body.length - 1}/${body.length + 1}`,
+          );
+        return response;
+      });
+      const resolution = resolveGeofabrikExtract(latest, {
+        ...options(fetcher),
+        preferDated: true,
+      });
+      if (scenario === 'valid') {
+        expect(await resolution).toMatchObject({
+          latestUrl: latest,
+          datedUrl: nestedDated,
+          downloadUrl: nestedDated,
+          publishedAt: '2026-10-01T02:01:12.000Z',
+          sourceTimestamp: timestamp,
+          bytes: body.length,
+        });
+      } else {
+        await expect(resolution).rejects.toThrow('mismatched bounded PBF');
+      }
+    },
+  );
+
+  it('rejects a catalogue redirect to another region on the same host', async () => {
+    const fetcher = upstream(
+      () =>
+        new Response(null, {
+          status: 301,
+          headers: { location: indexPage.replace('berkshire', 'bristol') },
+        }),
+    );
+    await expect(
+      resolveGeofabrikExtract(latest, options(fetcher)),
+    ).rejects.toThrow('Untrusted or mismatched Geofabrik URL');
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
   it('reads only 64 KiB when the probe ends inside a larger PBF block', async () => {
     const large = Buffer.concat([
       body,
