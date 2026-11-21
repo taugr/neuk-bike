@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { parkingModelCatalog } from './parking-model-catalog';
-import { createParkingMesh, satelliteParkingColor } from './parking-model-mesh';
+import {
+  createParkingMesh,
+  parkingVertexStride as stride,
+  satelliteParkingColor,
+} from './parking-model-mesh';
 
 describe('satellite model materials', () => {
   it.each(parkingModelCatalog.map(({ kind }) => kind))(
@@ -14,11 +18,12 @@ describe('satellite model materials', () => {
         expect(after.length).toBe(before.length);
         let geometryUnchanged = true,
           materialsValid = true;
-        for (let i = 0; i < before.length; i += 10) {
+        for (let i = 0; i < before.length; i += stride) {
           for (let j = 0; j < 6; j++)
             geometryUnchanged &&= before[i + j] === after[i + j];
           for (let j = 6; j < 10; j++)
             materialsValid &&= after[i + j] >= 0 && after[i + j] <= 1;
+          materialsValid &&= before[i + 10] === after[i + 10];
           const lightness =
             after[i + 6] * 0.2126 +
             after[i + 7] * 0.7152 +

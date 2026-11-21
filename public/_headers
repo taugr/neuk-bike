@@ -28,6 +28,9 @@
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
+/textures/neuk-surfaces-v1.png
+  Cache-Control: public, max-age=31536000, immutable
+
 /*
   Permissions-Policy: geolocation=(self)
   Referrer-Policy: strict-origin-when-cross-origin

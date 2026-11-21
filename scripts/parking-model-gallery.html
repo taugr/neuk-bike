@@ -113,15 +113,6 @@
         margin: 0;
         min-height: 40px;
       }
-      .tag {
-        font-size: 10px;
-        font-weight: 750;
-        letter-spacing: 0.08em;
-        color: #678478;
-        text-transform: uppercase;
-        float: right;
-        line-height: 21px;
-      }
       .aliases {
         margin-top: 12px;
         font-size: 11px;
@@ -177,8 +168,7 @@
         margin: 0;
       }
       body.overview .card p,
-      body.overview .aliases,
-      body.overview .tag {
+      body.overview .aliases {
         display: none;
       }
       .grid.single,
@@ -207,6 +197,10 @@
         <label><input id="selected" type="checkbox" /> Selected</label>
         <label
           ><input id="satellite" type="checkbox" /> Satellite contrast</label
+        >
+        <label
+          ><input id="texture" type="checkbox" checked disabled /> Image
+          texture</label
         >
         <label
           >Rotate
@@ -257,9 +251,14 @@
       >.
     </footer>
     <script type="module">
-      import { createParkingMesh } from './mesh.js';
+      import { createParkingMesh, parkingVertexStride } from './mesh.js';
       import { parkingModelCatalog } from './catalog.js';
       import { parkingVertexShader, parkingFragmentShader } from './shaders.js';
+      import {
+        createParkingSurfaceTexture,
+        parkingSurfaceMapFilename,
+        uploadParkingSurfaceMap,
+      } from './surface-map.js';
       const status = document.querySelector('#status');
       try {
         // One WebGL context renders all cards; each card keeps a 2D snapshot.
@@ -300,14 +299,26 @@
           [0, 3, 0],
           [1, 3, 12],
           [2, 4, 24],
+          [3, 1, 40],
         ]) {
           gl.enableVertexAttribArray(location);
-          gl.vertexAttribPointer(location, size, gl.FLOAT, false, 40, offset);
+          gl.vertexAttribPointer(
+            location,
+            size,
+            gl.FLOAT,
+            false,
+            4 * parkingVertexStride,
+            offset,
+          );
         }
         const matrix = gl.getUniformLocation(program, 'u_matrix');
         const view = gl.getUniformLocation(program, 'u_view');
         const expand = gl.getUniformLocation(program, 'u_expand');
         const outline = gl.getUniformLocation(program, 'u_outline');
+        const textureReady = gl.getUniformLocation(program, 'u_surface_ready');
+        gl.uniform1i(gl.getUniformLocation(program, 'u_surface'), 0);
+        const surfaceTexture = createParkingSurfaceTexture(gl);
+        const texture = document.querySelector('#texture');
         gl.uniform2f(
           gl.getUniformLocation(program, 'u_viewport'),
           surface.width,
@@ -326,14 +337,6 @@
           tilt = document.querySelector('#tilt'),
           family = document.querySelector('#family');
         const grid = document.querySelector('#models');
-        const original = new Set([
-          'stands',
-          'loops',
-          'racks',
-          'lockers',
-          'shed',
-          'bollard',
-        ]);
         const cards = parkingModelCatalog.map((model) => {
           const option = document.createElement('option');
           option.value = model.kind;
@@ -347,10 +350,7 @@
           canvas.height = surface.height;
           canvas.setAttribute('role', 'img');
           canvas.setAttribute('aria-label', model.title + ' 3D model');
-          const section = document.createElement('section'),
-            tag = document.createElement('span');
-          tag.className = 'tag';
-          tag.textContent = original.has(model.kind) ? 'Updated' : 'New';
+          const section = document.createElement('section');
           const h = document.createElement('h2');
           h.textContent = model.title;
           const p = document.createElement('p');
@@ -363,7 +363,7 @@
               ? ` · +${model.aliases.length - 4} aliases`
               : '');
           aliases.title = model.aliases.join(', ');
-          section.append(tag, h, p, aliases);
+          section.append(h, p, aliases);
           card.append(canvas, section);
           grid.append(card);
           return { model, card, canvas, context: canvas.getContext('2d') };
@@ -371,6 +371,10 @@
         const cache = new Map();
         function render() {
           grid.classList.toggle('single', family.value !== 'all');
+          gl.uniform1i(
+            textureReady,
+            Number(!texture.disabled && texture.checked),
+          );
           const a = (Number(rotation.value) * Math.PI) / 180,
             e = (Number(tilt.value) * Math.PI) / 180;
           const c = Math.cos(a),
@@ -404,7 +408,7 @@
               bottom = Infinity,
               top = -Infinity;
             for (const data of [mesh.opaque, mesh.glass])
-              for (let i = 0; i < data.length; i += 10) {
+              for (let i = 0; i < data.length; i += parkingVertexStride) {
                 const x = c * data[i] + s * data[i + 1];
                 const y =
                   -s * se * data[i] + c * se * data[i + 1] + ce * data[i + 2];
@@ -446,12 +450,27 @@
             gl.depthMask(true);
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            if (mesh.shadow.length) {
+              gl.depthMask(false);
+              gl.uniform1i(outline, 0);
+              gl.uniform1f(expand, 0);
+              gl.bufferData(gl.ARRAY_BUFFER, mesh.shadow, gl.STREAM_DRAW);
+              gl.drawArrays(
+                gl.TRIANGLES,
+                0,
+                mesh.shadow.length / parkingVertexStride,
+              );
+            }
             if (satellite.checked) {
               gl.depthMask(false);
               gl.uniform1i(outline, 1);
               gl.uniform1f(expand, 2.2);
               gl.bufferData(gl.ARRAY_BUFFER, mesh.opaque, gl.STREAM_DRAW);
-              gl.drawArrays(gl.TRIANGLES, 0, mesh.opaque.length / 10);
+              gl.drawArrays(
+                gl.TRIANGLES,
+                0,
+                mesh.opaque.length / parkingVertexStride,
+              );
             }
             gl.uniform1i(outline, 0);
             gl.uniform1f(expand, 0);
@@ -461,7 +480,7 @@
             ]) {
               gl.depthMask(opaque);
               gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
-              gl.drawArrays(gl.TRIANGLES, 0, data.length / 10);
+              gl.drawArrays(gl.TRIANGLES, 0, data.length / parkingVertexStride);
             }
             item.context.clearRect(0, 0, surface.width, surface.height);
             item.context.fillStyle = satellite.checked ? '#283b35' : '#e9eee5';
@@ -484,6 +503,7 @@
           cover,
           selected,
           satellite,
+          texture,
           rotation,
           tilt,
           family,
@@ -493,6 +513,7 @@
           cover.checked = false;
           selected.checked = false;
           satellite.checked = false;
+          texture.checked = true;
           rotation.value = '28';
           tilt.value = '32';
           family.value = 'all';
@@ -508,6 +529,16 @@
               : 'Overview';
           });
         render();
+        if (surfaceTexture) {
+          const image = new Image();
+          image.onload = () => {
+            gl.bindTexture(gl.TEXTURE_2D, surfaceTexture);
+            uploadParkingSurfaceMap(gl, image);
+            texture.disabled = false;
+            render();
+          };
+          image.src = `./${parkingSurfaceMapFilename}`;
+        }
         const report = await fetch('./coverage.json').then((r) => r.json());
         document.querySelector('#coverage').textContent =
           `${report.modeled.toLocaleString()} of ${report.total.toLocaleString()} parking records have a model. ${report.unspecified.toLocaleString()} records have no specified type.`;

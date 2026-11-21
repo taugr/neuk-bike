@@ -2,6 +2,13 @@ import {
   parkingVertexShader,
   parkingFragmentShader,
 } from './parking-model-shaders';
+import { parkingVertexStride as stride } from './parking-model-mesh';
+import {
+  createParkingSurfaceTexture,
+  parkingSurfaceMapFilename,
+  parkingSurfaceMapZoom,
+  uploadParkingSurfaceMap,
+} from './parking-surface-map';
 import {
   MercatorCoordinate,
   type Map,
@@ -41,11 +48,19 @@ export type ParkingModelDisplay = {
 export const parkingModelsLayer = 'parking-models-3d';
 const layers = new WeakMap<Map, ParkingLayer>();
 type MeshBounds = { min: number[]; max: number[] };
+type GpuSurface = { buffer: WebGLBuffer; vao: WebGLVertexArrayObject };
 type GpuMesh = {
   mesh: ParkingMesh;
-  opaque: WebGLBuffer;
-  glass: WebGLBuffer;
+  opaque: GpuSurface;
+  glass: GpuSurface | null;
+  shadow: GpuSurface | null;
 };
+const attributes = [
+  [0, 3, 0],
+  [1, 3, 3],
+  [2, 4, 6],
+  [3, 1, 10],
+];
 const uniformNames = [
   'u_viewport',
   'u_satellite',
@@ -53,6 +68,8 @@ const uniformNames = [
   'u_outline',
   'u_view',
   'u_matrix',
+  'u_surface',
+  'u_surface_ready',
 ] as const;
 type ShaderUniforms = Record<
   (typeof uniformNames)[number],
@@ -76,8 +93,6 @@ type PlacedMesh = {
   depth: number;
   bounds: { left: number; right: number; top: number; bottom: number };
 };
-const stride = 10;
-
 /** Multiply in double precision before handing the local transform to WebGL.
  * Uploading global Mercator positions as floats makes thin tubes jitter. */
 export function modelMatrix(
@@ -149,25 +164,31 @@ class ParkingLayer implements CustomLayerInterface {
   private map!: Map;
   private program: WebGLProgram | null = null;
   private uniforms: ShaderUniforms | null = null;
-  private vao: WebGLVertexArrayObject | null = null;
   private buffers = new globalThis.Map<string, GpuMesh>();
+  private surfaceTexture: WebGLTexture | null = null;
+  private surfaceImage: HTMLImageElement | null = null;
+  private surfaceUploaded = false;
   private placed: PlacedMesh[] = [];
   private onCameraSettled = () => this.map.triggerRepaint();
+  private retrySurfaceMap = () => {
+    this.surfaceImage = null;
+    this.map.triggerRepaint();
+  };
   private onContextRestored = () => {
     // A restored context invalidates all handles. Rebuild lazily if MapLibre
     // retained this layer; style replacement instead removes and re-adds it.
     this.program = null;
     this.uniforms = null;
-    this.vao = null;
     this.buffers.clear();
+    this.surfaceTexture = null;
+    this.surfaceUploaded = false;
     this.map.triggerRepaint();
   };
-  onAdd(map: Map, gl: WebGL2RenderingContext) {
+  onAdd(map: Map) {
     this.map = map;
     map.on('moveend', this.onCameraSettled);
     map.on('resize', this.onCameraSettled);
     map.on('webglcontextrestored', this.onContextRestored);
-    this.initialize(gl);
   }
   private initialize(gl: WebGL2RenderingContext) {
     this.buffers.clear();
@@ -198,7 +219,6 @@ class ParkingLayer implements CustomLayerInterface {
         gl.getUniformLocation(this.program!, name),
       ]),
     ) as ShaderUniforms;
-    this.vao = gl.createVertexArray();
   }
   private gpu(gl: WebGL2RenderingContext, model: ParkingModel) {
     const key = `${model.kind}:${model.covered}:${model.selected}:${this.satelliteContrast}`;
@@ -211,18 +231,58 @@ class ParkingLayer implements CustomLayerInterface {
       this.satelliteContrast,
     );
     const upload = (data: Float32Array) => {
+      const vao = gl.createVertexArray()!;
       const buffer = gl.createBuffer()!;
+      gl.bindVertexArray(vao);
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-      return buffer;
+      for (const [index, size, offset] of attributes) {
+        gl.enableVertexAttribArray(index);
+        gl.vertexAttribPointer(
+          index,
+          size,
+          gl.FLOAT,
+          false,
+          stride * 4,
+          offset * 4,
+        );
+      }
+      gl.bindVertexArray(null);
+      return { buffer, vao };
     };
     const value = {
       mesh,
       opaque: upload(mesh.opaque),
-      glass: upload(mesh.glass),
+      glass: mesh.glass.length ? upload(mesh.glass) : null,
+      shadow: mesh.shadow.length ? upload(mesh.shadow) : null,
     };
     this.buffers.set(key, value);
     return value;
+  }
+  private bindSurfaceMap(gl: WebGL2RenderingContext) {
+    if (!this.surfaceImage && this.map.getZoom() >= parkingSurfaceMapZoom) {
+      const image = new Image();
+      this.surfaceImage = image;
+      image.onload = () => this.map.triggerRepaint();
+      image.onerror = () => {
+        window.addEventListener('online', this.retrySurfaceMap, { once: true });
+      };
+      image.src = `/textures/${parkingSurfaceMapFilename}`;
+    }
+    gl.activeTexture(gl.TEXTURE0);
+    this.surfaceTexture ??= createParkingSurfaceTexture(gl);
+    gl.bindTexture(gl.TEXTURE_2D, this.surfaceTexture);
+    if (
+      this.surfaceTexture &&
+      !this.surfaceUploaded &&
+      this.surfaceImage?.complete &&
+      this.surfaceImage?.naturalWidth
+    ) {
+      uploadParkingSurfaceMap(gl, this.surfaceImage);
+      this.surfaceUploaded = true;
+    }
+    gl.uniform1i(this.uniforms!.u_surface, 0);
+    gl.uniform1i(this.uniforms!.u_surface_ready, Number(this.surfaceUploaded));
   }
   render(gl: WebGL2RenderingContext, args: CustomRenderMethodInput) {
     this.renderedCount = 0;
@@ -233,8 +293,8 @@ class ParkingLayer implements CustomLayerInterface {
       this.layoutKey = '';
       return;
     }
-    // Do not query GPU program validity on each frame: it can stall the CPU
-    // waiting for the GPU. Context restoration explicitly invalidates handles.
+    // Compile only when there is something to draw. Context restoration
+    // explicitly invalidates handles, avoiding a GPU validity query per frame.
     if (!this.program) this.initialize(gl);
     const width = this.map.getCanvas().clientWidth,
       height = this.map.getCanvas().clientHeight;
@@ -411,8 +471,9 @@ class ParkingLayer implements CustomLayerInterface {
     }
     for (const [id, value] of this.display)
       value.buttonOffset = this.buttonOffsets.get(id) ?? value.buttonOffset;
+    if (!this.placed.length) return;
     gl.useProgram(this.program);
-    gl.bindVertexArray(this.vao);
+    this.bindSurfaceMap(gl);
     const uniforms = this.uniforms!;
     gl.uniform2f(
       uniforms.u_viewport,
@@ -443,51 +504,43 @@ class ParkingLayer implements CustomLayerInterface {
       Math.cos(pitch),
     );
     const matrixLocation = uniforms.u_matrix;
-    const draw = (placed: PlacedMesh, glass: boolean) => {
-      const data = glass ? placed.gpu.mesh.glass : placed.gpu.mesh.opaque;
-      if (!data.length) return;
+    const draw = (placed: PlacedMesh, part: keyof ParkingMesh) => {
+      const data = placed.gpu.mesh[part];
+      const surface = placed.gpu[part];
+      if (!surface) return;
       gl.uniformMatrix4fv(matrixLocation, false, placed.matrix);
-      gl.bindBuffer(
-        gl.ARRAY_BUFFER,
-        glass ? placed.gpu.glass : placed.gpu.opaque,
-      );
-      for (const [index, size, offset] of [
-        [0, 3, 0],
-        [1, 3, 3],
-        [2, 4, 6],
-      ]) {
-        gl.enableVertexAttribArray(index);
-        gl.vertexAttribPointer(
-          index,
-          size,
-          gl.FLOAT,
-          false,
-          stride * 4,
-          offset * 4,
-        );
-      }
+      gl.bindVertexArray(surface.vao);
       gl.drawArrays(gl.TRIANGLES, 0, data.length / stride);
     };
+    if (this.map.getZoom() >= parkingSurfaceMapZoom) {
+      gl.depthMask(false);
+      gl.uniform1i(outlineLocation, 0);
+      gl.uniform1f(expandLocation, 0);
+      for (const placed of this.placed) draw(placed, 'shadow');
+    }
     if (this.satelliteContrast) {
       // Paint the narrow silhouette first without writing depth, so the real
       // surfaces cover its interior. Glazing keeps its open, transparent shape.
       gl.depthMask(false);
       gl.uniform1i(outlineLocation, 1);
       gl.uniform1f(expandLocation, expansion + 1.1 * pixelRatio);
-      for (const placed of this.placed) draw(placed, false);
+      for (const placed of this.placed) draw(placed, 'opaque');
     }
     gl.uniform1i(outlineLocation, 0);
     gl.uniform1f(expandLocation, expansion);
     gl.depthMask(true);
-    for (const placed of this.placed) draw(placed, false);
+    for (const placed of this.placed) draw(placed, 'opaque');
     gl.uniform1f(expandLocation, 0);
     gl.depthMask(false);
     // Render glazing after all opaque fixtures, far to near, without hiding
     // stands behind a transparent surface in the shared depth buffer.
-    for (const placed of [...this.placed].sort((a, b) => b.depth - a.depth))
-      draw(placed, true);
+    for (const placed of this.placed
+      .filter(({ gpu }) => gpu.glass)
+      .sort((a, b) => b.depth - a.depth))
+      draw(placed, 'glass');
     gl.depthMask(true);
     gl.bindVertexArray(null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
     this.renderedCount = this.placed.length;
   }
   pick(point: { x: number; y: number }): string | null {
@@ -548,16 +601,25 @@ class ParkingLayer implements CustomLayerInterface {
     this.map.off('moveend', this.onCameraSettled);
     this.map.off('resize', this.onCameraSettled);
     this.map.off('webglcontextrestored', this.onContextRestored);
-    for (const value of this.buffers.values()) {
-      gl.deleteBuffer(value.opaque);
-      gl.deleteBuffer(value.glass);
+    if (this.surfaceImage) {
+      this.surfaceImage.onload = null;
+      this.surfaceImage.onerror = null;
+      window.removeEventListener('online', this.retrySurfaceMap);
     }
+    this.surfaceImage = null;
+    gl.deleteTexture(this.surfaceTexture);
+    this.surfaceTexture = null;
+    this.surfaceUploaded = false;
+    for (const value of this.buffers.values())
+      for (const surface of [value.opaque, value.glass, value.shadow]) {
+        if (!surface) continue;
+        gl.deleteVertexArray(surface.vao);
+        gl.deleteBuffer(surface.buffer);
+      }
     this.buffers.clear();
     this.placed = [];
     this.renderedCount = 0;
-    gl.deleteVertexArray(this.vao);
     gl.deleteProgram(this.program);
-    this.vao = null;
     this.program = null;
     this.uniforms = null;
   }

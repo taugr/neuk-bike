@@ -9,6 +9,7 @@ import {
   createParkingMesh,
   parkingModelButtonOffset,
 } from './parking-models';
+import { parkingVertexStride as stride } from './parking-model-mesh';
 import type { ParkingPoint } from './types';
 const point = (
   type: string | null,
@@ -23,43 +24,87 @@ const point = (
 });
 
 describe('smooth parking meshes', () => {
-  it.each(['stands', 'post-hoop', 'loops', 'safe-loops', 'racks'] as const)(
-    'omits the artificial ground slab from %s, including selected and covered variants',
-    (kind) => {
-      for (const selected of [false, true])
-        for (const covered of [false, true]) {
-          const vertices = createParkingMesh(kind, covered, selected).opaque;
-          // The removed slab was the only geometry at ground z=0.
-          for (let i = 0; i < vertices.length; i += 10)
-            expect(vertices[i + 2]).toBeGreaterThan(0);
-        }
+  it.each(parkingModelCatalog)(
+    'keeps $kind contact shading independent from fixture surfaces',
+    ({ kind }) => {
+      const model = createParkingMesh(kind, false);
+      if (kind === 'floor') {
+        expect(model.shadow.length).toBe(0);
+        return;
+      }
+      expect(model.shadow.length).toBeGreaterThan(0);
+      expect(model.shadow.length % (stride * 6)).toBe(0);
+      for (let i = 0; i < model.shadow.length; i += stride) {
+        expect(model.shadow[i + 2]).toBeCloseTo(0.017);
+        expect(model.shadow[i + 10]).toBe(6);
+      }
+      expect(createParkingMesh(kind, false, true, true).shadow).toEqual(
+        model.shadow,
+      );
     },
   );
-  it('retains all six small mounting plates beneath Sheffield hoop legs', () => {
-    const vertices = createParkingMesh('stands', false).opaque;
-    for (const y of [-0.9, 0, 0.9])
-      for (const x of [-0.775, 0.775]) {
-        let plateVertices = 0;
-        for (let i = 0; i < vertices.length; i += 10)
-          if (
-            Math.abs(vertices[i] - x) < 0.096 &&
-            Math.abs(vertices[i + 1] - y) < 0.081 &&
-            Math.abs(vertices[i + 2] - 0.025) < 1e-6
-          )
-            plateVertices++;
-        expect(plateVertices).toBe(18);
+  it.each(parkingModelCatalog.filter(({ kind }) => kind !== 'floor'))(
+    'grounds $kind on its own structure',
+    ({ kind }) => {
+      const data = createParkingMesh(kind, false).opaque;
+      // No fixture sits on the old uniform platform that sliced across slopes.
+      for (let i = 0; i < data.length; i += stride * 3) {
+        const j = i + stride;
+        const k = j + stride;
+        if (Math.max(data[i + 2], data[j + 2], data[k + 2]) >= 0.027) continue;
+        const area =
+          Math.abs(
+            (data[j] - data[i]) * (data[k + 1] - data[i + 1]) -
+              (data[k] - data[i]) * (data[j + 1] - data[i + 1]),
+          ) / 2;
+        expect(area).toBeLessThan(4);
       }
+    },
+  );
+  it('keeps bolted flanges and a straight top on each Sheffield stand', () => {
+    const data = createParkingMesh('stands', false).opaque;
+    const vertices = Array.from({ length: data.length / stride }, (_, index) =>
+      data.subarray(index * stride, (index + 1) * stride),
+    );
+    for (const y of [-0.9, 0, 0.9])
+      for (const x of [-0.57, 0.57]) {
+        const flange = vertices.filter(
+          ([px, py, z]) =>
+            Math.abs(px - x) < 0.11 && Math.abs(py - y) < 0.11 && z < 0.047,
+        );
+        expect(flange.length).toBeGreaterThan(100);
+        expect(Math.min(...flange.map((vertex) => vertex[2]))).toBeCloseTo(
+          0.012,
+        );
+      }
+    for (const x of [-0.3796, 0.3796]) {
+      expect(
+        vertices.some(
+          ([px, py, z]) =>
+            Math.abs(px - x) < 0.012 && Math.abs(py) < 0.01 && z > 1.16,
+        ),
+      ).toBe(true);
+    }
+  });
+  it('fits the redesigned stand and canopy within their geometry budgets', () => {
+    const stand = createParkingMesh('stands', false);
+    const shelter = createParkingMesh('stands', true);
+    const triangles = (surface: Float32Array) => surface.length / (stride * 3);
+    expect(triangles(stand.opaque)).toBeLessThan(1800);
+    expect(triangles(shelter.opaque) + triangles(shelter.glass)).toBeLessThan(
+      3500,
+    );
   });
   it.each(parkingModelCatalog.map(({ kind }) => kind))(
     'builds finite triangles with unit normals for %s',
     (kind) => {
       const mesh = createParkingMesh(kind, true);
       for (const vertices of [mesh.opaque, mesh.glass]) {
-        expect(vertices.length % 30).toBe(0);
-        for (let i = 0; i < vertices.length; i += 10) {
-          expect([...vertices.slice(i, i + 10)].every(Number.isFinite)).toBe(
-            true,
-          );
+        expect(vertices.length % (stride * 3)).toBe(0);
+        for (let i = 0; i < vertices.length; i += stride) {
+          expect(
+            [...vertices.slice(i, i + stride)].every(Number.isFinite),
+          ).toBe(true);
           expect(Math.hypot(...vertices.slice(i + 3, i + 6))).toBeCloseTo(1, 5);
           expect(vertices[i + 2]).toBeGreaterThanOrEqual(-0.02);
         }
@@ -70,7 +115,7 @@ describe('smooth parking meshes', () => {
   it('uses round tubing with smoothly varying normals instead of rectangular stand bars', () => {
     const vertices = createParkingMesh('stands', false).opaque;
     const normals = new Set<string>();
-    for (let i = 0; i < vertices.length; i += 10)
+    for (let i = 0; i < vertices.length; i += stride)
       normals.add(
         [...vertices.slice(i + 3, i + 6)].map((v) => v.toFixed(3)).join(','),
       );
@@ -79,15 +124,15 @@ describe('smooth parking meshes', () => {
   it('joins roof sections at identical heights and shares smooth normals across them', () => {
     const vertices = createParkingMesh('stands', true).glass;
     expect(vertices.length).toBeGreaterThan(0);
-    for (let i = 0; i < vertices.length - 60; i += 60) {
+    for (let i = 0; i < vertices.length - stride * 6; i += stride * 6) {
       // Right edge of one quad equals the left edge of its neighbour.
-      expect([...vertices.slice(i + 10, i + 16)]).toEqual([
-        ...vertices.slice(i + 60, i + 66),
+      expect([...vertices.slice(i + stride, i + stride + 6)]).toEqual([
+        ...vertices.slice(i + stride * 6, i + stride * 6 + 6),
       ]);
     }
     const heights = Array.from(
-      { length: vertices.length / 10 },
-      (_, i) => vertices[i * 10 + 2],
+      { length: vertices.length / stride },
+      (_, i) => vertices[i * stride + 2],
     );
     expect(Math.max(...heights) - Math.min(...heights)).toBeGreaterThan(0.45);
     expect(Math.min(...heights)).toBeGreaterThan(2);
@@ -245,12 +290,12 @@ describe('dataset type aliases', () => {
 });
 
 describe('teal model selection', () => {
-  it('preserves metal and glazing with a teal outline and tints any remaining base', () => {
+  it('preserves metal and glazing with a teal outline', () => {
     const accent = new Float32Array([20 / 255, 184 / 255, 166 / 255]);
     const steel = new Float32Array([0.62, 0.71, 0.73]);
     const matchingVertices = (vertices: Float32Array, color: Float32Array) => {
       const matches: number[] = [];
-      for (let i = 0; i < vertices.length; i += 10) {
+      for (let i = 0; i < vertices.length; i += stride) {
         if (color.every((channel, j) => vertices[i + 6 + j] === channel))
           matches.push(i);
       }
@@ -260,15 +305,6 @@ describe('teal model selection', () => {
       const normal = createParkingMesh(kind, true);
       const selected = createParkingMesh(kind, true, true);
       expect(selected.glass).toEqual(normal.glass);
-      if (
-        !['stands', 'post-hoop', 'loops', 'safe-loops', 'racks'].includes(kind)
-      ) {
-        // Remaining bases become faint teal fills without extra transparent surfaces.
-        expect(selected.opaque[6]).toBeLessThan(normal.opaque[6]);
-        expect(selected.opaque[7]).toBeGreaterThan(normal.opaque[7]);
-        expect(selected.opaque[8]).toBeGreaterThan(normal.opaque[8]);
-        expect(selected.opaque[9]).toBe(1);
-      }
       expect(matchingVertices(selected.opaque, steel).length).toBe(
         matchingVertices(normal.opaque, steel).length,
       );

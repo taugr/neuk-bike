@@ -87,10 +87,13 @@ for recognized parking types. The catalogue includes stands, post hoops, wheel
 loops, supported loops, wheel racks, two-tier and upright racks, wave racks,
 anchors, ground slots, handlebar holders, saddle rails, railings, A-frames,
 scissor racks, lockers, streetpods, sheds, shelters, bollards, floor bays,
-trees, slotted logs, planters, bench hoops, lamp posts, and bicycle docks. Covered open fixtures have a continuous curved,
-translucent roof. Open hoop and loop models retain their feet or rails without
-an artificial ground slab. Models are illustrative, not surveyed dimensions,
-orientation or fixture counts.
+trees, slotted logs, planters, bench hoops, lamp posts, and bicycle docks.
+Models show details such as bolted feet, galvanized tubing, ventilated doors,
+painted frames and curved translucent shelter roofs. The app generates and
+reuses the meshes in the browser. At zoom 19 and closer, the app adds soft
+shadows under the fixtures' supports and loads one small shared surface
+texture. Shading continues while the texture loads or is unavailable offline.
+Dimensions, orientation and fixture counts are illustrative.
 Satellite imagery adds brighter metal, frames and solid materials, a thin dark
 outline and slightly fuller tubing at the first model zoom levels. Canopy glass
 has a clearer pale-blue tint and stronger reflections while remaining translucent.
@@ -116,8 +119,8 @@ Ordinary place destinations and the route overview keep their simple markers.
 For a local visual catalogue, run `pnpm preview:parking-models`, then
 `python3 -m http.server 4190 --bind 127.0.0.1 --directory output/parking-model-gallery`.
 Open `http://127.0.0.1:4190/` to rotate every model, toggle covered and selected
-states, and inspect dataset coverage. The gallery uses the map's actual meshes
-and shaders; its generated output stays outside the production export.
+states, compare image textures, and inspect dataset coverage. The gallery uses
+the map's meshes and shaders. Its generated output stays outside the export.
 
 Elevation loads only in 3D and is not included in offline-area downloads.
 Unavailable elevation returns the map to 2D. Switching respects reduced motion.

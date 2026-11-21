@@ -6,6 +6,7 @@ import {
   parkingModelCatalog,
   resolveParkingModelType,
 } from '../src/lib/parking-model-catalog.ts';
+import { parkingSurfaceMapFilename } from '../src/lib/parking-surface-map.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const destination = resolve(root, 'output/parking-model-gallery');
@@ -14,6 +15,7 @@ for (const [source, target] of [
   ['parking-model-mesh', 'mesh'],
   ['parking-model-catalog', 'catalog'],
   ['parking-model-shaders', 'shaders'],
+  ['parking-surface-map', 'surface-map'],
 ]) {
   const code = await readFile(resolve(root, `src/lib/${source}.ts`), 'utf8');
   await writeFile(
@@ -24,6 +26,10 @@ for (const [source, target] of [
 await copyFile(
   resolve(root, 'scripts/parking-model-gallery.html'),
   resolve(destination, 'index.html'),
+);
+await copyFile(
+  resolve(root, 'public/textures', parkingSurfaceMapFilename),
+  resolve(destination, parkingSurfaceMapFilename),
 );
 const manifest = JSON.parse(
   await readFile(resolve(root, 'public/data/parking/manifest.json'), 'utf8'),

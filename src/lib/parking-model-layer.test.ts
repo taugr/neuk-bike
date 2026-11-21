@@ -7,7 +7,7 @@ import type {
 import { syncParkingModels } from './parking-model-layer';
 import { buildParkingModels } from './parking-models';
 
-function setup() {
+function setup(zoom = 18) {
   const listeners = new Map<string, Set<() => void>>();
   let layer: CustomLayerInterface | undefined;
   const gl = {
@@ -44,6 +44,13 @@ function setup() {
     deleteBuffer: vi.fn(),
     deleteVertexArray: vi.fn(),
     deleteProgram: vi.fn(),
+    createTexture: vi.fn(() => ({})),
+    deleteTexture: vi.fn(),
+    activeTexture: vi.fn(),
+    bindTexture: vi.fn(),
+    texImage2D: vi.fn(),
+    texParameteri: vi.fn(),
+    generateMipmap: vi.fn(),
     drawingBufferWidth: 800,
     drawingBufferHeight: 600,
   };
@@ -61,7 +68,7 @@ function setup() {
       layer = value;
       layer.onAdd!(map as unknown as LibreMap, context);
     },
-    getZoom: () => 18,
+    getZoom: () => zoom,
     getPitch: () => 0,
     getBearing: () => 0,
     getCenter: () => ({ lng: -3.19, lat: 55.95 }),
@@ -89,6 +96,9 @@ function setup() {
   return {
     gl,
     repaint: map.triggerRepaint,
+    zoomTo: (value: number) => {
+      zoom = value;
+    },
     render: () => layer!.render!(context, args),
     restore: () => {
       for (const listener of listeners.get('webglcontextrestored') ?? [])
@@ -99,12 +109,24 @@ function setup() {
 }
 
 describe('parking model GPU lifecycle', () => {
+  it('defers shader compilation and mesh uploads until model zoom', () => {
+    const { gl, render, zoomTo } = setup(16);
+    render();
+    expect(gl.createProgram).not.toHaveBeenCalled();
+    expect(gl.bufferData).not.toHaveBeenCalled();
+    zoomTo(17);
+    render();
+    expect(gl.createProgram).toHaveBeenCalledTimes(1);
+    expect(gl.drawArrays).toHaveBeenCalled();
+  });
+
   it('reuses program, uniform locations and mesh buffers across frames', () => {
     const { gl, render } = setup();
     render();
     expect(gl.drawArrays).toHaveBeenCalled();
     const lookups = gl.getUniformLocation.mock.calls.length;
     const uploads = gl.bufferData.mock.calls.length;
+    const attributeBindings = gl.vertexAttribPointer.mock.calls.length;
     expect(lookups).toBeGreaterThan(0);
     expect(uploads).toBeGreaterThan(0);
     render();
@@ -113,6 +135,56 @@ describe('parking model GPU lifecycle', () => {
     expect(gl.createProgram).toHaveBeenCalledTimes(1);
     expect(gl.getUniformLocation).toHaveBeenCalledTimes(lookups);
     expect(gl.bufferData).toHaveBeenCalledTimes(uploads);
+    expect(attributeBindings).toBeGreaterThan(0);
+    expect(gl.vertexAttribPointer).toHaveBeenCalledTimes(attributeBindings);
+  });
+
+  it('requests one texture at close zoom and reuploads it after context recovery', () => {
+    const image = {
+      src: '',
+      complete: false,
+      naturalWidth: 0,
+      onload: null as null | (() => void),
+    };
+    const createImage = vi.fn(function MockImage() {
+      return image;
+    });
+    vi.stubGlobal('Image', createImage);
+    vi.stubGlobal('window', new EventTarget());
+    try {
+      const { gl, zoomTo, render, repaint, restore, remove } = setup();
+      render();
+      expect(createImage).not.toHaveBeenCalled();
+      expect(gl.texImage2D).toHaveBeenCalledTimes(1);
+      const ordinaryDraws = gl.drawArrays.mock.calls.length;
+      zoomTo(19);
+      render();
+      expect(gl.drawArrays).toHaveBeenCalledTimes(2 * ordinaryDraws + 1);
+      render();
+      expect(createImage).toHaveBeenCalledTimes(1);
+      expect(image.src).toBe('/textures/neuk-surfaces-v1.png');
+      expect(gl.drawArrays).toHaveBeenCalled();
+      expect(gl.generateMipmap).not.toHaveBeenCalled();
+      image.naturalWidth = 48;
+      render();
+      expect(gl.generateMipmap).not.toHaveBeenCalled();
+      image.complete = true;
+      repaint.mockClear();
+      image.onload!();
+      expect(repaint).toHaveBeenCalledTimes(1);
+      render();
+      render();
+      expect(gl.generateMipmap).toHaveBeenCalledTimes(1);
+      restore();
+      render();
+      expect(gl.generateMipmap).toHaveBeenCalledTimes(2);
+      expect(createImage).toHaveBeenCalledTimes(1);
+      remove();
+      expect(gl.deleteTexture).toHaveBeenCalledTimes(1);
+      expect(image.onload).toBeNull();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('recreates handles after context restoration when the layer survives', () => {
@@ -120,6 +192,9 @@ describe('parking model GPU lifecycle', () => {
     render();
     const oldProgram = gl.createProgram.mock.results[0].value;
     const oldBuffers = gl.createBuffer.mock.results.map(({ value }) => value);
+    const oldArrays = gl.createVertexArray.mock.results.map(
+      ({ value }) => value,
+    );
     const lookups = gl.getUniformLocation.mock.calls.length;
     const uploads = gl.bufferData.mock.calls.length;
     restore();
@@ -136,6 +211,11 @@ describe('parking model GPU lifecycle', () => {
     expect(gl.isProgram).not.toHaveBeenCalled();
     remove();
     expect(gl.deleteProgram).toHaveBeenCalledWith(newProgram);
+    expect(gl.deleteVertexArray).toHaveBeenCalledTimes(oldArrays.length);
+    for (const array of oldArrays)
+      expect(
+        gl.deleteVertexArray.mock.calls.some(([value]) => value === array),
+      ).toBe(false);
     for (const buffer of oldBuffers)
       expect(
         gl.deleteBuffer.mock.calls.some(([value]) => value === buffer),
