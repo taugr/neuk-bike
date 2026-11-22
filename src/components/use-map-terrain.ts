@@ -68,6 +68,9 @@ export function useMapTerrain(
         map.getTerrain()?.source === activeSourceId &&
         map.isSourceLoaded(activeSourceId)
       ) {
+        // This deadline applies only to the first usable terrain. A later
+        // pan may briefly make the source unready while new tiles stream.
+        clearTimeout(timeout);
         setLoaded(true);
         map.off('render', onRender);
       }

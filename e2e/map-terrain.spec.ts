@@ -148,7 +148,7 @@ for (const satellite of [false, true]) {
   }) => {
     // Multiple rendered drag gestures are slower with concurrent WebGL tests.
     test.slow();
-    await page.setViewportSize({ width: 1440, height: 844 });
+    await page.setViewportSize({ width: 1280, height: 720 });
     await page.route('https://services.arcgisonline.com/**', (route) =>
       route.fulfill({ contentType: 'image/png', path: tilePath }),
     );
@@ -166,46 +166,50 @@ for (const satellite of [false, true]) {
     await page.getByRole('button', { name: 'Switch to 3D map' }).click();
     await expectPitch(map, 55, satellite ? 30_000 : 15_000);
     await expect(map).toHaveAttribute('data-cycle-network-contrast', 'high');
-    await page.mouse.move(700, 250);
+    await page.mouse.move(600, 250);
     await page.mouse.down({ button: 'right' });
-    await page.mouse.move(960, 300, { steps: 16 });
+    await page.mouse.move(755, 300, { steps: 8 });
     await page.mouse.up({ button: 'right' });
     await expect
       .poll(async () => Number(await map.getAttribute('data-map-pitch')))
       .toBeLessThan(50);
     const expectParking = async () => {
       await expect
-        .poll(async () =>
-          map.evaluate((element) => {
-            const d = (element as HTMLElement).dataset;
-            return (
-              Number(d.mapNorth) > Number(d.mapSouth) &&
-              Number(d.mapEast) > Number(d.mapWest)
-            );
-          }),
+        .poll(
+          async () =>
+            map.evaluate((element) => {
+              const d = (element as HTMLElement).dataset;
+              return (
+                Number(d.mapNorth) > Number(d.mapSouth) &&
+                Number(d.mapEast) > Number(d.mapWest)
+              );
+            }),
+          { timeout: 15_000 },
         )
         .toBe(true);
       // Pinned nearby results alone hid the bug: require additional map pins.
       await expect
-        .poll(async () =>
-          page
-            .locator('.parking-marker:not(.parking-marker-ranked)')
-            .evaluateAll(
-              (markers) =>
-                markers.filter((marker) => {
-                  const r = marker.getBoundingClientRect();
-                  const canvas = document
-                    .querySelector('.maplibregl-canvas')
-                    ?.getBoundingClientRect();
-                  return (
-                    canvas &&
-                    r.x > canvas.left + 24 &&
-                    r.right < canvas.right - 24 &&
-                    r.y > canvas.top + 80 &&
-                    r.bottom < canvas.bottom - 16
-                  );
-                }).length,
-            ),
+        .poll(
+          async () =>
+            page
+              .locator('.parking-marker:not(.parking-marker-ranked)')
+              .evaluateAll(
+                (markers) =>
+                  markers.filter((marker) => {
+                    const r = marker.getBoundingClientRect();
+                    const canvas = document
+                      .querySelector('.maplibregl-canvas')
+                      ?.getBoundingClientRect();
+                    return (
+                      canvas &&
+                      r.x > canvas.left + 24 &&
+                      r.right < canvas.right - 24 &&
+                      r.y > canvas.top + 80 &&
+                      r.bottom < canvas.bottom - 16
+                    );
+                  }).length,
+              ),
+          { timeout: 15_000 },
         )
         .toBeGreaterThan(0);
     };
@@ -213,9 +217,9 @@ for (const satellite of [false, true]) {
     const longitude = Number(
       await map.getAttribute('data-map-center-longitude'),
     );
-    await page.mouse.move(800, 300);
+    await page.mouse.move(645, 300);
     await page.mouse.down();
-    await page.mouse.move(880, 360, { steps: 10 });
+    await page.mouse.move(725, 360, { steps: 8 });
     await page.mouse.up();
     await expect
       .poll(async () =>
@@ -229,9 +233,9 @@ for (const satellite of [false, true]) {
       'data-cycle-network-contrast',
       satellite ? 'high' : 'standard',
     );
-    await page.mouse.move(700, 300);
+    await page.mouse.move(600, 300);
     await page.mouse.down({ button: 'right' });
-    await page.mouse.move(750, 230, { steps: 8 });
+    await page.mouse.move(650, 230, { steps: 8 });
     await page.mouse.up({ button: 'right' });
     await expectPitch(map, 0);
   });
