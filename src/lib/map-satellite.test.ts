@@ -1,12 +1,21 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Map as LibreMap, LayerSpecification } from 'maplibre-gl';
 import {
+  addAerialBuildings,
   addSatelliteBasemap,
+  aerialBuildingsLayerId,
+  castleRockLayerId,
   loadSatelliteTile,
   satelliteSourceId,
 } from './map-satellite';
+import {
+  edinburghOverviewMinZoom,
+  isLocalAerialPreview,
+} from './local-aerial-preview';
 
 function fixture() {
+  const container = { dataset: {} };
+  const vectorSources = { openmaptiles: { type: 'vector' } };
   const specs: LayerSpecification[] = [
     { id: 'background', type: 'background' },
     { id: 'land', type: 'fill', source: 'base' },
@@ -23,7 +32,8 @@ function fixture() {
   const layers = new Map(specs.map((layer) => [layer.id, layer]));
   const sources = new Map();
   const map = {
-    getStyle: () => ({ layers: specs }),
+    getStyle: () => ({ layers: specs, sources: vectorSources }),
+    getContainer: () => container,
     getLayer: (id: string) => layers.get(id),
     getSource: (id: string) => sources.get(id),
     addSource: vi.fn((id, source) => sources.set(id, source)),
@@ -116,6 +126,146 @@ describe('satellite basemap', () => {
       'none',
     );
   });
+});
+
+describe('local aerial preview', () => {
+  it('requires a loopback host and explicit opt-in', () => {
+    expect(
+      isLocalAerialPreview(new URL('http://127.0.0.1/?aerialPreview=1')),
+    ).toBe(true);
+    expect(isLocalAerialPreview(new URL('http://127.0.0.1/'))).toBe(false);
+    expect(
+      isLocalAerialPreview(new URL('https://neuk.bike/?aerialPreview=1')),
+    ).toBe(false);
+  });
+
+  it.each([
+    [
+      'http://127.0.0.1/?aerialPreview=1&facades=princes&roofs=detail',
+      'Nick Hawkes',
+    ],
+    [
+      'http://127.0.0.1/?aerialPreview=1&facades=princes&roofs=photo',
+      '瑞丽江的河水',
+    ],
+    ['https://neuk.bike/?aerialPreview=1&facades=princes&roofs=detail', null],
+    [
+      'http://127.0.0.1/?aerialPreview=1&facades=princes&roofs=detail&lidar=0',
+      null,
+    ],
+  ])('credits only the opted-in roof image for %s', (url, credit) => {
+    vi.stubGlobal('window', { location: new URL(url) });
+    try {
+      const { map, api } = fixture();
+      addSatelliteBasemap(api, []);
+      const [, source] = map.addSource.mock.calls[0];
+      expect(source.attribution.includes('Nick Hawkes')).toBe(
+        credit === 'Nick Hawkes',
+      );
+      expect(source.attribution.includes('瑞丽江的河水')).toBe(
+        credit === '瑞丽江的河水',
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('retains ground imagery attribution and omits building photo credits in the shaded preview', () => {
+    vi.stubGlobal('window', {
+      location: new URL(
+        'http://127.0.0.1/?aerialPreview=1&buildings=shaded&facades=princes&roofs=detail',
+      ),
+    });
+    try {
+      const { map, api } = fixture();
+      addSatelliteBasemap(api, []);
+      const [, source] = map.addSource.mock.calls[0];
+      expect(source.attribution).toContain('Esri');
+      expect(source.attribution).toContain('Princes Street laser returns');
+      expect(source.attribution).not.toMatch(
+        /Waverley Gate photo|Princes Street textures|Nick Hawkes/,
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('uses the existing building tiles between imagery and labels', () => {
+    const { map, api } = fixture();
+    expect(addAerialBuildings(api)).toBeUndefined();
+    map.getStyle().layers.splice(3, 0, {
+      id: satelliteSourceId,
+      type: 'raster',
+      source: satelliteSourceId,
+    });
+    const remove = addAerialBuildings(api);
+    expect(map.addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: aerialBuildingsLayerId,
+        type: 'fill-extrusion',
+        source: 'openmaptiles',
+        'source-layer': 'building',
+        paint: expect.objectContaining({
+          'fill-extrusion-height': ['number', ['get', 'render_height'], 0],
+          'fill-extrusion-base': ['number', ['get', 'render_min_height'], 0],
+        }),
+      }),
+      'labels',
+    );
+    expect(map.addSource).not.toHaveBeenCalled();
+    remove?.();
+    expect(map.getLayer(aerialBuildingsLayerId)).toBeUndefined();
+  });
+
+  it.each([
+    ['http://127.0.0.1/?aerialPreview=1&buildings=edinburgh', true],
+    ['http://127.0.0.1/?aerialPreview=1&buildings=shaded', false],
+    ['https://neuk.bike/?aerialPreview=1&buildings=edinburgh', false],
+  ])(
+    'drapes the cliff material only in the local Edinburgh preview for %s',
+    (url, enabled) => {
+      vi.stubGlobal('window', { location: new URL(url) });
+      try {
+        const { map, api } = fixture();
+        map.getStyle().layers.splice(3, 0, {
+          id: satelliteSourceId,
+          type: 'raster',
+          source: satelliteSourceId,
+        });
+        const remove = addAerialBuildings(api);
+        if (enabled) {
+          expect(map.getLayer(aerialBuildingsLayerId)).toMatchObject({
+            layout: { visibility: 'none' },
+          });
+          expect(map.addLayer).toHaveBeenCalledWith(
+            expect.objectContaining({
+              id: castleRockLayerId,
+              type: 'raster',
+              minzoom: edinburghOverviewMinZoom,
+            }),
+            aerialBuildingsLayerId,
+          );
+          expect(map.getSource(castleRockLayerId)).toEqual(
+            expect.objectContaining({
+              type: 'image',
+              url: '/data/edinburgh-buildings/castle-rock.webp',
+            }),
+          );
+        } else {
+          expect(map.getLayer(aerialBuildingsLayerId)).not.toHaveProperty(
+            'layout',
+          );
+          expect(map.getLayer(castleRockLayerId)).toBeUndefined();
+          expect(map.addSource).not.toHaveBeenCalled();
+        }
+        remove?.();
+        expect(map.getLayer(castleRockLayerId)).toBeUndefined();
+        expect(map.getSource(castleRockLayerId)).toBeUndefined();
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    },
+  );
 });
 
 describe('Esri tile loader', () => {

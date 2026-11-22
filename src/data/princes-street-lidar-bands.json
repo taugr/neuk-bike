@@ -1,0 +1,8 @@
+[
+  { "from": 0.032, "to": 0.164, "elevation": 72.18, "returns": 23 },
+  { "from": 0.187, "to": 0.249, "elevation": 72.21, "returns": 12 },
+  { "from": 0.304, "to": 0.41, "elevation": 72.43, "returns": 17 },
+  { "from": 0.602, "to": 0.903, "elevation": 73.12, "returns": 32 },
+  { "from": 0.587, "to": 0.903, "elevation": 81.67, "returns": 38 },
+  { "from": 0.632, "to": 0.898, "elevation": 85.06, "returns": 30 }
+]

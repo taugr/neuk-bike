@@ -1,0 +1,36 @@
+Edinburgh Castle exterior model
+
+Mapped wall lines, Gatehouse footprint and passage alignment
+© OpenStreetMap contributors, ODbL 1.0.
+https://www.openstreetmap.org/copyright
+The source way IDs are recorded in scripts/data/edinburgh-castle.json.
+Cliff, bare-rock and building outlines also guide the Castle Rock material.
+
+Surveyed elevations and terrain
+Scottish Public Sector LiDAR Phase 5, NT27SW and NT27SE, 50 cm DTM and DSM.
+© Crown copyright Scottish Government and Fugro (2020), Open Government Licence v3.0.
+https://registry.opendata.aws/scottish-lidar/
+https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+Visual references for original geometry
+Edinburgh Castle Esplanade.JPG, Reinhard Dietrich, CC0 1.0.
+https://commons.wikimedia.org/wiki/File:Edinburgh_Castle_Esplanade.JPG
+Edinburgh Castle Esplanade & Gatehouse.jpg, Voello, CC0 1.0.
+https://commons.wikimedia.org/wiki/File:Edinburgh_Castle_Esplanade_%26_Gatehouse.jpg
+Edinburgh Castle from Princes Street Gardens.jpg, Kim Traynor, CC BY-SA 3.0.
+https://commons.wikimedia.org/wiki/File:Edinburgh_Castle_from_Princes_Street_Gardens.jpg
+https://creativecommons.org/licenses/by-sa/3.0/
+
+Architectural reference
+Historic Environment Scotland, Edinburgh Castle Gatehouse record LB48218.
+https://portal.historicenvironment.scot/apex/f?p=1505:300:::::VIEWTYPE,VIEWREF:designation,LB48218
+The reference photographs are used to study the exterior. The asset contains
+hand-authored geometry and procedural materials.
+
+Castle Rock material
+Rock colour, weathering and joints are generated procedurally. Surveyed slope
+and surface heights guide shading and blending with the surrounding terrain.
+The texture contains no satellite or reference-photo pixels.
+Geology reference: British Geological Survey, The Geology of the Neighbourhood
+of Edinburgh, Castle Rock basalt plug.
+https://webapps.bgs.ac.uk/memoirs/docs/B01944.html

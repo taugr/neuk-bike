@@ -1,19 +1,30 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import {
+  stabilizeTerrainPan,
   syncMapTerrain,
   terrainSourceId,
   terrainTransitionDuration,
   transitionMapTerrain,
 } from './map-terrain';
+import { lidarTerrainSourceId } from './waverley-lidar';
 
 function mapFixture() {
-  let source: unknown;
+  const sources = new Map<string, unknown>();
   let terrain: { source: string } | null = null;
   const calls: string[] = [];
   const listeners = new Map<string, Set<() => void>>();
   let pitch = 0;
+  let clamped = true;
   const map = {
+    getCenter: () => ({ lng: -3.199, lat: 55.949 }),
+    getCenterElevation: () => 110,
+    getCenterClampedToGround: () => clamped,
+    isMoving: vi.fn(() => false),
+    setCenterClampedToGround: vi.fn((value: boolean) => {
+      clamped = value;
+    }),
+    queryTerrainElevation: vi.fn(() => 82),
     getPitch: () => pitch,
     setMaxPitch: vi.fn(),
     isSourceLoaded: vi.fn(() => false),
@@ -26,17 +37,17 @@ function mapFixture() {
     off: (event: string, listener: () => void) => {
       listeners.get(event)?.delete(listener);
     },
-    getSource: () => source,
-    addSource: vi.fn((_id: string, value: unknown) => {
-      source = value;
+    getSource: (id = terrainSourceId) => sources.get(id),
+    addSource: vi.fn((id: string, value: unknown) => {
+      sources.set(id, value);
     }),
     getTerrain: () => terrain,
     setTerrain: vi.fn((value: { source: string } | null) => {
       terrain = value;
       calls.push('terrain');
     }),
-    removeSource: vi.fn(() => {
-      source = undefined;
+    removeSource: vi.fn((id: string) => {
+      sources.delete(id);
       calls.push('remove');
     }),
   };
@@ -80,6 +91,19 @@ describe('optional map terrain', () => {
     });
   });
 
+  it('swaps to the preview DEM and removes each previous source after switching', () => {
+    const { map, api, calls } = mapFixture();
+    syncMapTerrain(api, true);
+    syncMapTerrain(api, true, true);
+    expect(map.getTerrain()?.source).toBe(lidarTerrainSourceId);
+    expect(map.getSource(lidarTerrainSourceId)).toMatchObject({ maxzoom: 17 });
+    expect(map.getSource(terrainSourceId)).toBeUndefined();
+    expect(calls).toEqual(['terrain', 'terrain', 'remove']);
+    syncMapTerrain(api, true);
+    expect(map.getTerrain()?.source).toBe(terrainSourceId);
+    expect(map.getSource(lidarTerrainSourceId)).toBeUndefined();
+  });
+
   it('detaches terrain before removing its source and can enable it again', () => {
     const { map, api, calls } = mapFixture();
     syncMapTerrain(api, true);
@@ -90,6 +114,38 @@ describe('optional map terrain', () => {
     syncMapTerrain(api, true);
     expect(map.addSource).toHaveBeenCalledTimes(2);
     expect(map.getTerrain()?.source).toBe(terrainSourceId);
+  });
+});
+
+describe('terrain pan', () => {
+  it('holds elevation until drag and inertia end, then eases without changing zoom', async () => {
+    const { map, api, emit } = mapFixture();
+    const remove = stabilizeTerrainPan(api, false);
+    emit('dragstart');
+    emit('dragend');
+    expect(map.getCenterClampedToGround()).toBe(false);
+    expect(map.easeTo).not.toHaveBeenCalled();
+    emit('moveend');
+    await Promise.resolve();
+    expect(map.getCenterClampedToGround()).toBe(true);
+    expect(map.easeTo).toHaveBeenCalledExactlyOnceWith({ duration: 480 });
+    emit('moveend');
+    await Promise.resolve();
+    expect(map.easeTo).toHaveBeenCalledTimes(1);
+    remove();
+  });
+
+  it('restores the ground clamp and cancels a queued ease when removed', async () => {
+    const { map, api, emit } = mapFixture();
+    const remove = stabilizeTerrainPan(api, false);
+    emit('dragstart');
+    emit('moveend');
+    remove();
+    await Promise.resolve();
+    expect(map.getCenterClampedToGround()).toBe(true);
+    expect(map.easeTo).not.toHaveBeenCalled();
+    emit('dragstart');
+    expect(map.getCenterClampedToGround()).toBe(true);
   });
 });
 

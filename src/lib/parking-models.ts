@@ -2,6 +2,15 @@ import { isCyclingPoiPoint, type ParkingPoint } from '@/lib/types';
 
 export const parkingModelsZoom = 17;
 export const parkingModelScale = 3.4;
+
+export function getParkingModelMinZoom(trueScale: boolean) {
+  return trueScale ? 13 : parkingModelsZoom;
+}
+
+export function getParkingModelScale(trueScale: boolean) {
+  return trueScale ? 1 : parkingModelScale;
+}
+
 export { createParkingMesh } from './parking-model-mesh';
 export type { ParkingMesh, Vec3 } from './parking-model-mesh';
 export type { ModelKind } from './parking-model-catalog';

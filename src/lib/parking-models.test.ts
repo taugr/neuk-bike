@@ -7,7 +7,11 @@ import { describe, expect, it } from 'vitest';
 import {
   buildParkingModels,
   createParkingMesh,
+  getParkingModelMinZoom,
+  getParkingModelScale,
   parkingModelButtonOffset,
+  parkingModelScale,
+  parkingModelsZoom,
 } from './parking-models';
 import { parkingVertexStride as stride } from './parking-model-mesh';
 import type { ParkingPoint } from './types';
@@ -21,6 +25,13 @@ const point = (
   longitude: -3.19,
   sourceId: 'osm',
   properties: { bicycle_pa: type, covered },
+});
+
+it('uses one world metre per model metre throughout the aerial preview', () => {
+  expect(getParkingModelScale(true)).toBe(1);
+  expect(getParkingModelMinZoom(true)).toBeLessThan(parkingModelsZoom);
+  expect(getParkingModelScale(false)).toBe(parkingModelScale);
+  expect(getParkingModelMinZoom(false)).toBe(parkingModelsZoom);
 });
 
 describe('smooth parking meshes', () => {

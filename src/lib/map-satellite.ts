@@ -1,12 +1,121 @@
-import type { Map, StyleLayer } from 'maplibre-gl';
+import type { FilterSpecification, Map, StyleLayer } from 'maplibre-gl';
+import castleRockBounds from '@/data/castle-rock-bounds.json';
+import {
+  edinburghOverviewMinZoom,
+  edinburghOverviewFullZoom,
+  isLocalAerialPreview,
+  isLocalEdinburghBuildingsPreview,
+  isLocalEdinburghPilotPreview,
+  isLocalLidarPreview,
+  isLocalModeledFrontagePreview,
+  isLocalShadedBuildingsPreview,
+  localPrincesStreetRoofPreview,
+} from './local-aerial-preview';
+import {
+  princesStreetFacadeCredit,
+  princesStreetFacadeReferences,
+} from './princes-street-facades';
+import { princesStreetRoofPhotos } from './princes-street-roof-photo';
 
 export const satelliteStorageKey = 'bike-neuk-map-satellite';
 export const satelliteSourceId = 'neuk-satellite';
+export const aerialBuildingsLayerId = 'neuk-aerial-buildings';
+export const castleRockLayerId = 'neuk-castle-rock';
+export const aerialBuildingFilter: FilterSpecification = [
+  'all',
+  ['!=', ['get', 'hide_3d'], true],
+  ['>', ['number', ['get', 'render_height'], 0], 0],
+];
 export const satelliteOrigin = 'https://services.arcgisonline.com';
 export const satelliteProtocol = 'neuk-satellite';
 const endpoint = `${satelliteOrigin}/ArcGIS/rest/services/World_Imagery/MapServer/tile/`;
 export const satelliteAttribution =
   'Imagery © <a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Esri</a>, Vantor, Earthstar Geographics, and the GIS User Community';
+const facadePhotoCredit =
+  '<a href="https://commons.wikimedia.org/wiki/File:Waverly_Gate_or_Old_GPO.jpg">Waverley Gate photo</a> by SylviaStanley (cropped and rectified, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>)';
+
+export function addAerialBuildings(
+  map: Map,
+  edinburghCity = isLocalEdinburghBuildingsPreview(),
+) {
+  const { layers, sources } = map.getStyle();
+  const imageryIndex = layers.findIndex(({ id }) => id === satelliteSourceId);
+  // Both OpenFreeMap themes use this source. Reuse the same vector tiles.
+  if (imageryIndex === -1 || sources.openmaptiles?.type !== 'vector') return;
+  map.addLayer(
+    {
+      id: aerialBuildingsLayerId,
+      type: 'fill-extrusion',
+      source: 'openmaptiles',
+      'source-layer': 'building',
+      minzoom: 15,
+      ...(edinburghCity ? { layout: { visibility: 'none' } } : {}),
+      filter: aerialBuildingFilter,
+      paint: {
+        'fill-extrusion-color': '#aaa397',
+        'fill-extrusion-opacity-transition': { duration: 0 },
+        'fill-extrusion-height': ['number', ['get', 'render_height'], 0],
+        'fill-extrusion-base': ['number', ['get', 'render_min_height'], 0],
+      },
+    },
+    layers[imageryIndex + 1]?.id,
+  );
+  const layer = map.getLayer(aerialBuildingsLayerId);
+  const removeCastleRock = edinburghCity ? addCastleRock(map) : undefined;
+  const container = map.getContainer();
+  container.dataset.mapAerialBuildings = 'on';
+  return () => {
+    removeCastleRock?.();
+    if (layer && map.getLayer(aerialBuildingsLayerId) === layer) {
+      map.removeLayer(aerialBuildingsLayerId);
+    }
+    delete container.dataset.mapAerialBuildings;
+  };
+}
+
+function addCastleRock(map: Map) {
+  const [west, south, east, north] = castleRockBounds;
+  map.addSource(castleRockLayerId, {
+    type: 'image',
+    url: '/data/edinburgh-buildings/castle-rock.webp',
+    coordinates: [
+      [west, north],
+      [east, north],
+      [east, south],
+      [west, south],
+    ],
+  });
+  map.addLayer(
+    {
+      id: castleRockLayerId,
+      type: 'raster',
+      source: castleRockLayerId,
+      minzoom: edinburghOverviewMinZoom,
+      paint: {
+        'raster-fade-duration': 0,
+        'raster-opacity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          edinburghOverviewMinZoom,
+          0,
+          edinburghOverviewFullZoom,
+          1,
+        ],
+      },
+    },
+    aerialBuildingsLayerId,
+  );
+  const source = map.getSource(castleRockLayerId);
+  const layer = map.getLayer(castleRockLayerId);
+  return () => {
+    if (!source || map.getSource(castleRockLayerId) !== source) return;
+    if (layer && map.getLayer(castleRockLayerId) === layer) {
+      map.removeLayer(castleRockLayerId);
+    }
+    if (!map.getLayer(castleRockLayerId)) map.removeSource(castleRockLayerId);
+  };
+}
 
 /** Match Trail Atlas: missing detailed imagery falls back to parent tiles. */
 export async function loadSatelliteTile(
@@ -56,12 +165,28 @@ export function addSatelliteBasemap(
     .getStyle()
     .layers.filter((layer) => basemapLayerIds.includes(layer.id));
   const originals: { layer: StyleLayer; restore: () => void }[] = [];
+  const roofPreview = localPrincesStreetRoofPreview();
+  const buildingPhotos = !isLocalShadedBuildingsPreview();
   map.addSource(satelliteSourceId, {
     type: 'raster',
     tiles: [`${satelliteProtocol}://{z}/{y}/{x}`],
     tileSize: 256,
     maxzoom: 19,
-    attribution: satelliteAttribution,
+    attribution: [
+      satelliteAttribution,
+      buildingPhotos && isLocalAerialPreview() && facadePhotoCredit,
+      buildingPhotos && isLocalLidarPreview() && princesStreetFacadeCredit,
+      isLocalModeledFrontagePreview() && princesStreetFacadeReferences,
+      isLocalModeledFrontagePreview() &&
+        '<a href="/textures/princes-street-roof-detail.license.txt">Princes Street roof references</a>',
+      !buildingPhotos &&
+        !isLocalEdinburghBuildingsPreview() &&
+        !isLocalEdinburghPilotPreview() &&
+        '<a href="https://www.data.gov.uk/dataset/b2ad2bb5-d112-4b86-a0d6-6ec57d0ae3fb/lidar-for-scotland-phase-5-las">Princes Street laser returns</a> · Crown copyright Scottish Government, SEPA and Fugro (2021)',
+      roofPreview && princesStreetRoofPhotos[roofPreview].credit,
+    ]
+      .filter(Boolean)
+      .join(' · '),
   });
   map.addLayer(
     {

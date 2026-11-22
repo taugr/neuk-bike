@@ -1,0 +1,15 @@
+{
+  "bounds": [-3.19144, 55.95306, -3.1898, 55.95373],
+  "texture": "/textures/princes-street-roofs.webp",
+  "detailTexture": "/textures/princes-street-roof-detail.webp",
+  "flatRoof": {
+    "west": [-3.1905091, 55.9532095],
+    "east": [-3.1898224, 55.9533267],
+    "elevation": 89.7,
+    "plateau": [3, 6, 42, 29.8],
+    "courts": [
+      [9, 14, 12.8, 22.8],
+      [26.8, 14, 29.5, 22.7]
+    ]
+  }
+}

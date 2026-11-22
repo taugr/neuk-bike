@@ -7,11 +7,11 @@ import {
 import { installWindJourneyFixture, openWindJourney } from './wind-fixtures';
 
 test.use({ serviceWorkers: 'block', reducedMotion: 'reduce' });
-async function expectPitch(map: Locator, pitch: number) {
+async function expectPitch(map: Locator, pitch: number, timeout = 15_000) {
   await expect
     // Match the terrain loader's readiness budget, including software WebGL.
     .poll(async () => Number(await map.getAttribute('data-map-pitch')), {
-      timeout: 15_000,
+      timeout,
     })
     .toBeCloseTo(pitch, 4);
 }
@@ -26,6 +26,120 @@ test.beforeEach(async ({ context }) => {
   await context.route(terrainPattern, (route) =>
     route.fulfill({ contentType: 'image/png', path: tilePath }),
   );
+});
+
+test('selecting a neuk behind an Edinburgh building turns to a clear bearing in one transition', async ({
+  page,
+}) => {
+  test.slow();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.route('https://services.arcgisonline.com/**', (route) =>
+    route.fulfill({ contentType: 'image/png', path: tilePath }),
+  );
+  // A surveyed-style wall nine metres south of the selected Raeburn Place pin.
+  await page.route(
+    /\/edinburgh-buildings\/meshes\/\d+\/\d+\.bin\.gz/,
+    (route) => {
+      const fixture = route.request().url().includes('/32183/20420.bin.gz')
+        ? 'stockbridge-occluding-wall'
+        : 'empty-edinburgh-mesh';
+      return route.fulfill({
+        contentType: 'application/gzip',
+        path: fileURLToPath(
+          new URL(`./fixtures/${fixture}.bin.gz`, import.meta.url),
+        ),
+      });
+    },
+  );
+  await page.route(
+    /\/edinburgh-buildings\/(?:city-)?overview\/index\.json/,
+    (route) => route.fulfill({ json: {} }),
+  );
+  await page.goto(
+    '/?lat=55.958850486064&lng=-3.2100341808294&aerialPreview=1&buildings=edinburgh',
+  );
+  const map = page.getByTestId('parking-map');
+  await expect(map).toHaveAttribute('data-map-edinburgh-buildings', '1', {
+    timeout: 30_000,
+  });
+  await expect(map).toHaveAttribute('data-map-aerial-roofs', 'materials');
+  await expect(map).toHaveAttribute(
+    'data-map-terrain',
+    'neuk-waverley-terrain',
+  );
+  const compass = map
+    .getByRole('button', { name: 'Reset bearing to north' })
+    .locator('.maplibregl-ctrl-icon');
+  await expect(compass).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
+  const cameraMotion = await map.evaluateHandle((element) => {
+    const position = () =>
+      ['latitude', 'longitude']
+        .map((axis) => element.getAttribute(`data-map-center-${axis}`))
+        .join('/');
+    const centers = [position()];
+    const bearings = new Set<string>();
+    const needle = element.querySelector(
+      '.maplibregl-ctrl-compass .maplibregl-ctrl-icon',
+    )!;
+    const observer = new MutationObserver(() => {
+      const center = position();
+      if (center !== centers.at(-1)) centers.push(center);
+      bearings.add(needle.getAttribute('style') ?? '');
+    });
+    observer.observe(element, {
+      attributeFilter: [
+        'data-map-center-latitude',
+        'data-map-center-longitude',
+      ],
+    });
+    observer.observe(needle, { attributeFilter: ['style'] });
+    return { centers, bearings, observer };
+  });
+  await map.getByTestId('parking-marker-cec:492').click();
+  await expect(
+    map.getByRole('button', {
+      name: 'Open Street View for Raeburn Place near Dean Street',
+    }),
+  ).toBeVisible();
+  await expect(compass).not.toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
+  await expectPitch(map, 55);
+  await expect
+    .poll(() => cameraMotion.evaluate(({ centers }) => centers.length))
+    .toBe(2);
+  expect(
+    await cameraMotion.evaluate(({ bearings }) => bearings.size),
+  ).toBeGreaterThan(2);
+  await cameraMotion.evaluate(({ observer }) => observer.disconnect());
+});
+
+test('the 2D map still pans by dragging and zooms in and out', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 820 });
+  await page.goto(appUrl);
+  await expectRenderedBasemap(page);
+  const map = page.getByTestId('parking-map');
+  await expect(map).toHaveAttribute('data-map-terrain', 'none');
+  const canvas = (await map.locator('.maplibregl-canvas').boundingBox())!;
+  const zoom = () => map.getAttribute('data-map-zoom').then(Number);
+  const longitude = () =>
+    map.getAttribute('data-map-center-longitude').then(Number);
+  const start = await longitude();
+  const initialZoom = await zoom();
+  await page.mouse.move(canvas.x + 160, canvas.y + 270);
+  await page.mouse.down();
+  await page.mouse.move(canvas.x + 265, canvas.y + 300, { steps: 12 });
+  await page.mouse.up();
+  await expect.poll(longitude).toBeLessThan(start - 0.0001);
+  expect(await zoom()).toBe(initialZoom);
+  await map.getByRole('button', { name: 'Zoom in', exact: true }).click();
+  await expect.poll(zoom).toBeCloseTo(initialZoom + 1);
+  await map.getByRole('button', { name: 'Zoom out', exact: true }).click();
+  await expect.poll(zoom).toBeCloseTo(initialZoom);
+  await expectPitch(map, 0);
+  await expect(
+    map.getByRole('button', { name: /rank 1/ }).first(),
+  ).toBeVisible();
 });
 
 for (const satellite of [false, true]) {
@@ -50,7 +164,7 @@ for (const satellite of [false, true]) {
       await expect(map).toHaveAttribute('data-map-satellite', 'ready');
     }
     await page.getByRole('button', { name: 'Switch to 3D map' }).click();
-    await expectPitch(map, 55);
+    await expectPitch(map, 55, satellite ? 30_000 : 15_000);
     await expect(map).toHaveAttribute('data-cycle-network-contrast', 'high');
     await page.mouse.move(700, 250);
     await page.mouse.down({ button: 'right' });
@@ -80,11 +194,15 @@ for (const satellite of [false, true]) {
               (markers) =>
                 markers.filter((marker) => {
                   const r = marker.getBoundingClientRect();
+                  const canvas = document
+                    .querySelector('.maplibregl-canvas')
+                    ?.getBoundingClientRect();
                   return (
-                    r.x > 500 &&
-                    r.right < innerWidth &&
-                    r.y > 80 &&
-                    r.bottom < innerHeight
+                    canvas &&
+                    r.x > canvas.left + 24 &&
+                    r.right < canvas.right - 24 &&
+                    r.y > canvas.top + 80 &&
+                    r.bottom < canvas.bottom - 16
                   );
                 }).length,
             ),

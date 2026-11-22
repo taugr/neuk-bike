@@ -161,6 +161,25 @@ describe('bounded parking illustration placement', () => {
 });
 
 describe('model touch controls', () => {
+  it('keeps badges clear of map controls even when they sit beside an illustration', () => {
+    const area = { left: 0, right: 390, top: 80, bottom: 600 };
+    const toggle = { left: 328, right: 375, top: 160, bottom: 207 };
+    const layout = placeModelButtons(
+      [{ id: 'ranked', ground: { x: 352, y: 154 }, preferred: [0, 26] }],
+      [],
+      area,
+      [toggle],
+    );
+    const [x, y] = layout.get('ranked')!;
+    const badge = {
+      left: 330 + x,
+      right: 374 + x,
+      top: 132 + y,
+      bottom: 176 + y,
+    };
+    expect(boundsOverlap(badge, toggle, 2)).toBe(false);
+  });
+
   it('keeps dense 44px targets separated, visible, and outside nearby model roofs', () => {
     const area = { left: 0, right: 390, top: 80, bottom: 600 };
     const obstacles = [{ left: 130, right: 250, top: 240, bottom: 380 }];

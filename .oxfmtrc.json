@@ -8,6 +8,7 @@
     "public/data/parking/**",
     "public/data/cycling-pois/**",
     "public/data/cycle-network/**",
+    "public/data/edinburgh-buildings/index.json",
     "src/data/cycling-poi-report.json",
     "src/data/cycle-network-report.json"
   ],

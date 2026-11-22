@@ -1,0 +1,12 @@
+Princes Street roof texture
+https://creativecommons.org/licenses/by-sa/4.0/
+
+Source: Edinburgh Waverley railway station - aerial - 2025-04-19 02.jpg
+by 瑞丽江的河水, 19 April 2025, CC BY-SA 4.0.
+https://commons.wikimedia.org/wiki/File:Edinburgh_Waverley_railway_station_-_aerial_-_2025-04-19_02.jpg
+
+The photograph was projected onto the Scottish Phase 5 LiDAR surface,
+rectified, cropped, resampled and masked to the visible roofs.
+The LiDAR is Crown copyright Scottish Government and Fugro (2020),
+available under the Open Government Licence v3.0.
+https://registry.opendata.aws/scottish-lidar/

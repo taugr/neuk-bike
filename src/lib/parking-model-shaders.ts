@@ -33,13 +33,14 @@ export const parkingFragmentShader = `#version 300 es
       uniform vec3 u_view;
       uniform bool u_satellite;
       uniform bool u_outline;
+      uniform float u_opacity;
       uniform sampler2D u_surface;
       uniform bool u_surface_ready;
       out vec4 color;
       void main(){
         if(v_finish==6){
           float distanceFromSupport=length(v_normal.xy);
-          float alpha=0.24*(1.0-smoothstep(0.15,1.0,distanceFromSupport));
+          float alpha=u_opacity*0.24*(1.0-smoothstep(0.15,1.0,distanceFromSupport));
           color=vec4(vec3(0.05,0.07,0.06)*alpha,alpha);
           return;
         }
@@ -112,5 +113,5 @@ export const parkingFragmentShader = `#version 300 es
           // Mute light at fixtures' contact points so plates and rails read as grounded.
           lit*=mix(0.79,1.0,smoothstep(0.0,0.26,v_position.z));
         }
-        color=vec4(lit*alpha,alpha);
+        color=vec4(lit*alpha,alpha)*u_opacity;
       }`;

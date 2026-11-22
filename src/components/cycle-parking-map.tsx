@@ -5,17 +5,31 @@ import { useUnits } from '@/components/units-provider';
 
 import { improveDarkMapReadability } from '@/lib/map-readability';
 import { createMapRecovery } from '@/lib/map-recovery';
+import { parkingRevealBearing } from '@/lib/map-building-occlusion';
+import { isNearEdinburghBuildings } from '@/lib/edinburgh-building-area';
 import { useMapTerrain } from '@/components/use-map-terrain';
 import { useMapPinDensity } from '@/components/use-map-pin-density';
-import { terrainPitch } from '@/lib/map-terrain';
+import { terrainOrigin, terrainPitch } from '@/lib/map-terrain';
+import { lidarProtocol, loadLidarTerrainTile } from '@/lib/waverley-lidar';
 import { useMapSatellite } from '@/components/use-map-satellite';
 import {
+  isLocalAerialPreview,
+  isLocalEdinburghBuildingsPreview,
+  isLocalLidarPreview,
+  isLocalModeledFrontagePreview,
+  isLocalPrincesStreetPreview,
+} from '@/lib/local-aerial-preview';
+import {
+  addAerialBuildings,
+  aerialBuildingsLayerId,
   loadSatelliteTile,
   satelliteProtocol,
   satelliteSourceId,
 } from '@/lib/map-satellite';
 import {
   buildParkingModels,
+  getParkingModelMinZoom,
+  getParkingModelScale,
   parkingModelButtonOffset,
   parkingModelsZoom,
 } from '@/lib/parking-models';
@@ -129,6 +143,9 @@ maplibregl.setWorkerUrl(
   `/vendor/maplibre-gl/${maplibregl.getVersion()}/maplibre-gl-worker.mjs`,
 );
 maplibregl.addProtocol(satelliteProtocol, loadSatelliteTile);
+maplibregl.addProtocol(lidarProtocol, (request, controller) =>
+  loadLidarTerrainTile(request, controller, terrainOrigin),
+);
 
 type CycleParkingMapProps = {
   locale: AppLocale;
@@ -598,6 +615,25 @@ function centerPopupInVisibleMapArea(map: MapLibreMap, popup: MapLibrePopup) {
   });
 }
 
+function getMapControlBounds(map: MapLibreMap) {
+  const container = map.getContainer();
+  const origin = container.getBoundingClientRect();
+  return Array.from(
+    (container.parentElement ?? container).querySelectorAll(
+      '.maplibregl-ctrl-group, .map-terrain-toggle, .map-layers-trigger',
+    ),
+    (control) => {
+      const { left, right, top, bottom } = control.getBoundingClientRect();
+      return {
+        left: left - origin.left,
+        right: right - origin.left,
+        top: top - origin.top,
+        bottom: bottom - origin.top,
+      };
+    },
+  );
+}
+
 function keepPopupInVisibleMapArea(map: MapLibreMap, popup: MapLibrePopup) {
   if (!popup.isOpen()) return;
   const popupElement = popup.getElement();
@@ -703,20 +739,24 @@ function getPopupFocusCenter(
   zoom: number,
   mobileSheetState: 'collapsed' | 'expanded',
 ): [number, number] {
+  const target = getPopupTargetScreenPosition(map, toLngLat(point), popup);
+  return target
+    ? getMapPointCenterAtScreenPosition(map, point, zoom, target)
+    : getMapPointFocusCenter(map, point, zoom, mobileSheetState);
+}
+
+function getPopupTargetScreenPosition(
+  map: MapLibreMap,
+  location: [number, number],
+  popup: MapLibrePopup,
+) {
   const popupElement = popup.getElement();
-
-  if (!popup.isOpen() || !popupElement) {
-    return getMapPointFocusCenter(map, point, zoom, mobileSheetState);
-  }
-
+  if (!popup.isOpen() || !popupElement) return;
   const popupRect = popupElement.getBoundingClientRect();
-
-  if (popupRect.width === 0 || popupRect.height === 0) {
-    return getMapPointFocusCenter(map, point, zoom, mobileSheetState);
-  }
+  if (popupRect.width === 0 || popupRect.height === 0) return;
 
   const mapRect = map.getContainer().getBoundingClientRect();
-  const pointPosition = map.project(toLngLat(point));
+  const pointPosition = map.project(location);
   const popupCenter = {
     x: (popupRect.left + popupRect.right) / 2 - mapRect.left,
     y: (popupRect.top + popupRect.bottom) / 2 - mapRect.top,
@@ -727,10 +767,10 @@ function getPopupFocusCenter(
   };
   const visibleCenter = getVisibleMapArea(map).center;
 
-  return getMapPointCenterAtScreenPosition(map, point, zoom, {
+  return {
     x: visibleCenter.x - popupOffsetFromPoint.x,
     y: visibleCenter.y - popupOffsetFromPoint.y,
-  });
+  };
 }
 
 function isPointInVisibleMapArea(map: MapLibreMap, point: CycleRoutePoint) {
@@ -1934,6 +1974,7 @@ export default function CycleParkingMap({
   const suppressParkingViewFocusRef = useRef(false);
   const hasAppliedNearbyFocusRef = useRef(false);
   const isAutomaticFocusAnimationRef = useRef(false);
+  const parkingPinFocusRef = useRef<{ id: string; timer: number } | null>(null);
   const mobileSheetStateRef = useRef(mobileSheetState);
   const previousMobileSheetStateRef = useRef(mobileSheetState);
   const previousRouteSheetStateRef = useRef(mobileSheetState);
@@ -1966,6 +2007,27 @@ export default function CycleParkingMap({
     useState(0);
   const [renderedModelFeatureCount, setRenderedModelFeatureCount] = useState(0);
   const [styleRevision, setStyleRevision] = useState(0);
+  const [aerialPreview] = useState(isLocalAerialPreview);
+  const [lidarPreview] = useState(isLocalLidarPreview);
+  const [viewport, setViewport] = useState<{
+    bounds: ParkingMapBounds | null;
+    center: [number, number] | null;
+    zoom: number;
+    pitch: number;
+    terrainSource: string;
+  }>({
+    bounds: null,
+    center: null,
+    zoom: 13,
+    pitch: 0,
+    terrainSource: 'none',
+  });
+  const edinburghCity = aerialPreview
+    ? isLocalEdinburghBuildingsPreview()
+    : viewport.zoom >= 11 &&
+      isNearEdinburghBuildings(
+        viewport.center ?? [userLocation.longitude, userLocation.latitude],
+      );
   const basemapLayerIdsRef = useRef<string[]>([]);
   const satelliteLoaded = useMapSatellite(
     map,
@@ -1981,7 +2043,119 @@ export default function CycleParkingMap({
     isMapStyleLoaded,
     styleRevision,
     isOfflineBasemap,
+    isSatelliteVisible && (lidarPreview || edinburghCity),
+    isSatelliteVisible && edinburghCity,
   );
+  const aerialBuildingsEnabled =
+    isSatelliteVisible && satelliteLoaded && terrain.enabled;
+  const trueScaleParking =
+    aerialBuildingsEnabled && (aerialPreview || edinburghCity);
+  const cancelParkingPinFocus = useCallback(() => {
+    window.clearTimeout(parkingPinFocusRef.current?.timer);
+    parkingPinFocusRef.current = null;
+  }, []);
+  useEffect(
+    () => cancelParkingPinFocus,
+    [cancelParkingPinFocus, map, aerialBuildingsEnabled],
+  );
+  useEffect(() => {
+    if (route || isRoutePlanningMode) cancelParkingPinFocus();
+  }, [cancelParkingPinFocus, isRoutePlanningMode, route]);
+  const queueParkingPinFocus = useCallback(
+    (point: ParkingPoint) => {
+      cancelParkingPinFocus();
+      if (
+        !map ||
+        !aerialBuildingsEnabled ||
+        !map.getPitch() ||
+        !map.getLayer(aerialBuildingsLayerId)
+      )
+        return;
+      const mobile = window.matchMedia('(max-width: 820px)').matches;
+      const timer = window.setTimeout(
+        () => {
+          parkingPinFocusRef.current = null;
+          if (
+            mapRef.current !== map ||
+            selectedPointIdRef.current !== point.id ||
+            !map.getTerrain()
+          )
+            return;
+          const location = toLngLat(parkingPointToRoutePoint(point));
+          const popup = parkingMarkerRefs.current.get(point.id)?.popup;
+          const target =
+            (popup && getPopupTargetScreenPosition(map, location, popup)) ??
+            getVisibleMapArea(map).center;
+          const size = getMapSize(map);
+          const { left = 0, right = 0, top = 0, bottom = 0 } = map.getPadding();
+          const camera = {
+            bearing: map.getBearing(),
+            pitch: map.getPitch(),
+            zoom: Math.max(16, map.getZoom()),
+            offset: [
+              target.x - (size.x + left - right) / 2,
+              target.y - (size.y + top - bottom) / 2,
+            ] satisfies [number, number],
+          };
+          const display = getParkingModelDisplay(map, point.id);
+          const bearing = parkingRevealBearing(
+            map,
+            location,
+            display ? display.height / 2 : 0.5,
+            camera,
+          );
+          centeredCollapsedPopupPointRef.current = point.id;
+          centeredExpandedPopupPointRef.current = point.id;
+          hasCompletedNearbySelectionFocusRef.current = true;
+          isAutomaticFocusAnimationRef.current = true;
+          map.easeTo({
+            ...camera,
+            center: location,
+            bearing: bearing ?? camera.bearing,
+            duration: 850,
+            easing: (progress) => progress * progress * (3 - 2 * progress),
+          });
+        },
+        mobile ? 380 : 100,
+      );
+      // Own the explicit 3D pin focus while React opens and sizes its popup or sheet.
+      parkingPinFocusRef.current = { id: point.id, timer };
+    },
+    [aerialBuildingsEnabled, cancelParkingPinFocus, map],
+  );
+  useEffect(() => {
+    if (!map || !isMapStyleLoaded || !aerialBuildingsEnabled) return;
+    const removeBuildings = addAerialBuildings(map, edinburghCity);
+    if (!removeBuildings) return;
+    if (!aerialPreview && !edinburghCity) return removeBuildings;
+    let active = true;
+    let removeRoofs: (() => void) | undefined;
+    void import('@/lib/map-aerial-roofs')
+      .then(({ addAerialRoofs }) => {
+        if (active)
+          removeRoofs = addAerialRoofs(
+            map,
+            lidarPreview || edinburghCity,
+            edinburghCity,
+          );
+      })
+      .catch((error: unknown) => {
+        if (active) console.warn('Unable to load satellite roofs.', error);
+      });
+    return () => {
+      active = false;
+      removeRoofs?.();
+      removeBuildings();
+    };
+  }, [
+    aerialBuildingsEnabled,
+    aerialPreview,
+    edinburghCity,
+    isMapStyleLoaded,
+    lidarPreview,
+    map,
+    styleRevision,
+  ]);
   // Keep the initial loading background until the requested layers can render.
   // Later user toggles retain the current view while their tiles arrive.
   const isInitialViewReady =
@@ -2009,19 +2183,6 @@ export default function CycleParkingMap({
   terrainPitchRef.current = terrain.enabled ? terrainPitch : 0;
   const [selectedCycleNetworkRouteKey, setSelectedCycleNetworkRouteKey] =
     useState<string | null>(null);
-  const [viewport, setViewport] = useState<{
-    bounds: ParkingMapBounds | null;
-    center: [number, number] | null;
-    zoom: number;
-    pitch: number;
-    terrainSource: string;
-  }>({
-    bounds: null,
-    center: null,
-    zoom: 13,
-    pitch: 0,
-    terrainSource: 'none',
-  });
   const cycleNetworkBundles = useMemo(
     () => getCycleNetworkRouteBundles(cycleNetworkFeatures),
     [cycleNetworkFeatures],
@@ -2233,7 +2394,7 @@ export default function CycleParkingMap({
       : null;
   const showParkingModels =
     terrain.enabled &&
-    viewport.zoom >= parkingModelsZoom &&
+    viewport.zoom >= getParkingModelMinZoom(trueScaleParking) &&
     (!isDirectionsMode || routeModelPoint !== null);
 
   useEffect(() => {
@@ -2241,7 +2402,11 @@ export default function CycleParkingMap({
     const originals: FillExtrusionLayerSpecification[] = [];
     const flattenBuildings = () => {
       for (const layer of map.getStyle().layers ?? []) {
-        if (layer.type !== 'fill-extrusion') continue;
+        if (
+          layer.type !== 'fill-extrusion' ||
+          layer.id === aerialBuildingsLayerId
+        )
+          continue;
         originals.push(layer);
         map.setPaintProperty(layer.id, 'fill-extrusion-height', 0);
         map.setPaintProperty(layer.id, 'fill-extrusion-base', 0);
@@ -2287,6 +2452,7 @@ export default function CycleParkingMap({
     let attributionHideTimer: number | undefined;
     let isDisposed = false;
     const stopAutomaticFocusOnInteraction = () => {
+      cancelParkingPinFocus();
       if (selectedPointIdRef.current !== null) {
         hasUserAdjustedSelectionCameraRef.current = true;
       }
@@ -2553,6 +2719,7 @@ export default function CycleParkingMap({
       setRenderedModelFeatureCount(0);
     };
   }, [
+    cancelParkingPinFocus,
     closeCycleNetworkPopup,
     handleViewportChange,
     mapGeneration,
@@ -3327,8 +3494,13 @@ export default function CycleParkingMap({
     );
     const updateModels = () => {
       if (!isMapLoaded) return;
-      syncParkingModels(map, models, satelliteLoaded, () =>
-        getVisibleMapArea(map),
+      syncParkingModels(
+        map,
+        models,
+        satelliteLoaded,
+        () => getVisibleMapArea(map),
+        trueScaleParking,
+        trueScaleParking ? () => getMapControlBounds(map) : undefined,
       );
     };
     if (map.isStyleLoaded()) updateModels();
@@ -3505,27 +3677,32 @@ export default function CycleParkingMap({
       const interactionDisabled = isDirectionsMode && !isDestinationParkingMode;
       markerElement.tabIndex = interactionDisabled ? -1 : 0;
 
+      const activateMarker = () => {
+        if (isDestinationParkingMode) {
+          onSelectPoint(point.id);
+          return;
+        }
+        closeCycleNetworkPopup();
+        closeMarkerPopups(point.id);
+        renderedMarker.popup
+          ?.setLngLat(renderedMarker.marker.getLngLat())
+          .addTo(map);
+        if (pointCategory === 'parking' && !route && !isRoutePlanningMode)
+          queueParkingPinFocus(point);
+        if (
+          pointCategory === 'parking' &&
+          window.matchMedia('(max-width: 820px)').matches
+        ) {
+          onOpenDetails(point);
+        } else {
+          onSelectPoint(point.id);
+        }
+      };
       markerElement.onclick = interactionDisabled
         ? null
         : (event) => {
             event.stopImmediatePropagation();
-            if (isDestinationParkingMode) {
-              onSelectPoint(point.id);
-              return;
-            }
-            closeCycleNetworkPopup();
-            closeMarkerPopups(point.id);
-            renderedMarker.popup
-              ?.setLngLat(renderedMarker.marker.getLngLat())
-              .addTo(map);
-            if (
-              pointCategory === 'parking' &&
-              window.matchMedia('(max-width: 820px)').matches
-            ) {
-              onOpenDetails(point);
-            } else {
-              onSelectPoint(point.id);
-            }
+            activateMarker();
           };
       markerElement.onkeydown = interactionDisabled
         ? null
@@ -3536,23 +3713,7 @@ export default function CycleParkingMap({
 
             event.preventDefault();
             event.stopImmediatePropagation();
-            if (isDestinationParkingMode) {
-              onSelectPoint(point.id);
-              return;
-            }
-            closeCycleNetworkPopup();
-            closeMarkerPopups(point.id);
-            renderedMarker.popup
-              ?.setLngLat(renderedMarker.marker.getLngLat())
-              .addTo(map);
-            if (
-              pointCategory === 'parking' &&
-              window.matchMedia('(max-width: 820px)').matches
-            ) {
-              onOpenDetails(point);
-            } else {
-              onSelectPoint(point.id);
-            }
+            activateMarker();
           };
 
       if (isSelected) {
@@ -3739,6 +3900,7 @@ export default function CycleParkingMap({
     onRequestDirections,
     onSelectPoint,
     onToggleSavedPoint,
+    queueParkingPinFocus,
     parkingView,
     rankedPointRanks,
     route,
@@ -3749,12 +3911,20 @@ export default function CycleParkingMap({
     routeModelPoint,
     highlightRouteArrival,
     satelliteLoaded,
+    aerialBuildingsEnabled,
+    trueScaleParking,
     isMapLoaded,
     styleRevision,
   ]);
 
   useEffect(() => {
-    if (!map || !selectedPoint || route || isDestinationParkingMode) {
+    if (
+      !map ||
+      !selectedPoint ||
+      route ||
+      isDestinationParkingMode ||
+      parkingPinFocusRef.current?.id === selectedPoint.id
+    ) {
       return;
     }
 
@@ -3894,6 +4064,8 @@ export default function CycleParkingMap({
 
     const previousMobileSheetState = previousMobileSheetStateRef.current;
     previousMobileSheetStateRef.current = mobileSheetState;
+    if (selectedPoint && parkingPinFocusRef.current?.id === selectedPoint.id)
+      return;
     const isNewExpandedSelection =
       window.matchMedia('(max-width: 820px)').matches &&
       mobileSheetState === 'expanded' &&
@@ -4037,6 +4209,14 @@ export default function CycleParkingMap({
     if (!selectedPoint && selectedPointId !== null && !route) {
       return;
     }
+    if (
+      !route &&
+      selectedPoint &&
+      parkingPinFocusRef.current?.id === selectedPoint.id
+    ) {
+      previousFocusTargetRef.current = nextFocusTarget;
+      return;
+    }
     const needsInitialNearbySelectionFocus =
       selectedPoint !== null &&
       selectedPoint.id === nearestPoint?.id &&
@@ -4177,8 +4357,58 @@ export default function CycleParkingMap({
       return;
     }
 
+    if (
+      !hasAppliedNearbyFocusRef.current &&
+      isLocalEdinburghBuildingsPreview() &&
+      terrainPitchRef.current > 0
+    ) {
+      const query = new URLSearchParams(window.location.search);
+      if (
+        query.has('lat') &&
+        query.has('lng') &&
+        userLocation.latitude === Number(query.get('lat')) &&
+        userLocation.longitude === Number(query.get('lng'))
+      ) {
+        hasAppliedNearbyFocusRef.current = true;
+        const landmark = query.get('landmark');
+        map.jumpTo({
+          center: [userLocation.longitude, userLocation.latitude],
+          pitch: terrainPitchRef.current,
+          ...(landmark === 'castle'
+            ? { bearing: -81, zoom: 18.05 }
+            : landmark === 'castle-north'
+              ? { bearing: 157, zoom: 17.8 }
+              : landmark === 'edinburgh-city'
+                ? { zoom: 12.6 }
+                : { zoom: 17 }),
+        });
+        return;
+      }
+    }
     if (focusPoints.length > 0) {
       hasAppliedNearbyFocusRef.current = true;
+      if (
+        aerialPreview &&
+        userLocation.latitude === defaultCenter[0] &&
+        userLocation.longitude === defaultCenter[1]
+      ) {
+        map.jumpTo(
+          isLocalPrincesStreetPreview() || isLocalModeledFrontagePreview()
+            ? {
+                bearing: -18,
+                center: [-3.19065, 55.95302],
+                pitch: terrainPitchRef.current,
+                zoom: 18.1,
+              }
+            : {
+                bearing: 150,
+                center: toLngLat(defaultCenter),
+                pitch: terrainPitchRef.current,
+                zoom: parkingModelsZoom,
+              },
+        );
+        return;
+      }
       const bounds = createBounds([
         currentLocationPoint,
         ...focusPoints.map(parkingPointToRoutePoint),
@@ -4201,6 +4431,7 @@ export default function CycleParkingMap({
       zoom: 16,
     });
   }, [
+    aerialPreview,
     currentLocationFocusRequestId,
     highlightedPoints,
     map,
@@ -4298,6 +4529,11 @@ export default function CycleParkingMap({
           satelliteLoaded ? 'ready' : isSatelliteVisible ? 'loading' : 'off'
         }
         data-parking-model-features={renderedModelFeatureCount}
+        data-parking-model-scale={
+          (aerialPreview || edinburghCity) && showParkingModels
+            ? getParkingModelScale(trueScaleParking)
+            : undefined
+        }
         data-parking-model-contrast={satelliteLoaded ? 'high' : 'standard'}
         data-rendered-basemap-features={renderedBasemapFeatureCount}
         data-cycle-network-contrast={

@@ -1,0 +1,253 @@
+{
+  "sections": [
+    { "through": 448, "stone": 1, "cornice": 146 },
+    { "through": 681, "stone": 2, "cornice": 53 },
+    { "through": 805, "stone": 3, "cornice": 88 },
+    { "through": 1535, "stone": 4, "cornice": 81, "rise": 20 }
+  ],
+  "rows": [
+    {
+      "centres": [36, 113, 184, 260, 339, 382, 408],
+      "width": 24,
+      "top": 165,
+      "bottom": 193,
+      "style": "sash",
+      "panes": 2
+    },
+    {
+      "centres": [36, 113, 181, 258, 338, 382, 410],
+      "width": 24,
+      "top": 212,
+      "bottom": 242,
+      "style": "sash",
+      "panes": 2
+    },
+    {
+      "centres": [55, 120, 158, 253, 331, 389],
+      "width": 28,
+      "top": 269,
+      "bottom": 295,
+      "style": "sash",
+      "panes": 2
+    },
+    {
+      "centres": [488, 530, 552, 624, 650],
+      "width": 19,
+      "top": 82,
+      "bottom": 121,
+      "style": "arch",
+      "panes": 2
+    },
+    {
+      "centres": [479],
+      "width": 25,
+      "top": 158,
+      "bottom": 203,
+      "style": "sash",
+      "panes": 2
+    },
+    {
+      "centres": [542, 630],
+      "width": 56,
+      "top": 154,
+      "bottom": 202,
+      "style": "bay",
+      "panes": 3
+    },
+    {
+      "centres": [478],
+      "width": 29,
+      "top": 235,
+      "bottom": 296,
+      "style": "arch",
+      "panes": 2
+    },
+    {
+      "centres": [539, 624],
+      "width": 56,
+      "top": 227,
+      "bottom": 283,
+      "style": "bay",
+      "panes": 3
+    },
+    {
+      "centres": [725, 747, 774],
+      "width": 19,
+      "top": 101,
+      "bottom": 130,
+      "style": "sash",
+      "panes": 2
+    },
+    {
+      "centres": [743],
+      "width": 43,
+      "top": 159,
+      "bottom": 200,
+      "style": "bay",
+      "panes": 2
+    },
+    {
+      "centres": [743],
+      "width": 43,
+      "top": 219,
+      "bottom": 263,
+      "style": "bay",
+      "panes": 2
+    },
+    {
+      "centres": [
+        865, 912, 960, 1007, 1056, 1103, 1154, 1204, 1257, 1310, 1366, 1421,
+        1470
+      ],
+      "width": 23,
+      "top": 104,
+      "bottom": 128,
+      "rise": 26,
+      "style": "sash",
+      "panes": 2
+    },
+    {
+      "centres": [
+        821, 866, 912, 961, 1008, 1055, 1106, 1157, 1209, 1260, 1311, 1367,
+        1420, 1470
+      ],
+      "width": 34,
+      "top": 160,
+      "bottom": 192,
+      "rise": 17,
+      "style": "fan",
+      "panes": 3
+    },
+    {
+      "centres": [
+        821, 866, 912, 961, 1008, 1055, 1106, 1157, 1209, 1260, 1311, 1367,
+        1420, 1470
+      ],
+      "width": 35,
+      "top": 216,
+      "bottom": 270,
+      "rise": 18,
+      "style": "tall",
+      "panes": 3
+    }
+  ],
+  "shops": [
+    {
+      "from": 23,
+      "to": 177,
+      "top": 337,
+      "bottom": 391,
+      "fascia": 8,
+      "panes": 4,
+      "door": [0.67, 0.84]
+    },
+    {
+      "from": 199,
+      "to": 446,
+      "top": 329,
+      "bottom": 391,
+      "fascia": 9,
+      "panes": 5,
+      "door": [0.08, 0.19]
+    },
+    {
+      "from": 459,
+      "to": 516,
+      "top": 324,
+      "bottom": 391,
+      "fascia": 10,
+      "panes": 2,
+      "door": [0.13, 0.83]
+    },
+    {
+      "from": 524,
+      "to": 673,
+      "top": 324,
+      "bottom": 391,
+      "fascia": 11,
+      "panes": 4,
+      "door": [0.5, 0.73]
+    },
+    {
+      "from": 692,
+      "to": 802,
+      "top": 325,
+      "bottom": 392,
+      "fascia": 12,
+      "panes": 3
+    },
+    {
+      "from": 839,
+      "to": 910,
+      "top": 328,
+      "bottom": 393,
+      "fascia": 13,
+      "panes": 3
+    },
+    {
+      "from": 922,
+      "to": 1108,
+      "top": 309,
+      "bottom": 393,
+      "fascia": 4,
+      "panes": 4
+    },
+    {
+      "from": 1120,
+      "to": 1178,
+      "top": 309,
+      "bottom": 393,
+      "fascia": 4,
+      "panes": 2
+    },
+    {
+      "from": 1202,
+      "to": 1280,
+      "top": 306,
+      "bottom": 393,
+      "fascia": 4,
+      "panes": 2
+    },
+    {
+      "from": 1292,
+      "to": 1348,
+      "top": 306,
+      "bottom": 393,
+      "fascia": 4,
+      "panes": 2
+    },
+    {
+      "from": 1360,
+      "to": 1432,
+      "top": 305,
+      "bottom": 393,
+      "fascia": 4,
+      "panes": 2
+    },
+    {
+      "from": 1445,
+      "to": 1512,
+      "top": 304,
+      "bottom": 393,
+      "fascia": 4,
+      "panes": 2
+    }
+  ],
+  "seams": [448, 681, 805],
+  "piers": {
+    "positions": [
+      845, 889, 936, 984, 1032, 1081, 1132, 1183, 1235, 1286, 1340, 1394, 1445,
+      1500
+    ],
+    "top": 146,
+    "bottom": 270,
+    "rise": 19
+  },
+  "trim": [
+    { "from": 20, "to": 444, "top": 146, "bottom": 151 },
+    { "from": 450, "to": 677, "top": 58, "bottom": 64 },
+    { "from": 688, "to": 799, "top": 146, "bottom": 151 },
+    { "from": 816, "to": 1523, "top": 135, "bottom": 141, "rise": 25 },
+    { "from": 815, "to": 1523, "top": 269, "bottom": 274, "rise": 11 }
+  ]
+}

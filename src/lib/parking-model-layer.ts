@@ -17,8 +17,8 @@ import {
 } from 'maplibre-gl';
 import {
   createParkingMesh,
-  parkingModelScale,
-  parkingModelsZoom,
+  getParkingModelMinZoom,
+  getParkingModelScale,
   type ParkingMesh,
   type ParkingModel,
 } from './parking-models';
@@ -35,6 +35,7 @@ import {
 export type ParkingModelDisplay = {
   longitude: number;
   latitude: number;
+  height: number;
   ground: { x: number; y: number };
   anchor: { x: number; y: number };
   bounds: ModelBounds;
@@ -66,6 +67,7 @@ const uniformNames = [
   'u_satellite',
   'u_expand',
   'u_outline',
+  'u_opacity',
   'u_view',
   'u_matrix',
   'u_surface',
@@ -87,6 +89,7 @@ function meshBounds(mesh: ParkingMesh): MeshBounds {
   return { min, max };
 }
 type PlacedMesh = {
+  opacity: number;
   model: ParkingModel;
   gpu: GpuMesh;
   matrix: Float32Array;
@@ -141,7 +144,9 @@ class ParkingLayer implements CustomLayerInterface {
   renderingMode = '3d' as const;
   models: ParkingModel[] = [];
   satelliteContrast = false;
+  trueScale = false;
   getVisibleArea?: () => ModelBounds;
+  getControlBounds?: () => ModelBounds[];
   renderedCount = 0;
   display = new globalThis.Map<string, ParkingModelDisplay>();
   private layout: ModelPlacement[] = [];
@@ -287,7 +292,8 @@ class ParkingLayer implements CustomLayerInterface {
   render(gl: WebGL2RenderingContext, args: CustomRenderMethodInput) {
     this.renderedCount = 0;
     this.placed = [];
-    if (this.map.getZoom() < parkingModelsZoom || !this.models.length) {
+    const zoom = this.map.getZoom();
+    if (zoom < getParkingModelMinZoom(this.trueScale) || !this.models.length) {
       this.display.clear();
       this.layout = [];
       this.layoutKey = '';
@@ -296,6 +302,7 @@ class ParkingLayer implements CustomLayerInterface {
     // Compile only when there is something to draw. Context restoration
     // explicitly invalidates handles, avoiding a GPU validity query per frame.
     if (!this.program) this.initialize(gl);
+    const scale = getParkingModelScale(this.trueScale);
     const width = this.map.getCanvas().clientWidth,
       height = this.map.getCanvas().clientHeight;
     const modelById = new globalThis.Map(
@@ -319,7 +326,7 @@ class ParkingLayer implements CustomLayerInterface {
       const matrix = modelMatrix(
         args.defaultProjectionData.mainMatrix,
         origin,
-        origin.meterInMercatorCoordinateUnits() * parkingModelScale,
+        origin.meterInMercatorCoordinateUnits() * scale,
       );
       const key = `${model.kind}:${model.covered}`;
       // Always reserve the selected outline too, so selection never moves neighbours.
@@ -337,14 +344,20 @@ class ParkingLayer implements CustomLayerInterface {
       );
       const ground = project(matrix, 0, 0, 0, width, height);
       // Reserve the satellite silhouette in both styles to avoid style-driven shuffling.
-      const padding = 2;
+      const padding = this.trueScale ? 0 : 2;
       const bounds = {
         left: Math.min(...corners.map((p) => p.x)) - padding,
         right: Math.max(...corners.map((p) => p.x)) + padding,
         top: Math.min(...corners.map((p) => p.y)) - padding,
         bottom: Math.max(...corners.map((p) => p.y)) + padding,
       };
-      return { ...position, ground, bounds, matrix };
+      return {
+        ...position,
+        ground,
+        bounds,
+        matrix,
+        height: extent.max[2] * scale,
+      };
     };
     const projection = (id: string, offset: ModelOffset) => {
       const key = `${id}:${offset.east}:${offset.north}`;
@@ -385,7 +398,8 @@ class ParkingLayer implements CustomLayerInterface {
       area.bottom,
       center.lng,
       center.lat,
-      this.map.getZoom(),
+      zoom,
+      scale,
       this.map.getPitch(),
       this.map.getBearing(),
       ids.map((id) => {
@@ -401,11 +415,15 @@ class ParkingLayer implements CustomLayerInterface {
           .filter((p) => p.members.length === 1)
           .map((p) => [p.id, p.offset]),
       );
-      this.layout = placeParkingModels({
-        ids,
-        previous,
-        project: (id, offset) => projection(id, offset).bounds,
-      });
+      // In the aerial view the actual fixtures stay put. Only their touch
+      // controls are laid out in screen space when they would overlap.
+      this.layout = this.trueScale
+        ? ids.map((id) => ({ id, offset: zero, members: [id] }))
+        : placeParkingModels({
+            ids,
+            previous,
+            project: (id, offset) => projection(id, offset).bounds,
+          });
       this.layoutKey = key;
       this.buttonOffsets.clear();
     }
@@ -419,10 +437,18 @@ class ParkingLayer implements CustomLayerInterface {
         const other = modelById.get(id)!;
         return other.kind !== model.kind || other.covered !== model.covered;
       });
-      if (!neutral) {
+      const size = Math.max(
+        position.bounds.right - position.bounds.left,
+        position.bounds.bottom - position.bounds.top,
+      );
+      const opacity = this.trueScale
+        ? Math.min(1, Math.max(0, (size - 0.8) / 2.2))
+        : 1;
+      if (!neutral && opacity > 0) {
         const selected = members.some((id) => modelById.get(id)!.selected);
         const rendered = { ...model, selected };
         this.placed.push({
+          opacity,
           model: rendered,
           gpu: this.gpu(gl, rendered),
           matrix: position.matrix,
@@ -467,6 +493,7 @@ class ParkingLayer implements CustomLayerInterface {
         })),
         this.placed.map((p) => p.bounds),
         area,
+        this.getControlBounds?.(),
       );
     }
     for (const [id, value] of this.display)
@@ -485,7 +512,8 @@ class ParkingLayer implements CustomLayerInterface {
     const outlineLocation = uniforms.u_outline;
     const pixelRatio = gl.drawingBufferWidth / Math.max(1, width);
     // Give subpixel tubes a little more body at the first model zooms.
-    const expansion = this.satelliteContrast
+    const hasOutline = this.satelliteContrast && !this.trueScale;
+    const expansion = hasOutline
       ? Math.max(0, 19 - this.map.getZoom()) * 0.3 * pixelRatio
       : 0;
     // Preserve MapLibre's depth range, which reserves space for map layers.
@@ -509,16 +537,17 @@ class ParkingLayer implements CustomLayerInterface {
       const surface = placed.gpu[part];
       if (!surface) return;
       gl.uniformMatrix4fv(matrixLocation, false, placed.matrix);
+      gl.uniform1f(uniforms.u_opacity, placed.opacity);
       gl.bindVertexArray(surface.vao);
       gl.drawArrays(gl.TRIANGLES, 0, data.length / stride);
     };
-    if (this.map.getZoom() >= parkingSurfaceMapZoom) {
+    if (this.trueScale || zoom >= parkingSurfaceMapZoom) {
       gl.depthMask(false);
       gl.uniform1i(outlineLocation, 0);
       gl.uniform1f(expandLocation, 0);
       for (const placed of this.placed) draw(placed, 'shadow');
     }
-    if (this.satelliteContrast) {
+    if (hasOutline) {
       // Paint the narrow silhouette first without writing depth, so the real
       // surfaces cover its interior. Glazing keeps its open, transparent shape.
       gl.depthMask(false);
@@ -629,6 +658,8 @@ export function syncParkingModels(
   models: ParkingModel[],
   satelliteContrast = false,
   getVisibleArea?: () => ModelBounds,
+  trueScale = false,
+  getControlBounds?: () => ModelBounds[],
 ) {
   let layer = layers.get(map);
   if (!map.getLayer(parkingModelsLayer)) {
@@ -639,6 +670,8 @@ export function syncParkingModels(
   layer!.models = models;
   layer!.getVisibleArea = getVisibleArea;
   layer!.satelliteContrast = satelliteContrast;
+  layer!.trueScale = trueScale;
+  layer!.getControlBounds = getControlBounds;
   map.triggerRepaint();
 }
 export const getParkingModelRenderCount = (map: Map) =>

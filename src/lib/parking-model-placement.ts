@@ -266,6 +266,11 @@ export function offsetModelLocation(
   };
 }
 
+const badgeOffsets = Array.from(
+  { length: 17 * 17 },
+  (_, i) => [((i % 17) - 8) * 46, (Math.floor(i / 17) - 8) * 46] as const,
+).sort((a, b) => Math.hypot(...a) - Math.hypot(...b));
+
 /** Keep 44px controls clear of both other controls and the illustrations. */
 export function placeModelButtons(
   buttons: {
@@ -275,6 +280,7 @@ export function placeModelButtons(
   }[],
   obstacles: ModelBounds[],
   area: ModelBounds,
+  controls: ModelBounds[] = [],
 ): Map<string, [number, number]> {
   const result = new Map<string, [number, number]>();
   const occupied: ModelBounds[] = [];
@@ -301,28 +307,23 @@ export function placeModelButtons(
       result.set(button.id, preferred);
       continue;
     }
-    const options: [number, number][] = [];
-    for (let row = -8; row <= 8; row++)
-      for (let column = -8; column <= 8; column++)
-        options.push([preferred[0] + column * 46, preferred[1] + row * 46]);
-    options.sort(
-      (a, b) =>
-        Math.hypot(a[0] - preferred[0], a[1] - preferred[1]) -
-        Math.hypot(b[0] - preferred[0], b[1] - preferred[1]),
-    );
     const available = (offset: [number, number], avoidModels: boolean) => {
       const bounds = box(offset);
       return (
         inArea(bounds) &&
+        !controls.some((control) => boundsOverlap(bounds, control, 2)) &&
         !occupied.some((other) => boundsOverlap(bounds, other, 2)) &&
         (!avoidModels ||
           !obstacles.some((other) => boundsOverlap(bounds, other, 2)))
       );
     };
-    const offset =
-      options.find((o) => available(o, true)) ??
-      options.find((o) => available(o, false)) ??
-      preferred;
+    const findOffset = (avoidModels: boolean) => {
+      for (const [x, y] of badgeOffsets) {
+        const offset: [number, number] = [preferred[0] + x, preferred[1] + y];
+        if (available(offset, avoidModels)) return offset;
+      }
+    };
+    const offset = findOffset(true) ?? findOffset(false) ?? preferred;
     occupied.push(box(offset));
     result.set(button.id, offset);
   }

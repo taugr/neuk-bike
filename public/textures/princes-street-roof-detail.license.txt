@@ -1,0 +1,19 @@
+Princes Street roof detail
+
+Sources: Edinburgh, Scotland, two 4K drone clips by Nick Hawkes, published
+21 January 2024 on Pexels. The frames were registered to the measured roofs,
+rectified, masked for visibility, and combined into a 3D map texture.
+The main deck retains its photographed colour. The adjacent roofs retain
+local colour and surface detail from the footage as contrast over the map shading.
+East view, 00:31: https://www.pexels.com/video/edinburgh-scotland-19951743/
+North view, 00:29: https://www.pexels.com/video/edinburgh-scotland-19951740/
+https://www.pexels.com/license/
+
+Registration uses Scottish Phase 5 LiDAR, Crown copyright Scottish
+Government and Fugro (2020), Open Government Licence v3.0.
+https://registry.opendata.aws/scottish-lidar/
+
+To regenerate from the original 4K clips:
+ffmpeg -ss 31 -i <east.mp4> -frames:v 1 <east.png>
+ffmpeg -ss 29 -i <north.mp4> -frames:v 1 <north.png>
+python3 scripts/build-princes-street-roof-photo.py --detail-frame --north-frame <north.png> <east.png>

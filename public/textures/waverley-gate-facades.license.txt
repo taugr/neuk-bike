@@ -1,0 +1,8 @@
+waverley-gate-facades.webp
+
+Source: Waverly Gate or Old GPO.jpg by SylviaStanley
+https://commons.wikimedia.org/wiki/File:Waverly_Gate_or_Old_GPO.jpg
+
+The north and west façades were cropped, perspective-corrected, resized and
+combined into a single texture. The texture is licensed under CC BY-SA 4.0.
+https://creativecommons.org/licenses/by-sa/4.0/

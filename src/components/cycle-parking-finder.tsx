@@ -2,6 +2,7 @@
 import { rainStorageKey, weatherSummary } from '@/lib/rain';
 import { useRainForecast } from '@/components/rain-forecast';
 import { satelliteStorageKey } from '@/lib/map-satellite';
+import { isLocalAerialPreview } from '@/lib/local-aerial-preview';
 import { resolveUnits } from '@/lib/units';
 import { useUnits } from '@/components/units-provider';
 
@@ -992,6 +993,10 @@ export default function CycleParkingFinder() {
     setSatelliteUnavailable(true);
   }, []);
   useEffect(() => {
+    if (isLocalAerialPreview()) {
+      setIsSatelliteVisible(true);
+      return;
+    }
     try {
       setIsSatelliteVisible(
         window.localStorage.getItem(satelliteStorageKey) === 'true',

@@ -116,6 +116,192 @@ The marker sits above the model with a short connecting line. Selecting the
 arrival instruction highlights this marker instead of adding a second pin.
 Ordinary place destinations and the route overview keep their simple markers.
 
+For the [Waverley aerial preview](http://127.0.0.1:4181/?lat=55.9533&lng=-3.1883&aerialPreview=1),
+serve the static export locally. It opens in 3D Satellite with surveyed terrain and
+roof profiles over roughly 560 × 445 metres. OpenFreeMap supplies the footprints.
+The roofs use a filtered colour sample from inside each footprint, with shaded
+surfaces and defined edges. Roof materials are modelled with smoothed lighting
+across the surveyed geometry. Waverley Station has metal framing and glazed panes,
+and the other roof finishes are illustrative. From zoom 18, the preview reuses
+aerial tiles to add fine surface detail within visible footprints. It uses a
+finer imagery level from zoom 19 and falls back to the coarser tiles when needed.
+The shader softens roof outlines and suppresses broad or over-zoomed photo detail.
+The LiDAR assets load in Satellite and 3D together.
+
+The [shaded buildings preview](http://127.0.0.1:4181/?lat=55.95336&lng=-3.19059&aerialPreview=1&buildings=shaded)
+uses the surveyed roof profiles and building footprints with plain walls and
+directional shading. The satellite imagery stays on the ground. Zoom in around
+Princes Street to compare it with the photographed façade and roof previews.
+At close zoom, the shaded preview loads a half-metre elevation grid for
+10–25 Princes Street so the mesh can retain smaller surveyed roof features.
+Six frontage spans have repeated laser returns at consistent heights. Narrow
+3D bands mark those spans, with approximate depth. The survey does not resolve
+individual windows or doors reliably. The bands were checked against the
+Phase 5 LAS tiles NT2573 and NT2574, using the median elevation and central
+90% of the along-street range of each selected group of façade returns.
+
+The [modelled façade preview](http://127.0.0.1:4181/?lat=55.9533&lng=-3.1883&aerialPreview=1&buildings=shaded&facades=model)
+adds recessed windows, projecting bays, shopfronts and street entrances from
+zoom 18 on the Princes Street side of the block. Storefront colours, window
+arrangements and trim were traced from the [street photo references](public/textures/princes-street-facades.license.txt).
+The building surfaces use geometry and shaded materials. The window and
+door depths are approximate. Where the LiDAR grid rounds off a street-facing
+eave, the local preview fits the cornice using the trace and nearby roof
+elevations. Façades outside the reference coverage use the plain shaded finish.
+The roof shader adds slate courses on the smaller roofs, sheet seams on the
+lighter east deck, and shadows around the two surveyed lightwells. The deck
+levels out between the lightwells, and fine seams fade across steep or uneven
+survey surfaces. The finishes
+are inferred from [aerial reference frames](public/textures/princes-street-roof-detail.license.txt).
+The shader generates the patterns over the LiDAR mesh without loading roof
+photographs.
+
+Waverley Gate uses a rectified photograph on its Waterloo Place and North
+Bridge façades, aligned to the surveyed building height.
+The [Princes Street façade preview](http://127.0.0.1:4181/?lat=55.9533&lng=-3.1883&aerialPreview=1&facades=princes)
+shows the photographed south-facing row at 10–25 Princes Street. One WebP
+texture loads from zoom 18 when that frontage is in view. Shaded walls fill
+areas the photos could not capture clearly. The
+[source notes](public/textures/princes-street-facades.license.txt) list the
+four photographs and their licences. To regenerate the texture with
+ImageMagick, run `python3 scripts/build-princes-street-facades.py <photo-directory>`
+with the JPEG filenames listed in the notes.
+The [Princes Street roof photo preview](http://127.0.0.1:4181/?lat=55.9533&lng=-3.1883&aerialPreview=1&facades=princes&roofs=photo)
+uses a CC BY-SA drone photograph from April 2025 on the visible roof
+surfaces of that block. A mask leaves hidden and uncertain areas shaded.
+The texture loads from zoom 18 when the block is in view. Remove
+`&roofs=photo` to compare the same camera with the shaded roofs.
+To rebuild, use `python3 scripts/build-princes-street-roof-photo.py <original-jpeg>`
+with the Python dependencies for the LiDAR script. The
+[roof photo credits](public/textures/princes-street-roofs.license.txt)
+link the original image and survey.
+The [roof detail preview](http://127.0.0.1:4181/?lat=55.9533&lng=-3.1883&aerialPreview=1&facades=princes&roofs=detail)
+uses two registered 4K drone frames across 10–25 Princes Street. The frames
+show the main deck and parts of the smaller roofs and slopes beside it.
+The smaller roofs use photographed details over the shaded LiDAR finish,
+which also fills gaps in coverage. Use `roofs=photo`
+to compare with the original drone photo. The
+[detail texture credits](public/textures/princes-street-roof-detail.license.txt)
+include the source and rebuild steps.
+Street-facing shopfronts use mapped businesses and local street geometry.
+Display windows and doorways are modelled at the surveyed pavement height.
+Parking models in the 3D Satellite previews use fixed metre dimensions at their
+mapped locations. The perspective view shrinks them with distance, and they
+fade as they become too small to resolve. Their badges retain their touch target.
+
+The [preview without local LiDAR](http://127.0.0.1:4181/?lat=55.9533&lng=-3.1883&aerialPreview=1&lidar=0)
+is available for comparison.
+
+To regenerate the local tiles and surface grid, run
+`python3 scripts/build-waverley-lidar.py` in a Python environment with
+`rasterio`, `numpy`, and `Pillow`. The script reads cropped sections of the
+Scottish Phase 5 NT27SE 50 cm terrain and surface rasters and uses Mapzen
+elevation along the terrain boundary. The surface grid stores paired surface
+and ground elevations in decimetres. Crown copyright Scottish Government and
+Fugro (2020). [Scottish Public Sector LiDAR and licence](https://registry.opendata.aws/scottish-lidar/)
+· [Mapzen elevation attribution](https://github.com/tilezen/joerd/blob/master/docs/attribution.md).
+Add `--princes-roofs-only` to rebuild only the detailed Princes Street roof grid.
+
+### Edinburgh 3D buildings
+
+Switch on Satellite in Map layers and use the 3D button to see buildings.
+Edinburgh uses detailed meshes with LiDAR terrain. Elsewhere the same view
+shows OpenFreeMap buildings where height data is available. Select a neuk
+behind a building to turn to a clear angle when the map can find one.
+
+Open the local citywide 3D Satellite view at
+[Grassmarket](http://127.0.0.1:4181/?lat=55.94735&lng=-3.197&aerialPreview=1&buildings=edinburgh),
+[Stockbridge](http://127.0.0.1:4181/?lat=55.95875&lng=-3.2097&aerialPreview=1&buildings=edinburgh),
+[Old Town](http://127.0.0.1:4181/?lat=55.94991&lng=-3.18896&aerialPreview=1&buildings=edinburgh),
+[New Town](http://127.0.0.1:4181/?lat=55.95151&lng=-3.20736&aerialPreview=1&buildings=edinburgh),
+[the Shore in Leith](http://127.0.0.1:4181/?lat=55.9763&lng=-3.1693&aerialPreview=1&buildings=edinburgh),
+[Portobello](http://127.0.0.1:4181/?lat=55.9532&lng=-3.1134&aerialPreview=1&buildings=edinburgh),
+or [South Queensferry](http://127.0.0.1:4181/?lat=55.9905&lng=-3.3975&aerialPreview=1&buildings=edinburgh).
+The [city overview](http://127.0.0.1:4181/?lat=55.9489&lng=-3.2104&aerialPreview=1&buildings=edinburgh&landmark=edinburgh-city)
+starts with a wider view. It streams up to nine detailed tiles close to the
+camera, compact neighbourhood tiles farther away and a lighter mesh for the
+remaining districts. All three use the same mapped footprints and roof
+height source. The wider meshes use fewer roof samples and omit recessed
+openings. The neighbourhood budget is 12 tiles, 8 MiB compressed and 1 million
+triangles. The city overview budget is 12 tiles, 12 MiB compressed and 1.5
+million triangles. The edge of the streamed area blends into the imagery, and
+the city geometry fades between zoom 12 and 11. OpenFreeMap extrusions provide
+context beyond the city boundary. The renderer requests nearby tiles during pan
+and zoom and keeps overlapping meshes visible while replacements load. Newly
+covered areas fade in, and a lossless encoding reduces the size of the city
+overview downloads. When you select a neuk hidden by an Edinburgh building,
+the map turns around the pin if it finds a clear view. The build
+matches mapped footprints with surveyed roof elevations. Buildings with
+insufficient roof returns use mapped heights or typical heights for their type.
+The surveyed terrain blends into the surrounding Mapzen elevation tiles.
+The shaders give roofs and walls illustrative finishes. Shaded seams follow
+shared walls in OpenStreetMap. Where a terrace has one outline and a consistent
+row of mapped entrances or addresses, the map estimates divisions between them.
+The Stockbridge preview adds recessed sash windows, dressed stone sills and
+street-facing doors to selected rows around Malta Terrace, Saxe-Coburg Place
+and Dean Terrace. Opening positions are estimated from the building footprints
+and street alignment. The Saxe-Coburg details draw on the
+[Historic Environment Scotland description](https://portal.historicenvironment.scot/apex/f?p=1505:300:::::VIEWTYPE,VIEWREF:designation,LB29763).
+Within the Old Town and New Town conservation areas, the preview uses mapped
+street alignment, entrances, shop locations and building levels to estimate
+façade layouts. It gives Old Town tenements narrower window bays and New Town
+terraces taller principal-floor sashes. Mapped street-level businesses guide
+the position of shopfronts. The council's character appraisals describe the
+[Old Town](https://www.edinburgh.gov.uk/directory-record/1099435/old-town-conservation-area)
+and [New Town](https://www.edinburgh.gov.uk/directory-record/1099433/new-town-conservation-area).
+Photo-traced windows and shops are available in the separate Princes Street
+preview above.
+
+The citywide compiler uses the [City of Edinburgh Council Localities boundary](https://city-of-edinburgh-council-open-spatial-data-cityofedinburgh.hub.arcgis.com/datasets/cityofedinburgh::edinburgh-council-localities-1)
+and [Conservation Areas](https://city-of-edinburgh-council-open-spatial-data-cityofedinburgh.hub.arcgis.com/datasets/cityofedinburgh::conservation-areas)
+under OGL v3, [OpenStreetMap footprints](https://www.openstreetmap.org/copyright)
+from the 20 November 2026 Geofabrik Scotland snapshot under the ODbL, and
+[Scottish Phase 5 LiDAR](https://registry.opendata.aws/scottish-lidar/) under OGL v3.
+The geometry tiles generated from OpenStreetMap are available under the
+[Open Database License](https://opendatacommons.org/licenses/odbl/).
+
+Preview Edinburgh Castle from the
+[Esplanade](http://127.0.0.1:4181/?lat=55.94853&lng=-3.19907&aerialPreview=1&buildings=edinburgh&landmark=castle)
+or [Princes Street Gardens](http://127.0.0.1:4181/?lat=55.94887&lng=-3.20072&aerialPreview=1&buildings=edinburgh&landmark=castle-north).
+The castle geometry uses mapped wall lines and the Gatehouse footprint, with
+wall levels fitted to the 50 cm Scottish Phase 5 LiDAR. The arch, stonework
+and other architectural details are original interpretations of openly
+licensed exterior references. The geometry is baked into the standard
+building tiles. Castle Rock uses a procedural basalt finish on steep faces
+below the ramparts. It uses the 50 cm LiDAR and OpenStreetMap cliff and
+bare-rock outlines to blend into the surrounding aerial imagery. See the
+[castle source credits](public/data/edinburgh-buildings/castle-sources.txt).
+
+To rebuild the rock finish, place the Phase 5 50 cm NT27SW and NT27SE grids
+in a directory as `NT27SW-dtm.tif`, `NT27SW-dsm.tif`, `NT27SE-dtm.tif` and
+`NT27SE-dsm.tif`. Full grids and crops covering the preview bounds both work.
+
+```sh
+python3 scripts/build-castle-rock.py /path/to/lidar .cache/scotland-latest.osm.pbf public/data/edinburgh-buildings/castle-rock.webp
+```
+
+To rebuild, use a fresh staging directory when changing source files.
+The Python stage uses `osmium`, `shapely`, `rasterio`, `numpy` and `Pillow`.
+The compiler writes the manifest, three mesh levels and terrain tiles.
+Pass `--overview-only` or `--city-overview-only` after the output directory
+to regenerate that mesh level from the prepared area.
+
+```sh
+python3 scripts/prepare-edinburgh-buildings.py .cache/scotland-latest.osm.pbf /tmp/neuk-edinburgh-stage
+pnpm exec vite build --ssr scripts/build-edinburgh-meshes.ts --config scripts/edinburgh-build.vite.config.mjs --outDir /tmp/neuk-edinburgh-compiler
+node /tmp/neuk-edinburgh-compiler/build-edinburgh-meshes.js /tmp/neuk-edinburgh-stage /tmp/neuk-edinburgh-output
+```
+
+Place the completed output in `public/data/edinburgh-buildings/` before building
+the static export.
+
+Use `buildings=edinburgh-pilot` on the Grassmarket, Stockbridge or Leith links
+to compare the earlier browser-generated meshes. Regenerate those three
+survey grids with `python3 scripts/build-waverley-lidar.py --edinburgh-pilot`.
+
+Waverley Gate's façade texture is adapted from [Waverly Gate or Old GPO](https://commons.wikimedia.org/wiki/File:Waverly_Gate_or_Old_GPO.jpg)
+by SylviaStanley under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
 For a local visual catalogue, run `pnpm preview:parking-models`, then
 `python3 -m http.server 4190 --bind 127.0.0.1 --directory output/parking-model-gallery`.
 Open `http://127.0.0.1:4190/` to rotate every model, toggle covered and selected
