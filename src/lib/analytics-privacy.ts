@@ -102,6 +102,8 @@ const mapDiagnosticProperties = new Set([
   '$lib',
   '$lib_version',
   '$cookieless_mode',
+  // PostHog needs the browser user agent to compute the cookieless ID.
+  '$raw_user_agent',
   '$process_person_profile',
   'distinct_id',
   'token',

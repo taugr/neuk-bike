@@ -105,6 +105,7 @@ test.describe('map diagnostics', () => {
       is_test: true,
       $device: 'iPhone',
       $os: 'iOS',
+      $raw_user_agent: devices['iPhone 13'].userAgent,
     });
     expect(JSON.stringify(event)).not.toMatch(
       /55\.9533|-3\.1883|mockGps|private-fragment|utm_content|\$current_url|\$referrer|elevation-tiles-prod/,

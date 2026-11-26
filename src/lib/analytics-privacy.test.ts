@@ -23,6 +23,7 @@ describe('analytics privacy boundary', () => {
         $device: 'iPhone',
         $host: 'neuk.bike',
         $cookieless_mode: true,
+        $raw_user_agent: 'Mozilla/5.0 (iPhone)',
         $current_url: 'https://neuk.bike/?lat=55.95&lng=-3.19',
         $referrer: 'https://example.com/55.95,-3.19',
         utm_content: '55.95,-3.19',
@@ -35,6 +36,7 @@ describe('analytics privacy boundary', () => {
       $device: 'iPhone',
       $host: 'neuk.bike',
       $cookieless_mode: true,
+      $raw_user_agent: 'Mozilla/5.0 (iPhone)',
     });
   });
   it('drops location data, names, free text, nested data, and unknown fields', () => {
