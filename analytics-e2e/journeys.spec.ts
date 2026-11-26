@@ -1,5 +1,6 @@
 import { gunzipSync } from 'node:zlib';
-import { expect, test, type Page } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
+import { devices, expect, test, type Page } from '@playwright/test';
 import { installOfflineMapFixture } from '../e2e/offline-map-fixtures';
 
 type Event = { event: string; properties: Record<string, unknown> };
@@ -82,6 +83,114 @@ async function mockRouteServices(page: Page) {
 test.beforeEach(async ({ context, page }) => {
   await installOfflineMapFixture(context);
   await mockRouteServices(page);
+});
+
+test.describe('map diagnostics', () => {
+  test.use({
+    userAgent: devices['iPhone 13'].userAgent,
+    reducedMotion: 'reduce',
+  });
+
+  const terrainTiles = 'https://elevation-tiles-prod.s3.amazonaws.com/**';
+  const terrainFixture = fileURLToPath(
+    new URL('../e2e/fixtures/terrain.png', import.meta.url),
+  );
+  const appUrl =
+    '/?mockGps=55.9533,-3.1883,5&analyticsTest=1&utm_content=55.9533,-3.1883#private-fragment';
+
+  function expectPrivateDiagnostic(event: Event) {
+    expect(event.properties).toMatchObject({
+      app: 'neuk-bike',
+      analytics_schema_version: 2,
+      is_test: true,
+      $device: 'iPhone',
+      $os: 'iOS',
+    });
+    expect(JSON.stringify(event)).not.toMatch(
+      /55\.9533|-3\.1883|mockGps|private-fragment|utm_content|\$current_url|\$referrer|elevation-tiles-prod/,
+    );
+  }
+
+  test('reports one terrain failure and allows a successful retry', async ({
+    page,
+  }) => {
+    const events = await recordEvents(page);
+    await page.route(terrainTiles, (route) => route.abort());
+    await page.goto(appUrl);
+    await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+    await expect(
+      page.getByText('3D terrain unavailable.', { exact: false }),
+    ).toBeVisible();
+    const failures = () =>
+      events.filter(({ event }) => event === 'map_terrain_failed');
+    await expect.poll(() => failures().length, { timeout: 15_000 }).toBe(1);
+    const failure = failures()[0]!;
+    expect(failure.properties).toMatchObject({
+      reason: 'tile_error',
+      terrain_source: 'global',
+      terrain_ready: false,
+    });
+    expectPrivateDiagnostic(failure);
+
+    await page.unroute(terrainTiles);
+    await page.route(terrainTiles, (route) =>
+      route.fulfill({ contentType: 'image/png', path: terrainFixture }),
+    );
+    await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+    const map = page.getByTestId('parking-map');
+    await expect(map).toHaveAttribute('data-map-terrain', 'neuk-terrain');
+    await expect
+      .poll(async () => Number(await map.getAttribute('data-map-pitch')), {
+        timeout: 15_000,
+      })
+      .toBeCloseTo(55, 0);
+    expect(failures()).toHaveLength(1);
+  });
+
+  test('reports WebGL loss and restoration while 3D terrain is active', async ({
+    page,
+  }) => {
+    const events = await recordEvents(page);
+    await page.route(terrainTiles, (route) =>
+      route.fulfill({ contentType: 'image/png', path: terrainFixture }),
+    );
+    await page.goto(appUrl);
+    await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+    const map = page.getByTestId('parking-map');
+    await expect(map).toHaveAttribute('data-map-terrain', 'neuk-terrain');
+    await page.locator('.maplibregl-canvas').evaluate(async (element) => {
+      const canvas = element as HTMLCanvasElement;
+      const extension = canvas
+        .getContext('webgl2')!
+        .getExtension('WEBGL_lose_context')!;
+      await new Promise<void>((resolve) => {
+        canvas.addEventListener('webglcontextlost', () => resolve(), {
+          once: true,
+        });
+        extension.loseContext();
+      });
+      // The loss event must finish dispatching before restoration is allowed.
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise<void>((resolve) => {
+        canvas.addEventListener('webglcontextrestored', () => resolve(), {
+          once: true,
+        });
+        extension.restoreContext();
+      });
+    });
+    const changes = () =>
+      events.filter(({ event }) => event === 'map_webgl_context_changed');
+    await expect.poll(() => changes().length, { timeout: 15_000 }).toBe(2);
+    expect(changes().map(({ properties }) => properties.context_state)).toEqual(
+      ['lost', 'restored'],
+    );
+    for (const change of changes()) {
+      expect(change.properties.terrain_active).toBe(true);
+      expectPrivateDiagnostic(change);
+    }
+    await expect(map).toHaveAttribute('data-map-terrain', 'neuk-terrain');
+    await expect(page.locator('.parking-marker').first()).toBeVisible();
+  });
 });
 
 test('records explicit weather and wind switches without counting restored preferences', async ({

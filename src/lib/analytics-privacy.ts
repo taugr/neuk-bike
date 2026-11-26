@@ -22,6 +22,8 @@ const booleanProperties = new Set([
   'route_comparison_available',
   'started',
   'arrived',
+  'terrain_active',
+  'terrain_ready',
 ]);
 const values: Record<string, readonly string[]> = {
   source: [
@@ -59,6 +61,10 @@ const values: Record<string, readonly string[]> = {
     'user',
     'context_changed',
     'location_error',
+    'basemap_unavailable',
+    'tile_error',
+    'startup_timeout',
+    'setup_error',
   ],
   result_source: ['api', 'cache', 'short_route'],
   route_kind: ['planned', 'imported'],
@@ -70,10 +76,47 @@ const values: Record<string, readonly string[]> = {
   language: ['en', 'gd', 'es', 'hy'],
   sort_mode: ['nearest', 'best-match'],
   layer: ['national_cycle_network', 'drinking_water', 'weather', 'wind'],
+  terrain_source: ['lidar', 'global'],
+  context_state: ['lost', 'restored'],
 };
 const idProperties = new Set(['journey_id', 'attempt_id', 'ride_id']);
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const mapDiagnosticProperties = new Set([
+  'reason',
+  'terrain_source',
+  'terrain_ready',
+  'context_state',
+  'terrain_active',
+  'app',
+  'analytics_schema_version',
+  'is_test',
+  '$host',
+  '$device',
+  '$device_type',
+  '$browser',
+  '$browser_version',
+  '$os',
+  '$os_version',
+  '$lib',
+  '$lib_version',
+  '$cookieless_mode',
+  '$process_person_profile',
+  'distinct_id',
+  'token',
+]);
+
+/** Keep SDK transport and device fields while dropping URL and campaign data. */
+export function restrictMapDiagnosticProperties(
+  properties: Record<string, unknown>,
+) {
+  return Object.fromEntries(
+    Object.entries(properties).filter(([key]) =>
+      mapDiagnosticProperties.has(key),
+    ),
+  );
+}
 
 /** Only bounded, explicitly understood custom properties leave the browser. */
 export function sanitizeAnalyticsProperties(

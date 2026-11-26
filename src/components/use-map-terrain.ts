@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Map, ErrorEvent, MapSourceDataEvent } from 'maplibre-gl';
+import { captureAnalyticsEvent } from '@/lib/analytics';
 import { lidarTerrainSourceId } from '@/lib/waverley-lidar';
 import { isLocalAerialPreview } from '@/lib/local-aerial-preview';
 import {
@@ -11,6 +12,13 @@ import {
   terrainSourceId,
   terrainStorageKey,
 } from '@/lib/map-terrain';
+
+type TerrainFailureReason =
+  | 'offline'
+  | 'basemap_unavailable'
+  | 'tile_error'
+  | 'startup_timeout'
+  | 'setup_error';
 
 export function useMapTerrain(
   map: Map | null,
@@ -39,20 +47,28 @@ export function useMapTerrain(
     if (!map || !ready) return;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let failed = false;
+    let terrainReady = false;
     const activeSourceId = lidar ? lidarTerrainSourceId : terrainSourceId;
     let cancelTransition: (() => void) | undefined;
     let stopStabilizingPan: (() => void) | undefined;
-    const fail = () => {
+    const fail = (reason: TerrainFailureReason) => {
       if (failed) return;
       failed = true;
       clearTimeout(timeout);
       setUnavailable(true);
       setEnabled(false);
+      captureAnalyticsEvent('map_terrain_failed', {
+        reason,
+        terrain_source: lidar ? 'lidar' : 'global',
+        terrain_ready: terrainReady,
+      });
     };
+    const onOffline = () => fail('offline');
     const onError = (event: ErrorEvent) => {
       const sourceId = 'sourceId' in event ? event.sourceId : undefined;
       const url = 'url' in event.error ? String(event.error.url) : '';
-      if (sourceId === activeSourceId || url.startsWith(terrainOrigin)) fail();
+      if (sourceId === activeSourceId || url.startsWith(terrainOrigin))
+        fail('tile_error');
     };
     const onSourceData = (event: MapSourceDataEvent) => {
       if (
@@ -71,19 +87,21 @@ export function useMapTerrain(
         // This deadline applies only to the first usable terrain. A later
         // pan may briefly make the source unready while new tiles stream.
         clearTimeout(timeout);
+        terrainReady = true;
         setLoaded(true);
         map.off('render', onRender);
       }
     };
     const active = enabled && !offlineBasemap && navigator.onLine;
-    if (enabled && !active) fail();
+    if (enabled && !active)
+      fail(navigator.onLine ? 'basemap_unavailable' : 'offline');
     if (active) {
       map.on('error', onError);
       map.on('sourcedata', onSourceData);
       map.on('render', onRender);
-      window.addEventListener('offline', fail);
+      window.addEventListener('offline', onOffline);
       timeout = setTimeout(() => {
-        if (!map.isSourceLoaded(activeSourceId)) fail();
+        if (!map.isSourceLoaded(activeSourceId)) fail('startup_timeout');
       }, 15_000);
     }
     try {
@@ -105,7 +123,7 @@ export function useMapTerrain(
         stopStabilizingPan = stabilizeTerrainPan(map, reducedMotion);
       }
     } catch {
-      if (active) fail();
+      if (active) fail('setup_error');
     }
     return () => {
       clearTimeout(timeout);
@@ -114,7 +132,7 @@ export function useMapTerrain(
       map.off('error', onError);
       map.off('sourcedata', onSourceData);
       map.off('render', onRender);
-      window.removeEventListener('offline', fail);
+      window.removeEventListener('offline', onOffline);
     };
   }, [
     map,

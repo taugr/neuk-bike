@@ -5,6 +5,7 @@ import { useUnits } from '@/components/units-provider';
 
 import { improveDarkMapReadability } from '@/lib/map-readability';
 import { createMapRecovery } from '@/lib/map-recovery';
+import { captureAnalyticsEvent } from '@/lib/analytics';
 import { parkingRevealBearing } from '@/lib/map-building-occlusion';
 import { isNearEdinburghBuildings } from '@/lib/edinburgh-building-area';
 import { useMapTerrain } from '@/components/use-map-terrain';
@@ -2473,6 +2474,7 @@ export default function CycleParkingMap({
       }
 
       let contextInvalid = false;
+      let terrainActiveAtContextLoss = false;
       const mapInstance = new maplibregl.Map({
         attributionControl: false,
         bearing: savedCameraRef.current?.bearing ?? 0,
@@ -2575,8 +2577,10 @@ export default function CycleParkingMap({
         setStyleRevision((revision) => revision + 1);
         if (initiallyLoaded) handleMapReady();
       });
-      mapInstance.on('webglcontextlost', () => {
+      mapInstance.on('webglcontextlost', ({ originalEvent }) => {
+        if (contextInvalid || isDisposed) return;
         contextInvalid = true;
+        terrainActiveAtContextLoss = mapInstance.getTerrain() !== null;
         const center = mapInstance.getCenter();
         recoveryCameraRef.current ??= {
           center: [center.lng, center.lat],
@@ -2589,12 +2593,25 @@ export default function CycleParkingMap({
         setIsMapStyleLoaded(false);
         setRenderedModelFeatureCount(0);
         setRenderedBasemapFeatureCount(0);
+        // MapLibre also emits synthetic context events on worker restarts.
+        if (originalEvent.isTrusted) {
+          captureAnalyticsEvent('map_webgl_context_changed', {
+            context_state: 'lost',
+            terrain_active: terrainActiveAtContextLoss,
+          });
+        }
       });
-      mapInstance.on('webglcontextrestored', () => {
+      mapInstance.on('webglcontextrestored', ({ originalEvent }) => {
         // Reusing a restored context can mix raster tiles with sprite/glyph
         // textures. A fresh Map owns fresh GPU resources; finder state stays.
-        if (contextInvalid && !isDisposed)
-          setMapGeneration((generation) => generation + 1);
+        if (!contextInvalid || isDisposed) return;
+        setMapGeneration((generation) => generation + 1);
+        if (originalEvent.isTrusted) {
+          captureAnalyticsEvent('map_webgl_context_changed', {
+            context_state: 'restored',
+            terrain_active: terrainActiveAtContextLoss,
+          });
+        }
       });
       mapInstance.on('error', (event) => {
         if (contextInvalid || isDisposed) return;

@@ -55,6 +55,22 @@ refreshing a forecast does not emit a switch event. These events measure control
 use, not whether a forecast successfully loaded or a weather effect rendered.
 No forecast values, map bounds or location data accompany them.
 
+## Map diagnostics
+
+- `map_terrain_failed` records a fallback to 2D. The `reason` is `offline`,
+  `basemap_unavailable`, `tile_error`, `startup_timeout` or `setup_error`.
+  `terrain_source` identifies `lidar` or `global` elevation, and `terrain_ready`
+  records whether terrain had rendered during that load attempt.
+- `map_webgl_context_changed` records browser WebGL signals with
+  `context_state=lost` or `restored`.
+  `terrain_active` describes whether terrain was attached when the context was
+  lost. Restoration records the browser signal that starts a map rebuild.
+
+Filter both events by `$device=iPhone` and use `$os_version` and `$browser`
+to compare device environments. The payload keeps bounded diagnostics, browser
+and device fields, and required SDK metadata. It omits coordinates, URLs, tile
+addresses, campaign values and raw error text.
+
 ## Weekly report contract
 
 Use a half-open seven-day window ending Friday 17:00 Asia/Yerevan (13:00 UTC),

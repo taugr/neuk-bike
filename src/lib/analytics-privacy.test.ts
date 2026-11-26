@@ -1,10 +1,42 @@
 import { describe, expect, it } from 'vitest';
 import {
   redactAnalyticsUrl,
+  restrictMapDiagnosticProperties,
   sanitizeAnalyticsProperties,
 } from '@/lib/analytics-privacy';
 
 describe('analytics privacy boundary', () => {
+  it('keeps bounded map diagnostics and device fields without SDK location metadata', () => {
+    const customProperties = sanitizeAnalyticsProperties({
+      reason: 'tile_error',
+      terrain_source: 'lidar',
+      terrain_ready: false,
+      terrain_active: 'false',
+      context_state: 'raw error with coordinates',
+      position: [55.95, -3.19],
+      tile_url: 'https://tiles.example/12/2011/1276',
+    });
+    expect(
+      restrictMapDiagnosticProperties({
+        ...customProperties,
+        token: 'test-key',
+        $device: 'iPhone',
+        $host: 'neuk.bike',
+        $cookieless_mode: true,
+        $current_url: 'https://neuk.bike/?lat=55.95&lng=-3.19',
+        $referrer: 'https://example.com/55.95,-3.19',
+        utm_content: '55.95,-3.19',
+      }),
+    ).toEqual({
+      reason: 'tile_error',
+      terrain_source: 'lidar',
+      terrain_ready: false,
+      token: 'test-key',
+      $device: 'iPhone',
+      $host: 'neuk.bike',
+      $cookieless_mode: true,
+    });
+  });
   it('drops location data, names, free text, nested data, and unknown fields', () => {
     expect(
       sanitizeAnalyticsProperties({

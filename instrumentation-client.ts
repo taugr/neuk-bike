@@ -1,6 +1,9 @@
 import posthog from 'posthog-js';
 import { isAnalyticsEnabled, isAnalyticsTestTraffic } from '@/lib/analytics';
-import { redactAnalyticsUrl } from '@/lib/analytics-privacy';
+import {
+  redactAnalyticsUrl,
+  restrictMapDiagnosticProperties,
+} from '@/lib/analytics-privacy';
 
 const urlPropertyNames = [
   '$current_url',
@@ -18,7 +21,7 @@ if (isAnalyticsEnabled()) {
     autocapture: false,
     person_profiles: 'never',
     disable_session_recording: true,
-    // Route failures are measured with bounded reason codes. Arbitrary error
+    // Handled failures are measured with bounded reason codes. Arbitrary error
     // messages/stack URLs can contain location-bearing request data.
     capture_exceptions: false,
     before_send: (event) => {
@@ -27,6 +30,18 @@ if (isAnalyticsEnabled()) {
       }
       if (event.event === '$exception') return null;
       event.properties.is_test = isAnalyticsTestTraffic();
+
+      if (
+        event.event === 'map_terrain_failed' ||
+        event.event === 'map_webgl_context_changed'
+      ) {
+        return {
+          event: event.event,
+          timestamp: event.timestamp,
+          uuid: event.uuid,
+          properties: restrictMapDiagnosticProperties(event.properties),
+        };
+      }
 
       for (const propertyName of urlPropertyNames) {
         if (event.properties?.[propertyName]) {
