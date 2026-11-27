@@ -1,9 +1,11 @@
 import posthog from 'posthog-js';
 import { isAnalyticsEnabled, isAnalyticsTestTraffic } from '@/lib/analytics';
 import {
+  mapDiagnosticEvents,
   redactAnalyticsUrl,
   restrictMapDiagnosticProperties,
 } from '@/lib/analytics-privacy';
+import { installMapDiagnostics } from '@/lib/map-diagnostics';
 
 const urlPropertyNames = [
   '$current_url',
@@ -31,10 +33,7 @@ if (isAnalyticsEnabled()) {
       if (event.event === '$exception') return null;
       event.properties.is_test = isAnalyticsTestTraffic();
 
-      if (
-        event.event === 'map_terrain_failed' ||
-        event.event === 'map_webgl_context_changed'
-      ) {
+      if (mapDiagnosticEvents.has(event.event)) {
         return {
           event: event.event,
           timestamp: event.timestamp,
@@ -54,4 +53,5 @@ if (isAnalyticsEnabled()) {
       return event;
     },
   });
+  if (window.location.pathname === '/') installMapDiagnostics();
 }

@@ -103,4 +103,31 @@ describe('analytics enablement', () => {
       is_test: true,
     });
   });
+
+  it('sends crash diagnostics promptly with bounded properties', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_KEY', 'phc_test');
+    vi.stubGlobal('window', {
+      location: { hostname: 'neuk.bike', search: '?analyticsTest=1' },
+    });
+    captureAnalyticsEvent('map_page_error', {
+      map_phase: 'recovering',
+      terrain_active: true,
+      reason: 'unhandled_rejection',
+      error: 'private error URL',
+      latitude: 55.95,
+    });
+    expect(posthogCapture).toHaveBeenCalledWith(
+      'map_page_error',
+      {
+        map_phase: 'recovering',
+        terrain_active: true,
+        reason: 'unhandled_rejection',
+        app: 'neuk-bike',
+        analytics_schema_version: 2,
+        is_test: true,
+      },
+      { send_instantly: true },
+    );
+  });
 });

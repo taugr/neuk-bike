@@ -1,5 +1,8 @@
 import posthog from 'posthog-js';
-import { sanitizeAnalyticsProperties } from '@/lib/analytics-privacy';
+import {
+  mapDiagnosticEvents,
+  sanitizeAnalyticsProperties,
+} from '@/lib/analytics-privacy';
 
 type AnalyticsRuntime = {
   forceEnable?: string;
@@ -62,10 +65,15 @@ export function captureAnalyticsEvent(
     return;
   }
 
-  posthog.capture(eventName, {
+  const payload = {
     ...sanitizeAnalyticsProperties(properties),
     app: 'neuk-bike',
     analytics_schema_version: 2,
     is_test: isAnalyticsTestTraffic(),
-  });
+  };
+  if (mapDiagnosticEvents.has(eventName)) {
+    posthog.capture(eventName, payload, { send_instantly: true });
+    return;
+  }
+  posthog.capture(eventName, payload);
 }

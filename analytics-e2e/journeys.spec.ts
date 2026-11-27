@@ -112,6 +112,128 @@ test.describe('map diagnostics', () => {
     );
   }
 
+  test('reports bounded page errors once per kind', async ({ page }) => {
+    const events = await recordEvents(page);
+    await page.goto(appUrl);
+    await expect(page.getByTestId('parking-map')).toHaveAttribute(
+      'data-map-initializing',
+      'false',
+    );
+    await page.evaluate(() => {
+      for (let index = 0; index < 2; index++) {
+        setTimeout(() => {
+          throw new Error('https://example.com/?lat=55.9533');
+        }, 0);
+        setTimeout(() => {
+          void Promise.reject(new Error('https://example.com/?lng=-3.1883'));
+        }, 0);
+      }
+    });
+    const errors = () =>
+      events.filter(({ event }) => event === 'map_page_error');
+    await expect.poll(() => errors().length).toBe(2);
+    expect(
+      errors()
+        .map(({ properties }) => properties.reason)
+        .sort(),
+    ).toEqual(['runtime_error', 'unhandled_rejection']);
+    for (const error of errors()) {
+      expect(error.properties).toMatchObject({
+        map_phase: 'ready',
+        terrain_active: false,
+      });
+      expect(JSON.stringify(error)).not.toContain('example.com');
+      expectPrivateDiagnostic(error);
+    }
+  });
+
+  test('reports a foreground startup stall only once', async ({ page }) => {
+    const events = await recordEvents(page);
+    let releaseStyle: () => void = () => {};
+    const styleReady = new Promise<void>((resolve) => {
+      releaseStyle = resolve;
+    });
+    const requestedStyle = page.waitForRequest(
+      'https://tiles.openfreemap.org/styles/liberty',
+    );
+    await page.route(
+      'https://tiles.openfreemap.org/styles/liberty',
+      async (route) => {
+        await styleReady;
+        await route.fallback();
+      },
+    );
+    try {
+      await page.clock.install();
+      await page.goto(appUrl);
+      await requestedStyle;
+      await page.clock.fastForward(21_000);
+      const stalls = () =>
+        events.filter(({ event }) => event === 'map_render_stalled');
+      await expect.poll(() => stalls().length).toBe(1);
+      await page.clock.fastForward(21_000);
+      expect(stalls()).toHaveLength(1);
+      expect(stalls()[0]!.properties).toMatchObject({
+        map_phase: 'starting',
+        terrain_active: false,
+      });
+      expectPrivateDiagnostic(stalls()[0]!);
+    } finally {
+      releaseStyle();
+    }
+  });
+
+  test('reports a recent unfinished reload without counting a clean reload', async ({
+    page,
+  }) => {
+    const events = await recordEvents(page);
+    await page.goto(appUrl);
+    await expect(page.getByTestId('parking-map')).toHaveAttribute(
+      'data-map-initializing',
+      'false',
+    );
+    await page.evaluate(() => {
+      // Restore the previous foreground marker after the app's clean-exit listener.
+      window.addEventListener(
+        'pagehide',
+        () => {
+          sessionStorage.setItem(
+            'bike-neuk-map-diagnostics-v1',
+            JSON.stringify({
+              checkedAt: Date.now(),
+              isTest: true,
+              map_phase: 'recovering',
+              terrain_active: true,
+              coordinates: [55.9533, -3.1883],
+            }),
+          );
+        },
+        { once: true },
+      );
+    });
+    await page.reload();
+    const interruptions = () =>
+      events.filter(({ event }) => event === 'map_session_interrupted');
+    await expect.poll(() => interruptions().length).toBe(1);
+    expect(interruptions()[0]!.properties).toMatchObject({
+      reason: 'unclean_reload',
+      map_phase: 'recovering',
+      terrain_active: true,
+    });
+    expectPrivateDiagnostic(interruptions()[0]!);
+    await expect(page.getByTestId('parking-map')).toHaveAttribute(
+      'data-map-initializing',
+      'false',
+    );
+    await page.reload();
+    await expect
+      .poll(() => events.filter(({ event }) => event === '$pageview').length, {
+        timeout: 15_000,
+      })
+      .toBe(3);
+    expect(interruptions()).toHaveLength(1);
+  });
+
   test('reports one terrain failure and allows a successful retry', async ({
     page,
   }) => {

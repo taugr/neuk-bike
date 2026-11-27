@@ -65,11 +65,25 @@ No forecast values, map bounds or location data accompany them.
   `context_state=lost` or `restored`.
   `terrain_active` describes whether terrain was attached when the context was
   lost. Restoration records the browser signal that starts a map rebuild.
+- `map_page_error` records the first uncaught JavaScript error and the first
+  unhandled promise rejection per page. It sends the reason code, map phase,
+  and whether 3D was enabled.
+- `map_render_stalled` records 20 continuous foreground seconds waiting for
+  the map to start or recover. It reports once per loading phase.
+- `map_session_interrupted` records a reload with a recent unfinished map
+  session or a browser-reported discard. A tab-local marker holds the last
+  phase, 3D state, timestamp, and test flag for up to five minutes. The
+  timestamp stays in the browser. Normal page exits clear the marker.
+  An unfinished session is evidence of a possible interruption.
 
 Filter both events by `$device=iPhone` and use `$os_version` and `$browser`
 to compare device environments. The payload keeps bounded diagnostics, browser
 and device fields, and required SDK metadata. It omits coordinates, URLs, tile
 addresses, campaign values and raw error text.
+
+These events do not measure memory or detect every blank frame. If the browser
+stops the page, reporting can resume on a supported reload only if the tab's
+marker survives.
 
 ## Weekly report contract
 

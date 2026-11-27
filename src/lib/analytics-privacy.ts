@@ -65,6 +65,10 @@ const values: Record<string, readonly string[]> = {
     'tile_error',
     'startup_timeout',
     'setup_error',
+    'runtime_error',
+    'unhandled_rejection',
+    'browser_discarded',
+    'unclean_reload',
   ],
   result_source: ['api', 'cache', 'short_route'],
   route_kind: ['planned', 'imported'],
@@ -78,6 +82,7 @@ const values: Record<string, readonly string[]> = {
   layer: ['national_cycle_network', 'drinking_water', 'weather', 'wind'],
   terrain_source: ['lidar', 'global'],
   context_state: ['lost', 'restored'],
+  map_phase: ['starting', 'ready', 'recovering'],
 };
 const idProperties = new Set(['journey_id', 'attempt_id', 'ride_id']);
 const uuidPattern =
@@ -88,6 +93,7 @@ const mapDiagnosticProperties = new Set([
   'terrain_source',
   'terrain_ready',
   'context_state',
+  'map_phase',
   'terrain_active',
   'app',
   'analytics_schema_version',
@@ -107,6 +113,14 @@ const mapDiagnosticProperties = new Set([
   '$process_person_profile',
   'distinct_id',
   'token',
+]);
+
+export const mapDiagnosticEvents = new Set([
+  'map_terrain_failed',
+  'map_webgl_context_changed',
+  'map_page_error',
+  'map_render_stalled',
+  'map_session_interrupted',
 ]);
 
 /** Keep SDK transport and device fields while dropping URL and campaign data. */

@@ -6,6 +6,7 @@ import { useUnits } from '@/components/units-provider';
 import { improveDarkMapReadability } from '@/lib/map-readability';
 import { createMapRecovery } from '@/lib/map-recovery';
 import { captureAnalyticsEvent } from '@/lib/analytics';
+import { setMapDiagnosticState } from '@/lib/map-diagnostics';
 import { parkingRevealBearing } from '@/lib/map-building-occlusion';
 import { isNearEdinburghBuildings } from '@/lib/edinburgh-building-area';
 import { useMapTerrain } from '@/components/use-map-terrain';
@@ -2164,6 +2165,13 @@ export default function CycleParkingMap({
     (!isSatelliteVisible || satelliteLoaded) &&
     (!terrain.enabled || terrain.loaded);
   const isInitializing = !hasPresentedMap && !isInitialViewReady;
+  useEffect(() => {
+    const loadingPhase = recoveryCameraRef.current ? 'recovering' : 'starting';
+    setMapDiagnosticState(
+      isInitializing ? loadingPhase : 'ready',
+      terrain.enabled,
+    );
+  }, [isInitializing, terrain.enabled]);
   useEffect(() => {
     if (!isInitialViewReady || !map) return;
     const camera = recoveryCameraRef.current;
