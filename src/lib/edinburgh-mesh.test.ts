@@ -136,6 +136,10 @@ it.each([edinburghOverviewZoom, edinburghCityOverviewZoom])(
       new Uint8Array(mesh),
     );
     const overview = decodeEdinburghOverview(bytes, x, y, zoom);
+    expect(overview.roofEnds.buffer).not.toBe(bytes);
+    expect(overview.wallEnds.buffer.byteLength).toBe(
+      edinburghOverviewHeaderBytes,
+    );
     expect(overview.mesh.roofs.vertices[0]).toBe(vertex[0]);
     expect(edinburghOverviewRanges(overview.roofEnds, 0)).toEqual([
       { first: 0, count: 9 },

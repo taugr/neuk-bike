@@ -28,6 +28,37 @@ test.beforeEach(async ({ context }) => {
   );
 });
 
+test.describe('touch rendering budget', () => {
+  test.use({
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    viewport: { width: 390, height: 844 },
+  });
+
+  test('limits the phone canvas to 2x and retains the terrain and parking', async ({
+    page,
+  }) => {
+    await page.goto(appUrl);
+    await page.getByRole('button', { name: 'Switch to 3D map' }).click();
+    const map = page.getByTestId('parking-map');
+    await expectPitch(map, 55);
+    await expect(map).toHaveAttribute('data-map-terrain', 'neuk-terrain');
+    const sizes = await map
+      .locator('canvas.maplibregl-canvas')
+      .evaluate((element) => {
+        const canvas = element as HTMLCanvasElement;
+        return {
+          renderWidth: canvas.width,
+          displayWidth: canvas.clientWidth,
+          deviceRatio: window.devicePixelRatio,
+        };
+      });
+    expect(sizes.deviceRatio).toBe(3);
+    expect(sizes.renderWidth).toBe(2 * sizes.displayWidth);
+    await expect(page.locator('.parking-marker').first()).toBeVisible();
+  });
+});
+
 test('selecting a neuk behind an Edinburgh building turns to a clear bearing in one transition', async ({
   page,
 }) => {

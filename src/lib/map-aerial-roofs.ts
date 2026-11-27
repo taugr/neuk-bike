@@ -109,6 +109,8 @@ const citySurfaceNames = ['roofs', 'walls', 'outlines'] as const;
 type CitySurface = (typeof citySurfaceNames)[number];
 const cityMeshCacheBytes = 160 * 1024 * 1024;
 const overviewMeshCacheBytes = 96 * 1024 * 1024;
+const compactCityMeshCacheBytes = 48 * 1024 * 1024;
+const compactOverviewMeshCacheBytes = 24 * 1024 * 1024;
 const cityRefreshIntervalMs = 120;
 const overviewArrivalMs = 220;
 const overviewPreloadZoom = edinburghOverviewFullZoom - 0.25;
@@ -446,7 +448,7 @@ class AerialRoofs implements CustomLayerInterface {
   private cityOverviewMeshes = new Map<string, EdinburghOverviewMesh>();
   private overviewDraw = new Map<EdinburghMesh, OverviewDraw>();
   private cityGpuMeshes = new Map<EdinburghMesh, CityMeshBuffers>();
-  private cityRequests = new Set<string>();
+  private cityRequests = new Map<string, AbortController>();
   private cityMissing = new Set<string>();
   private overviewMissing = new Set<string>();
   private cityOverviewMissing = new Set<string>();
@@ -466,6 +468,7 @@ class AerialRoofs implements CustomLayerInterface {
     private readonly edinburghCity: boolean,
     private readonly registeredRoofMode?: PrincesStreetRoofPhotoMode,
   ) {}
+  private readonly compact = window.matchMedia('(pointer: coarse)').matches;
   private dirty = true;
 
   onAdd(map: LibreMap, gl: WebGL2RenderingContext) {
@@ -650,17 +653,22 @@ class AerialRoofs implements CustomLayerInterface {
     load: (key: string, signal: AbortSignal) => Promise<T>,
     parallelLimit = 6,
   ) {
-    let inFlight = [...this.cityRequests].filter((key) =>
+    let inFlight = [...this.cityRequests.keys()].filter((key) =>
       key.startsWith(`${type}/`),
     ).length;
     for (const key of keys) {
-      if (this.cityRequests.size >= 6 || inFlight >= parallelLimit) break;
+      if (
+        this.cityRequests.size >= (this.compact ? 3 : 6) ||
+        inFlight >= parallelLimit
+      )
+        break;
       const request = `${type}/${key}`;
       if (cache.has(key) || missing.has(key) || this.cityRequests.has(request))
         continue;
-      this.cityRequests.add(request);
+      const controller = new AbortController();
+      this.cityRequests.set(request, controller);
       inFlight++;
-      const { signal } = this.surveyRequest;
+      const { signal } = controller;
       void load(key, signal)
         .then((mesh) => {
           if (!signal.aborted) cache.set(key, mesh);
@@ -674,11 +682,19 @@ class AerialRoofs implements CustomLayerInterface {
           );
         })
         .finally(() => {
+          if (this.cityRequests.get(request) !== controller) return;
           this.cityRequests.delete(request);
-          if (signal.aborted) return;
           this.invalidate();
           this.map.triggerRepaint();
         });
+    }
+  }
+
+  private cancelCityRequests(wanted?: ReadonlySet<string>) {
+    for (const [key, controller] of this.cityRequests) {
+      if (wanted?.has(key)) continue;
+      this.cityRequests.delete(key);
+      controller.abort();
     }
   }
 
@@ -744,8 +760,11 @@ class AerialRoofs implements CustomLayerInterface {
       (bytes, { mesh }) => bytes + edinburghMeshBytes(mesh),
       0,
     );
+    const limit = this.compact
+      ? compactOverviewMeshCacheBytes
+      : overviewMeshCacheBytes;
     for (const [key, { mesh }] of cache) {
-      if (remaining <= overviewMeshCacheBytes) break;
+      if (remaining <= limit) break;
       if (keep.includes(key)) continue;
       cache.delete(key);
       remaining -= edinburghMeshBytes(mesh);
@@ -803,13 +822,21 @@ class AerialRoofs implements CustomLayerInterface {
     const nearest = wantsDetail
       ? edinburghMeshViewport(bounds, center, cityIndex.tiles, 0)
       : undefined;
+    const detailRequests = requested?.tiles ?? [];
+    this.cancelCityRequests(
+      new Set([
+        ...cityKeys.map((key) => `city-overview/${key}`),
+        ...preloadOverview.map((key) => `overview/${key}`),
+        ...detailRequests.map((key) => `detail/${key}`),
+      ]),
+    );
     this.requestCityTiles(
       cityKeys,
       this.cityOverviewMeshes,
       this.cityOverviewMissing,
       'city-overview',
       loadEdinburghCityOverviewMesh,
-      2,
+      this.compact && wantsDetail ? 1 : 2,
     );
     this.requestCityTiles(
       preloadOverview,
@@ -817,10 +844,10 @@ class AerialRoofs implements CustomLayerInterface {
       this.overviewMissing,
       'overview',
       loadEdinburghOverviewMesh,
-      wantsDetail ? 3 : cityKeys.length ? 4 : 6,
+      wantsDetail ? (this.compact ? 1 : 3) : cityKeys.length ? 4 : 6,
     );
     this.requestCityTiles(
-      requested?.tiles ?? [],
+      detailRequests,
       this.cityMeshes,
       this.cityMissing,
       'detail',
@@ -890,8 +917,13 @@ class AerialRoofs implements CustomLayerInterface {
       (bytes, mesh) => bytes + edinburghMeshBytes(mesh),
       0,
     );
+    const detailLimit = this.compact
+      ? compactCityMeshCacheBytes
+      : cityMeshCacheBytes;
+    const detailTileLimit = this.compact ? 18 : 60;
     for (const [key, mesh] of this.cityMeshes) {
-      if (this.cityMeshes.size <= 60 && cacheBytes <= cityMeshCacheBytes) break;
+      if (this.cityMeshes.size <= detailTileLimit && cacheBytes <= detailLimit)
+        break;
       if (requested?.tiles.includes(key) || view?.tiles.includes(key)) continue;
       this.cityMeshes.delete(key);
       cacheBytes -= edinburghMeshBytes(mesh);
@@ -2018,6 +2050,7 @@ class AerialRoofs implements CustomLayerInterface {
     this.removeBuildingSightlines?.();
     this.imagery.abort();
     this.surveyRequest.abort();
+    this.cancelCityRequests();
     this.setMaterialsActive(false);
     delete map.getContainer().dataset.mapLidarBuildings;
     delete map.getContainer().dataset.mapDetailedLidarBuildings;
@@ -2061,6 +2094,18 @@ class AerialRoofs implements CustomLayerInterface {
     gl.deleteVertexArray(this.vao);
     gl.deleteTexture(this.fallbackTexture);
     gl.deleteProgram(this.program);
+    this.pendingCityMeshes = undefined;
+    this.pendingSurfaces = null;
+    this.cityMeshes.clear();
+    this.overviewMeshes.clear();
+    this.cityOverviewMeshes.clear();
+    this.overviewDraw.clear();
+    this.cityGpuMeshes.clear();
+    this.batches.clear();
+    this.materialRoofs.clear();
+    this.pendingImages.clear();
+    this.textures.clear();
+    this.pilotTiles.clear();
   }
 }
 

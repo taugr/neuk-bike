@@ -2483,6 +2483,7 @@ export default function CycleParkingMap({
 
       let contextInvalid = false;
       let terrainActiveAtContextLoss = false;
+      const compact = window.matchMedia('(pointer: coarse)').matches;
       const mapInstance = new maplibregl.Map({
         attributionControl: false,
         bearing: savedCameraRef.current?.bearing ?? 0,
@@ -2491,6 +2492,12 @@ export default function CycleParkingMap({
           (offlineBasemap || !navigator.onLine ? 0 : terrainPitchRef.current),
         maxPitch: 60,
         canvasContextAttributes: { antialias: true },
+        ...(compact
+          ? {
+              // Terrain allocates render targets in physical pixels.
+              pixelRatio: Math.min(window.devicePixelRatio, 2),
+            }
+          : {}),
         center: savedCameraRef.current?.center ?? toLngLat(defaultCenter),
         container,
         dragRotate: true,

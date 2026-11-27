@@ -34,7 +34,12 @@ export function decodeEdinburghOverview(
     zoom,
     edinburghOverviewHeaderBytes,
   );
-  const ends = new Uint32Array(bytes, 0, edinburghOverviewChildCount * 2);
+  // Keep the small lookup tables without retaining the decompressed mesh.
+  const ends = new Uint32Array(
+    bytes,
+    0,
+    edinburghOverviewChildCount * 2,
+  ).slice();
   const roofEnds = ends.subarray(0, edinburghOverviewChildCount);
   const wallEnds = ends.subarray(edinburghOverviewChildCount);
   const valid = (offsets: Uint32Array, count: number) =>
